@@ -1,9 +1,9 @@
 import * as React from 'react';
 
-export class Tile extends React.Component<ITileProps, ITileState> {
+export class Tile<State> extends React.Component<ITileProps, State> {
     protected image:string;
 
-    public constructor(props:ITileProps, state: ITileState) {
+    public constructor(props:ITileProps, state: State) {
         super(props, state);
     }
 
@@ -15,8 +15,4 @@ export class Tile extends React.Component<ITileProps, ITileState> {
 export interface ITileProps {
     left: number;
     top: number;
-}
-
-export interface ITileState {
-    randomState: null;
 }

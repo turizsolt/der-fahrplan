@@ -1,8 +1,8 @@
-import {ITileProps, ITileState, Tile } from './Tile';
+import {ITileProps, Tile } from './Tile';
 
-export class Platform extends Tile {
+export class Platform extends Tile<{}> {
 
-    public constructor(props:ITileProps, state:ITileState) {
+    public constructor(props:ITileProps, state:{}) {
         super(props, state);
 
         this.image = "tiles/platform.svg";
