@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Engine } from './Tiles/Engine';
+import { PassengerCar } from './Tiles/PassengerCar';
 import { Platform } from './Tiles/Platform';
 import { Track } from './Tiles/Track';
 
@@ -17,6 +18,8 @@ const tileList = [
     {type: "Platform", position: [1, 2]},
     {type: "Platform", position: [1, 4]},
     {type: "Platform", position: [1, 6]},
+    {type: "PassengerCar", position: [2, 2]},
+    {type: "PassengerCar", position: [2, 4]},
     {type: "DieselEngine", position: [2, 6]},
 ];
 
@@ -31,6 +34,7 @@ export class Land extends React.Component<any, any> {
                             {tile.type === "Track" && <Track top={tile.position[0]*30} left={tile.position[1]*30} />}
                             {tile.type === "Platform" && <Platform top={tile.position[0]*30} left={tile.position[1]*30} />}
                             {tile.type === "DieselEngine" && <Engine top={tile.position[0]*30} left={tile.position[1]*30} />}
+                            {tile.type === "PassengerCar" && <PassengerCar top={tile.position[0]*30} left={tile.position[1]*30} />}
                         </>
                     ))
                 }
