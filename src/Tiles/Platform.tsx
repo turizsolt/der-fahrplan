@@ -1,10 +1,10 @@
 import {ITileProps, ITileState, Tile } from './Tile';
 
-export class Track extends Tile {
+export class Platform extends Tile {
 
     public constructor(props:ITileProps, state:ITileState) {
         super(props, state);
 
-        this.image = "tiles/track-line.svg";
+        this.image = "tiles/platform.svg";
     }
 }

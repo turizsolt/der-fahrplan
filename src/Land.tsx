@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Platform } from './Tiles/Platform';
 import { Track } from './Tiles/Track';
 
 const tileList = [
@@ -17,7 +18,10 @@ export class Land extends React.Component<any, any> {
             <div style={{position: "absolute"}}>
                 {
                     tileList.map((tile: any) => (
-                        <Track top={tile.position[0]*30} left={tile.position[1]*30} />
+                        <>
+                            {tile.type === "Track" && <Track top={tile.position[0]*30} left={tile.position[1]*30} />}
+                            {tile.type === "Platform" && <Platform top={tile.position[0]*30} left={tile.position[1]*30} />}
+                        </>
                     ))
                 }
             </div>
