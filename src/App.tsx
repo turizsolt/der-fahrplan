@@ -1,15 +1,12 @@
 import * as React from 'react';
 import './App.css';
-import { Track } from './Tiles/Track';
+import { Land } from './Land';
 
 class App extends React.Component {
   public render() {
     return (
       <div className="App">
-        <Track />
-        <Track />
-        <Track />
-        <Track />
+        <Land />
       </div>
     );
   }
