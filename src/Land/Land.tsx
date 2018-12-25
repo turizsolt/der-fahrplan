@@ -11,40 +11,45 @@ export class Land extends React.Component<any, any> {
         super(props, state);
 
         this.onEngineClicked = this.onEngineClicked.bind(this);
+        this.onEngineDoubleClicked = this.onEngineDoubleClicked.bind(this);
         this.onTick = this.onTick.bind(this);
 
-        setInterval(this.onTick, 5000);
+        setInterval(this.onTick, 100);
     }
 
     public render() {
         return (
             <div style={{position: "absolute"}}>
                 {
-                    this.props.model.tileList.map((tile: any) => (
-                        <>
-                            {tile.type === "Track" && <Track top={tile.position[0]*30} left={tile.position[1]*30} />}
-                            {tile.type === "Platform" && <Platform top={tile.position[0]*30} left={tile.position[1]*30} />}
-                         </>
+                    this.props.model.tracks.map((tile: any, index:any) => (
+                        <Track key={index} top={tile.position[0]} left={tile.position[1]} />
+                    ))
+                }
+                {
+                    this.props.model.platforms.map((tile: any, index:any) => (
+                        <Platform key={index} top={tile.position[0]} left={tile.position[1]} />
                     ))
                 }
                 {
                     this.props.model.engines.map((tile: any) => (
-                        <>
-                            {tile.type === "DieselEngine" && <Engine
-                                key={tile.position[1]} 
-                                top={tile.position[0]*30}
-                                left={tile.position[1]*30}
-                                id={tile.id}
-                                onClick={this.onEngineClicked}
-                            />}
-                        </>
+                        <Engine
+                            key={tile.id} 
+                            top={tile.position[0]}
+                            left={tile.position[1]}
+                            id={tile.id}
+                            onClick={this.onEngineClicked}
+                            onDoubleClick={this.onEngineDoubleClicked}
+                        />
                     ))
                 }
                 {
                     this.props.model.cars.map((tile: any) => (
-                        <>
-                            {tile.type === "PassengerCar" && <PassengerCar top={tile.position[0]*30} left={tile.position[1]*30} />}
-                        </>
+                        <PassengerCar
+                            key={tile.id} 
+                            top={tile.position[0]}
+                            left={tile.position[1]}
+                            id={tile.id}
+                        />
                     ))
                 }
             </div>
@@ -53,6 +58,10 @@ export class Land extends React.Component<any, any> {
 
     private onEngineClicked(event:any) {
         this.props.onEngineClicked(event.target.id);
+    }
+
+    private onEngineDoubleClicked(event:any) {
+        this.props.onEngineDoubleClicked(event.target.id);
     }
 
     private onTick() {

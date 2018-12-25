@@ -1,4 +1,4 @@
-import { startEngine, tick } from 'src/actions';
+import { startEngine, tick, stopEngine } from 'src/actions';
 import { connect } from 'react-redux';
 import { Land } from './Land';
 
@@ -10,6 +10,7 @@ const mapStateToProps = (state: any) => ({
   
   const mapDispatchToProps = {
     onEngineClicked: startEngine,
+    onEngineDoubleClicked: stopEngine,
     onTick: tick
   }
   

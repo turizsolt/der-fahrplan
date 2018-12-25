@@ -1,33 +1,52 @@
 import { TileModel } from "src/Tiles/TileModel";
 import { EngineModel } from 'src/Engine/EngineModel';
-import { START_ENGINE, TICK } from 'src/actions';
+import { START_ENGINE, TICK, STOP_ENGINE } from 'src/actions';
 import { PassengerCarModel } from 'src/Engine/PassengerCarModel';
 
-const engine1 = new EngineModel("DieselEngine", "engine-1", 2, 6);
+export const TILE_SIZE = 30;
+
 const initialState = {
     cars: [
-        new PassengerCarModel("PassengerCar", "engine-1", 2, 2),
-        new PassengerCarModel("PassengerCar", "engine-1", 2, 4),
+        new PassengerCarModel("car-11", "engine-1", 2*TILE_SIZE, 2*TILE_SIZE),
+        new PassengerCarModel("car-12", "engine-1", 2*TILE_SIZE, 4*TILE_SIZE),
+        new PassengerCarModel("car-21", "engine-2", 3*TILE_SIZE, 2*TILE_SIZE),
     ],
     engines: [
-        engine1
+        new EngineModel("engine-1", 2*TILE_SIZE, 6*TILE_SIZE),
+        new EngineModel("engine-2", 3*TILE_SIZE, 4*TILE_SIZE),
     ],
-    tileList: [
-        new TileModel("Track", 2, 2),
-        new TileModel("Track", 2, 4),
-        new TileModel("Track", 2, 6),
-        new TileModel("Track", 2, 8),
-        new TileModel("Track", 2, 10),
-        new TileModel("Track", 2, 12),
-        new TileModel("Track", 2, 14),
-        new TileModel("Track", 2, 16),
-        new TileModel("Track", 2, 18),
-        new TileModel("Track", 2, 20),
+    platforms: [
+        new TileModel("Platform", 1*TILE_SIZE, 2*TILE_SIZE),
+        new TileModel("Platform", 1*TILE_SIZE, 4*TILE_SIZE),
+        new TileModel("Platform", 1*TILE_SIZE, 6*TILE_SIZE),
 
-        new TileModel("Platform", 1, 2),
-        new TileModel("Platform", 1, 4),
-        new TileModel("Platform", 1, 6),
+        new TileModel("Platform", 4*TILE_SIZE, 2*TILE_SIZE),
+        new TileModel("Platform", 4*TILE_SIZE, 4*TILE_SIZE),
+        new TileModel("Platform", 4*TILE_SIZE, 6*TILE_SIZE),
     ],
+    tracks: [
+        new TileModel("Track", 2*TILE_SIZE, 2*TILE_SIZE),
+        new TileModel("Track", 2*TILE_SIZE, 4*TILE_SIZE),
+        new TileModel("Track", 2*TILE_SIZE, 6*TILE_SIZE),
+        new TileModel("Track", 2*TILE_SIZE, 8*TILE_SIZE),
+        new TileModel("Track", 2*TILE_SIZE, 10*TILE_SIZE),
+        new TileModel("Track", 2*TILE_SIZE, 12*TILE_SIZE),
+        new TileModel("Track", 2*TILE_SIZE, 14*TILE_SIZE),
+        new TileModel("Track", 2*TILE_SIZE, 16*TILE_SIZE),
+        new TileModel("Track", 2*TILE_SIZE, 18*TILE_SIZE),
+        new TileModel("Track", 2*TILE_SIZE, 20*TILE_SIZE),
+
+        new TileModel("Track", 3*TILE_SIZE, 2*TILE_SIZE),
+        new TileModel("Track", 3*TILE_SIZE, 4*TILE_SIZE),
+        new TileModel("Track", 3*TILE_SIZE, 6*TILE_SIZE),
+        new TileModel("Track", 3*TILE_SIZE, 8*TILE_SIZE),
+        new TileModel("Track", 3*TILE_SIZE, 10*TILE_SIZE),
+        new TileModel("Track", 3*TILE_SIZE, 12*TILE_SIZE),
+        new TileModel("Track", 3*TILE_SIZE, 14*TILE_SIZE),
+        new TileModel("Track", 3*TILE_SIZE, 16*TILE_SIZE),
+        new TileModel("Track", 3*TILE_SIZE, 18*TILE_SIZE),
+        new TileModel("Track", 3*TILE_SIZE, 20*TILE_SIZE),
+    ],    
 };
 
 export function LandReducer(state=initialState, action:any) {
@@ -40,6 +59,18 @@ export function LandReducer(state=initialState, action:any) {
                     {
                         ...state.engines.find((engine) => engine.id === action.params.id),
                         moving: 1
+                    }
+                ]
+            };
+
+        case STOP_ENGINE:
+            return {
+                ...state,
+                engines: [
+                    ...state.engines.filter((engine) => engine.id !== action.params.id),
+                    {
+                        ...state.engines.find((engine) => engine.id === action.params.id),
+                        willStopOnTile: true
                     }
                 ]
             };
@@ -57,7 +88,11 @@ export function LandReducer(state=initialState, action:any) {
                 }),
                 engines: state.engines.map((engine:any) => {
                     if(engine.moving) {
-                        return {...engine, position: [engine.position[0], ++engine.position[1]]}
+                        if(engine.willStopOnTile && (engine.position[1]%TILE_SIZE === TILE_SIZE-1)) {
+                            return {...engine, position: [engine.position[0], ++engine.position[1]], moving: 0, willStopOnTile: false}
+                        } else {
+                            return {...engine, position: [engine.position[0], ++engine.position[1]]}
+                        }
                     } else {
                         return engine;
                     }
