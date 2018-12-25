@@ -8,6 +8,7 @@ import { TileModel } from 'src/Tiles/TileModel';
 import { EngineModel } from 'src/Engine/EngineModel';
 import { PassengerCarModel } from 'src/Engine/PassengerCarModel';
 import { ILandProps } from './LandContainer';
+import { End } from 'src/actions';
 
 export class Land extends React.Component<ILandProps, {}> {
 
@@ -18,6 +19,8 @@ export class Land extends React.Component<ILandProps, {}> {
         this.onEngineReverse = this.onEngineReverse.bind(this);
         this.onEngineStop = this.onEngineStop.bind(this);
         this.onTick = this.onTick.bind(this);
+        this.onAttachCar = this.onAttachCar.bind(this);
+        this.onDetachCar = this.onDetachCar.bind(this);
 
         setInterval(this.onTick, 100);
     }
@@ -57,6 +60,9 @@ export class Land extends React.Component<ILandProps, {}> {
                             top={car.position[0]}
                             left={car.position[1]}
                             id={car.id}
+                            model={car}
+                            onAttach={this.onAttachCar}
+                            onDetach={this.onDetachCar}
                         />
                     ))
                 }
@@ -74,6 +80,14 @@ export class Land extends React.Component<ILandProps, {}> {
 
     private onEngineStop(event:React.MouseEvent<HTMLElement>) {
         this.props.onEngineStop((event.target as HTMLElement).id);
+    }
+
+    private onAttachCar(event:React.MouseEvent<HTMLElement>, end:End) {
+        this.props.onAttachCar((event.target as HTMLElement).id, end);
+    }
+
+    private onDetachCar(event:React.MouseEvent<HTMLElement>, end:End) {
+        this.props.onDetachCar((event.target as HTMLElement).id, end);
     }
 
     private onTick() {

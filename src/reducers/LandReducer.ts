@@ -8,13 +8,13 @@ export const TILE_SIZE:number = 30;
 
 const initialState:LandModel = {
     cars: [
-        new PassengerCarModel("car-11", "engine-1", 2*TILE_SIZE, 2*TILE_SIZE),
-        new PassengerCarModel("car-12", "engine-1", 2*TILE_SIZE, 4*TILE_SIZE),
-        new PassengerCarModel("car-21", "engine-2", 3*TILE_SIZE, 2*TILE_SIZE),
+        new PassengerCarModel("car-11", "engine-1", 2*TILE_SIZE, 2*TILE_SIZE, null, "car-12"),
+        new PassengerCarModel("car-12", "engine-1", 2*TILE_SIZE, 4*TILE_SIZE, "car-11", "engine-1"),
+        new PassengerCarModel("car-21", "engine-2", 3*TILE_SIZE, 2*TILE_SIZE, null, null),
     ],
     engines: [
-        new EngineModel("engine-1", 2*TILE_SIZE, 6*TILE_SIZE),
-        new EngineModel("engine-2", 3*TILE_SIZE, 4*TILE_SIZE),
+        new EngineModel("engine-1", 2*TILE_SIZE, 6*TILE_SIZE, "car-12", null, "car-11"),
+        new EngineModel("engine-2", 3*TILE_SIZE, 4*TILE_SIZE, null, null, "engine-2"),
     ],
     platforms: [
         new TileModel("Platform", 1*TILE_SIZE, 2*TILE_SIZE),
@@ -111,6 +111,20 @@ export function LandReducer(state:LandModel=initialState, action:Action<any>) {
                     }
                 }),
             };
+
+        case ActionType.ATTACH_CAR:
+        case ActionType.DETACH_CAR:
+            console.log(action);
+            /*return {
+                ...state,
+                cars: state.cars.map((car:PassengerCarModel) => {
+                    if(car.id === action.params.id) {
+                        return {...car, attachedA: null, attachedB: null}
+                    } else {
+                        return car;
+                    }
+                }),
+            };*/
 
         default:
             return state;
