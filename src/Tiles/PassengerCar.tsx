@@ -1,10 +1,10 @@
 import {ITileProps, Tile } from './Tile';
 
-export class Track extends Tile<{}> {
+export class PassengerCar extends Tile<{}> {
 
     public constructor(props:ITileProps, state:{}) {
         super(props, state);
 
-        this.image = "tiles/track-line.svg";
+        this.image = "tiles/passenger-car.svg";
     }
 }
