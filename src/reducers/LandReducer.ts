@@ -56,21 +56,33 @@ export function LandReducer(state:LandModel=initialState, action:Action<any>) {
             return {
                 ...state,
                 engines: [
-                    ...state.engines.filter((engine) => engine.id !== action.params.id),
+                    ...state.engines.filter((engine:EngineModel) => engine.id !== action.params.id),
                     {
-                        ...state.engines.find((engine) => engine.id === action.params.id),
+                        ...state.engines.find((engine:EngineModel) => engine.id === action.params.id),
                         moving: 1
                     }
                 ]
             };
 
+        case ActionType.REVERSE_ENGINE:
+            return {
+                ...state,
+                engines: [
+                    ...state.engines.filter((engine:EngineModel) => engine.id !== action.params.id),
+                    {
+                        ...state.engines.find((engine:EngineModel) => engine.id === action.params.id),
+                        moving: -1
+                    }
+                ]
+            };    
+
         case ActionType.STOP_ENGINE:
             return {
                 ...state,
                 engines: [
-                    ...state.engines.filter((engine) => engine.id !== action.params.id),
+                    ...state.engines.filter((engine:EngineModel) => engine.id !== action.params.id),
                     {
-                        ...state.engines.find((engine) => engine.id === action.params.id),
+                        ...state.engines.find((engine:EngineModel) => engine.id === action.params.id),
                         willStopOnTile: true
                     }
                 ]
@@ -82,17 +94,17 @@ export function LandReducer(state:LandModel=initialState, action:Action<any>) {
                 cars: state.cars.map((car:PassengerCarModel) => {
                     const draggerEngine = state.engines.find((engine:EngineModel) => engine.id === car.draggedBy);
                     if(draggerEngine && draggerEngine.moving) {
-                        return {...car, position: [car.position[0], ++car.position[1]]}
+                        return {...car, position: [car.position[0], car.position[1]+draggerEngine.moving]}
                     } else {
                         return car;
                     }
                 }),
                 engines: state.engines.map((engine:EngineModel) => {
                     if(engine.moving) {
-                        if(engine.willStopOnTile && (engine.position[1]%TILE_SIZE === TILE_SIZE-1)) {
-                            return {...engine, position: [engine.position[0], ++engine.position[1]], moving: 0, willStopOnTile: false}
+                        if(engine.willStopOnTile && ((engine.position[1]+engine.moving)%TILE_SIZE === 0)) {
+                            return {...engine, position: [engine.position[0], engine.position[1]+engine.moving], moving: 0, willStopOnTile: false}
                         } else {
-                            return {...engine, position: [engine.position[0], ++engine.position[1]]}
+                            return {...engine, position: [engine.position[0], engine.position[1]+engine.moving]}
                         }
                     } else {
                         return engine;

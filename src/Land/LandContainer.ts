@@ -1,4 +1,4 @@
-import { startEngine, tick, stopEngine } from 'src/actions';
+import { startEngine, tick, stopEngine, reverseEngine } from 'src/actions';
 import { connect } from 'react-redux';
 import { Land } from './Land';
 import { LandModel } from './LandModel';
@@ -19,14 +19,16 @@ const mapStateToProps = (state: any):ILandMapToStateProps => ({
 // dispatchToProps
   
 export interface ILandDispatchToProps {
-  onEngineClicked: (id: string) => void,
-  onEngineDoubleClicked: (id: string) => void,
+  onEngineReverse: (id: string) => void,
+  onEngineStart: (id: string) => void,
+  onEngineStop: (id: string) => void,
   onTick: () => void
 };
 
 const mapDispatchToProps = {
-    onEngineClicked: startEngine,
-    onEngineDoubleClicked: stopEngine,
+    onEngineReverse: reverseEngine,
+    onEngineStart: startEngine,
+    onEngineStop: stopEngine,
     onTick: tick
 };
 

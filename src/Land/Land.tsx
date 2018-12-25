@@ -14,8 +14,9 @@ export class Land extends React.Component<ILandProps, {}> {
     public constructor(props:ILandProps, state:{}) {
         super(props, state);
 
-        this.onEngineClicked = this.onEngineClicked.bind(this);
-        this.onEngineDoubleClicked = this.onEngineDoubleClicked.bind(this);
+        this.onEngineStart = this.onEngineStart.bind(this);
+        this.onEngineReverse = this.onEngineReverse.bind(this);
+        this.onEngineStop = this.onEngineStop.bind(this);
         this.onTick = this.onTick.bind(this);
 
         setInterval(this.onTick, 100);
@@ -40,9 +41,12 @@ export class Land extends React.Component<ILandProps, {}> {
                             key={engine.id} 
                             top={engine.position[0]}
                             left={engine.position[1]}
+                            moving={engine.moving}
+                            willStop={engine.willStopOnTile}
                             id={engine.id}
-                            onClick={this.onEngineClicked}
-                            onDoubleClick={this.onEngineDoubleClicked}
+                            onStart={this.onEngineStart}
+                            onReverse={this.onEngineReverse}
+                            onStop={this.onEngineStop}
                         />
                     ))
                 }
@@ -60,12 +64,16 @@ export class Land extends React.Component<ILandProps, {}> {
         );
     }
 
-    private onEngineClicked(event:React.MouseEvent<HTMLElement>) {
-        this.props.onEngineClicked((event.target as HTMLElement).id);
+    private onEngineStart(event:React.MouseEvent<HTMLElement>) {
+        this.props.onEngineStart((event.target as HTMLElement).id);
     }
 
-    private onEngineDoubleClicked(event:React.MouseEvent<HTMLElement>) {
-        this.props.onEngineDoubleClicked((event.target as HTMLElement).id);
+    private onEngineReverse(event:React.MouseEvent<HTMLElement>) {
+        this.props.onEngineReverse((event.target as HTMLElement).id);
+    }
+
+    private onEngineStop(event:React.MouseEvent<HTMLElement>) {
+        this.props.onEngineStop((event.target as HTMLElement).id);
     }
 
     private onTick() {
