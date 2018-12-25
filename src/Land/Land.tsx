@@ -10,9 +10,9 @@ import { PassengerCarModel } from 'src/Engine/PassengerCarModel';
 import { ILandProps } from './LandContainer';
 import { End } from 'src/actions';
 
-export class Land extends React.Component<ILandProps, {}> {
+export class Land extends React.Component<any, {}> {
 
-    public constructor(props:ILandProps, state:{}) {
+    public constructor(props:any, state:{}) {
         super(props, state);
 
         this.onEngineStart = this.onEngineStart.bind(this);
@@ -29,17 +29,17 @@ export class Land extends React.Component<ILandProps, {}> {
         return (
             <div style={{position: "absolute"}}>
                 {
-                    this.props.model.tracks.map((tile: TileModel, index:number) => (
+                    this.props.model.get("tracks").valueSeq().map((tile: TileModel, index:number) => (
                         <Track key={index} top={tile.position[0]} left={tile.position[1]} />
                     ))
                 }
                 {
-                    this.props.model.platforms.map((tile: TileModel, index:number) => (
+                    this.props.model.get("platforms").valueSeq().map((tile: TileModel, index:number) => (
                         <Platform key={index} top={tile.position[0]} left={tile.position[1]} />
                     ))
                 }
                 {
-                    this.props.model.engines.map((engine: EngineModel) => (
+                    this.props.model.get("engines").valueSeq().map((engine: EngineModel) => (
                         <Engine
                             key={engine.id} 
                             top={engine.position[0]}
@@ -54,7 +54,7 @@ export class Land extends React.Component<ILandProps, {}> {
                     ))
                 }
                 {
-                    this.props.model.cars.map((car: PassengerCarModel) => (
+                    this.props.model.get("cars").valueSeq().map((car: PassengerCarModel) => (
                         <PassengerCar
                             key={car.id} 
                             top={car.position[0]}

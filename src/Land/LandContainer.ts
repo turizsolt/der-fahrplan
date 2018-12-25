@@ -1,7 +1,7 @@
 import { startEngine, tick, stopEngine, reverseEngine, End, attachCar, detachCar } from 'src/actions';
 import { connect } from 'react-redux';
 import { Land } from './Land';
-import { LandModel } from './LandModel';
+import { TileModel } from 'src/Tiles/TileModel';
 
 // selector
 
@@ -9,7 +9,7 @@ const getModel = ((state: any) => state.LandReducer);
 
 // mapToStateProps
 export interface ILandMapToStateProps {
-  model: LandModel,
+  model: Map<string, TileModel[]>,
 }
 
 const mapStateToProps = (state: any):ILandMapToStateProps => ({
