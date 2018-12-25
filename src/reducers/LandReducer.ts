@@ -1,11 +1,12 @@
 import { TileModel } from "src/Tiles/TileModel";
 import { EngineModel } from 'src/Engine/EngineModel';
-import { START_ENGINE, TICK, STOP_ENGINE } from 'src/actions';
+import { Action, ActionType } from 'src/actions';
 import { PassengerCarModel } from 'src/Engine/PassengerCarModel';
+import { LandModel } from 'src/Land/LandModel';
 
-export const TILE_SIZE = 30;
+export const TILE_SIZE:number = 30;
 
-const initialState = {
+const initialState:LandModel = {
     cars: [
         new PassengerCarModel("car-11", "engine-1", 2*TILE_SIZE, 2*TILE_SIZE),
         new PassengerCarModel("car-12", "engine-1", 2*TILE_SIZE, 4*TILE_SIZE),
@@ -49,9 +50,9 @@ const initialState = {
     ],    
 };
 
-export function LandReducer(state=initialState, action:any) {
+export function LandReducer(state:LandModel=initialState, action:Action<any>) {
     switch(action.type) {
-        case START_ENGINE:
+        case ActionType.START_ENGINE:
             return {
                 ...state,
                 engines: [
@@ -63,7 +64,7 @@ export function LandReducer(state=initialState, action:any) {
                 ]
             };
 
-        case STOP_ENGINE:
+        case ActionType.STOP_ENGINE:
             return {
                 ...state,
                 engines: [
@@ -75,18 +76,18 @@ export function LandReducer(state=initialState, action:any) {
                 ]
             };
 
-        case TICK:
+        case ActionType.TICK:
             return {
                 ...state,
-                cars: state.cars.map((car:any) => {
-                    const draggerEngine = state.engines.find((engine:any) => engine.id === car.draggedBy);
+                cars: state.cars.map((car:PassengerCarModel) => {
+                    const draggerEngine = state.engines.find((engine:EngineModel) => engine.id === car.draggedBy);
                     if(draggerEngine && draggerEngine.moving) {
                         return {...car, position: [car.position[0], ++car.position[1]]}
                     } else {
                         return car;
                     }
                 }),
-                engines: state.engines.map((engine:any) => {
+                engines: state.engines.map((engine:EngineModel) => {
                     if(engine.moving) {
                         if(engine.willStopOnTile && (engine.position[1]%TILE_SIZE === TILE_SIZE-1)) {
                             return {...engine, position: [engine.position[0], ++engine.position[1]], moving: 0, willStopOnTile: false}

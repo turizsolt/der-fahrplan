@@ -15,11 +15,11 @@ export class Tile<State> extends React.Component<ITileProps, State> {
         return <img src={this.image} onClick={this.onClick} onDoubleClick={this.onDoubleClick} style={{position: "absolute", left: this.props.left+"px", top: this.props.top+"px", width: "60px", height: "30px"}} />
     }
 
-    protected onClick(event: any) {
+    protected onClick(event: React.MouseEvent<HTMLElement>) {
         if(this.props.onClick) { this.props.onClick(event); }
     }
 
-    protected onDoubleClick(event: any) {
+    protected onDoubleClick(event: React.MouseEvent<HTMLElement>) {
         if(this.props.onDoubleClick) { this.props.onDoubleClick(event); }
     }
 }
@@ -29,6 +29,6 @@ export interface ITileProps {
     top: number;
     id?: string;
     model?: TileModel;
-    onClick?: (event:any) => void;
-    onDoubleClick?: (event:any) => void;
+    onClick?: (event:React.MouseEvent<HTMLElement>) => void;
+    onDoubleClick?: (event:React.MouseEvent<HTMLElement>) => void;
 }

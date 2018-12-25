@@ -4,10 +4,14 @@ import { PassengerCar } from '../Tiles/PassengerCar';
 import { Platform } from '../Tiles/Platform';
 import { Track } from '../Tiles/Track';
 import { LandModel } from './LandModel';
+import { TileModel } from 'src/Tiles/TileModel';
+import { EngineModel } from 'src/Engine/EngineModel';
+import { PassengerCarModel } from 'src/Engine/PassengerCarModel';
+import { ILandProps } from './LandContainer';
 
-export class Land extends React.Component<any, any> {
+export class Land extends React.Component<ILandProps, {}> {
 
-    public constructor(props:any, state:any) {
+    public constructor(props:ILandProps, state:{}) {
         super(props, state);
 
         this.onEngineClicked = this.onEngineClicked.bind(this);
@@ -21,34 +25,34 @@ export class Land extends React.Component<any, any> {
         return (
             <div style={{position: "absolute"}}>
                 {
-                    this.props.model.tracks.map((tile: any, index:any) => (
+                    this.props.model.tracks.map((tile: TileModel, index:number) => (
                         <Track key={index} top={tile.position[0]} left={tile.position[1]} />
                     ))
                 }
                 {
-                    this.props.model.platforms.map((tile: any, index:any) => (
+                    this.props.model.platforms.map((tile: TileModel, index:number) => (
                         <Platform key={index} top={tile.position[0]} left={tile.position[1]} />
                     ))
                 }
                 {
-                    this.props.model.engines.map((tile: any) => (
+                    this.props.model.engines.map((engine: EngineModel) => (
                         <Engine
-                            key={tile.id} 
-                            top={tile.position[0]}
-                            left={tile.position[1]}
-                            id={tile.id}
+                            key={engine.id} 
+                            top={engine.position[0]}
+                            left={engine.position[1]}
+                            id={engine.id}
                             onClick={this.onEngineClicked}
                             onDoubleClick={this.onEngineDoubleClicked}
                         />
                     ))
                 }
                 {
-                    this.props.model.cars.map((tile: any) => (
+                    this.props.model.cars.map((car: PassengerCarModel) => (
                         <PassengerCar
-                            key={tile.id} 
-                            top={tile.position[0]}
-                            left={tile.position[1]}
-                            id={tile.id}
+                            key={car.id} 
+                            top={car.position[0]}
+                            left={car.position[1]}
+                            id={car.id}
                         />
                     ))
                 }
@@ -56,12 +60,12 @@ export class Land extends React.Component<any, any> {
         );
     }
 
-    private onEngineClicked(event:any) {
-        this.props.onEngineClicked(event.target.id);
+    private onEngineClicked(event:React.MouseEvent<HTMLElement>) {
+        this.props.onEngineClicked((event.target as HTMLElement).id);
     }
 
-    private onEngineDoubleClicked(event:any) {
-        this.props.onEngineDoubleClicked(event.target.id);
+    private onEngineDoubleClicked(event:React.MouseEvent<HTMLElement>) {
+        this.props.onEngineDoubleClicked((event.target as HTMLElement).id);
     }
 
     private onTick() {
