@@ -1,14 +1,16 @@
 import { TileModel } from "src/Tiles/TileModel";
 import { EngineModel } from 'src/Engine/EngineModel';
 import { START_ENGINE, TICK } from 'src/actions';
+import { PassengerCarModel } from 'src/Engine/PassengerCarModel';
 
+const engine1 = new EngineModel("DieselEngine", "engine-1", 2, 6);
 const initialState = {
     cars: [
-        new TileModel("PassengerCar", 2, 2),
-        new TileModel("PassengerCar", 2, 4),
+        new PassengerCarModel("PassengerCar", "engine-1", 2, 2),
+        new PassengerCarModel("PassengerCar", "engine-1", 2, 4),
     ],
     engines: [
-        new EngineModel("DieselEngine", "engine-1", 2, 6),
+        engine1
     ],
     tileList: [
         new TileModel("Track", 2, 2),
@@ -45,13 +47,21 @@ export function LandReducer(state=initialState, action:any) {
         case TICK:
             return {
                 ...state,
+                cars: state.cars.map((car:any) => {
+                    const draggerEngine = state.engines.find((engine:any) => engine.id === car.draggedBy);
+                    if(draggerEngine && draggerEngine.moving) {
+                        return {...car, position: [car.position[0], ++car.position[1]]}
+                    } else {
+                        return car;
+                    }
+                }),
                 engines: state.engines.map((engine:any) => {
                     if(engine.moving) {
                         return {...engine, position: [engine.position[0], ++engine.position[1]]}
                     } else {
                         return engine;
                     }
-                })
+                }),
             };
 
         default:
