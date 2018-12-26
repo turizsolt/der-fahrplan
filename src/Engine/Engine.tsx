@@ -24,7 +24,8 @@ export class Engine extends React.Component<any, {}> {
             />
             <div
                 style={{display:"flex", justifyContent: "space-between", position: "absolute", left: this.props.left+"px", top: this.props.top+"px", width: "60px", height: "30px", lineHeight:"30px", fontSize:"60%"}}>
-                <span style={{cursor: "pointer"}} id={this.props.id}>⚪</span>
+                <span />
+                {false && <span style={{cursor: "pointer"}} id={this.props.id}>⚪</span> }
                 <span>
                     { this.props.moving===0 && <>
                         <span style={{cursor: "pointer"}} id={this.props.id} onClick={this.onReverse}>⏪</span>
@@ -35,7 +36,8 @@ export class Engine extends React.Component<any, {}> {
                     }
                     { this.props.moving!==0 && this.props.willStop && <span>⏺</span> }
                 </span>
-                <span style={{cursor: "pointer"}} id={this.props.id}>⚫</span>
+                {false && <span style={{cursor: "pointer"}} id={this.props.id}>⚫</span> }
+                <span />
             </div>
         </>);         
     }
