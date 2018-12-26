@@ -80,7 +80,7 @@ export function LandReducer(state=initialState, action:Action<any>) {
                 });
             });
             keys.map((key:any) => {
-                const engine = newState.getIn(["cars", key]);
+                const engine = state.getIn(["cars", key]);
                 if(engine.moving) {
                     const cars = getCars(state, engine.id);
                     cars.map((carId:string) => {
@@ -109,17 +109,15 @@ export function LandReducer(state=initialState, action:Action<any>) {
             } 
 
             return detachedState;
-
-            // TODO what if detached already
-            // TODO if nobody there
         
         case ActionType.ATTACH_CAR:   
             let attachedState = state;
 
             if(action.params.end === "B") {
                 const thisCar = attachedState.getIn(["cars", action.params.id]);
-                const otherCar = attachedState.get("cars").toArray().find((car:any) => car[1].position[1] === thisCar.position[1]+2*TILE_SIZE)[1];
-                if(otherCar) {
+                const otherCarObj = attachedState.get("cars").toArray().find((car:any) => car[1].position[1] === thisCar.position[1]+2*TILE_SIZE && car[1].position[0] === thisCar.position[0]);
+                if(otherCarObj) {
+                    const otherCar = otherCarObj[1];
                     attachedState = attachedState.updateIn(["cars", thisCar.id], (car:any) => ({...car, attachedB: otherCar.id}));
                     attachedState = attachedState.updateIn(["cars", otherCar.id], (car:any) => ({...car, attachedA: thisCar.id}));
                 }
@@ -127,16 +125,15 @@ export function LandReducer(state=initialState, action:Action<any>) {
 
             if(action.params.end === "A") {
                 const thisCar = attachedState.getIn(["cars", action.params.id]);
-                const otherCar = attachedState.get("cars").toArray().find((car:any) => car[1].position[1] === thisCar.position[1]-2*TILE_SIZE)[1];
-                if(otherCar) {
+                const otherCarObj = attachedState.get("cars").toArray().find((car:any) => car[1].position[1] === thisCar.position[1]-2*TILE_SIZE && car[1].position[0] === thisCar.position[0]);
+                if(otherCarObj) {
+                    const otherCar = otherCarObj[1];
                     attachedState = attachedState.updateIn(["cars", thisCar.id], (car:any) => ({...car, attachedA: otherCar.id}));
                     attachedState = attachedState.updateIn(["cars", otherCar.id], (car:any) => ({...car, attachedB: thisCar.id}));
                 }
             }
 
             return attachedState;
-
-            // TODO also as above
 
         default:
             return state;
