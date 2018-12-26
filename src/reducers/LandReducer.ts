@@ -1,21 +1,20 @@
-import { TileModel } from "src/Tiles/TileModel";
-import { EngineModel } from 'src/Engine/EngineModel';
-import { Action, ActionType } from 'src/actions';
-import { PassengerCarModel } from 'src/Engine/PassengerCarModel';
-import { LandModel } from 'src/Land/LandModel';
+import { TileModel } from "../Tiles/TileModel";
+import { EngineModel } from '../Car/Engine/EngineModel';
+import { Action, ActionType } from '../actions';
+import { PassengerCarModel } from '../Car/PassengerCar/PassengerCarModel';
+import { fromJS } from 'immutable';
 
 export const TILE_SIZE:number = 30;
 
-const initialState:LandModel = {
-    cars: [
-        new PassengerCarModel("car-11", "engine-1", 2*TILE_SIZE, 2*TILE_SIZE),
-        new PassengerCarModel("car-12", "engine-1", 2*TILE_SIZE, 4*TILE_SIZE),
-        new PassengerCarModel("car-21", "engine-2", 3*TILE_SIZE, 2*TILE_SIZE),
-    ],
-    engines: [
-        new EngineModel("engine-1", 2*TILE_SIZE, 6*TILE_SIZE),
-        new EngineModel("engine-2", 3*TILE_SIZE, 4*TILE_SIZE),
-    ],
+const initialState = fromJS({
+    cars: {
+        "car-11": new PassengerCarModel("car-11", 2*TILE_SIZE, 2*TILE_SIZE, null, "car-12"),
+        "car-12": new PassengerCarModel("car-12", 2*TILE_SIZE, 4*TILE_SIZE, "car-11", "car-13"),
+        "car-13": new PassengerCarModel("car-13", 2*TILE_SIZE, 6*TILE_SIZE, "car-12", "engine-1"),
+        "car-21": new PassengerCarModel("car-21", 3*TILE_SIZE, 2*TILE_SIZE, null, null),
+        "engine-1": new EngineModel("engine-1", 2*TILE_SIZE, 8*TILE_SIZE, "car-13", null),
+        "engine-2": new EngineModel("engine-2", 3*TILE_SIZE, 4*TILE_SIZE, null, null),
+    },
     platforms: [
         new TileModel("Platform", 1*TILE_SIZE, 2*TILE_SIZE),
         new TileModel("Platform", 1*TILE_SIZE, 4*TILE_SIZE),
@@ -48,59 +47,115 @@ const initialState:LandModel = {
         new TileModel("Track", 3*TILE_SIZE, 18*TILE_SIZE),
         new TileModel("Track", 3*TILE_SIZE, 20*TILE_SIZE),
     ],    
-};
+});
 
-export function LandReducer(state:LandModel=initialState, action:Action<any>) {
+export function LandReducer(state=initialState, action:Action<any>) {
     switch(action.type) {
         case ActionType.START_ENGINE:
-            return {
-                ...state,
-                engines: [
-                    ...state.engines.filter((engine) => engine.id !== action.params.id),
-                    {
-                        ...state.engines.find((engine) => engine.id === action.params.id),
-                        moving: 1
-                    }
-                ]
-            };
+            return state.updateIn(["cars", action.params.id], (engine:EngineModel) => ({...engine, moving: 1}));
+
+        case ActionType.REVERSE_ENGINE:
+            return state.updateIn(["cars", action.params.id], (engine:EngineModel) => ({...engine, moving: -1}));
 
         case ActionType.STOP_ENGINE:
-            return {
-                ...state,
-                engines: [
-                    ...state.engines.filter((engine) => engine.id !== action.params.id),
-                    {
-                        ...state.engines.find((engine) => engine.id === action.params.id),
-                        willStopOnTile: true
-                    }
-                ]
-            };
+            return state.updateIn(["cars", action.params.id], (engine:EngineModel) => ({...engine, willStopOnTile: true}));
 
         case ActionType.TICK:
-            return {
-                ...state,
-                cars: state.cars.map((car:PassengerCarModel) => {
-                    const draggerEngine = state.engines.find((engine:EngineModel) => engine.id === car.draggedBy);
-                    if(draggerEngine && draggerEngine.moving) {
-                        return {...car, position: [car.position[0], ++car.position[1]]}
-                    } else {
-                        return car;
-                    }
-                }),
-                engines: state.engines.map((engine:EngineModel) => {
+            let newState = state;
+            const keys = newState.get("cars").keySeq().toArray();
+            keys.map((key:any) => {
+                const car = newState.getIn(["cars", key]);
+                if(car.type !== "DieselEngine") { return; }
+
+                newState = newState.updateIn(["cars", key], (engine:EngineModel) => {
                     if(engine.moving) {
-                        if(engine.willStopOnTile && (engine.position[1]%TILE_SIZE === TILE_SIZE-1)) {
-                            return {...engine, position: [engine.position[0], ++engine.position[1]], moving: 0, willStopOnTile: false}
+                        if(engine.willStopOnTile && ((engine.position[1]+engine.moving)%TILE_SIZE === 0)) {
+                            return {...engine, position: [engine.position[0], engine.position[1]+engine.moving], moving: 0, willStopOnTile: false}
                         } else {
-                            return {...engine, position: [engine.position[0], ++engine.position[1]]}
+                            return {...engine, position: [engine.position[0], engine.position[1]+engine.moving]}
                         }
                     } else {
                         return engine;
                     }
-                }),
-            };
+                });
+            });
+            keys.map((key:any) => {
+                const engine = state.getIn(["cars", key]);
+                if(engine.moving) {
+                    const cars = getCars(state, engine.id);
+                    cars.map((carId:string) => {
+                        newState = newState.updateIn(["cars", carId], (car:PassengerCarModel) => {
+                            return {...car, position: [car.position[0], car.position[1]+engine.moving]}
+                        });
+                    });
+                }
+            });
+
+            return newState;
+        
+        case ActionType.DETACH_CAR:
+            let detachedState = state;
+            
+            if(action.params.end === "B") {
+                const otherId = detachedState.getIn(["cars", action.params.id]).attachedB;
+                detachedState = detachedState.updateIn(["cars", action.params.id], (car:any) => ({...car, attachedB: null}));
+                detachedState = detachedState.updateIn(["cars", otherId], (car:any) => ({...car, attachedA: null}));
+            } 
+
+            if(action.params.end === "A") {
+                const otherId = detachedState.getIn(["cars", action.params.id]).attachedA;
+                detachedState = detachedState.updateIn(["cars", action.params.id], (car:any) => ({...car, attachedA: null}));
+                detachedState = detachedState.updateIn(["cars", otherId], (car:any) => ({...car, attachedB: null}));
+            } 
+
+            return detachedState;
+        
+        case ActionType.ATTACH_CAR:   
+            let attachedState = state;
+
+            if(action.params.end === "B") {
+                const thisCar = attachedState.getIn(["cars", action.params.id]);
+                const otherCarObj = attachedState.get("cars").toArray().find((car:any) => car[1].position[1] === thisCar.position[1]+2*TILE_SIZE && car[1].position[0] === thisCar.position[0]);
+                if(otherCarObj) {
+                    const otherCar = otherCarObj[1];
+                    attachedState = attachedState.updateIn(["cars", thisCar.id], (car:any) => ({...car, attachedB: otherCar.id}));
+                    attachedState = attachedState.updateIn(["cars", otherCar.id], (car:any) => ({...car, attachedA: thisCar.id}));
+                }
+            }
+
+            if(action.params.end === "A") {
+                const thisCar = attachedState.getIn(["cars", action.params.id]);
+                const otherCarObj = attachedState.get("cars").toArray().find((car:any) => car[1].position[1] === thisCar.position[1]-2*TILE_SIZE && car[1].position[0] === thisCar.position[0]);
+                if(otherCarObj) {
+                    const otherCar = otherCarObj[1];
+                    attachedState = attachedState.updateIn(["cars", thisCar.id], (car:any) => ({...car, attachedA: otherCar.id}));
+                    attachedState = attachedState.updateIn(["cars", otherCar.id], (car:any) => ({...car, attachedB: thisCar.id}));
+                }
+            }
+
+            return attachedState;
 
         default:
             return state;
     }
+}
+
+function getCars(state: any, engineId: string): string[] {
+    const list:string[] = [];
+
+    let car = state.getIn(["cars", engineId]);
+
+    if(car.attachedA) {
+        while(car.attachedA) {
+            car = state.getIn(["cars", car.attachedA]);
+            list.push(car.id);
+        }
+    } else if (car.attachedB) {
+        while(car.attachedB) {
+            car = state.getIn(["cars", car.attachedB]);
+            list.push(car.id);
+        }
+    } 
+
+    return list;
 }

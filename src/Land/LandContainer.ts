@@ -1,7 +1,7 @@
-import { startEngine, tick, stopEngine } from 'src/actions';
+import { startEngine, tick, stopEngine, reverseEngine, End, attachCar, detachCar } from 'src/actions';
 import { connect } from 'react-redux';
 import { Land } from './Land';
-import { LandModel } from './LandModel';
+import { TileModel } from 'src/Tiles/TileModel';
 
 // selector
 
@@ -9,7 +9,7 @@ const getModel = ((state: any) => state.LandReducer);
 
 // mapToStateProps
 export interface ILandMapToStateProps {
-  model: LandModel,
+  model: Map<string, TileModel[]>,
 }
 
 const mapStateToProps = (state: any):ILandMapToStateProps => ({
@@ -19,15 +19,21 @@ const mapStateToProps = (state: any):ILandMapToStateProps => ({
 // dispatchToProps
   
 export interface ILandDispatchToProps {
-  onEngineClicked: (id: string) => void,
-  onEngineDoubleClicked: (id: string) => void,
-  onTick: () => void
+  onAttachCar: (id: string, end:End) => void,
+  onDetachCar: (id: string, end:End) => void,
+  onEngineReverse: (id: string) => void,
+  onEngineStart: (id: string) => void,
+  onEngineStop: (id: string) => void,
+  onTick: () => void,
 };
 
 const mapDispatchToProps = {
-    onEngineClicked: startEngine,
-    onEngineDoubleClicked: stopEngine,
-    onTick: tick
+    onAttachCar: attachCar,
+    onDetachCar: detachCar,
+    onEngineReverse: reverseEngine,
+    onEngineStart: startEngine,
+    onEngineStop: stopEngine,
+    onTick: tick,
 };
 
 export type ILandProps = ILandMapToStateProps & ILandDispatchToProps;
