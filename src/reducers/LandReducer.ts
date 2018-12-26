@@ -1,21 +1,21 @@
-import { TileModel } from "src/Tiles/TileModel";
-import { EngineModel } from 'src/Engine/EngineModel';
-import { Action, ActionType } from 'src/actions';
-import { PassengerCarModel } from 'src/Engine/PassengerCarModel';
+import { TileModel } from "../Tiles/TileModel";
+import { EngineModel } from '../Car/Engine/EngineModel';
+import { Action, ActionType } from '../actions';
+import { PassengerCarModel } from '../Car/PassengerCar/PassengerCarModel';
 import { fromJS } from 'immutable';
 
 export const TILE_SIZE:number = 30;
 
 const initialState = fromJS({
     cars: {
-        "car-11": new PassengerCarModel("car-11", "engine-1", 2*TILE_SIZE, 2*TILE_SIZE, null, "car-12"),
-        "car-12": new PassengerCarModel("car-12", "engine-1", 2*TILE_SIZE, 4*TILE_SIZE, "car-11", "car-13"),
-        "car-13": new PassengerCarModel("car-13", "engine-1", 2*TILE_SIZE, 6*TILE_SIZE, "car-12", "engine-1"),
-        "car-21": new PassengerCarModel("car-21", "engine-2", 3*TILE_SIZE, 2*TILE_SIZE, null, null),
+        "car-11": new PassengerCarModel("car-11", 2*TILE_SIZE, 2*TILE_SIZE, null, "car-12"),
+        "car-12": new PassengerCarModel("car-12", 2*TILE_SIZE, 4*TILE_SIZE, "car-11", "car-13"),
+        "car-13": new PassengerCarModel("car-13", 2*TILE_SIZE, 6*TILE_SIZE, "car-12", "engine-1"),
+        "car-21": new PassengerCarModel("car-21", 3*TILE_SIZE, 2*TILE_SIZE, null, null),
     },
     engines: {
-        "engine-1": new EngineModel("engine-1", 2*TILE_SIZE, 8*TILE_SIZE, "car-13", null, "car-11"),
-        "engine-2": new EngineModel("engine-2", 3*TILE_SIZE, 4*TILE_SIZE, null, null, "engine-2"),
+        "engine-1": new EngineModel("engine-1", 2*TILE_SIZE, 8*TILE_SIZE, "car-13", null),
+        "engine-2": new EngineModel("engine-2", 3*TILE_SIZE, 4*TILE_SIZE, null, null),
     },
     platforms: [
         new TileModel("Platform", 1*TILE_SIZE, 2*TILE_SIZE),

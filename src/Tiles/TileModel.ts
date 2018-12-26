@@ -6,8 +6,4 @@ export class TileModel {
         this.type = type;
         this.position = [top, left];
     }
-
-    public onTick() {
-        // 
-    }
 }

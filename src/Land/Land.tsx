@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { Engine } from '../Engine/Engine';
-import { PassengerCar } from '../Tiles/PassengerCar';
+import { Engine } from '../Car/Engine/Engine';
+import { PassengerCar } from '../Car/PassengerCar/PassengerCar';
 import { Platform } from '../Tiles/Platform';
 import { Track } from '../Tiles/Track';
 import { LandModel } from './LandModel';
 import { TileModel } from 'src/Tiles/TileModel';
-import { EngineModel } from 'src/Engine/EngineModel';
-import { PassengerCarModel } from 'src/Engine/PassengerCarModel';
+import { EngineModel } from 'src/Car/Engine/EngineModel';
+import { PassengerCarModel } from 'src/Car/PassengerCar/PassengerCarModel';
 import { ILandProps } from './LandContainer';
 import { End } from 'src/actions';
 
