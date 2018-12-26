@@ -12,8 +12,6 @@ const initialState = fromJS({
         "car-12": new PassengerCarModel("car-12", 2*TILE_SIZE, 4*TILE_SIZE, "car-11", "car-13"),
         "car-13": new PassengerCarModel("car-13", 2*TILE_SIZE, 6*TILE_SIZE, "car-12", "engine-1"),
         "car-21": new PassengerCarModel("car-21", 3*TILE_SIZE, 2*TILE_SIZE, null, null),
-    },
-    engines: {
         "engine-1": new EngineModel("engine-1", 2*TILE_SIZE, 8*TILE_SIZE, "car-13", null),
         "engine-2": new EngineModel("engine-2", 3*TILE_SIZE, 4*TILE_SIZE, null, null),
     },
@@ -54,19 +52,22 @@ const initialState = fromJS({
 export function LandReducer(state=initialState, action:Action<any>) {
     switch(action.type) {
         case ActionType.START_ENGINE:
-            return state.updateIn(["engines", action.params.id], (engine:EngineModel) => ({...engine, moving: 1}));
+            return state.updateIn(["cars", action.params.id], (engine:EngineModel) => ({...engine, moving: 1}));
 
         case ActionType.REVERSE_ENGINE:
-            return state.updateIn(["engines", action.params.id], (engine:EngineModel) => ({...engine, moving: -1}));
+            return state.updateIn(["cars", action.params.id], (engine:EngineModel) => ({...engine, moving: -1}));
 
         case ActionType.STOP_ENGINE:
-            return state.updateIn(["engines", action.params.id], (engine:EngineModel) => ({...engine, willStopOnTile: true}));
+            return state.updateIn(["cars", action.params.id], (engine:EngineModel) => ({...engine, willStopOnTile: true}));
 
         case ActionType.TICK:
             let newState = state;
-            const keys = newState.get("engines").keySeq().toArray();
+            const keys = newState.get("cars").keySeq().toArray();
             keys.map((key:any) => {
-                newState = newState.updateIn(["engines", key], (engine:EngineModel) => {
+                const car = newState.getIn(["cars", key]);
+                if(car.type !== "DieselEngine") { return; }
+
+                newState = newState.updateIn(["cars", key], (engine:EngineModel) => {
                     if(engine.moving) {
                         if(engine.willStopOnTile && ((engine.position[1]+engine.moving)%TILE_SIZE === 0)) {
                             return {...engine, position: [engine.position[0], engine.position[1]+engine.moving], moving: 0, willStopOnTile: false}
@@ -79,7 +80,7 @@ export function LandReducer(state=initialState, action:Action<any>) {
                 });
             });
             keys.map((key:any) => {
-                const engine = newState.getIn(["engines", key]);
+                const engine = newState.getIn(["cars", key]);
                 if(engine.moving) {
                     const cars = getCars(state, engine.id);
                     cars.map((carId:string) => {
@@ -110,7 +111,7 @@ export function LandReducer(state=initialState, action:Action<any>) {
             return detachedState;
 
             // TODO what if detached already
-            // TODO what if engine *common anchestor*
+            // TODO if nobody there
         
         case ActionType.ATTACH_CAR:   
             let attachedState = state;
@@ -145,7 +146,7 @@ export function LandReducer(state=initialState, action:Action<any>) {
 function getCars(state: any, engineId: string): string[] {
     const list:string[] = [];
 
-    let car = state.getIn(["engines", engineId]);
+    let car = state.getIn(["cars", engineId]);
 
     if(car.attachedA) {
         while(car.attachedA) {

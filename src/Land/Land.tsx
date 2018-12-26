@@ -6,9 +6,9 @@ import { Track } from '../Tiles/Track';
 import { LandModel } from './LandModel';
 import { TileModel } from 'src/Tiles/TileModel';
 import { EngineModel } from 'src/Car/Engine/EngineModel';
-import { PassengerCarModel } from 'src/Car/PassengerCar/PassengerCarModel';
 import { ILandProps } from './LandContainer';
 import { End } from 'src/actions';
+import { CarModel } from 'src/Car/CarModel';
 
 export class Land extends React.Component<any, {}> {
 
@@ -39,32 +39,37 @@ export class Land extends React.Component<any, {}> {
                     ))
                 }
                 {
-                    this.props.model.get("engines").valueSeq().map((engine: EngineModel) => (
-                        <Engine
-                            key={engine.id} 
-                            top={engine.position[0]}
-                            left={engine.position[1]}
-                            moving={engine.moving}
-                            willStop={engine.willStopOnTile}
-                            id={engine.id}
-                            onStart={this.onEngineStart}
-                            onReverse={this.onEngineReverse}
-                            onStop={this.onEngineStop}
-                        />
-                    ))
-                }
-                {
-                    this.props.model.get("cars").valueSeq().map((car: PassengerCarModel) => (
-                        <PassengerCar
-                            key={car.id} 
-                            top={car.position[0]}
-                            left={car.position[1]}
-                            id={car.id}
-                            model={car}
-                            onAttach={this.onAttachCar}
-                            onDetach={this.onDetachCar}
-                        />
-                    ))
+                    this.props.model.get("cars").valueSeq().map((car: CarModel) => {
+                        if(car.type === "PassengerCar") {
+                            return (<PassengerCar
+                                key={car.id} 
+                                top={car.position[0]}
+                                left={car.position[1]}
+                                id={car.id}
+                                model={car}
+                                onAttach={this.onAttachCar}
+                                onDetach={this.onDetachCar}
+                            />);
+                        } else if (car.type === "DieselEngine") {
+                            const engine = car as EngineModel;
+                            return (<Engine
+                                key={engine.id} 
+                                top={engine.position[0]}
+                                left={engine.position[1]}
+                                moving={engine.moving}
+                                willStop={engine.willStopOnTile}
+                                id={engine.id}
+                                onStart={this.onEngineStart}
+                                onReverse={this.onEngineReverse}
+                                onStop={this.onEngineStop}
+                                model={engine}
+                                onAttach={this.onAttachCar}
+                                onDetach={this.onDetachCar}
+                            />);
+                        } else {
+                            return null;
+                        }
+                    })
                 }
             </div>
         );
