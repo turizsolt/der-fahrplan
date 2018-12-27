@@ -1,9 +1,16 @@
-export class TileModel {
-    public type: string;
-    public position: number[];
+import { Coordinate } from 'src/Coordinate';
+import { Rectangle } from 'src/Rectangle';
 
-    public constructor(type: string, top: number, left: number) {
+export type TileType = "Track"|"Platform"|"PassengerCar"|"DieselEngine";
+
+export class TileModel {
+    public type: TileType;
+    public center: Coordinate;
+    public box: Rectangle;
+
+    public constructor(type: TileType, center: Coordinate, box: Rectangle) {
         this.type = type;
-        this.position = [top, left];
+        this.center = center;
+        this.box = box;
     }
 }

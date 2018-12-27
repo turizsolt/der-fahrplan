@@ -30,12 +30,12 @@ export class Land extends React.Component<any, {}> {
             <div style={{position: "absolute"}}>
                 {
                     this.props.model.get("tracks").valueSeq().map((tile: TileModel, index:number) => (
-                        <Track key={index} top={tile.position[0]} left={tile.position[1]} />
+                        <Track key={index} model={tile} />
                     ))
                 }
                 {
                     this.props.model.get("platforms").valueSeq().map((tile: TileModel, index:number) => (
-                        <Platform key={index} top={tile.position[0]} left={tile.position[1]} />
+                        <Platform key={index} model={tile} />
                     ))
                 }
                 {
@@ -43,9 +43,6 @@ export class Land extends React.Component<any, {}> {
                         if(car.type === "PassengerCar") {
                             return (<PassengerCar
                                 key={car.id} 
-                                top={car.position[0]}
-                                left={car.position[1]}
-                                id={car.id}
                                 model={car}
                                 onAttach={this.onAttachCar}
                                 onDetach={this.onDetachCar}
@@ -54,17 +51,12 @@ export class Land extends React.Component<any, {}> {
                             const engine = car as EngineModel;
                             return (<Engine
                                 key={engine.id} 
-                                top={engine.position[0]}
-                                left={engine.position[1]}
-                                moving={engine.moving}
-                                willStop={engine.willStopOnTile}
-                                id={engine.id}
-                                onStart={this.onEngineStart}
-                                onReverse={this.onEngineReverse}
-                                onStop={this.onEngineStop}
                                 model={engine}
                                 onAttach={this.onAttachCar}
                                 onDetach={this.onDetachCar}
+                                onStart={this.onEngineStart}
+                                onReverse={this.onEngineReverse}
+                                onStop={this.onEngineStop}
                             />);
                         } else {
                             return null;
