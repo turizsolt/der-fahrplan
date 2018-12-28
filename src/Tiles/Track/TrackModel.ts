@@ -8,15 +8,11 @@ export class TrackModel extends TileModel {
         return new Vector(track.center.y, track.box.left+(track.box.getWidth()/track.sleeperCount)*sleeper, 0);
     }
 
-    public type: TileType;
-    public id:string;
-    public center: Coordinate;
-    public box: Rectangle;
-    public sleeperCount: number;
-
-    public constructor(type: TileType, id:string, center: Coordinate, box: Rectangle, sleeperCount: number) {
+    public constructor(type: TileType, public id:string, public center: Coordinate, public box: Rectangle, public sleeperCount: number, public attachedA: string|null, public attachedB: string|null) {
         super(type, center, box);
         this.sleeperCount = sleeperCount;
         this.id = id;
+        this.attachedA = attachedA;
+        this.attachedB = attachedB;
     }
 }

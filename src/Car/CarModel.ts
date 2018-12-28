@@ -11,7 +11,7 @@ export class CarModel extends TileModel {
         const diffX = newVector.x - car.center.x;
         const diffY = newVector.y - car.center.y;
         const newBox = new Rectangle(car.box.top+diffY, car.box.left+diffX, car.box.bottom+diffY, car.box.right+diffX);
-        return new CarModel(car.type, car.id, newCenter, newBox, car.attachedA, car.attachedB, car.trackId, sleeper);
+        return new CarModel(car.type, car.id, newCenter, newBox, car.attachedA, car.attachedB, track.id, sleeper);
     }
 
     public constructor(type:TileType, public id:string, center: Coordinate, box: Rectangle, public attachedA:string|null, public attachedB:string|null, public trackId: string, public sleeper: number) {

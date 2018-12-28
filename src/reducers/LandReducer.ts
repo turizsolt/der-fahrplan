@@ -12,11 +12,11 @@ export const TILE_SIZE:number = 30;
 
 const initialState = fromJS({
     cars: {
-        "car-11": new PassengerCarModel("car-11", new Coordinate(2.5*TILE_SIZE, 3*TILE_SIZE), new Rectangle(2*TILE_SIZE, 2*TILE_SIZE, 3*TILE_SIZE, 4*TILE_SIZE), null, "car-12", "track-1", 30),
-        "car-12": new PassengerCarModel("car-12", new Coordinate(2.5*TILE_SIZE, 5*TILE_SIZE), new Rectangle(2*TILE_SIZE, 4*TILE_SIZE, 3*TILE_SIZE, 6*TILE_SIZE), "car-11", "car-13", "track-1", 90),
-        "car-13": new PassengerCarModel("car-13", new Coordinate(2.5*TILE_SIZE, 7*TILE_SIZE), new Rectangle(2*TILE_SIZE, 6*TILE_SIZE, 3*TILE_SIZE, 8*TILE_SIZE), "car-12", "engine-1", "track-1", 150),
+        "car-11": new PassengerCarModel("car-11", new Coordinate(2.5*TILE_SIZE, 3*TILE_SIZE), new Rectangle(2*TILE_SIZE, 2*TILE_SIZE, 3*TILE_SIZE, 4*TILE_SIZE), null, "car-12", "track-11", 30),
+        "car-12": new PassengerCarModel("car-12", new Coordinate(2.5*TILE_SIZE, 5*TILE_SIZE), new Rectangle(2*TILE_SIZE, 4*TILE_SIZE, 3*TILE_SIZE, 6*TILE_SIZE), "car-11", "car-13", "track-11", 90),
+        "car-13": new PassengerCarModel("car-13", new Coordinate(2.5*TILE_SIZE, 7*TILE_SIZE), new Rectangle(2*TILE_SIZE, 6*TILE_SIZE, 3*TILE_SIZE, 8*TILE_SIZE), "car-12", "engine-1", "track-11", 150),
         "car-21": new PassengerCarModel("car-21", new Coordinate(3.5*TILE_SIZE, 3*TILE_SIZE), new Rectangle(3*TILE_SIZE, 2*TILE_SIZE, 4*TILE_SIZE, 4*TILE_SIZE), null, null, "track-2", 30),
-        "engine-1": new EngineModel("engine-1", new Coordinate(2.5*TILE_SIZE, 9*TILE_SIZE), new Rectangle(2*TILE_SIZE, 8*TILE_SIZE, 3*TILE_SIZE, 10*TILE_SIZE), "car-13", null, "track-1", 210),
+        "engine-1": new EngineModel("engine-1", new Coordinate(2.5*TILE_SIZE, 9*TILE_SIZE), new Rectangle(2*TILE_SIZE, 8*TILE_SIZE, 3*TILE_SIZE, 10*TILE_SIZE), "car-13", null, "track-11", 210),
         "engine-2": new EngineModel("engine-2", new Coordinate(3.5*TILE_SIZE, 5*TILE_SIZE), new Rectangle(3*TILE_SIZE, 4*TILE_SIZE, 4*TILE_SIZE, 6*TILE_SIZE), null, null, "track-2", 90),
     },
     platforms: [
@@ -24,8 +24,9 @@ const initialState = fromJS({
         new TileModel("Platform", new Coordinate(4.5*TILE_SIZE, 5*TILE_SIZE), new Rectangle(4*TILE_SIZE, 2*TILE_SIZE, 5*TILE_SIZE, 8*TILE_SIZE)),
     ],
     tracks: {
-        "track-1": new TrackModel("Track", "track-1", new Coordinate(2.5*TILE_SIZE, 12*TILE_SIZE), new Rectangle(2*TILE_SIZE, 2*TILE_SIZE, 3*TILE_SIZE, 22*TILE_SIZE), 600),
-        "track-2": new TrackModel("Track", "track-2", new Coordinate(3.5*TILE_SIZE, 12*TILE_SIZE), new Rectangle(3*TILE_SIZE, 2*TILE_SIZE, 4*TILE_SIZE, 22*TILE_SIZE), 600),
+        "track-11": new TrackModel("Track", "track-11", new Coordinate(2.5*TILE_SIZE, 7*TILE_SIZE), new Rectangle(2*TILE_SIZE, 2*TILE_SIZE, 3*TILE_SIZE, 12*TILE_SIZE), 300, null, "track-12"),
+        "track-12": new TrackModel("Track", "track-12", new Coordinate(2.5*TILE_SIZE, 17*TILE_SIZE), new Rectangle(2*TILE_SIZE, 12*TILE_SIZE, 3*TILE_SIZE, 22*TILE_SIZE), 300, "track-11", null),
+        "track-2": new TrackModel("Track", "track-2", new Coordinate(3.5*TILE_SIZE, 12*TILE_SIZE), new Rectangle(3*TILE_SIZE, 2*TILE_SIZE, 4*TILE_SIZE, 22*TILE_SIZE), 600, null, null),
     },    
 });
 
@@ -49,8 +50,29 @@ export function LandReducer(state=initialState, action:Action<any>) {
 
                 newState = newState.updateIn(["cars", key], (engine:EngineModel) => {
                     if(engine.moving) {
-                        const track = state.getIn(["tracks", engine.trackId]);
-                        const sleeper = engine.sleeper+engine.moving; 
+                        let track:TrackModel = state.getIn(["tracks", engine.trackId]);
+                        let sleeper:number = engine.sleeper+engine.moving; 
+
+                        if(sleeper < 0) {
+                            if(track.attachedA) {
+                                track = state.getIn(["tracks", track.attachedA]);
+                                sleeper = sleeper + track.sleeperCount;
+                            } else {
+                                sleeper = engine.sleeper-engine.moving;
+                                return EngineModel.moveToAndStop(engine, track, sleeper);
+                            }
+                        }
+
+                        if(sleeper > track.sleeperCount) {
+                            if(track.attachedB) {
+                                sleeper = sleeper - track.sleeperCount;
+                                track = state.getIn(["tracks", track.attachedB]);
+                            } else {
+                                sleeper = engine.sleeper-engine.moving;
+                                return EngineModel.moveToAndStop(engine, track, sleeper);
+                            }
+                        }
+
                         if(engine.willStopOnTile && sleeper%TILE_SIZE === 0) {
                             return EngineModel.moveToAndStop(engine, track, sleeper);
                         } else {
@@ -67,8 +89,28 @@ export function LandReducer(state=initialState, action:Action<any>) {
                     const cars = getCars(state, engine.id);
                     cars.map((carId:string) => {
                         newState = newState.updateIn(["cars", carId], (car:PassengerCarModel) => {
-                            const track = state.getIn(["tracks", car.trackId]);
-                            const sleeper = car.sleeper+engine.moving; 
+                            let track:TrackModel = state.getIn(["tracks", car.trackId]);
+                            let sleeper:number = car.sleeper+engine.moving; 
+
+                            // TODO copy-paste suspition ahead
+                            if(sleeper < 0) {
+                                if(track.attachedA) {
+                                    track = state.getIn(["tracks", track.attachedA]);
+                                    sleeper = sleeper + track.sleeperCount;
+                                } else {
+                                    return car;
+                                }
+                            }
+    
+                            if(sleeper > track.sleeperCount) {
+                                if(track.attachedB) {
+                                    sleeper = sleeper - track.sleeperCount;
+                                    track = state.getIn(["tracks", track.attachedB]);
+                                } else {
+                                    return car;
+                                }
+                            }
+
                             return CarModel.moveTo(car, track, sleeper);
                         });
                     });
