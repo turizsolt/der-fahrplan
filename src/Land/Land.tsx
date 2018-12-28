@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Engine } from '../Car/Engine/Engine';
 import { PassengerCar } from '../Car/PassengerCar/PassengerCar';
-import { Platform } from '../Tiles/Platform';
-import { Track } from '../Tiles/Track';
+import { Platform } from '../Tiles/Platform/Platform';
+import { Track } from '../Tiles/Track/Track';
 import { LandModel } from './LandModel';
 import { TileModel } from 'src/Tiles/TileModel';
 import { EngineModel } from 'src/Car/Engine/EngineModel';

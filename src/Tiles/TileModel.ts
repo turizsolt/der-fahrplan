@@ -1,5 +1,5 @@
-import { Coordinate } from 'src/Coordinate';
-import { Rectangle } from 'src/Rectangle';
+import { Coordinate } from 'src/Geometry/Coordinate';
+import { Rectangle } from 'src/Geometry/Rectangle';
 
 export type TileType = "Track"|"Platform"|"PassengerCar"|"DieselEngine";
 

@@ -1,5 +1,5 @@
-import {ITileProps, Tile } from './Tile';
-import { TileModel } from './TileModel';
+import {ITileProps, Tile } from '../Tile';
+import { TileModel } from '../TileModel';
 
 export class Platform extends Tile {
 
