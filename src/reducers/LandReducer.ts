@@ -7,6 +7,7 @@ import { Coordinate } from 'src/Geometry/Coordinate';
 import { Rectangle } from 'src/Geometry/Rectangle';
 import { TrackModel } from 'src/Tiles/Track/TrackModel';
 import { CarModel } from 'src/Car/CarModel';
+import { TrackSModel } from 'src/Tiles/Track/TrackSModel';
 
 export const TILE_SIZE:number = 30;
 
@@ -25,7 +26,8 @@ const initialState = fromJS({
     ],
     tracks: {
         "track-11": new TrackModel("Track", "track-11", new Coordinate(2.5*TILE_SIZE, 7*TILE_SIZE), new Rectangle(2*TILE_SIZE, 2*TILE_SIZE, 3*TILE_SIZE, 12*TILE_SIZE), 300, null, "track-12"),
-        "track-12": new TrackModel("Track", "track-12", new Coordinate(2.5*TILE_SIZE, 17*TILE_SIZE), new Rectangle(2*TILE_SIZE, 12*TILE_SIZE, 3*TILE_SIZE, 22*TILE_SIZE), 300, "track-11", null),
+        "track-12": new TrackSModel("TrackS", "track-12", new Coordinate(2.5*TILE_SIZE, 11.5*TILE_SIZE), new Rectangle(1*TILE_SIZE, 12*TILE_SIZE, 3*TILE_SIZE, 15*TILE_SIZE), 90, "track-11","track-13"),
+        "track-13": new TrackModel("Track", "track-13", new Coordinate(1.5*TILE_SIZE, 20*TILE_SIZE), new Rectangle(1*TILE_SIZE, 15*TILE_SIZE, 2*TILE_SIZE, 25*TILE_SIZE), 300, "track-12", null),
         "track-2": new TrackModel("Track", "track-2", new Coordinate(3.5*TILE_SIZE, 12*TILE_SIZE), new Rectangle(3*TILE_SIZE, 2*TILE_SIZE, 4*TILE_SIZE, 22*TILE_SIZE), 600, null, null),
     },    
 });

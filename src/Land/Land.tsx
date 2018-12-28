@@ -9,6 +9,7 @@ import { EngineModel } from 'src/Car/Engine/EngineModel';
 import { ILandProps } from './LandContainer';
 import { End } from 'src/actions';
 import { CarModel } from 'src/Car/CarModel';
+import { TrackS } from 'src/Tiles/Track/TrackS';
 
 export class Land extends React.Component<any, {}> {
 
@@ -29,9 +30,15 @@ export class Land extends React.Component<any, {}> {
         return (
             <div style={{position: "absolute"}}>
                 {
-                    this.props.model.get("tracks").valueSeq().map((tile: TileModel, index:number) => (
-                        <Track key={index} model={tile} />
-                    ))
+                    this.props.model.get("tracks").valueSeq().map((tile: TileModel, index:number) => {
+                        if(tile.type === "TrackS") {
+                            return <TrackS key={index} model={tile} />;
+                        } else if(tile.type === "Track") {
+                            return <Track key={index} model={tile} />;
+                        } else {
+                            return null;
+                        }
+                    })
                 }
                 {
                     this.props.model.get("platforms").valueSeq().map((tile: TileModel, index:number) => (
