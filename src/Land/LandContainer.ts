@@ -1,4 +1,4 @@
-import { startEngine, tick, stopEngine, reverseEngine, End, attachCar, detachCar } from 'src/actions';
+import { startEngine, tick, stopEngine, reverseEngine, End, attachCar, detachCar, trackSwitch } from 'src/actions';
 import { connect } from 'react-redux';
 import { Land } from './Land';
 import { TileModel } from 'src/Tiles/TileModel';
@@ -24,6 +24,7 @@ export interface ILandDispatchToProps {
   onEngineReverse: (id: string) => void,
   onEngineStart: (id: string) => void,
   onEngineStop: (id: string) => void,
+  onSwitch: (id: string) => void,
   onTick: () => void,
 };
 
@@ -33,6 +34,7 @@ const mapDispatchToProps = {
     onEngineReverse: reverseEngine,
     onEngineStart: startEngine,
     onEngineStop: stopEngine,
+    onSwitch: trackSwitch,
     onTick: tick,
 };
 

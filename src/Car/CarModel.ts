@@ -4,6 +4,7 @@ import { Rectangle } from 'src/Geometry/Rectangle';
 import { TrackModel } from 'src/Tiles/Track/TrackModel';
 import { TrackSModel } from 'src/Tiles/Track/TrackSModel';
 import { Vector } from 'src/Geometry/Vector';
+import { SwitchModel } from 'src/Tiles/Track/SwitchModel';
 
 export class CarModel extends TileModel {
 
@@ -11,6 +12,8 @@ export class CarModel extends TileModel {
         let newVector:Vector;
         if(track.type === "TrackS") {
             newVector = TrackSModel.getSleeperVector(track, sleeper);
+        } else if(track.type === "Switch") {
+            newVector = SwitchModel.getSleeperVector(track as SwitchModel, sleeper);
         } else {
             newVector = TrackModel.getSleeperVector(track, sleeper);
         }

@@ -10,6 +10,8 @@ import { ILandProps } from './LandContainer';
 import { End } from 'src/actions';
 import { CarModel } from 'src/Car/CarModel';
 import { TrackS } from 'src/Tiles/Track/TrackS';
+import { Switch } from 'src/Tiles/Track/Switch';
+import { SwitchModel } from 'src/Tiles/Track/SwitchModel';
 
 export class Land extends React.Component<any, {}> {
 
@@ -20,6 +22,7 @@ export class Land extends React.Component<any, {}> {
         this.onEngineReverse = this.onEngineReverse.bind(this);
         this.onEngineStop = this.onEngineStop.bind(this);
         this.onTick = this.onTick.bind(this);
+        this.onSwitch = this.onSwitch.bind(this);
         this.onAttachCar = this.onAttachCar.bind(this);
         this.onDetachCar = this.onDetachCar.bind(this);
 
@@ -35,6 +38,9 @@ export class Land extends React.Component<any, {}> {
                             return <TrackS key={index} model={tile} />;
                         } else if(tile.type === "Track") {
                             return <Track key={index} model={tile} />;
+                        } else if(tile.type === "Switch") {
+                            const switc = tile as SwitchModel;
+                            return <Switch key={index} model={switc} onSwitch={this.onSwitch} />;
                         } else {
                             return null;
                         }
@@ -84,6 +90,10 @@ export class Land extends React.Component<any, {}> {
 
     private onEngineStop(event:React.MouseEvent<HTMLElement>) {
         this.props.onEngineStop((event.target as HTMLElement).id);
+    }
+
+    private onSwitch(event:React.MouseEvent<HTMLElement>) {
+        this.props.onSwitch((event.target as HTMLElement).id);
     }
 
     private onAttachCar(event:React.MouseEvent<HTMLElement>, end:End) {
