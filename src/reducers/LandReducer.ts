@@ -7,7 +7,8 @@ import { Coordinate } from 'src/Geometry/Coordinate';
 import { Rectangle } from 'src/Geometry/Rectangle';
 import { TrackModel } from 'src/Tiles/Track/TrackModel';
 import { CarModel } from 'src/Car/CarModel';
-import { SwitchModel } from 'src/Tiles/Track/SwitchModel';
+import { SwitchModelRight } from 'src/Tiles/Track/SwitchModelRight';
+import { SwitchModelLeft } from 'src/Tiles/Track/SwitchModelLeft';
 
 export const TILE_SIZE:number = 30;
 
@@ -27,9 +28,11 @@ const initialState = fromJS({
     ],
     tracks: {
         "track-11": new TrackModel("Track", "track-11", new Coordinate(2.5*TILE_SIZE, 7*TILE_SIZE), new Rectangle(2*TILE_SIZE, 2*TILE_SIZE, 3*TILE_SIZE, 12*TILE_SIZE), 300, null, "track-12"),
-        "track-12": new SwitchModel("Switch", "track-12", new Coordinate(2.5*TILE_SIZE, 11.5*TILE_SIZE), new Rectangle(1*TILE_SIZE, 12*TILE_SIZE, 3*TILE_SIZE, 15*TILE_SIZE), 90, "track-11","track-14", "track-13"),
-        "track-13": new TrackModel("Track", "track-13", new Coordinate(1.5*TILE_SIZE, 20*TILE_SIZE), new Rectangle(1*TILE_SIZE, 15*TILE_SIZE, 2*TILE_SIZE, 25*TILE_SIZE), 300, "track-12", null),
-        "track-14": new TrackModel("Track", "track-14", new Coordinate(2.5*TILE_SIZE, 20*TILE_SIZE), new Rectangle(2*TILE_SIZE, 15*TILE_SIZE, 3*TILE_SIZE, 25*TILE_SIZE), 300, "track-12", null),
+        "track-12": new SwitchModelRight("SwitchRight", "track-12", new Coordinate(2.5*TILE_SIZE, 11.5*TILE_SIZE), new Rectangle(1*TILE_SIZE, 12*TILE_SIZE, 3*TILE_SIZE, 15*TILE_SIZE), 90, "track-11","track-14", "track-13"),
+        "track-13": new TrackModel("Track", "track-13", new Coordinate(1.5*TILE_SIZE, 20*TILE_SIZE), new Rectangle(1*TILE_SIZE, 15*TILE_SIZE, 2*TILE_SIZE, 25*TILE_SIZE), 300, "track-12", "track-15"),
+        "track-14": new TrackModel("Track", "track-14", new Coordinate(2.5*TILE_SIZE, 20*TILE_SIZE), new Rectangle(2*TILE_SIZE, 15*TILE_SIZE, 3*TILE_SIZE, 25*TILE_SIZE), 300, "track-12", "track-15"),
+        "track-15": new SwitchModelLeft("SwitchLeft", "track-15", new Coordinate(2.5*TILE_SIZE, 26.5*TILE_SIZE), new Rectangle(1*TILE_SIZE, 25*TILE_SIZE, 3*TILE_SIZE, 28*TILE_SIZE), 90, "track-14","track-16", "track-13"),
+        "track-16": new TrackModel("Track", "track-16", new Coordinate(2.5*TILE_SIZE, 32*TILE_SIZE), new Rectangle(2*TILE_SIZE, 28*TILE_SIZE, 3*TILE_SIZE, 36*TILE_SIZE), 240, "track-15", null),
         "track-2": new TrackModel("Track", "track-2", new Coordinate(3.5*TILE_SIZE, 12*TILE_SIZE), new Rectangle(3*TILE_SIZE, 2*TILE_SIZE, 4*TILE_SIZE, 22*TILE_SIZE), 600, null, null),
     },    
 });
@@ -166,7 +169,14 @@ export function LandReducer(state=initialState, action:Action<any>) {
             return attachedState;
 
         case ActionType.TRACK_SWITCH:
-            return state.updateIn(["tracks", action.params.id], (track:SwitchModel) => SwitchModel.doSwitch(track));
+            const sw = state.getIn(["tracks", action.params.id]);
+            if(sw.type === "SwitchRight") {
+                return state.updateIn(["tracks", action.params.id], (track:SwitchModelRight) => SwitchModelRight.doSwitch(track));
+            } else if(sw.type === "SwitchLeft") {
+                return state.updateIn(["tracks", action.params.id], (track:SwitchModelLeft) => SwitchModelLeft.doSwitch(track));
+            } else {
+                return state;
+            }
 
         default:
             return state;

@@ -10,8 +10,10 @@ import { ILandProps } from './LandContainer';
 import { End } from 'src/actions';
 import { CarModel } from 'src/Car/CarModel';
 import { TrackS } from 'src/Tiles/Track/TrackS';
-import { Switch } from 'src/Tiles/Track/Switch';
-import { SwitchModel } from 'src/Tiles/Track/SwitchModel';
+import { SwitchRight } from 'src/Tiles/Track/SwitchRight';
+import { SwitchModelRight } from 'src/Tiles/Track/SwitchModelRight';
+import { SwitchModelLeft } from 'src/Tiles/Track/SwitchModelLeft';
+import { SwitchLeft } from 'src/Tiles/Track/SwitchLeft';
 
 export class Land extends React.Component<any, {}> {
 
@@ -38,9 +40,12 @@ export class Land extends React.Component<any, {}> {
                             return <TrackS key={index} model={tile} />;
                         } else if(tile.type === "Track") {
                             return <Track key={index} model={tile} />;
-                        } else if(tile.type === "Switch") {
-                            const switc = tile as SwitchModel;
-                            return <Switch key={index} model={switc} onSwitch={this.onSwitch} />;
+                        } else if(tile.type === "SwitchRight") {
+                            const switc = tile as SwitchModelRight;
+                            return <SwitchRight key={index} model={switc} onSwitch={this.onSwitch} />;
+                        } else if(tile.type === "SwitchLeft") {
+                            const switc = tile as SwitchModelLeft;
+                            return <SwitchLeft key={index} model={switc} onSwitch={this.onSwitch} />;
                         } else {
                             return null;
                         }

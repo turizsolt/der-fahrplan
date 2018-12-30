@@ -1,7 +1,7 @@
 import { Coordinate } from 'src/Geometry/Coordinate';
 import { Rectangle } from 'src/Geometry/Rectangle';
 
-export type TileType = "Track"|"TrackS"|"Switch"|"Platform"|"PassengerCar"|"DieselEngine";
+export type TileType = "Track"|"TrackS"|"SwitchLeft"|"SwitchRight"|"Platform"|"PassengerCar"|"DieselEngine";
 
 export class TileModel {
     public type: TileType;

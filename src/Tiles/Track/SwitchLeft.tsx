@@ -1,15 +1,15 @@
 import * as React from 'react';
-import { SwitchModel } from './SwitchModel';
+import { SwitchModelRight } from './SwitchModelRight';
 
-export class Switch extends React.Component<ISwitchProps, {}> {
+export class SwitchLeft extends React.Component<ISwitchProps, {}> {
     protected image:string;
     protected imageSwitched:string;
 
     public constructor(props:ISwitchProps) {
         super(props);
 
-        this.image = "tiles/track-switch-line.svg";
-        this.imageSwitched = "tiles/track-switch-s.svg";
+        this.image = "tiles/track-switch-line-left.svg";
+        this.imageSwitched = "tiles/track-switch-s-left.svg";
 
         this.onSwitch = this.onSwitch.bind(this);
     }
@@ -34,6 +34,6 @@ export class Switch extends React.Component<ISwitchProps, {}> {
 }
 
 export interface ISwitchProps {
-    model: SwitchModel;
+    model: SwitchModelRight;
     onSwitch: (event: React.MouseEvent<HTMLElement>) => void,
 }

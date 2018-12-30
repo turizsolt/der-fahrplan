@@ -4,7 +4,8 @@ import { Rectangle } from 'src/Geometry/Rectangle';
 import { TrackModel } from 'src/Tiles/Track/TrackModel';
 import { TrackSModel } from 'src/Tiles/Track/TrackSModel';
 import { Vector } from 'src/Geometry/Vector';
-import { SwitchModel } from 'src/Tiles/Track/SwitchModel';
+import { SwitchModelRight } from 'src/Tiles/Track/SwitchModelRight';
+import { SwitchModelLeft } from 'src/Tiles/Track/SwitchModelLeft';
 
 export class CarModel extends TileModel {
 
@@ -12,8 +13,10 @@ export class CarModel extends TileModel {
         let newVector:Vector;
         if(track.type === "TrackS") {
             newVector = TrackSModel.getSleeperVector(track, sleeper);
-        } else if(track.type === "Switch") {
-            newVector = SwitchModel.getSleeperVector(track as SwitchModel, sleeper);
+        } else if(track.type === "SwitchRight") {
+            newVector = SwitchModelRight.getSleeperVector(track as SwitchModelRight, sleeper);
+        } else if(track.type === "SwitchLeft") {
+            newVector = SwitchModelLeft.getSleeperVector(track as SwitchModelLeft, sleeper);
         } else {
             newVector = TrackModel.getSleeperVector(track, sleeper);
         }
