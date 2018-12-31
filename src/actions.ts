@@ -7,6 +7,7 @@ export enum ActionType {
     TICK = "TICK",
     ATTACH_CAR = "ATTACH_CAR",
     DETACH_CAR = "DETACH_CAR",
+    TRACK_SWITCH = "TRACK_SWITCH",
 }
 
 // action creators
@@ -21,6 +22,10 @@ export function reverseEngine(id:string):Action<IParamsId> {
 
 export function stopEngine(id:string):Action<IParamsId> {
     return {type: ActionType.STOP_ENGINE, params: {id}};
+}
+
+export function trackSwitch(id:string):Action<IParamsId> {
+    return {type: ActionType.TRACK_SWITCH, params: {id}};
 }
 
 export function tick():Action<{}> {

@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Car } from '../Car';
+import { Car, ICarProps } from '../Car';
+import { EngineModel } from './EngineModel';
 
-export class Engine extends Car {
+export class Engine extends Car<IEngineProps> {
     protected image:string;
 
-    public constructor(props:any, state:{}) {
-        super(props, state);
+    public constructor(props:ICarProps & IEngineProps) {
+        super(props);
 
         this.image = "tiles/engine-diesel.svg";
 
@@ -18,13 +19,20 @@ export class Engine extends Car {
         return (<>
             <img 
                 src={this.image}
-                style={{position: "absolute", left: this.props.left+"px", top: this.props.top+"px", width: "60px", height: "30px"}} 
+                style={{position: "absolute", ...this.props.model.box.getPositionStyle()}} 
                 
                 
-                id={this.props.id}  
+                id={this.props.model.id}  
             />
             <div
-                style={{display:"flex", justifyContent: "space-between", position: "absolute", left: this.props.left+"px", top: this.props.top+"px", width: "60px", height: "30px", lineHeight:"30px", fontSize:"60%"}}>
+                style={{
+                    display:"flex",
+                    fontSize:"60%",
+                    justifyContent: "space-between",
+                    lineHeight:this.props.model.box.getHeight()+"px",
+                    position: "absolute",
+                    ...this.props.model.box.getPositionStyle(),
+                    }}>
                 {this.renderEndA()}
                 {this.renderEngineButtons()}
                 {this.renderEndB()}
@@ -35,14 +43,14 @@ export class Engine extends Car {
     protected renderEngineButtons() {
         return (
             <span>
-                { this.props.moving===0 && <>
-                    <span style={{cursor: "pointer"}} id={this.props.id} onClick={this.onReverse}>⏪</span>
-                    <span style={{cursor: "pointer"}} id={this.props.id} onClick={this.onStart}>⏩</span>
+                { this.props.model.moving===0 && <>
+                    <span style={{cursor: "pointer"}} id={this.props.model.id} onClick={this.onReverse}>⏪</span>
+                    <span style={{cursor: "pointer"}} id={this.props.model.id} onClick={this.onStart}>⏩</span>
                 </> }
-                { this.props.moving!==0 && !this.props.willStop && 
-                    <span style={{cursor: "pointer"}} id={this.props.id} onClick={this.onStop}>⏸</span>
+                { this.props.model.moving!==0 && !this.props.model.willStopOnTile && 
+                    <span style={{cursor: "pointer"}} id={this.props.model.id} onClick={this.onStop}>⏸</span>
                 }
-                { this.props.moving!==0 && this.props.willStop && <span>⏺</span> }
+                { this.props.model.moving!==0 && this.props.model.willStopOnTile && <span>⏺</span> }
             </span>
         );
     }
@@ -59,4 +67,11 @@ export class Engine extends Car {
         if(this.props.onStop) { this.props.onStop(event); }
     }
 
+}
+
+export interface IEngineProps extends ICarProps {
+    model: EngineModel,
+    onStart: (event: React.MouseEvent<HTMLElement>) => void,
+    onReverse: (event: React.MouseEvent<HTMLElement>) => void,
+    onStop: (event: React.MouseEvent<HTMLElement>) => void,
 }

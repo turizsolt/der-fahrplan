@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Car } from '../Car';
+import { Car, ICarProps } from '../Car';
 
-export class PassengerCar extends Car {
-    public constructor(props:any, state:{}) {
-        super(props, state);
+export class PassengerCar extends Car<ICarProps> {
+    public constructor(props:ICarProps) {
+        super(props);
 
         this.image = "tiles/passenger-car.svg";
     }
@@ -12,13 +12,21 @@ export class PassengerCar extends Car {
         return (<>
             <img 
                 src={this.image}
-                style={{position: "absolute", left: this.props.left+"px", top: this.props.top+"px", width: "60px", height: "30px"}} 
-                
-                
-                id={this.props.id}  
+                style={{
+                    position: "absolute", 
+                    ...this.props.model.box.getPositionStyle()
+                }} 
+                id={this.props.model.id}  
             />
             <div
-                style={{display:"flex", justifyContent: "space-between", position: "absolute", left: this.props.left+"px", top: this.props.top+"px", width: "60px", height: "30px", lineHeight:"30px", fontSize:"60%"}}>
+                style={{
+                    display:"flex",
+                    fontSize:"60%",
+                    justifyContent: "space-between",
+                    lineHeight:this.props.model.box.getHeight()+"px",
+                    position: "absolute",
+                    ...this.props.model.box.getPositionStyle(),
+                }}>
                 {this.renderEndA()}
                 {this.renderEndB()}
             </div>

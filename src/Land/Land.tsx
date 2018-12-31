@@ -1,14 +1,19 @@
 import * as React from 'react';
 import { Engine } from '../Car/Engine/Engine';
 import { PassengerCar } from '../Car/PassengerCar/PassengerCar';
-import { Platform } from '../Tiles/Platform';
-import { Track } from '../Tiles/Track';
+import { Platform } from '../Tiles/Platform/Platform';
+import { Track } from '../Tiles/Track/Track';
 import { LandModel } from './LandModel';
 import { TileModel } from 'src/Tiles/TileModel';
 import { EngineModel } from 'src/Car/Engine/EngineModel';
 import { ILandProps } from './LandContainer';
 import { End } from 'src/actions';
 import { CarModel } from 'src/Car/CarModel';
+import { TrackS } from 'src/Tiles/Track/TrackS';
+import { SwitchRight } from 'src/Tiles/Track/SwitchRight';
+import { SwitchModelRight } from 'src/Tiles/Track/SwitchModelRight';
+import { SwitchModelLeft } from 'src/Tiles/Track/SwitchModelLeft';
+import { SwitchLeft } from 'src/Tiles/Track/SwitchLeft';
 
 export class Land extends React.Component<any, {}> {
 
@@ -19,6 +24,7 @@ export class Land extends React.Component<any, {}> {
         this.onEngineReverse = this.onEngineReverse.bind(this);
         this.onEngineStop = this.onEngineStop.bind(this);
         this.onTick = this.onTick.bind(this);
+        this.onSwitch = this.onSwitch.bind(this);
         this.onAttachCar = this.onAttachCar.bind(this);
         this.onDetachCar = this.onDetachCar.bind(this);
 
@@ -29,13 +35,25 @@ export class Land extends React.Component<any, {}> {
         return (
             <div style={{position: "absolute"}}>
                 {
-                    this.props.model.get("tracks").valueSeq().map((tile: TileModel, index:number) => (
-                        <Track key={index} top={tile.position[0]} left={tile.position[1]} />
-                    ))
+                    this.props.model.get("tracks").valueSeq().map((tile: TileModel, index:number) => {
+                        if(tile.type === "TrackS") {
+                            return <TrackS key={index} model={tile} />;
+                        } else if(tile.type === "Track") {
+                            return <Track key={index} model={tile} />;
+                        } else if(tile.type === "SwitchRight") {
+                            const switc = tile as SwitchModelRight;
+                            return <SwitchRight key={index} model={switc} onSwitch={this.onSwitch} />;
+                        } else if(tile.type === "SwitchLeft") {
+                            const switc = tile as SwitchModelLeft;
+                            return <SwitchLeft key={index} model={switc} onSwitch={this.onSwitch} />;
+                        } else {
+                            return null;
+                        }
+                    })
                 }
                 {
                     this.props.model.get("platforms").valueSeq().map((tile: TileModel, index:number) => (
-                        <Platform key={index} top={tile.position[0]} left={tile.position[1]} />
+                        <Platform key={index} model={tile} />
                     ))
                 }
                 {
@@ -43,9 +61,6 @@ export class Land extends React.Component<any, {}> {
                         if(car.type === "PassengerCar") {
                             return (<PassengerCar
                                 key={car.id} 
-                                top={car.position[0]}
-                                left={car.position[1]}
-                                id={car.id}
                                 model={car}
                                 onAttach={this.onAttachCar}
                                 onDetach={this.onDetachCar}
@@ -54,17 +69,12 @@ export class Land extends React.Component<any, {}> {
                             const engine = car as EngineModel;
                             return (<Engine
                                 key={engine.id} 
-                                top={engine.position[0]}
-                                left={engine.position[1]}
-                                moving={engine.moving}
-                                willStop={engine.willStopOnTile}
-                                id={engine.id}
-                                onStart={this.onEngineStart}
-                                onReverse={this.onEngineReverse}
-                                onStop={this.onEngineStop}
                                 model={engine}
                                 onAttach={this.onAttachCar}
                                 onDetach={this.onDetachCar}
+                                onStart={this.onEngineStart}
+                                onReverse={this.onEngineReverse}
+                                onStop={this.onEngineStop}
                             />);
                         } else {
                             return null;
@@ -85,6 +95,10 @@ export class Land extends React.Component<any, {}> {
 
     private onEngineStop(event:React.MouseEvent<HTMLElement>) {
         this.props.onEngineStop((event.target as HTMLElement).id);
+    }
+
+    private onSwitch(event:React.MouseEvent<HTMLElement>) {
+        this.props.onSwitch((event.target as HTMLElement).id);
     }
 
     private onAttachCar(event:React.MouseEvent<HTMLElement>, end:End) {

@@ -1,10 +1,12 @@
 import * as React from 'react';
+import { CarModel } from './CarModel';
+import { End } from 'src/actions';
 
-export abstract class Car extends React.Component<any, {}> {
+export abstract class Car<Type extends ICarProps> extends React.Component<Type, {}> {
     protected image:string;
 
-    public constructor(props:any, state:{}) {
-        super(props, state);
+    public constructor(props:Type) {
+        super(props);
 
         this.onAttachCarA = this.onAttachCarA.bind(this);
         this.onAttachCarB = this.onAttachCarB.bind(this);
@@ -14,15 +16,15 @@ export abstract class Car extends React.Component<any, {}> {
 
     protected renderEndA() {
         return (<>
-            {this.props.model.attachedA && <span style={{cursor: "pointer"}} id={this.props.id} onClick={this.onDetachCarA}>⚫</span> }
-            {!this.props.model.attachedA && <span style={{cursor: "pointer"}} id={this.props.id} onClick={this.onAttachCarA}>⚪</span> }
+            {this.props.model.attachedA && <span style={{cursor: "pointer"}} id={this.props.model.id} onClick={this.onDetachCarA}>⚫</span> }
+            {!this.props.model.attachedA && <span style={{cursor: "pointer"}} id={this.props.model.id} onClick={this.onAttachCarA}>⚪</span> }
         </>);
     }
 
     protected renderEndB() {
         return (<>
-            {this.props.model.attachedB && <span style={{cursor: "pointer"}} id={this.props.id} onClick={this.onDetachCarB}>⚫</span> }
-            {!this.props.model.attachedB && <span style={{cursor: "pointer"}} id={this.props.id} onClick={this.onAttachCarB}>⚪</span> }
+            {this.props.model.attachedB && <span style={{cursor: "pointer"}} id={this.props.model.id} onClick={this.onDetachCarB}>⚫</span> }
+            {!this.props.model.attachedB && <span style={{cursor: "pointer"}} id={this.props.model.id} onClick={this.onAttachCarB}>⚪</span> }
         </>);
     }
 
@@ -41,4 +43,10 @@ export abstract class Car extends React.Component<any, {}> {
     protected onDetachCarB(event: React.MouseEvent<HTMLElement>) {
         if(this.props.onDetach) { this.props.onDetach(event, "B");}
     }
+}
+
+export interface ICarProps {
+    model: CarModel;
+    onAttach: (event: React.MouseEvent<HTMLElement>, end:End) => void,
+    onDetach: (event: React.MouseEvent<HTMLElement>, end:End) => void,
 }
