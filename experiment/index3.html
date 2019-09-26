@@ -48,7 +48,7 @@
             p0 = new BABYLON.Vector3(0, 0, 0),
             p1 = new BABYLON.Vector3(0, 0, 10),
             p2 = new BABYLON.Vector3(10, 0, 10),
-            300);
+            20);
         points = bezier.getPoints();
         var track = BABYLON.MeshBuilder.CreateLines(
             'track',
@@ -57,6 +57,17 @@
             scene);
         console.log("by length", bezier.length());
         track.color = new BABYLON.Color3(0, 0, 0);
+
+        var bezier2 = BABYLON.Curve3.CreateQuadraticBezier(
+            new BABYLON.Vector3(0, 0, 0),
+            new BABYLON.Vector3(0, 0, 12),
+            new BABYLON.Vector3(10, 0, 12),
+            20);
+        var track2 = BABYLON.MeshBuilder.CreateDashedLines(
+            'track2',
+            {points: bezier2.getPoints(), updateable: false, dashNb: 60, dashSize: 1, gapSize: 3},
+            scene);
+        track2.color = new BABYLON.Color3(0, 0, 0);
 
         var pos = 0;
 
