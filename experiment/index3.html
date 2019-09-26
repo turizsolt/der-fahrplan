@@ -36,11 +36,29 @@
         boxMaterial.diffuseColor = new BABYLON.Color3(1,0,0);
         box.material = boxMaterial;
 
+        var boxp = BABYLON.Mesh.CreateBox("box", 0.5, scene);
+        boxp.position = new BABYLON.Vector3(0,1.5,0);
+        boxp.material = boxMaterial;
+
+        var p0, p1, p2;
         var points = [];
         points.push(new BABYLON.Vector3(0, 0, 0));
         points.push(new BABYLON.Vector3(0, 0, 10));
-        var track = BABYLON.MeshBuilder.CreateLines('track', {points: points}, scene);
+        var bezier = BABYLON.Curve3.CreateQuadraticBezier(
+            p0 = new BABYLON.Vector3(0, 0, 0),
+            p1 = new BABYLON.Vector3(0, 0, 10),
+            p2 = new BABYLON.Vector3(10, 0, 10),
+            300);
+        points = bezier.getPoints();
+        var track = BABYLON.MeshBuilder.CreateLines(
+            'track',
+            // {points: points},
+            {points: points},
+            scene);
+        console.log("by length", bezier.length());
         track.color = new BABYLON.Color3(0, 0, 0);
+
+        var pos = 0;
 
 
 
@@ -67,15 +85,30 @@
         scene.registerAfterRender(function () {
 
             if ((map["w"] || map["W"])) {
-                box.position.z += 0.1;
-                if(box.position.z > 10) box.position.z = 10;
+                pos += 0.1;
+                if(pos > bezier.length()) pos = bezier.length();
             };
 
             if ((map["s"] || map["S"])) {
-                box.position.z -= 0.1;
-                if(box.position.z < 0) box.position.z = 0;
+                pos -= 0.1;
+                if(pos < 0) pos = 0;
             };
 
+            var t = pos / bezier.length();
+            var p = new BABYLON.Vector3(
+                (1-t)*(1-t)*p0.x + 2*(1-t)*t*p1.x + t*t*p2.x,
+                1.5,
+                (1-t)*(1-t)*p0.z + 2*(1-t)*t*p1.z + t*t*p2.z,
+            );
+            var pd = new BABYLON.Vector3(
+                2*(1-t)*(p1.x-p0.x) + 2*t*(p2.x-p1.x),
+                0,
+                2*(1-t)*(p1.z-p0.z) + 2*t*(p2.z-p1.z),
+            );
+            box.position = p;
+            box.rotation.y = Math.atan2(pd.x, pd.z);
+
+            boxp.position = p.add(pd.scale(0.4));
         });
 
         /****************************End************************************************/
