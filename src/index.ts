@@ -1,26 +1,15 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset = "utf-8">
-    <title>Train test</title>
-    <script src="https://cdn.babylonjs.com/babylon.js"></script>
-    <style>
-        * { border: 0; margin: 0; padding: 0;}
-        canvas { width: 100%; height: 100%; position: fixed;}
-    </style>
-</head>
+import 'babylonjs-loaders';
+import * as BABYLON from 'babylonjs';
 
-<body>
-<canvas id = "renderCanvas"></canvas>
-<script type = "text/javascript">
-    var canvas = document.getElementById("renderCanvas");
+window.addEventListener('DOMContentLoaded', () => {
+    var canvas:BABYLON.Nullable<HTMLCanvasElement> = document.getElementById("renderCanvas") as HTMLCanvasElement;
     var engine = new BABYLON.Engine(canvas, true);
     var createScene  = function() {
         var scene = new BABYLON.Scene(engine);
-        scene.clearColor = new BABYLON.Color3(0, 1, 0);
+        scene.clearColor = new BABYLON.Color4(0, 1, 0, 1);
 
         var camera = new BABYLON.ArcRotateCamera("Camera", 1, 0.8, 50, new BABYLON.Vector3(0, 0, 0), scene);
-        camera.attachControl(canvas, true);
+        camera.attachControl(canvas as HTMLElement, true);
 
         var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 10, 0), scene);
         light.intensity = 0.7;
@@ -40,14 +29,16 @@
         boxp.position = new BABYLON.Vector3(0,1.5,0);
         boxp.material = boxMaterial;
 
-        var p0, p1, p2;
+        var p0 = new BABYLON.Vector3(0, 0, 0);
+        var p1 = new BABYLON.Vector3(0, 0, 10);
+        var p2 = new BABYLON.Vector3(10, 0, 10);
         var points = [];
         points.push(new BABYLON.Vector3(0, 0, 0));
         points.push(new BABYLON.Vector3(0, 0, 10));
         var bezier = BABYLON.Curve3.CreateQuadraticBezier(
-            p0 = new BABYLON.Vector3(0, 0, 0),
-            p1 = new BABYLON.Vector3(0, 0, 10),
-            p2 = new BABYLON.Vector3(10, 0, 10),
+            p0,
+            p1,
+            p2,
             20);
         points = bezier.getPoints();
         var track = BABYLON.MeshBuilder.CreateLines(
@@ -65,7 +56,7 @@
             20);
         var track2 = BABYLON.MeshBuilder.CreateDashedLines(
             'track2',
-            {points: bezier2.getPoints(), updateable: false, dashNb: 60, dashSize: 1, gapSize: 3},
+            {points: bezier2.getPoints(), updatable: false, dashNb: 60, dashSize: 1, gapSize: 3},
             scene);
         track2.color = new BABYLON.Color3(0, 0, 0);
 
@@ -73,8 +64,7 @@
 
 
 
-        var ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 30, height: 30}, scene);
-        ground.color = new BABYLON.Color3(0, 1, 1);
+        BABYLON.MeshBuilder.CreateGround("ground", {width: 30, height: 30}, scene);
 
         /****************************Key Control Multiple Keys************************************************/
 
@@ -130,6 +120,4 @@
     engine.runRenderLoop(function() {
         scene.render();
     });
-</script>
-</body>
-</html>
+});
