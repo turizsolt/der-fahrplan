@@ -30,8 +30,8 @@ export class Track {
     }
 
     setSegments(prev: Track, next: Track) {
-        this._prevSegment = prev;
-        this._nextSegment = next;
+        if (prev) { this._prevSegment = prev; }
+        if (next) { this._nextSegment = next; }
     }
 
     render(scene: BABYLON.Scene) {

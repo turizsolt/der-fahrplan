@@ -41,9 +41,14 @@ export class TrackList {
 
         for(let j = 0; j < this.list.length; j++) {
             this.list[j].setSegments(
-                j-1 < 0 ? this.list[j-1] : undefined,
-                j+1 >= this.list.length ? this.list[j+1] : undefined
+                j-1 < 0 ? undefined: this.list[j-1],
+                j+1 >= this.list.length ? undefined : this.list[j+1]
             );
         }
+    }
+
+    connect(bEnd: Track, aStart: Track) {
+        bEnd.setSegments(undefined, aStart);
+        aStart.setSegments(bEnd, undefined);
     }
 }
