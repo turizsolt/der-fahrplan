@@ -1,5 +1,6 @@
 import 'babylonjs-loaders';
 import * as BABYLON from 'babylonjs';
+import {TrackCreatorList, TrackList} from "./structs/tracklist";
 
 window.addEventListener('DOMContentLoaded', () => {
     var canvas:BABYLON.Nullable<HTMLCanvasElement> = document.getElementById("renderCanvas") as HTMLCanvasElement;
@@ -29,6 +30,7 @@ window.addEventListener('DOMContentLoaded', () => {
         boxp.position = new BABYLON.Vector3(0,1.5,0);
         boxp.material = boxMaterial;
 
+        /*
         var p0 = new BABYLON.Vector3(0, 0, 0);
         var p1 = new BABYLON.Vector3(0, 0, 10);
         var p2 = new BABYLON.Vector3(10, 0, 10);
@@ -59,9 +61,26 @@ window.addEventListener('DOMContentLoaded', () => {
             {points: bezier2.getPoints(), updatable: false, dashNb: 60, dashSize: 1, gapSize: 3},
             scene);
         track2.color = new BABYLON.Color3(0, 0, 0);
-
+        */
         var pos = 0;
 
+        const trackCreatorList:TrackCreatorList = [
+            {x: 0, z: 0},
+            {x: 10, z: 0},
+            {x: 20, z: 0, im: true},
+            {x: 20, z: 10},
+            {x: 20, z: 20, im: true},
+            {x: 10, z: 20},
+            {x: 0, z: 20},
+            {x: -10, z: 20, im: true},
+            {x: -10, z: 10},
+            {x: -10, z: 0, im: true},
+            {x: 0, z: 0}
+        ];
+
+        const trackList = new TrackList(trackCreatorList);
+
+        trackList.list.map(x => x.render(scene));
 
 
         BABYLON.MeshBuilder.CreateGround("ground", {width: 30, height: 30}, scene);
@@ -85,6 +104,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         scene.registerAfterRender(function () {
 
+            /*
             if ((map["w"] || map["W"])) {
                 pos += 0.1;
                 if(pos > bezier.length()) pos = bezier.length();
@@ -110,6 +130,7 @@ window.addEventListener('DOMContentLoaded', () => {
             box.rotation.y = Math.atan2(pd.x, pd.z);
 
             boxp.position = p.add(pd.scale(0.4));
+            */
         });
 
         /****************************End************************************************/
