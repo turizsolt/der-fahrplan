@@ -1,6 +1,8 @@
 import 'babylonjs-loaders';
 import * as BABYLON from 'babylonjs';
 import {Engine} from "./structs/engine";
+import {Switch} from "./structs/switch";
+import {Track} from "./structs/track";
 import {TrackCreatorList, TrackList} from "./structs/tracklist";
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -22,6 +24,7 @@ window.addEventListener('DOMContentLoaded', () => {
         pl.intensity = 0.8;
 
         const trackCreatorList:TrackCreatorList = [
+            /*
             {x: 0, z: 0},
             {x: 10, z: 0},
             {x: 20, z: 0, im: true},
@@ -33,10 +36,20 @@ window.addEventListener('DOMContentLoaded', () => {
             {x: -10, z: 10},
             {x: -10, z: 0, im: true},
             {x: 0, z: 0}
+             */
+            {x: 0, z: 0},
+            {x: 10, z: 0},
         ];
 
+        const ta = new Track(new BABYLON.Vector3(10, 0, 0), new BABYLON.Vector3(30, 0, 0));
+        // const ta = new Track(new BABYLON.Vector3(10, 0, 0), new BABYLON.Vector3(20, 0, -10), new BABYLON.Vector3(20, 0 ,0));
+        const tb = new Track(new BABYLON.Vector3(10, 0, 0), new BABYLON.Vector3(20, 0, 10), new BABYLON.Vector3(20, 0 ,0));
+        const sw = new Switch(ta, tb);
+        sw.render(scene);
+
         const trackList = new TrackList(trackCreatorList);
-        trackList.connect(trackList.list[5], trackList.list[0]);
+        // trackList.connect(trackList.list[0], tb);
+        // trackList.connect(trackList.list[5], trackList.list[0]);
 
         const engine = new Engine();
         engine.putOnTrack(trackList.list[0]);
@@ -73,6 +86,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
             if ((map["s"] || map["S"])) {
                 engine.backward();
+            };
+
+            if ((map["1"])) {
+                sw.switch();
             };
         });
 
