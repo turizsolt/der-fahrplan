@@ -1,8 +1,9 @@
 import * as BABYLON from "babylonjs";
-import {Track} from "./track";
+import {Track} from "./Track";
+import {TrackBase} from "./TrackBase";
 
 export class Engine {
-    private track:Track;
+    private track:TrackBase;
     private position:BABYLON.Vector3;
     private rotation: number;
     private positionOnTrack: number;
@@ -10,7 +11,7 @@ export class Engine {
 
     putOnTrack(track: Track) {
         this.track = track;
-        this.position = track.PA;
+        this.position = track.A.point;
         this.positionOnTrack = 0;
     }
 
@@ -25,26 +26,25 @@ export class Engine {
     }
 
     forward() {
-        this.positionOnTrack += 0.1;
-        if (this.positionOnTrack > this.track.length) {
-            const trackLength = this.track.length;
-            if(this.track.nextSegment) {
-                this.track = this.track.nextSegment;
+        this.positionOnTrack += 1;
+        if (this.positionOnTrack > this.track.segment.length) {
+            const trackLength = this.track.segment.length;
+            if(this.track.B.connectedTo) {
+                this.track = this.track.B.connectedTo;
                 this.positionOnTrack -= trackLength;
             } else {
                 this.positionOnTrack = trackLength;
             }
         }
-
         this.reposition();
     }
 
     backward() {
-        this.positionOnTrack -= 0.1;
+        this.positionOnTrack -= 1;
         if (this.positionOnTrack < 0) {
-            if(this.track.prevSegment) {
-                this.track = this.track.prevSegment;
-                const prevTrackLength = this.track.length;
+            if(this.track.A.connectedTo) {
+                this.track = this.track.A.connectedTo;
+                const prevTrackLength = this.track.segment.length;
                 this.positionOnTrack += prevTrackLength;
             } else {
                 this.positionOnTrack = 0;
@@ -55,17 +55,17 @@ export class Engine {
     }
 
     reposition() {
-        if(this.track.isCurve) {
-            const t = this.positionOnTrack / this.track.length;
+        if(this.track.I) {
+            const t = this.positionOnTrack / this.track.segment.length;
             var p = new BABYLON.Vector3(
-                (1 - t) * (1 - t) * this.track.PA.x + 2 * (1 - t) * t * this.track.PI[0].x + t * t * this.track.PB.x,
+                (1 - t) * (1 - t) * this.track.A.point.x + 2 * (1 - t) * t * this.track.I.x + t * t * this.track.B.point.x,
                 0,
-                (1 - t) * (1 - t) * this.track.PA.z + 2 * (1 - t) * t * this.track.PI[0].z + t * t * this.track.PB.z,
+                (1 - t) * (1 - t) * this.track.A.point.z + 2 * (1 - t) * t * this.track.I.z + t * t * this.track.B.point.z,
             );
             var pd = new BABYLON.Vector3(
-                2 * (1 - t) * (this.track.PI[0].x - this.track.PA.x) + 2 * t * (this.track.PB.x - this.track.PI[0].x),
+                2 * (1 - t) * (this.track.I.x - this.track.A.point.x) + 2 * t * (this.track.B.point.x - this.track.I.x),
                 0,
-                2 * (1 - t) * (this.track.PI[0].z - this.track.PA.z) + 2 * t * (this.track.PB.z - this.track.PI[0].z),
+                2 * (1 - t) * (this.track.I.z - this.track.A.point.z) + 2 * t * (this.track.B.point.z - this.track.I.z),
             );
 
             this.position = p;
@@ -75,16 +75,16 @@ export class Engine {
             this.rotation = rot;
             this.renderEngine.rotation.y = rot;
         } else {
-            const t = this.positionOnTrack / this.track.length;
+            const t = this.positionOnTrack / this.track.segment.length;
             var p = new BABYLON.Vector3(
-                (1 - t) * this.track.PA.x + t * this.track.PB.x,
+                (1 - t) * this.track.A.point.x + t * this.track.B.point.x,
                 0,
-                (1 - t) * this.track.PA.z + t * this.track.PB.z,
+                (1 - t) * this.track.A.point.z + t * this.track.B.point.z,
             );
             var pd = new BABYLON.Vector3(
-                this.track.PB.x - this.track.PA.x,
+                this.track.B.point.x - this.track.A.point.x,
                 0,
-                this.track.PB.z - this.track.PA.z,
+                this.track.B.point.z - this.track.A.point.z,
             );
 
             this.position = p;

@@ -1,4 +1,5 @@
-import {Track} from "./track";
+import {Track} from "./Track";
+import {TrackEnd} from "./TrackEnd";
 
 export type TrackCreatorList = TrackCreatorListElement[];
 
@@ -39,16 +40,12 @@ export class TrackList {
             i += tempList.length - 1;
         }
 
-        for(let j = 0; j < this.list.length; j++) {
-            this.list[j].setSegments(
-                j-1 < 0 ? undefined: this.list[j-1],
-                j+1 >= this.list.length ? undefined : this.list[j+1]
-            );
+        for(let j = 1; j < this.list.length; j++) {
+            TrackList.connect(this.list[j-1].B, this.list[j].A);
         }
     }
 
-    connect(bEnd: Track, aStart: Track) {
-        bEnd.setSegments(undefined, aStart);
-        aStart.setSegments(bEnd, undefined);
+    static connect(a: TrackEnd, b: TrackEnd) {
+        a.connect(b);
     }
 }
