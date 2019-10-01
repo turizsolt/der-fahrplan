@@ -60,6 +60,8 @@ export class Switch extends TrackBase {
     }
 
     switch() {
+        if(this.checkedList.length > 0) return;
+
         this.state = 1 - this.state;
         if(this.mesh) this.mesh = BABYLON.Mesh.CreateLines(null, this.segment.curvePoints, null, null, this.mesh);
 

@@ -13,6 +13,7 @@ export class Engine {
         this.track = track;
         this.position = track.A.point;
         this.positionOnTrack = 0;
+        track.checkin(this);
     }
 
     render(scene: BABYLON.Scene) {
@@ -30,7 +31,9 @@ export class Engine {
         if (this.positionOnTrack > this.track.segment.length) {
             const trackLength = this.track.segment.length;
             if(this.track.B.connectedTo) {
+                this.track.checkout(this);
                 this.track = this.track.B.connectedTo;
+                this.track.checkin(this);
                 this.positionOnTrack -= trackLength;
             } else {
                 this.positionOnTrack = trackLength;
@@ -43,7 +46,9 @@ export class Engine {
         this.positionOnTrack -= 1;
         if (this.positionOnTrack < 0) {
             if(this.track.A.connectedTo) {
+                this.track.checkout(this);
                 this.track = this.track.A.connectedTo;
+                this.track.checkin(this);
                 const prevTrackLength = this.track.segment.length;
                 this.positionOnTrack += prevTrackLength;
             } else {
