@@ -16,7 +16,7 @@ window.addEventListener('DOMContentLoaded', () => {
         var camera = new BABYLON.ArcRotateCamera("Camera", 1, 0.8, 300, new BABYLON.Vector3(0, 0, 0), scene);
         camera.attachControl(canvas as HTMLElement, true);
 
-        var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 10, 0), scene);
+        var light = new BABYLON.DirectionalLight("DirectionalLight", new BABYLON.Vector3(0, -1, 0), scene);
         light.intensity = 0.7;
 
         var pol = new BABYLON.PointLight("pl", BABYLON.Vector3.Zero(), scene);

@@ -13,11 +13,12 @@ export class Engine {
         this.track = track;
         this.position = track.A.point;
         this.positionOnTrack = 0;
+        this.reposition();
         track.checkin(this);
     }
 
     render(scene: BABYLON.Scene) {
-        this.renderEngine = BABYLON.Mesh.CreateBox("box", 3, scene);
+        this.renderEngine = BABYLON.MeshBuilder.CreateBox("box", {height: 3, width: 3, depth: 10}, scene);
         this.renderEngine.position = this.position;
 
         var boxMaterial = new BABYLON.StandardMaterial("boxMat", scene);
