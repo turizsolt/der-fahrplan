@@ -74,15 +74,15 @@ window.addEventListener('DOMContentLoaded', () => {
         sw.E.connect(tr1.A);
         sw.F.connect(tr2.A);
 
-        const pl1 = new Platform(tr0, 10, 30, 10, Side.Left);
+        const pl1 = new Platform("A1", tr0, 10, 30, 10, Side.Left);
         pl1.render(scene);
 
-        const pl2 = new Platform(tr0, 20, 40, 10, Side.Right);
+        const pl2 = new Platform("A2", tr0, 20, 40, 10, Side.Right);
         pl2.render(scene);
 
-        const pl3 = new Platform(trm2, 5, 25, 10, Side.Left);
+        const pl3 = new Platform("C", trm2, 5, 25, 10, Side.Left);
         pl3.render(scene);
-        const pl4 = new Platform(trm4, 35, 65, 10, Side.Right);
+        const pl4 = new Platform("D", trm4, 35, 65, 10, Side.Right);
         pl4.render(scene);
 
         // const trackList = new TrackList(trackCreatorList);

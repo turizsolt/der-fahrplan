@@ -12,7 +12,7 @@ export class Platform {
     private blue: BABYLON.StandardMaterial;
     private red: BABYLON.StandardMaterial;
 
-    constructor(readonly track: TrackBase, readonly start: number, readonly end: number,
+    constructor(readonly no: string, readonly track: TrackBase, readonly start: number, readonly end: number,
                 readonly width: number, readonly side: Side) {
         track.addPlatform(this);
 
@@ -55,16 +55,23 @@ export class Platform {
     }
 
     render(scene: BABYLON.Scene) {
-        this.mesh = BABYLON.MeshBuilder.CreateBox("platform-"+(Math.random()*1000|0), {width: this.width, height: 1.5, depth: (this.end - this.start)}, scene);
+        this.mesh = BABYLON.MeshBuilder.CreateBox("platform-"+this.no, {width: this.width, height: 1.5, depth: (this.end - this.start)}, scene);
         this.mesh.position = this.position;
         this.mesh.rotation.y = this.rotation;
 
         this.blue = new BABYLON.StandardMaterial("blue", scene);
-        this.blue.diffuseColor = new BABYLON.Color3(0,this.side === Side.Left ? 1 : 0,1);
+        this.blue.diffuseColor = new BABYLON.Color3(0,this.side === Side.Left ? 1 : 0.6,1);
 
         this.red = new BABYLON.StandardMaterial("red", scene);
         this.red.diffuseColor = new BABYLON.Color3(1,0, 0);
 
+        var textureResolution = 100;
+        var textureGround = new BABYLON.DynamicTexture(this.no, {width:100, height:50}, scene, false);
+        var textureContext = textureGround.getContext();
+        var font = "bold 48px monospace";
+        textureGround.drawText(this.no, 5, 45, font, "black", "white", true, true);
+
+        this.blue.diffuseTexture = textureGround;
 
         this.mesh.material = this.blue;
         return this.mesh;
