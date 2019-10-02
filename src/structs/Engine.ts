@@ -13,7 +13,6 @@ export class Engine {
         this.track = track;
         this.position = track.A.point;
         this.positionOnTrack = 0;
-        this.reposition();
         track.checkin(this);
     }
 
@@ -24,6 +23,7 @@ export class Engine {
         var boxMaterial = new BABYLON.StandardMaterial("boxMat", scene);
         boxMaterial.diffuseColor = new BABYLON.Color3(1,0,0);
         this.renderEngine.material = boxMaterial;
+        this.reposition();
         return this.renderEngine;
     }
 
