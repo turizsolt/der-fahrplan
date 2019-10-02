@@ -1,4 +1,5 @@
 import * as BABYLON from "babylonjs";
+import {Engine} from "./Engine";
 import {Side} from "./Side";
 import {TrackBase} from "./TrackBase";
 
@@ -6,9 +7,15 @@ export class Platform {
     private mesh: BABYLON.Mesh;
     private position: BABYLON.Vector3;
     private rotation: number;
+    carList: Engine[];
+
+    private blue: BABYLON.StandardMaterial;
+    private red: BABYLON.StandardMaterial;
 
     constructor(readonly track: TrackBase, readonly start: number, readonly end: number,
                 readonly width: number, readonly side: Side) {
+        track.addPlatform(this);
+
         var rot = new BABYLON.Vector3(
             this.track.B.point.x - this.track.A.point.x,
             0,
@@ -43,6 +50,8 @@ export class Platform {
         this.position = shift2.add(shift.scale(dist)).add(height);
         const rot1 = Math.atan2(rot.x, rot.z);
         this.rotation = rot1;
+
+        this.carList = [];
     }
 
     render(scene: BABYLON.Scene) {
@@ -50,9 +59,31 @@ export class Platform {
         this.mesh.position = this.position;
         this.mesh.rotation.y = this.rotation;
 
-        var meshMaterial = new BABYLON.StandardMaterial("boxMat", scene);
-        meshMaterial.diffuseColor = new BABYLON.Color3(0,this.side === Side.Left ? 1 : 0,1);
-        this.mesh.material = meshMaterial;
+        this.blue = new BABYLON.StandardMaterial("blue", scene);
+        this.blue.diffuseColor = new BABYLON.Color3(0,this.side === Side.Left ? 1 : 0,1);
+
+        this.red = new BABYLON.StandardMaterial("red", scene);
+        this.red.diffuseColor = new BABYLON.Color3(1,0, 0);
+
+
+        this.mesh.material = this.blue;
         return this.mesh;
+    }
+
+    checkin(engine:Engine) {
+        this.carList.push(engine);
+
+        this.mesh.material = this.red;
+    }
+
+    checkout(engine:Engine) {
+        this.carList = this.carList.filter(elem => elem !== engine);
+        if(this.carList.length === 0) {
+            this.mesh.material = this.blue;
+        }
+    }
+
+    isChecked(engine:Engine) {
+        return this.carList.filter(elem => elem === engine).length > 0;
     }
 }

@@ -99,5 +99,15 @@ export class Engine {
             this.rotation = rot;
             this.renderEngine.rotation.y = rot;
         }
+
+        this.track.platformList.map(platform => {
+            if(platform.start <= this.positionOnTrack && this.positionOnTrack <= platform.end) {
+                if(!platform.isChecked(this)) {
+                    platform.checkin(this);
+                }
+            } else {
+                platform.checkout(this);
+            }
+        });
     }
 }
