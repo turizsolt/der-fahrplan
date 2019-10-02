@@ -1,9 +1,10 @@
-import 'babylonjs-loaders';
 import * as BABYLON from 'babylonjs';
+import 'babylonjs-loaders';
 import {Engine} from "./structs/Engine";
+import {Platform} from "./structs/Platform";
+import {Side} from "./structs/Side";
 import {Switch} from "./structs/Switch";
 import {Track} from "./structs/Track";
-import {TrackCreatorList, TrackList} from "./structs/TrackList";
 
 window.addEventListener('DOMContentLoaded', () => {
     var canvas:BABYLON.Nullable<HTMLCanvasElement> = document.getElementById("renderCanvas") as HTMLCanvasElement;
@@ -12,16 +13,16 @@ window.addEventListener('DOMContentLoaded', () => {
         var scene = new BABYLON.Scene(renderEngine);
         scene.clearColor = new BABYLON.Color4(0, 1, 0, 1);
 
-        var camera = new BABYLON.ArcRotateCamera("Camera", 1, 0.8, 50, new BABYLON.Vector3(0, 0, 0), scene);
+        var camera = new BABYLON.ArcRotateCamera("Camera", 1, 0.8, 300, new BABYLON.Vector3(0, 0, 0), scene);
         camera.attachControl(canvas as HTMLElement, true);
 
         var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 10, 0), scene);
         light.intensity = 0.7;
 
-        var pl = new BABYLON.PointLight("pl", BABYLON.Vector3.Zero(), scene);
-        pl.diffuse = new BABYLON.Color3(1, 1, 1);
-        pl.specular = new BABYLON.Color3(1, 1, 1);
-        pl.intensity = 0.8;
+        var pol = new BABYLON.PointLight("pl", BABYLON.Vector3.Zero(), scene);
+        pol.diffuse = new BABYLON.Color3(1, 1, 1);
+        pol.specular = new BABYLON.Color3(1, 1, 1);
+        pol.intensity = 0.8;
         /*
                 const trackCreatorList:TrackCreatorList = [
 
@@ -49,7 +50,11 @@ window.addEventListener('DOMContentLoaded', () => {
         sw.render(scene);
         */
 
-        const tr0 = new Track({x: 0, z: 0}, {x: 10, z: 0});
+        const trm4 = new Track({x: -120, z: 110}, {x: -90, z: 50});
+        const trm3 = new Track({x: -90, z: 50}, {x: -80, z: 35}, {x: -85, z: 40});
+        const trm2 = new Track({x: -80, z: 35}, {x: -50, z: 5});
+        const trm1 = new Track({x: -50, z: 5}, {x: -40, z: 0}, {x: -45, z: 0});
+        const tr0 = new Track({x: -40, z: 0}, {x: 10, z: 0});
 
         const sw = new Switch(
             new BABYLON.Vector3(10, 0, 0),
@@ -61,9 +66,24 @@ window.addEventListener('DOMContentLoaded', () => {
         const tr1 = new Track({x: 20, z: 0}, {x: 30, z: 0});
         const tr2 = new Track({x: 20, z: 5}, {x: 30, z: 10}, {x: 25, z: 10});
 
+        trm4.B.connect(trm3.A);
+        trm3.B.connect(trm2.A);
+        trm2.B.connect(trm1.A);
+        trm1.B.connect(tr0.A);
         tr0.B.connect(sw.A);
         sw.E.connect(tr1.A);
         sw.F.connect(tr2.A);
+
+        const pl1 = new Platform(tr0, 10, 30, 10, Side.Left);
+        pl1.render(scene);
+
+        const pl2 = new Platform(tr0, 20, 40, 10, Side.Right);
+        pl2.render(scene);
+
+        const pl3 = new Platform(trm2, 5, 25, 10, Side.Left);
+        pl3.render(scene);
+        const pl4 = new Platform(trm4, 35, 65, 10, Side.Right);
+        pl4.render(scene);
 
         // const trackList = new TrackList(trackCreatorList);
         // trackList.connect(trackList.list[0], tb);
@@ -75,6 +95,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
         // trackList.list.map(x => x.render(scene));
         engine.putOnTrack(tr0);
+        trm4.render(scene);
+        trm3.render(scene);
+        trm2.render(scene);
+        trm1.render(scene);
         tr0.render(scene);
         tr1.render(scene);
         tr2.render(scene);
@@ -82,7 +106,7 @@ window.addEventListener('DOMContentLoaded', () => {
         engine.render(scene);
 
 
-        const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 30, height: 30}, scene);
+        const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 300, height: 300}, scene);
         ground.position.y = -1.5;
 
         /****************************Key Control Multiple Keys************************************************/
