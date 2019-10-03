@@ -6,7 +6,7 @@ import {TrackBase} from "./TrackBase";
 
 export class Engine {
     private track:TrackBase;
-    private position:BABYLON.Vector3;
+    position:BABYLON.Vector3; // todo getter
     private rotation: number;
     private positionOnTrack: number;
     private renderEngine: BABYLON.Mesh;
@@ -146,5 +146,7 @@ export class Engine {
                 platform.checkout(this);
             }
         });
+
+        this.passengerList.map(passenger => passenger.updatePosition());
     }
 }

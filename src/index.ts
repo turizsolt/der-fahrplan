@@ -86,7 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const pl4 = new Platform("D", trm4, 35, 65, 10, Side.Right);
         pl4.render(scene);
 
-        new PassengerGenerator([pl1, pl2, pl3, pl4]);
+        new PassengerGenerator([pl1, pl2, pl3, pl4], scene);
 
         // const trackList = new TrackList(trackCreatorList);
         // trackList.connect(trackList.list[0], tb);

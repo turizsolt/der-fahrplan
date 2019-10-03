@@ -6,7 +6,7 @@ import {TrackBase} from "./TrackBase";
 
 export class Platform {
     private mesh: BABYLON.Mesh;
-    private position: BABYLON.Vector3;
+    position: BABYLON.Vector3; // todo getter only
     private rotation: number;
     carList: Engine[];
     passengerList: Passenger[] = [];
