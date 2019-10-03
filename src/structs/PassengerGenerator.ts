@@ -6,7 +6,7 @@ export class PassengerGenerator {
     private interval: number;
 
     constructor(readonly platformList: Platform[], readonly scene:BABYLON.Scene) {
-        this.interval = setInterval(() => this.tick(), 500) as unknown as number;
+        this.interval = setInterval(() => this.tick(), 2000) as unknown as number;
         this.tick();
     }
 
@@ -20,10 +20,6 @@ export class PassengerGenerator {
                 this.platformList[fromIdx].addPassenger(passenger);
                 passenger.render();
             }
-        }
-
-        if(Math.random() < 0.01) {
-            clearInterval(this.interval);
         }
     }
 }

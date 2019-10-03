@@ -39,6 +39,9 @@ export class Engine {
             const trackLength = this.track.segment.length;
             if(this.track.B.connectedTo) {
                 this.track.checkout(this);
+                this.track.platformList.map(platform => {
+                    platform.checkout(this);
+                });
                 this.track = this.track.B.connectedTo;
                 this.track.checkin(this);
                 this.positionOnTrack -= trackLength;
@@ -56,6 +59,9 @@ export class Engine {
         if (this.positionOnTrack < 0) {
             if(this.track.A.connectedTo) {
                 this.track.checkout(this);
+                this.track.platformList.map(platform => {
+                    platform.checkout(this);
+                });
                 this.track = this.track.A.connectedTo;
                 this.track.checkin(this);
                 const prevTrackLength = this.track.segment.length;

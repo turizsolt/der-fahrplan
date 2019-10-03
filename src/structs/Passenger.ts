@@ -24,11 +24,11 @@ export class Passenger {
     render() {
         console.log('passenger created', this.id, this.from.no, "->", this.to.no);
 
-        this.mesh = BABYLON.MeshBuilder.CreateBox("box", {height: 0.5, width: 0.5, depth: 0.5}, this.scene);
+        this.mesh = BABYLON.MeshBuilder.CreateBox("box", {height: 1, width: 1, depth: 1}, this.scene);
         this.mesh.position = this.position;
 
         var boxMaterial = new BABYLON.StandardMaterial("boxMat", this.scene);
-        boxMaterial.diffuseColor = new BABYLON.Color3(1,1,0);
+        boxMaterial.diffuseColor = this.to.color;
         this.mesh.material = boxMaterial;
         return this.mesh;
     }

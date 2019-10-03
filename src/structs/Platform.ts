@@ -15,7 +15,7 @@ export class Platform {
     private red: BABYLON.StandardMaterial;
 
     constructor(readonly no: string, readonly track: TrackBase, readonly start: number, readonly end: number,
-                readonly width: number, readonly side: Side) {
+                readonly width: number, readonly side: Side, readonly color: BABYLON.Color3) {
         track.addPlatform(this);
 
         var rot = new BABYLON.Vector3(
@@ -62,10 +62,10 @@ export class Platform {
         this.mesh.rotation.y = this.rotation;
 
         this.blue = new BABYLON.StandardMaterial("blue", scene);
-        this.blue.diffuseColor = new BABYLON.Color3(0,this.side === Side.Left ? 1 : 0.6,1);
+        this.blue.diffuseColor = this.color;
 
         this.red = new BABYLON.StandardMaterial("red", scene);
-        this.red.diffuseColor = new BABYLON.Color3(1,0, 0);
+        this.red.diffuseColor = this.color;
 
         var textureResolution = 100;
         var textureGround = new BABYLON.DynamicTexture(this.no, {width:100, height:50}, scene, false);
