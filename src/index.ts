@@ -75,15 +75,15 @@ window.addEventListener('DOMContentLoaded', () => {
         sw.E.connect(tr1.A);
         sw.F.connect(tr2.A);
 
-        const pl1 = new Platform("A1", tr0, 10, 30, 10, Side.Left);
+        const pl1 = new Platform("A1", tr0, 0, 24, 10, Side.Left, new BABYLON.Color3(0,1,1));
         pl1.render(scene);
 
-        const pl2 = new Platform("A2", tr0, 20, 40, 10, Side.Right);
+        const pl2 = new Platform("A2", tr0, 26, 50, 10, Side.Right, new BABYLON.Color3(0,0.6,1));
         pl2.render(scene);
 
-        const pl3 = new Platform("C", trm2, 5, 25, 10, Side.Left);
+        const pl3 = new Platform("C", trm2, 5, 25, 10, Side.Left, new BABYLON.Color3(0,1,0.6));
         pl3.render(scene);
-        const pl4 = new Platform("D", trm4, 35, 65, 10, Side.Right);
+        const pl4 = new Platform("D", trm4, 35, 65, 10, Side.Right, new BABYLON.Color3(0,0.6,0.6));
         pl4.render(scene);
 
         new PassengerGenerator([pl1, pl2, pl3, pl4], scene);
@@ -168,5 +168,8 @@ window.addEventListener('DOMContentLoaded', () => {
     var scene = createScene();
     renderEngine.runRenderLoop(function() {
         scene.render();
+    });
+    window.addEventListener('resize', function(){
+        renderEngine.resize();
     });
 });
