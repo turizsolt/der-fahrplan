@@ -1,5 +1,6 @@
 import * as BABYLON from "babylonjs";
 import {Engine} from "./Engine";
+import {Passenger} from "./Passenger";
 import {Side} from "./Side";
 import {TrackBase} from "./TrackBase";
 
@@ -8,6 +9,7 @@ export class Platform {
     private position: BABYLON.Vector3;
     private rotation: number;
     carList: Engine[];
+    passengerList: Passenger[] = [];
 
     private blue: BABYLON.StandardMaterial;
     private red: BABYLON.StandardMaterial;
@@ -92,5 +94,17 @@ export class Platform {
 
     isChecked(engine:Engine) {
         return this.carList.filter(elem => elem === engine).length > 0;
+    }
+
+    addPassenger(passenger: Passenger) {
+        this.passengerList.push(passenger);
+    }
+
+    removePassenger(passenger: Passenger) {
+        this.passengerList = this.passengerList.filter(x => x !== passenger);
+    }
+
+    callPassengers(engine: Engine) {
+        this.passengerList.map(x => x.checkTrain(engine));
     }
 }

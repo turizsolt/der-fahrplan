@@ -1,6 +1,7 @@
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 import {Engine} from "./structs/Engine";
+import {PassengerGenerator} from "./structs/PassengerGenerator";
 import {Platform} from "./structs/Platform";
 import {Side} from "./structs/Side";
 import {Switch} from "./structs/Switch";
@@ -85,6 +86,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const pl4 = new Platform("D", trm4, 35, 65, 10, Side.Right);
         pl4.render(scene);
 
+        new PassengerGenerator([pl1, pl2, pl3, pl4]);
+
         // const trackList = new TrackList(trackCreatorList);
         // trackList.connect(trackList.list[0], tb);
         // trackList.connect(trackList.list[5], trackList.list[0]);
@@ -126,15 +129,26 @@ window.addEventListener('DOMContentLoaded', () => {
 
         /****************************Move Sphere******************************************************/
 
+        var enabledD = true;
         var enabled = true;
         scene.registerAfterRender(function () {
 
             if ((map["w"] || map["W"])) {
+                engine.resume();
                 engine.forward();
             };
 
             if ((map["s"] || map["S"])) {
+                engine.resume();
                 engine.backward();
+            };
+
+            if ((map["d"] || map["D"])) {
+                if(enabledD) {
+                    engine.stop();
+                    enabledD = false;
+                    setTimeout(() => {enabledD = true;}, 500);
+                }
             };
 
             if ((map["1"])) {

@@ -1,4 +1,6 @@
 import * as BABYLON from "babylonjs";
+import {Passenger} from "./Passenger";
+import {Platform} from "./Platform";
 import {Track} from "./Track";
 import {TrackBase} from "./TrackBase";
 
@@ -8,6 +10,8 @@ export class Engine {
     private rotation: number;
     private positionOnTrack: number;
     private renderEngine: BABYLON.Mesh;
+    private movable: boolean = true;
+    private passengerList: Passenger[] = [];
 
     putOnTrack(track: Track) {
         this.track = track;
@@ -28,6 +32,8 @@ export class Engine {
     }
 
     forward() {
+        if(!this.movable) return;
+
         this.positionOnTrack += 1;
         if (this.positionOnTrack > this.track.segment.length) {
             const trackLength = this.track.segment.length;
@@ -44,6 +50,8 @@ export class Engine {
     }
 
     backward() {
+        if(!this.movable) return;
+
         this.positionOnTrack -= 1;
         if (this.positionOnTrack < 0) {
             if(this.track.A.connectedTo) {
@@ -58,6 +66,34 @@ export class Engine {
         }
 
         this.reposition();
+    }
+
+    stop() {
+        this.movable = false;
+
+        this.track.platformList.map(platform => {
+            if(platform.start <= this.positionOnTrack && this.positionOnTrack <= platform.end) {
+                this.passengerList.map(passenger => {
+                    passenger.checkPlatform(platform);
+                });
+
+                platform.callPassengers(this);
+                console.log('on platform', platform.no, platform.passengerList.map(x => `${x.id}->${x.to.no}`));
+            }
+        });
+        console.log('on train', this.passengerList.map(x => `${x.id}->${x.to.no}`));
+    }
+
+    resume() {
+        this.movable = true;
+    }
+
+    getOn(passenger: Passenger) {
+        this.passengerList.push(passenger);
+    }
+
+    getOff(passenger: Passenger) {
+        this.passengerList = this.passengerList.filter(x => x !== passenger);
     }
 
     reposition() {
