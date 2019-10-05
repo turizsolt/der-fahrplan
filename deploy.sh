@@ -1,2 +1,2 @@
 git pull
-yarn start
+yarn start &
