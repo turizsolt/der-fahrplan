@@ -15,5 +15,6 @@ before_install:
 - eval "$(ssh-agent -s)"
 - chmod 600 ./deploy_rsa
 - ssh-add ./deploy_rsa
-- ssh -i ./deploy_rsa git@turizsolt.hu cd der-fahrplan && deploy.sh
+- ssh -i ./deploy_rsa git@turizsolt.hu
+- cd der-fahrplan && deploy.sh
 
