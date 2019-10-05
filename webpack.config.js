@@ -24,7 +24,8 @@ module.exports = {
     ],
     devtool: 'inline-source-map',
     devServer: {
-        contentBase: distFolder
+        contentBase: distFolder,
+        host: '0.0.0.0'
     },
     module: {
         rules: [
