@@ -25,7 +25,8 @@ module.exports = {
     devtool: 'inline-source-map',
     devServer: {
         contentBase: distFolder,
-        host: '0.0.0.0'
+        host: '0.0.0.0',
+        public: 'zsiri.eu:8080',
     },
     module: {
         rules: [
