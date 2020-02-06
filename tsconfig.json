@@ -7,10 +7,13 @@
     "target": "es5",
     "jsx": "react",
     "allowJs": true,
+    "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
     "types": [
       "babylonjs",
       "babylonjs-gui",
-      "babylonjs-materials"
+      "babylonjs-materials",
+      "reflect-metadata"
     ],
     "lib": [
       "es2016",

@@ -1,25 +1,30 @@
-import * as BABYLON from "babylonjs";
-import {Passenger} from "./Passenger";
-import {Platform} from "./Platform";
+import * as BABYLON from 'babylonjs';
+import { Passenger } from './Passenger/Passenger';
+import { Platform } from './Platform';
 
 export class PassengerGenerator {
-    private interval: number;
+  private interval: number;
 
-    constructor(readonly platformList: Platform[], readonly scene:BABYLON.Scene) {
-        this.interval = setInterval(() => this.tick(), 2000) as unknown as number;
-        this.tick();
-    }
+  constructor(
+    readonly platformList: Platform[],
+    readonly scene: BABYLON.Scene
+  ) {
+    this.interval = (setInterval(() => this.tick(), 2000) as unknown) as number;
+    this.tick();
+  }
 
-    tick() {
-        if(Math.random() < .8) {
-            const length = this.platformList.length;
-            const fromIdx = Math.random() * length | 0;
-            const toIdx = Math.random() * length | 0;
-            if(toIdx !== fromIdx) {
-                const passenger = new Passenger(this.platformList[toIdx], this.platformList[fromIdx], this.scene);
-                this.platformList[fromIdx].addPassenger(passenger);
-                passenger.render();
-            }
-        }
+  tick() {
+    if (Math.random() < 0.8) {
+      const length = this.platformList.length;
+      const fromIdx = (Math.random() * length) | 0;
+      const toIdx = (Math.random() * length) | 0;
+      if (toIdx !== fromIdx) {
+        const passenger = new Passenger(
+          this.platformList[toIdx],
+          this.platformList[fromIdx]
+        );
+        this.platformList[fromIdx].addPassenger(passenger);
+      }
     }
+  }
 }
