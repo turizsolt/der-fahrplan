@@ -6,6 +6,7 @@ import { Platform } from './structs/Platform';
 import { Side } from './structs/Side';
 import { Switch } from './structs/Switch';
 import { Track } from './structs/Track';
+import { Vector3 } from 'babylonjs';
 
 window.addEventListener('DOMContentLoaded', () => {
   var canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
@@ -20,11 +21,11 @@ window.addEventListener('DOMContentLoaded', () => {
       'Camera',
       1,
       0.8,
-      300,
+      180, // 300,
       new BABYLON.Vector3(0, 0, 0),
       scene
     );
-    camera.attachControl(canvas as HTMLElement, true);
+    // camera.attachControl(canvas as HTMLElement, true);
 
     var light = new BABYLON.DirectionalLight(
       'DirectionalLight',
@@ -169,6 +170,22 @@ window.addEventListener('DOMContentLoaded', () => {
     );
     ground.position.y = -1.5;
 
+    for (let i = -150; i <= 150; i += 10) {
+      const gridVer = BABYLON.MeshBuilder.CreateLines(
+        'gridVer',
+        { points: [new Vector3(i, -1.49, -150), new Vector3(i, -1.49, 150)] },
+        scene
+      );
+      gridVer.color = new BABYLON.Color3(0, 0, 0);
+
+      const gridHor = BABYLON.MeshBuilder.CreateLines(
+        'gridHor',
+        { points: [new Vector3(-150, -1.49, i), new Vector3(150, -1.49, i)] },
+        scene
+      );
+      gridHor.color = new BABYLON.Color3(0, 0, 0);
+    }
+
     /****************************Key Control Multiple Keys************************************************/
 
     var map = {}; //object for multiple key presses
@@ -240,9 +257,169 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', function() {
     renderEngine.resize();
   });
+
+  const arrowMaterial = new BABYLON.StandardMaterial('arrow', scene);
+  arrowMaterial.diffuseTexture = new BABYLON.Texture('assets/arrow.png', scene);
+
+  let mouseDownPoint = null;
+  let mouseUpPoint = null;
+  let mouseRotation = 0;
+  let selected = null;
+
+  let markers = [];
+
+  const mouseCone = BABYLON.MeshBuilder.CreateCylinder(
+    'cone',
+    {
+      diameter: 5,
+      tessellation: 24,
+      height: 1,
+      faceUV: [
+        new BABYLON.Vector4(0, 0, 1, 1),
+        new BABYLON.Vector4(1, 1, 1, 1)
+      ],
+      faceColors: [
+        new BABYLON.Color4(0, 0, 0, 1),
+        new BABYLON.Color4(0, 0, 0, 1),
+        new BABYLON.Color4(1, 1, 0, 1)
+      ],
+      updatable: true
+    },
+    scene
+  );
+  mouseCone.material = arrowMaterial;
+
+  const move = () => {
+    // console.log('move');
+    var pickResult = scene.pick(scene.pointerX, scene.pointerY);
+    const mouseMovePoint = pickResult.pickedPoint;
+
+    if (mouseDownPoint || mouseMovePoint) {
+      mouseCone.position = snapXZ(mouseDownPoint || mouseMovePoint);
+      mouseCone.position.y = -0.6;
+      mouseCone.rotation.y = mouseRotation;
+      if (mouseDownPoint && mouseMovePoint) {
+        var rotVector = new BABYLON.Vector3(
+          mouseMovePoint.x - mouseDownPoint.x,
+          0,
+          mouseMovePoint.z - mouseDownPoint.z
+        );
+        let rot = Math.atan2(rotVector.x, rotVector.z);
+        const fifteen = Math.PI / 12;
+        rot = Math.round(rot / fifteen) * fifteen;
+        if (rot !== mouseRotation) {
+          console.log((rot / Math.PI) * 180);
+        }
+        mouseRotation = rot;
+
+        if (selected) {
+          selected.rotation.y = rot;
+        } else {
+          mouseCone.rotation.y = rot;
+        }
+      }
+    }
+  };
+
+  window.addEventListener('pointerdown', function(event) {
+    // console.log('mousedown');
+    var pickResult = scene.pick(scene.pointerX, scene.pointerY);
+    mouseDownPoint = pickResult.pickedPoint;
+
+    // console.log('picked', pickResult.pickedMesh.id);
+    if (pickResult.pickedMesh && pickResult.pickedMesh.id.startsWith('m-')) {
+      const pos = pickResult.pickedMesh.id.substring(2);
+      selected = markers[pos];
+
+      // console.log(event);
+      if (event.ctrlKey) {
+        // console.log('shift');
+        selected.setEnabled(false);
+        delete markers[pos];
+      }
+    } else {
+      const newMarker = BABYLON.MeshBuilder.CreateCylinder(
+        'm-' + markers.length,
+        {
+          diameter: 5,
+          tessellation: 24,
+          height: 1,
+          faceUV: [
+            new BABYLON.Vector4(0, 0, 1, 1),
+            new BABYLON.Vector4(1, 1, 1, 1)
+          ],
+          updatable: true
+        },
+        scene
+      );
+      newMarker.material = arrowMaterial;
+      newMarker.position = snapXZ(mouseDownPoint);
+      newMarker.position.y = -0.5;
+      newMarker.rotation.y = mouseRotation;
+      markers.push(newMarker);
+
+      selected = newMarker;
+    }
+    console.log(markers.length);
+  });
+
+  window.addEventListener('pointerup', function() {
+    // console.log('mouseup');
+    var pickResult = scene.pick(scene.pointerX, scene.pointerY);
+    mouseUpPoint = pickResult.pickedPoint;
+
+    // console.log(mouseDownPoint, mouseUpPoint);
+    mouseDownPoint = null;
+    mouseUpPoint = null;
+    selected = null;
+    move();
+  });
+
+  window.addEventListener('pointermove', function() {
+    move();
+  });
+
   window.addEventListener('click', function() {
+    return;
+
     // We try to pick an object
     var pickResult = scene.pick(scene.pointerX, scene.pointerY);
-    console.log(pickResult);
+    // console.log(pickResult.pickedMesh.name, pickResult.pickedPoint);
+
+    const faceUV = [];
+    faceUV[0] = new BABYLON.Vector4(0, 0, 1, 1);
+    faceUV[1] = new BABYLON.Vector4(1, 1, 1, 1);
+
+    const cone = BABYLON.MeshBuilder.CreateCylinder(
+      'cone',
+      {
+        diameterTop: 10,
+        tessellation: 16,
+        height: 1,
+        diameterBottom: 10,
+        faceUV,
+        updatable: true
+      },
+      scene
+    );
+    const point = new BABYLON.Vector3();
+    point.x = snap(pickResult.pickedPoint.x);
+    point.z = snap(pickResult.pickedPoint.z);
+    point.y = -1;
+    cone.position = point;
+    cone.rotation.y = Math.PI / 4;
+    cone.material = arrowMaterial;
+
+    console.log(point);
   });
 });
+
+function snapXZ(p) {
+  return new BABYLON.Vector3(snap(p.x), p.y, snap(p.z));
+}
+
+function snap(p) {
+  const diff = p % 10;
+  if (diff < 2.5 || diff > 7.5) return Math.round(p / 10) * 10;
+  return p;
+}
