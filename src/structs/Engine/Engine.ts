@@ -1,40 +1,37 @@
 import * as BABYLON from 'babylonjs';
-import { Passenger } from './Passenger/Passenger';
-import { Platform } from './Platform';
-import { Track } from './Track';
-import { TrackBase } from './TrackBase';
-import { Coordinate } from './Coordinate';
-import { CoordinateToBabylonVector3 } from './Vector3ToBabylonVector3';
+import { Passenger } from '../Passenger/Passenger';
+import { Track } from '../Track';
+import { TrackBase } from '../TrackBase';
+import { Coordinate } from '../Coordinate';
+import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
+import { EngineRenderer } from './EngineRenderer';
+import { TYPES } from '../TYPES';
+import { babylonContainer } from '../inversify.config';
+import { BabylonVector3ToCoordinate } from '../BabylonVector3ToCoordinate';
 
 export class Engine {
   private track: TrackBase;
   position: Coordinate; // todo getter
-  private rotation: number;
+  public rotation: number;
   private positionOnTrack: number;
-  private renderEngine: BABYLON.Mesh;
   private movable: boolean = true;
   private passengerList: Passenger[] = [];
+  private renderer: EngineRenderer;
+
+  constructor() {
+    this.position = new Coordinate(0, 0, 0);
+    this.renderer = babylonContainer.get<EngineRenderer>(TYPES.EngineRenderer);
+    this.renderer.init(this);
+  }
 
   putOnTrack(track: Track) {
     this.track = track;
-    this.position = track.A.point;
+    this.position = BabylonVector3ToCoordinate(track.A.point);
     this.positionOnTrack = 0;
     track.checkin(this);
-  }
 
-  render(scene: BABYLON.Scene) {
-    this.renderEngine = BABYLON.MeshBuilder.CreateBox(
-      'box',
-      { height: 3, width: 3, depth: 10 },
-      scene
-    );
-    this.renderEngine.position = CoordinateToBabylonVector3(this.position);
-
-    var boxMaterial = new BABYLON.StandardMaterial('boxMat', scene);
-    boxMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
-    this.renderEngine.material = boxMaterial;
-    this.reposition();
-    return this.renderEngine;
+    console.log('putOn', this.position);
+    this.renderer.update();
   }
 
   forward() {
@@ -136,11 +133,9 @@ export class Engine {
       );
 
       this.position = p;
-      this.renderEngine.position = p;
 
       const rot = Math.atan2(pd.x, pd.z);
       this.rotation = rot;
-      this.renderEngine.rotation.y = rot;
     } else {
       const t = this.positionOnTrack / this.track.segment.length;
       var p = new BABYLON.Vector3(
@@ -155,11 +150,9 @@ export class Engine {
       );
 
       this.position = p;
-      this.renderEngine.position = p;
 
       const rot = Math.atan2(pd.x, pd.z);
       this.rotation = rot;
-      this.renderEngine.rotation.y = rot;
     }
 
     this.track.platformList.map(platform => {
@@ -176,5 +169,7 @@ export class Engine {
     });
 
     this.passengerList.map(passenger => passenger.updatePosition());
+
+    this.renderer.update();
   }
 }

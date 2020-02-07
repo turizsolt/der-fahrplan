@@ -1,4 +1,4 @@
-import { Engine } from '../Engine';
+import { Engine } from '../Engine/Engine';
 import { Platform } from '../Platform';
 import { PassengerRenderer } from './PassengerRenderer';
 import { Coordinate } from '../Coordinate';

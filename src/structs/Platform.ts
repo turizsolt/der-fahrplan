@@ -1,10 +1,10 @@
 import * as BABYLON from 'babylonjs';
-import { Engine } from './Engine';
+import { Engine } from './Engine/Engine';
 import { Passenger } from './Passenger/Passenger';
 import { Side } from './Side';
 import { TrackBase } from './TrackBase';
 import { Coordinate } from './Coordinate';
-import { CoordinateToBabylonVector3 } from './Vector3ToBabylonVector3';
+import { CoordinateToBabylonVector3 } from './CoordinateToBabylonVector3';
 
 export class Platform {
   private mesh: BABYLON.Mesh;

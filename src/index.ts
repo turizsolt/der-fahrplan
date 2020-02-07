@@ -1,6 +1,6 @@
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
-import { Engine } from './structs/Engine';
+import { Engine } from './structs/Engine/Engine';
 import { PassengerGenerator } from './structs/PassengerGenerator';
 import { Platform } from './structs/Platform';
 import { Side } from './structs/Side';
@@ -148,11 +148,9 @@ window.addEventListener('DOMContentLoaded', () => {
     // trackList.connect(trackList.list[5], trackList.list[0]);
     // trackList.list[0].B.connect(sw.D);
 
-    const engine = new Engine();
     // engine.putOnTrack(trackList.list[0]);
 
     // trackList.list.map(x => x.render(scene));
-    engine.putOnTrack(tr0);
     trm4.render(scene);
     trm3.render(scene);
     trm2.render(scene);
@@ -161,7 +159,11 @@ window.addEventListener('DOMContentLoaded', () => {
     tr1.render(scene);
     tr2.render(scene);
     sw.render(scene);
-    engine.render(scene);
+
+    const engine = new Engine();
+    engine.putOnTrack(tr0);
+
+    // engine.render(scene);
 
     const ground = BABYLON.MeshBuilder.CreateGround(
       'ground',

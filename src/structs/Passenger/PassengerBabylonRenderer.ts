@@ -1,7 +1,7 @@
 import * as BABYLON from 'babylonjs';
 import { Passenger } from './Passenger';
 import { PassengerRenderer } from './PassengerRenderer';
-import { CoordinateToBabylonVector3 } from '../Vector3ToBabylonVector3';
+import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
 import { injectable } from 'inversify';
 
 @injectable()
