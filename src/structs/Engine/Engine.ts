@@ -3,7 +3,6 @@ import { Passenger } from '../Passenger/Passenger';
 import { Track } from '../Track';
 import { TrackBase } from '../TrackBase';
 import { Coordinate } from '../Coordinate';
-import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
 import { EngineRenderer } from './EngineRenderer';
 import { TYPES } from '../TYPES';
 import { babylonContainer } from '../inversify.config';
@@ -18,20 +17,19 @@ export class Engine {
   private passengerList: Passenger[] = [];
   private renderer: EngineRenderer;
 
-  constructor() {
-    this.position = new Coordinate(0, 0, 0);
-    this.renderer = babylonContainer.get<EngineRenderer>(TYPES.EngineRenderer);
-    this.renderer.init(this);
-  }
-
   putOnTrack(track: Track) {
     this.track = track;
     this.position = BabylonVector3ToCoordinate(track.A.point);
     this.positionOnTrack = 0;
     track.checkin(this);
 
-    console.log('putOn', this.position);
-    this.renderer.update();
+    if (!this.renderer) {
+      this.renderer = babylonContainer.get<EngineRenderer>(
+        TYPES.EngineRenderer
+      );
+      this.renderer.init(this);
+      this.reposition();
+    }
   }
 
   forward() {
