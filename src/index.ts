@@ -7,6 +7,7 @@ import { Side } from './structs/Side';
 import { Switch } from './structs/Switch';
 import { Track } from './structs/Track';
 import { Vector3 } from 'babylonjs';
+import { TrackJoint } from './structs/TrackJoint/TrackJoint';
 
 window.addEventListener('DOMContentLoaded', () => {
   var canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
@@ -268,7 +269,7 @@ window.addEventListener('DOMContentLoaded', () => {
   let mouseRotation = 0;
   let selected = null;
 
-  let markers = [];
+  let markers: TrackJoint[] = [];
 
   const mouseCone = BABYLON.MeshBuilder.CreateCylinder(
     'cone',
@@ -315,7 +316,7 @@ window.addEventListener('DOMContentLoaded', () => {
         mouseRotation = rot;
 
         if (selected) {
-          selected.rotation.y = rot;
+          selected.rotate(rot);
         } else {
           mouseCone.rotation.y = rot;
         }
@@ -330,37 +331,25 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // console.log('picked', pickResult.pickedMesh.id);
     if (pickResult.pickedMesh && pickResult.pickedMesh.id.startsWith('m-')) {
-      const pos = pickResult.pickedMesh.id.substring(2);
+      const id = parseInt(pickResult.pickedMesh.id.substring(2), 10);
+      const pos = markers.findIndex(x => x.id === id);
+      if (pos === -1) return;
+
       selected = markers[pos];
 
       // console.log(event);
       if (event.ctrlKey) {
         // console.log('shift');
-        selected.setEnabled(false);
+        //selected.setEnabled(false);
+        markers[pos].remove();
         delete markers[pos];
       }
     } else {
-      const newMarker = BABYLON.MeshBuilder.CreateCylinder(
-        'm-' + markers.length,
-        {
-          diameter: 5,
-          tessellation: 24,
-          height: 1,
-          faceUV: [
-            new BABYLON.Vector4(0, 0, 1, 1),
-            new BABYLON.Vector4(1, 1, 1, 1)
-          ],
-          updatable: true
-        },
-        scene
-      );
-      newMarker.material = arrowMaterial;
-      newMarker.position = snapXZ(mouseDownPoint);
-      newMarker.position.y = -0.5;
-      newMarker.rotation.y = mouseRotation;
-      markers.push(newMarker);
+      const position = snapXZ(mouseDownPoint);
+      const joint = new TrackJoint(position.x, position.z, mouseRotation);
+      markers.push(joint);
 
-      selected = newMarker;
+      selected = joint;
     }
     console.log(markers.length);
   });
