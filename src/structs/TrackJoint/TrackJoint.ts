@@ -2,12 +2,19 @@ import { TrackJointRenderer } from './TrackJointRenderer';
 import { Coordinate } from '../Coordinate';
 import { TYPES } from '../TYPES';
 import { babylonContainer } from '../inversify.config';
+import { Track } from '../Track';
+import { TrackBase } from '../TrackBase';
+import { Switch } from '../Switch';
 
 export class TrackJoint {
   readonly id: number;
   public position: Coordinate;
   public rotation: number;
   public removed: boolean = false;
+  public tracks: { A: TrackBase | null; B: TrackBase | null } = {
+    A: null,
+    B: null
+  };
 
   private renderer: TrackJointRenderer;
 
@@ -56,7 +63,7 @@ export class TrackJoint {
         };
   }
 
-  connect(joint: TrackJoint) {
+  ww(joint: TrackJoint) {
     const e1 = this.equ();
     const e2 = joint.equ();
 
@@ -81,6 +88,59 @@ export class TrackJoint {
     const z = (e2.b - e1.b) / (e1.a - e2.a);
     const x = e1.a * z + e1.b;
     return { x, z };
+  }
+
+  connect(joint: TrackJoint) {
+    const w: any = this.ww(joint);
+    if (w) {
+      // true lesz a B oldal
+      const side = (b: boolean) => (b ? 'B' : 'A');
+
+      const p1 = w === true ? joint.position : w;
+      const dir1 = Math.atan2(p1.x - this.position.x, p1.z - this.position.z);
+      const s1 = side(almost(dir1, this.rotation));
+
+      const p2 = w === true ? this.position : w;
+      const dir2 = Math.atan2(p2.x - joint.position.x, p2.z - joint.position.z);
+      const s2 = side(almost(dir2, joint.rotation));
+
+      if (this.tracks[s1] && this.tracks[s1].constructor.name === Switch.name)
+        return false;
+      if (joint.tracks[s2] && joint.tracks[s2].constructor.name === Switch.name)
+        return false;
+      if (
+        this.tracks[s1] &&
+        this.tracks[s1].constructor.name === Track.name &&
+        joint.tracks[s2] &&
+        joint.tracks[s2].constructor.name === Track.name
+      )
+        return false;
+
+      // TODO
+      console.log('s1s2', this.tracks[s1], joint.tracks[s2]);
+
+      let t: Track;
+      const jp = { x: joint.position.x, z: joint.position.z };
+      const tp = { x: this.position.x, z: this.position.z };
+      const wp = { x: w.x, z: w.z };
+
+      if (w && w.z !== undefined) {
+        t = new Track(jp, tp, wp);
+        t.render(null);
+      } else if (w) {
+        t = new Track(jp, tp);
+        t.render(null);
+      }
+
+      if (t) {
+        this.tracks[s1] = t;
+        joint.tracks[s2] = t;
+
+        //console.log('typeof', t.constructor.name, Track.name);
+      }
+    } else {
+      // not able to draw the track
+    }
   }
 }
 

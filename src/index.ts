@@ -366,21 +366,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (previousSelected && selected) {
       const w = selected.connect(previousSelected);
-      if (w && w.z !== undefined) {
-        const t = new Track(
-          { x: previousSelected.position.x, z: previousSelected.position.z },
-          { x: selected.position.x, z: selected.position.z },
-          { x: w.x, z: w.z }
-        );
-        t.render(scene);
-        console.log(t);
-      } else if (w) {
-        const t = new Track(
-          { x: previousSelected.position.x, z: previousSelected.position.z },
-          { x: selected.position.x, z: selected.position.z }
-        );
-        t.render(scene);
-      }
 
       //console.log(w);
     } else {
