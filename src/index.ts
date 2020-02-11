@@ -268,6 +268,7 @@ window.addEventListener('DOMContentLoaded', () => {
   let mouseUpPoint = null;
   let mouseRotation = 0;
   let selected = null;
+  let previousSelected = null;
 
   let markers: TrackJoint[] = [];
 
@@ -311,7 +312,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const fifteen = Math.PI / 12;
         rot = Math.round(rot / fifteen) * fifteen;
         if (rot !== mouseRotation) {
-          console.log((rot / Math.PI) * 180);
+          // console.log((rot / Math.PI) * 180);
         }
         mouseRotation = rot;
 
@@ -351,7 +352,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
       selected = joint;
     }
-    console.log(markers.length);
+    // console.log(markers.length);
   });
 
   window.addEventListener('pointerup', function() {
@@ -362,6 +363,31 @@ window.addEventListener('DOMContentLoaded', () => {
     // console.log(mouseDownPoint, mouseUpPoint);
     mouseDownPoint = null;
     mouseUpPoint = null;
+
+    if (previousSelected && selected) {
+      const w = selected.connect(previousSelected);
+      if (w && w.z !== undefined) {
+        const t = new Track(
+          { x: previousSelected.position.x, z: previousSelected.position.z },
+          { x: selected.position.x, z: selected.position.z },
+          { x: w.x, z: w.z }
+        );
+        t.render(scene);
+        console.log(t);
+      } else if (w) {
+        const t = new Track(
+          { x: previousSelected.position.x, z: previousSelected.position.z },
+          { x: selected.position.x, z: selected.position.z }
+        );
+        t.render(scene);
+      }
+
+      //console.log(w);
+    } else {
+      //console.log('oups', previousSelected, selected);
+    }
+
+    previousSelected = selected;
     selected = null;
     move();
   });
@@ -401,7 +427,7 @@ window.addEventListener('DOMContentLoaded', () => {
     cone.rotation.y = Math.PI / 4;
     cone.material = arrowMaterial;
 
-    console.log(point);
+    //console.log(point);
   });
 });
 

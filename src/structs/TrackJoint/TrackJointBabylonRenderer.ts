@@ -11,6 +11,7 @@ export class TrackJointBabylonRenderer implements TrackJointRenderer {
   readonly scene: BABYLON.Scene;
 
   init(trackJoint: TrackJoint): void {
+    //return;
     this.trackJoint = trackJoint;
 
     this.mesh = BABYLON.MeshBuilder.CreateCylinder(
@@ -37,6 +38,7 @@ export class TrackJointBabylonRenderer implements TrackJointRenderer {
   }
 
   update() {
+    //return;
     if (!this.trackJoint.removed) {
       this.mesh.position = CoordinateToBabylonVector3(this.trackJoint.position);
       this.mesh.position.y = -0.5;
