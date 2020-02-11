@@ -3,7 +3,7 @@ import 'babylonjs-loaders';
 import { Engine } from './structs/Engine/Engine';
 import { Vector3 } from 'babylonjs';
 import { TrackJoint } from './structs/TrackJoint/TrackJoint';
-import { Switch } from './structs/Switch';
+import { TrackSwitch } from './structs/TrackSwitch/TrackSwitch';
 
 window.addEventListener('DOMContentLoaded', () => {
   var canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
@@ -213,7 +213,7 @@ window.addEventListener('DOMContentLoaded', () => {
     ) {
       const id = parseInt(pickResult.pickedMesh.id.substring(10), 10);
       console.log('swB', id);
-      const sw: Switch = (window as any).switches.find(x => x.id === id);
+      const sw: TrackSwitch = (window as any).switches.find(x => x.id === id);
       if (sw) {
         sw.switch();
       }

@@ -3,9 +3,9 @@ import { TrackJointRenderer } from './TrackJointRenderer';
 import { Coordinate } from '../Coordinate';
 import { TYPES } from '../TYPES';
 import { babylonContainer } from '../inversify.config';
-import { Track } from '../Track';
-import { Switch } from '../Switch';
+import { Track } from '../Track/Track';
 import { TrackJointEnd } from './TrackJointEnd';
+import { TrackSwitch } from '../TrackSwitch/TrackSwitch';
 
 // true lesz a B oldal
 const side = (b: boolean) => (b ? 'B' : 'A');
@@ -121,10 +121,8 @@ export class TrackJoint {
       let t: Track;
       if (w && w.z !== undefined) {
         t = new Track(jp, tp, wp);
-        t.render(null);
       } else if (w) {
         t = new Track(jp, tp);
-        t.render(null);
       }
 
       this.setOneEnd(this.whichEnd(w, this, joint), t, t.B, 'B');
@@ -136,7 +134,7 @@ export class TrackJoint {
     if (!this.ends[this.whichEnd(w, this, joint)].isSet()) {
       const oldTrack = joint.ends[this.whichEnd(w, joint, this)].track;
 
-      const sw = new Switch(
+      const sw = new TrackSwitch(
         oldTrack.A.point,
         oldTrack.B.point,
         tp,
@@ -146,11 +144,10 @@ export class TrackJoint {
 
       oldTrack.A.disconnect();
       oldTrack.B.disconnect();
-      (oldTrack as Track).mesh.setEnabled(false);
+      // TODO (oldTrack as Track).mesh.setEnabled(false);
 
       this.setOneEnd(this.whichEnd(w, this, joint), sw, sw.B, 'B');
       joint.setOneEnd(this.whichEnd(w, joint, this), sw, sw.A, 'A');
-      sw.render(null);
 
       return {};
     }

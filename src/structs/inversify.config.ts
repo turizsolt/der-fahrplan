@@ -7,6 +7,10 @@ import { EngineBabylonRenderer } from './Engine/EngineBabylonRenderer';
 import { EngineRenderer } from './Engine/EngineRenderer';
 import { TrackJointRenderer } from './TrackJoint/TrackJointRenderer';
 import { TrackJointBabylonRenderer } from './TrackJoint/TrackJointBabylonRenderer';
+import { TrackRenderer } from './Track/TrackRenderer';
+import { TrackBabylonRenderer } from './Track/TrackBabylonRenderer';
+import { SwitchRenderer } from './TrackSwitch/SwitchRenderer';
+import { SwitchBabylonRenderer } from './TrackSwitch/SwitchBabylonRenderer';
 
 export const babylonContainer = new Container();
 babylonContainer
@@ -18,3 +22,9 @@ babylonContainer
 babylonContainer
   .bind<TrackJointRenderer>(TYPES.TrackJointRenderer)
   .to(TrackJointBabylonRenderer);
+babylonContainer
+  .bind<TrackRenderer>(TYPES.TrackRenderer)
+  .to(TrackBabylonRenderer);
+babylonContainer
+  .bind<SwitchRenderer>(TYPES.SwitchRenderer)
+  .to(SwitchBabylonRenderer);

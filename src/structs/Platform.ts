@@ -2,7 +2,7 @@ import * as BABYLON from 'babylonjs';
 import { Engine } from './Engine/Engine';
 import { Passenger } from './Passenger/Passenger';
 import { Side } from './Side';
-import { TrackBase } from './TrackBase';
+import { TrackBase } from './TrackBase/TrackBase';
 import { Coordinate } from './Coordinate';
 import { CoordinateToBabylonVector3 } from './CoordinateToBabylonVector3';
 

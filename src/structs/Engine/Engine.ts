@@ -1,12 +1,11 @@
 import * as BABYLON from 'babylonjs';
 import { Passenger } from '../Passenger/Passenger';
-import { Track } from '../Track';
-import { TrackBase } from '../TrackBase';
+import { Track } from '../Track/Track';
+import { TrackBase } from '../TrackBase/TrackBase';
 import { Coordinate } from '../Coordinate';
 import { EngineRenderer } from './EngineRenderer';
 import { TYPES } from '../TYPES';
 import { babylonContainer } from '../inversify.config';
-import { BabylonVector3ToCoordinate } from '../BabylonVector3ToCoordinate';
 
 export class Engine {
   private track: TrackBase;
@@ -19,7 +18,7 @@ export class Engine {
 
   putOnTrack(track: Track) {
     this.track = track;
-    this.position = BabylonVector3ToCoordinate(track.A.point);
+    this.position = track.A.point;
     this.positionOnTrack = 0;
     track.checkin(this);
 

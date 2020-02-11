@@ -1,15 +1,14 @@
-import * as BABYLON from 'babylonjs';
-import { Engine } from './Engine/Engine';
-import { Platform } from './Platform';
-import { TrackEnd } from './TrackEnd';
+import { Engine } from '../Engine/Engine';
+import { Platform } from '../Platform';
+import { TrackEnd } from '../Track/TrackEnd';
 import { TrackSegment } from './TrackSegment';
+import { Coordinate } from '../Coordinate';
 
 export abstract class TrackBase {
   readonly A: TrackEnd;
   readonly B: TrackEnd;
-  readonly I: BABYLON.Vector3;
+  readonly I: Coordinate;
   readonly segment: TrackSegment;
-  abstract render(scene: BABYLON.Scene);
   protected checkedList: Engine[] = [];
   private _platformList: Platform[] = [];
   get platformList() {
