@@ -1,26 +1,33 @@
+import * as BABYLON from 'babylonjs';
 import { TrackJointRenderer } from './TrackJointRenderer';
 import { Coordinate } from '../Coordinate';
 import { TYPES } from '../TYPES';
 import { babylonContainer } from '../inversify.config';
 import { Track } from '../Track';
-import { TrackBase } from '../TrackBase';
 import { Switch } from '../Switch';
+import { TrackJointEnd } from './TrackJointEnd';
+
+// true lesz a B oldal
+const side = (b: boolean) => (b ? 'B' : 'A');
+const otherSide = (ch: 'A' | 'B'): 'A' | 'B' => (ch === 'A' ? 'B' : 'A');
 
 export class TrackJoint {
   readonly id: number;
   public position: Coordinate;
   public rotation: number;
   public removed: boolean = false;
-  public tracks: { A: TrackBase | null; B: TrackBase | null } = {
-    A: null,
-    B: null
-  };
+  public ends: { A: TrackJointEnd; B: TrackJointEnd };
 
   private renderer: TrackJointRenderer;
 
   constructor(x: number, z: number, rot: number) {
     // console.log(`(${x}, ${z}) R${Math.round((rot * 180) / Math.PI)}`);
     this.id = (Math.random() * 1000000) | 0;
+
+    this.ends = {
+      A: new TrackJointEnd(),
+      B: new TrackJointEnd()
+    };
 
     this.position = new Coordinate(x, 0, z);
     this.rotation = rot;
@@ -90,40 +97,28 @@ export class TrackJoint {
     return { x, z };
   }
 
+  whichEnd(w: any, one: TrackJoint, other: TrackJoint) {
+    const comparePosition = w === true ? other.position : w;
+    const direction = Math.atan2(
+      comparePosition.x - one.position.x,
+      comparePosition.z - one.position.z
+    );
+    return side(almost(direction, one.rotation));
+  }
+
   connect(joint: TrackJoint) {
     const w: any = this.ww(joint);
-    if (w) {
-      // true lesz a B oldal
-      const side = (b: boolean) => (b ? 'B' : 'A');
+    if (!w) return { track: null };
 
-      const p1 = w === true ? joint.position : w;
-      const dir1 = Math.atan2(p1.x - this.position.x, p1.z - this.position.z);
-      const s1 = side(almost(dir1, this.rotation));
+    const jp = { x: joint.position.x, z: joint.position.z };
+    const tp = new BABYLON.Vector3(this.position.x, 0, this.position.z);
+    const wp = new BABYLON.Vector3(w.x, 0, w.z);
 
-      const p2 = w === true ? this.position : w;
-      const dir2 = Math.atan2(p2.x - joint.position.x, p2.z - joint.position.z);
-      const s2 = side(almost(dir2, joint.rotation));
-
-      if (this.tracks[s1] && this.tracks[s1].constructor.name === Switch.name)
-        return false;
-      if (joint.tracks[s2] && joint.tracks[s2].constructor.name === Switch.name)
-        return false;
-      if (
-        this.tracks[s1] &&
-        this.tracks[s1].constructor.name === Track.name &&
-        joint.tracks[s2] &&
-        joint.tracks[s2].constructor.name === Track.name
-      )
-        return false;
-
-      // TODO
-      console.log('s1s2', this.tracks[s1], joint.tracks[s2]);
-
+    if (
+      !this.ends[this.whichEnd(w, this, joint)].isSet() &&
+      !joint.ends[this.whichEnd(w, joint, this)].isSet()
+    ) {
       let t: Track;
-      const jp = { x: joint.position.x, z: joint.position.z };
-      const tp = { x: this.position.x, z: this.position.z };
-      const wp = { x: w.x, z: w.z };
-
       if (w && w.z !== undefined) {
         t = new Track(jp, tp, wp);
         t.render(null);
@@ -132,14 +127,40 @@ export class TrackJoint {
         t.render(null);
       }
 
-      if (t) {
-        this.tracks[s1] = t;
-        joint.tracks[s2] = t;
+      this.setOneEnd(this.whichEnd(w, this, joint), t, t.B, 'B');
+      joint.setOneEnd(this.whichEnd(w, joint, this), t, t.A, 'A');
 
-        //console.log('typeof', t.constructor.name, Track.name);
-      }
-    } else {
-      // not able to draw the track
+      return { track: t };
+    }
+
+    if (!this.ends[this.whichEnd(w, this, joint)].isSet()) {
+      const oldTrack = joint.ends[this.whichEnd(w, joint, this)].track;
+
+      const sw = new Switch(
+        oldTrack.A.point,
+        oldTrack.B.point,
+        tp,
+        oldTrack.I,
+        wp
+      );
+
+      oldTrack.A.disconnect();
+      oldTrack.B.disconnect();
+      (oldTrack as Track).mesh.setEnabled(false);
+
+      this.setOneEnd(this.whichEnd(w, this, joint), sw, sw.B, 'B');
+      joint.setOneEnd(this.whichEnd(w, joint, this), sw, sw.A, 'A');
+      sw.render(null);
+
+      return {};
+    }
+  }
+
+  setOneEnd(jointEnd, track, trackEnd, trackEndName) {
+    console.log(jointEnd, trackEndName);
+    this.ends[jointEnd].setEnd(track, trackEnd);
+    if (this.ends[otherSide(jointEnd)].isSet()) {
+      this.ends.A.end.connect(this.ends.B.end);
     }
   }
 }
