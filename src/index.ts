@@ -3,6 +3,7 @@ import 'babylonjs-loaders';
 import { Engine } from './structs/Engine/Engine';
 import { Vector3 } from 'babylonjs';
 import { TrackJoint } from './structs/TrackJoint/TrackJoint';
+import { Switch } from './structs/Switch';
 
 window.addEventListener('DOMContentLoaded', () => {
   var canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
@@ -49,6 +50,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const engine = new Engine();
     engine.putOnTrack(tr0);
+
+    (window as any).switches = [];
 
     /* end of setup */
 
@@ -203,8 +206,21 @@ window.addEventListener('DOMContentLoaded', () => {
     var pickResult = scene.pick(scene.pointerX, scene.pointerY);
     mouseDownPoint = pickResult.pickedPoint;
 
-    // console.log('picked', pickResult.pickedMesh.id);
-    if (pickResult.pickedMesh && pickResult.pickedMesh.id.startsWith('m-')) {
+    console.log('picked', pickResult.pickedMesh.id);
+    if (
+      pickResult.pickedMesh &&
+      pickResult.pickedMesh.id.startsWith('switchBox-')
+    ) {
+      const id = parseInt(pickResult.pickedMesh.id.substring(10), 10);
+      console.log('swB', id);
+      const sw: Switch = (window as any).switches.find(x => x.id === id);
+      if (sw) {
+        sw.switch();
+      }
+    } else if (
+      pickResult.pickedMesh &&
+      pickResult.pickedMesh.id.startsWith('m-')
+    ) {
       const id = parseInt(pickResult.pickedMesh.id.substring(2), 10);
       const pos = markers.findIndex(x => x.id === id);
       if (pos === -1) return;
