@@ -1,6 +1,5 @@
 import { TrackBase } from '../TrackBase/TrackBase';
 import { TrackEnd } from './TrackEnd';
-import { TrackCreatorListElement } from '../TrackList';
 import { TrackSegment } from '../TrackBase/TrackSegment';
 import { TrackRenderer } from './TrackRenderer';
 import { babylonContainer } from '../inversify.config';
@@ -14,11 +13,7 @@ export class Track extends TrackBase {
   readonly segment: TrackSegment;
   private renderer: TrackRenderer;
 
-  constructor(
-    a: TrackCreatorListElement,
-    b: TrackCreatorListElement,
-    i?: TrackCreatorListElement
-  ) {
+  constructor(a: Coordinate, b: Coordinate, i?: Coordinate) {
     super();
     this.A = new TrackEnd(new Coordinate(a.x, 0, a.z), this);
     this.B = new TrackEnd(new Coordinate(b.x, 0, b.z), this);

@@ -1,4 +1,3 @@
-import * as BABYLON from 'babylonjs';
 import { TrackJointRenderer } from './TrackJointRenderer';
 import { Coordinate } from '../Coordinate';
 import { TYPES } from '../TYPES';
@@ -110,9 +109,9 @@ export class TrackJoint {
     const w: any = this.ww(joint);
     if (!w) return { track: null };
 
-    const jp = { x: joint.position.x, z: joint.position.z };
-    const tp = new BABYLON.Vector3(this.position.x, 0, this.position.z);
-    const wp = new BABYLON.Vector3(w.x, 0, w.z);
+    const jp = new Coordinate(joint.position.x, 0, joint.position.z);
+    const tp = new Coordinate(this.position.x, 0, this.position.z);
+    const wp = new Coordinate(w.x, 0, w.z);
 
     if (
       !this.ends[this.whichEnd(w, this, joint)].isSet() &&
