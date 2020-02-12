@@ -4,6 +4,9 @@ import { Engine } from './structs/Engine/Engine';
 import { Vector3 } from 'babylonjs';
 import { TrackJoint } from './structs/TrackJoint/TrackJoint';
 import { TrackSwitch } from './structs/TrackSwitch/TrackSwitch';
+import { babylonContainer } from './structs/inversify.config';
+import { Land } from './structs/Land/Land';
+import { TYPES } from './structs/TYPES';
 
 window.addEventListener('DOMContentLoaded', () => {
   var canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
@@ -41,17 +44,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     /* level setup */
 
-    const j1 = new TrackJoint(0, 0, 0);
-    const j2 = new TrackJoint(0, 20, 0);
-    const { track: tr0 } = j2.connect(j1);
-
-    markers.push(j1);
-    markers.push(j2);
-
-    const engine = new Engine();
-    engine.putOnTrack(tr0);
-
     (window as any).switches = [];
+
+    const land = babylonContainer.get<Land>(TYPES.Land);
+    const engine = land.init(markers);
 
     /* end of setup */
 

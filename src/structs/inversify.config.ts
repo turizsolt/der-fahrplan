@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Container } from 'inversify';
+import { Container, interfaces } from 'inversify';
 import { PassengerRenderer } from './Passenger/PassengerRenderer';
 import { TYPES } from './TYPES';
 import { PassengerBabylonRenderer } from './Passenger/PassengerBabylonRenderer';
@@ -11,6 +11,10 @@ import { TrackRenderer } from './Track/TrackRenderer';
 import { TrackBabylonRenderer } from './Track/TrackBabylonRenderer';
 import { SwitchRenderer } from './TrackSwitch/SwitchRenderer';
 import { SwitchBabylonRenderer } from './TrackSwitch/SwitchBabylonRenderer';
+import { Land } from './Land/Land';
+import { ActualLand } from './Land/ActualLand';
+import { Engine } from './Engine/Engine';
+import { ActualEngine } from './Engine/ActualEngine';
 
 export const babylonContainer = new Container();
 babylonContainer
@@ -28,3 +32,13 @@ babylonContainer
 babylonContainer
   .bind<SwitchRenderer>(TYPES.SwitchRenderer)
   .to(SwitchBabylonRenderer);
+babylonContainer.bind<Land>(TYPES.Land).to(ActualLand);
+babylonContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
+
+babylonContainer
+  .bind<interfaces.Factory<Engine>>(TYPES.FactoryOfEngine)
+  .toFactory<Engine>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Engine>(TYPES.Engine);
+    };
+  });

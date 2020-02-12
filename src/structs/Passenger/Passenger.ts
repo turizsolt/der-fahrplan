@@ -38,7 +38,8 @@ export class Passenger {
         .clone()
         .add(new Coordinate(0, 2.5, 0).add(this.shift));
     } else if (this.onEngine) {
-      this.position = this.onEngine.position
+      this.position = this.onEngine
+        .getPosition()
         .clone()
         .add(new Coordinate(0, 2.5, 0).add(this.shift));
     }

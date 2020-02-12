@@ -28,8 +28,8 @@ export class EngineBabylonRenderer implements EngineRenderer {
 
   update() {
     this.renderEngine.position = CoordinateToBabylonVector3(
-      this.engine.position
+      this.engine.getPosition()
     );
-    this.renderEngine.rotation.y = this.engine.rotation;
+    this.renderEngine.rotation.y = this.engine.getRotation();
   }
 }
