@@ -1,7 +1,7 @@
 import { Engine } from '../Engine/Engine';
 import { Platform } from '../Platform';
 import { PassengerRenderer } from './PassengerRenderer';
-import { Coordinate } from '../Coordinate';
+import { Coordinate } from '../Geometry/Coordinate';
 import { TYPES } from '../TYPES';
 import { babylonContainer } from '../inversify.config';
 
@@ -57,13 +57,20 @@ export class Passenger {
     this.updatePosition();
   }
 
-  checkPlatform(platform: Platform) {
-    console.log('check platform', this.id);
-    if (platform === this.to) {
-      this.onEngine.getOff(this);
-      this.onEngine = null;
+  isArrivedAt(platform: Platform) {
+    return platform === this.to;
+  }
 
-      this.updatePosition();
+  checkShouldGetOffAt(platform: Platform) {
+    if (this.isArrivedAt(platform)) {
+      this.getOff();
     }
+  }
+
+  getOff() {
+    this.onEngine.getOff(this);
+    this.onEngine = null;
+
+    this.updatePosition();
   }
 }

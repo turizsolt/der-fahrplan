@@ -1,11 +1,13 @@
 import { Passenger } from '../Passenger/Passenger';
 import { Track } from '../Track/Track';
 import { TrackBase } from '../TrackBase/TrackBase';
-import { Coordinate } from '../Coordinate';
+import { Coordinate } from '../Geometry/Coordinate';
 import { EngineRenderer } from './EngineRenderer';
 import { TYPES } from '../TYPES';
 import { inject, injectable } from 'inversify';
 import { Engine } from './Engine';
+import { Platform } from '../Platform';
+import { Bezier } from '../Geometry/Bezier';
 
 @injectable()
 export class ActualEngine implements Engine {
@@ -14,7 +16,7 @@ export class ActualEngine implements Engine {
   private rotation: number;
   private positionOnTrack: number;
   private movable: boolean = true;
-  private passengerList: Passenger[] = [];
+  private carriedPassengers: Passenger[] = [];
   @inject(TYPES.EngineRenderer) private renderer: EngineRenderer;
 
   putOnTrack(track: Track) {
@@ -24,9 +26,18 @@ export class ActualEngine implements Engine {
     track.checkin(this);
 
     this.renderer.init(this);
-    this.reposition();
+    this.update();
   }
 
+  getPosition(): Coordinate {
+    return this.position;
+  }
+
+  getRotation(): number {
+    return this.rotation;
+  }
+
+  // TODO should have refactor, when AB-BA pairing will considering as well
   forward() {
     if (!this.movable) return;
 
@@ -35,7 +46,7 @@ export class ActualEngine implements Engine {
       const trackLength = this.track.segment.length;
       if (this.track.B.connectedTo) {
         this.track.checkout(this);
-        this.track.platformList.map(platform => {
+        this.track.platformsBeside.map(platform => {
           platform.checkout(this);
         });
         this.track = this.track.B.connectedTo;
@@ -45,9 +56,10 @@ export class ActualEngine implements Engine {
         this.positionOnTrack = trackLength;
       }
     }
-    this.reposition();
+    this.update();
   }
 
+  // TODO should have refactor, when AB-BA pairing will considering as well
   backward() {
     if (!this.movable) return;
 
@@ -55,7 +67,7 @@ export class ActualEngine implements Engine {
     if (this.positionOnTrack < 0) {
       if (this.track.A.connectedTo) {
         this.track.checkout(this);
-        this.track.platformList.map(platform => {
+        this.track.platformsBeside.map(platform => {
           platform.checkout(this);
         });
         this.track = this.track.A.connectedTo;
@@ -67,30 +79,18 @@ export class ActualEngine implements Engine {
       }
     }
 
-    this.reposition();
+    this.update();
   }
 
   stop() {
     this.movable = false;
 
-    this.track.platformList.map(platform => {
-      if (
-        platform.start <= this.positionOnTrack &&
-        this.positionOnTrack <= platform.end
-      ) {
-        this.passengerList.map(passenger => {
-          passenger.checkPlatform(platform);
-        });
-
-        platform.callPassengers(this);
-        console.log(
-          'on platform',
-          platform.no,
-          platform.passengerList.map(x => `${x.id}->${x.to.no}`)
-        );
+    this.track.platformsBeside.map(platform => {
+      if (this.isBeside(platform)) {
+        this.callForArrivedPassengersAt(platform);
+        platform.callForDepartingPassengers(this);
       }
     });
-    console.log('on train', this.passengerList.map(x => `${x.id}->${x.to.no}`));
   }
 
   resume() {
@@ -98,61 +98,43 @@ export class ActualEngine implements Engine {
   }
 
   getOn(passenger: Passenger) {
-    this.passengerList.push(passenger);
+    this.carriedPassengers.push(passenger);
   }
 
   getOff(passenger: Passenger) {
-    this.passengerList = this.passengerList.filter(x => x !== passenger);
+    this.carriedPassengers = this.carriedPassengers.filter(
+      x => x !== passenger
+    );
   }
 
-  reposition() {
-    if (this.track.I) {
-      const t = this.positionOnTrack / this.track.segment.length;
-      var p = new BABYLON.Vector3(
-        (1 - t) * (1 - t) * this.track.A.point.x +
-          2 * (1 - t) * t * this.track.I.x +
-          t * t * this.track.B.point.x,
-        0,
-        (1 - t) * (1 - t) * this.track.A.point.z +
-          2 * (1 - t) * t * this.track.I.z +
-          t * t * this.track.B.point.z
-      );
-      var pd = new BABYLON.Vector3(
-        2 * (1 - t) * (this.track.I.x - this.track.A.point.x) +
-          2 * t * (this.track.B.point.x - this.track.I.x),
-        0,
-        2 * (1 - t) * (this.track.I.z - this.track.A.point.z) +
-          2 * t * (this.track.B.point.z - this.track.I.z)
-      );
+  update() {
+    this.updatePosition();
+    this.updateWhichPlatformsBeside();
+    this.updateCarriedPassengersPosition();
+    this.renderer.update();
+  }
 
-      this.position = p;
+  private callForArrivedPassengersAt(platform: Platform) {
+    this.carriedPassengers.map(passenger => {
+      passenger.checkShouldGetOffAt(platform);
+    });
+  }
 
-      const rot = Math.atan2(pd.x, pd.z);
-      this.rotation = rot;
-    } else {
-      const t = this.positionOnTrack / this.track.segment.length;
-      var p = new BABYLON.Vector3(
-        (1 - t) * this.track.A.point.x + t * this.track.B.point.x,
-        0,
-        (1 - t) * this.track.A.point.z + t * this.track.B.point.z
-      );
-      var pd = new BABYLON.Vector3(
-        this.track.B.point.x - this.track.A.point.x,
-        0,
-        this.track.B.point.z - this.track.A.point.z
-      );
+  private isBeside(platform: Platform) {
+    return (
+      platform.start <= this.positionOnTrack &&
+      this.positionOnTrack <= platform.end
+    );
+  }
 
-      this.position = p;
+  private updateCarriedPassengersPosition() {
+    this.carriedPassengers.map(passenger => passenger.updatePosition());
+  }
 
-      const rot = Math.atan2(pd.x, pd.z);
-      this.rotation = rot;
-    }
-
-    this.track.platformList.map(platform => {
-      if (
-        platform.start <= this.positionOnTrack &&
-        this.positionOnTrack <= platform.end
-      ) {
+  private updateWhichPlatformsBeside() {
+    this.track.platformsBeside.map(platform => {
+      // todo checkins can be optimised, not just here
+      if (this.isBeside(platform)) {
         if (!platform.isChecked(this)) {
           platform.checkin(this);
         }
@@ -160,16 +142,35 @@ export class ActualEngine implements Engine {
         platform.checkout(this);
       }
     });
-
-    this.passengerList.map(passenger => passenger.updatePosition());
-
-    this.renderer.update();
   }
 
-  getPosition(): Coordinate {
-    return this.position;
-  }
-  getRotation(): number {
-    return this.rotation;
+  // todo do somehow shorter
+  private updatePosition() {
+    if (this.track.I) {
+      const percentage = this.positionOnTrack / this.track.segment.length;
+      this.position = Bezier.pointOnCurve(
+        percentage,
+        this.track.A.point,
+        this.track.I,
+        this.track.B.point
+      );
+      this.rotation = Bezier.directionOnCurve(
+        percentage,
+        this.track.A.point,
+        this.track.I,
+        this.track.B.point
+      );
+    } else {
+      const percentage = this.positionOnTrack / this.track.segment.length;
+      this.position = Bezier.pointOnLine(
+        percentage,
+        this.track.A.point,
+        this.track.B.point
+      );
+      this.rotation = Bezier.directionOnLine(
+        this.track.A.point,
+        this.track.B.point
+      );
+    }
   }
 }

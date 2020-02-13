@@ -4,7 +4,7 @@ import { TrackSegment } from '../TrackBase/TrackSegment';
 import { TrackRenderer } from './TrackRenderer';
 import { babylonContainer } from '../inversify.config';
 import { TYPES } from '../TYPES';
-import { Coordinate } from '../Coordinate';
+import { Coordinate } from '../Geometry/Coordinate';
 
 export class Track extends TrackBase {
   readonly A: TrackEnd;

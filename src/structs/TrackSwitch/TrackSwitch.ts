@@ -2,7 +2,7 @@ import { TrackSwitchEnd } from './TrackSwitchEnd';
 import { TrackBase } from '../TrackBase/TrackBase';
 import { TrackEnd } from '../Track/TrackEnd';
 import { TrackSegment } from '../TrackBase/TrackSegment';
-import { Coordinate } from '../Coordinate';
+import { Coordinate } from '../Geometry/Coordinate';
 import { SwitchRenderer } from './SwitchRenderer';
 import { babylonContainer } from '../inversify.config';
 import { TYPES } from '../TYPES';

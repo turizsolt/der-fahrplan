@@ -1,5 +1,5 @@
 import { TrackBase } from '../TrackBase/TrackBase';
-import { Coordinate } from '../Coordinate';
+import { Coordinate } from '../Geometry/Coordinate';
 
 export class TrackEnd {
   readonly point: Coordinate;

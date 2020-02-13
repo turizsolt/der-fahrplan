@@ -2,7 +2,7 @@ import { Engine } from '../Engine/Engine';
 import { Platform } from '../Platform';
 import { TrackEnd } from '../Track/TrackEnd';
 import { TrackSegment } from './TrackSegment';
-import { Coordinate } from '../Coordinate';
+import { Coordinate } from '../Geometry/Coordinate';
 
 export abstract class TrackBase {
   readonly A: TrackEnd;
@@ -10,9 +10,9 @@ export abstract class TrackBase {
   readonly I: Coordinate;
   readonly segment: TrackSegment;
   protected checkedList: Engine[] = [];
-  private _platformList: Platform[] = [];
-  get platformList() {
-    return this._platformList;
+  private _platformsBeside: Platform[] = [];
+  get platformsBeside() {
+    return this._platformsBeside;
   }
 
   checkin(engine: Engine) {
@@ -24,6 +24,6 @@ export abstract class TrackBase {
   }
 
   addPlatform(platform: Platform) {
-    this._platformList.push(platform);
+    this._platformsBeside.push(platform);
   }
 }

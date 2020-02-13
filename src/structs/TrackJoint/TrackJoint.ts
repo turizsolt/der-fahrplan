@@ -1,5 +1,5 @@
 import { TrackJointRenderer } from './TrackJointRenderer';
-import { Coordinate } from '../Coordinate';
+import { Coordinate } from '../Geometry/Coordinate';
 import { TYPES } from '../TYPES';
 import { babylonContainer } from '../inversify.config';
 import { Track } from '../Track/Track';

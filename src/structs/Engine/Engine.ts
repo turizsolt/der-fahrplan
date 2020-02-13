@@ -1,6 +1,6 @@
 import { Passenger } from '../Passenger/Passenger';
 import { Track } from '../Track/Track';
-import { Coordinate } from '../Coordinate';
+import { Coordinate } from '../Geometry/Coordinate';
 
 export interface Engine {
   putOnTrack(track: Track);

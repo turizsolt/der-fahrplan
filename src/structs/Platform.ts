@@ -3,7 +3,7 @@ import { Engine } from './Engine/Engine';
 import { Passenger } from './Passenger/Passenger';
 import { Side } from './Side';
 import { TrackBase } from './TrackBase/TrackBase';
-import { Coordinate } from './Coordinate';
+import { Coordinate } from './Geometry/Coordinate';
 import { CoordinateToBabylonVector3 } from './CoordinateToBabylonVector3';
 
 export class Platform {
@@ -125,7 +125,7 @@ export class Platform {
     this.passengerList = this.passengerList.filter(x => x !== passenger);
   }
 
-  callPassengers(engine: Engine) {
+  callForDepartingPassengers(engine: Engine) {
     this.passengerList.map(x => x.checkTrain(engine));
   }
 }

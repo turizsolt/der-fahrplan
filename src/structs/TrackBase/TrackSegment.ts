@@ -1,5 +1,5 @@
 import * as BABYLON from 'babylonjs';
-import { Coordinate } from '../Coordinate';
+import { Coordinate } from '../Geometry/Coordinate';
 import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
 
 export class TrackSegment {

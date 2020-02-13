@@ -1,7 +1,7 @@
 import { TrackSwitch } from './TrackSwitch';
 import { TrackBase } from '../TrackBase/TrackBase';
 import { TrackEnd } from '../Track/TrackEnd';
-import { Coordinate } from '../Coordinate';
+import { Coordinate } from '../Geometry/Coordinate';
 
 export class TrackSwitchEnd extends TrackEnd {
   readonly point: Coordinate;
