@@ -1,6 +1,6 @@
 import { TrackSwitch } from './TrackSwitch';
 
-export interface SwitchRenderer {
+export interface TrackSwitchRenderer {
   init(sw: TrackSwitch): void;
   update();
 }

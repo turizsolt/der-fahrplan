@@ -1,11 +1,11 @@
 import * as BABYLON from 'babylonjs';
-import { SwitchRenderer } from './SwitchRenderer';
+import { TrackSwitchRenderer } from './TrackSwitchRenderer';
 import { injectable } from 'inversify';
 import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
 import { TrackSwitch } from './TrackSwitch';
 
 @injectable()
-export class SwitchBabylonRenderer implements SwitchRenderer {
+export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
   private mesh: BABYLON.LinesMesh;
   private trackSwitch: TrackSwitch;
   readonly scene: BABYLON.Scene;

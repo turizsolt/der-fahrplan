@@ -1,10 +1,18 @@
 export const TYPES = {
-  PassengerRenderer: Symbol.for('PassengerRenderer'),
-  EngineRenderer: Symbol.for('EngineRenderer'),
+  Land: Symbol.for('Land'),
+
   Engine: Symbol.for('Engine'),
+  EngineRenderer: Symbol.for('EngineRenderer'),
   FactoryOfEngine: Symbol.for('Factory<Engine>'),
-  TrackJointRenderer: Symbol.for('TrackJointRenderer'),
+
+  Track: Symbol.for('Track'),
   TrackRenderer: Symbol.for('TrackRenderer'),
-  SwitchRenderer: Symbol.for('SwitchRenderer'),
-  Land: Symbol.for('Land')
+  FactoryOfTrack: Symbol.for('Factory<Track>'),
+
+  TrackSwitch: Symbol.for('TrackSwitch'),
+  TrackSwitchRenderer: Symbol.for('TrackSwitchRenderer'),
+  FactoryOfTrackSwitch: Symbol.for('Factory<TrackSwitch>'),
+
+  PassengerRenderer: Symbol.for('PassengerRenderer'),
+  TrackJointRenderer: Symbol.for('TrackJointRenderer')
 };
