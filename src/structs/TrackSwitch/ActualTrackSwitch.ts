@@ -9,27 +9,26 @@ import { TrackSwitch } from './TrackSwitch';
 import { ActualTrackBase } from '../TrackBase/ActualTrackBase';
 
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
-  readonly D: TrackEnd;
-  readonly E: TrackSwitchEnd;
-  readonly F: TrackSwitchEnd;
+  protected D: TrackEnd;
+  protected E: TrackSwitchEnd;
+  protected F: TrackSwitchEnd;
 
-  readonly IE: Coordinate;
-  readonly IF: Coordinate;
+  protected IE: Coordinate;
+  protected IF: Coordinate;
 
-  readonly segmentE: TrackSegment;
-  readonly segmentF: TrackSegment;
+  protected segmentE: TrackSegment;
+  protected segmentF: TrackSegment;
 
-  get A() {
+  getA() {
     return this.D;
   }
-  get B() {
+
+  getB() {
     return this.state ? this.F : this.E;
   }
-  get I() {
+
+  getI() {
     return this.state ? this.IF : this.IE;
-  }
-  get segment() {
-    return this.state ? this.segmentF : this.segmentE;
   }
 
   readonly id: number;
@@ -57,8 +56,8 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
       this.IF = ic;
     }
 
-    this.segmentE = new TrackSegment(a, b, ib, true);
-    this.segmentF = new TrackSegment(a, c, ic, true);
+    this.segmentE = new TrackSegment(ib ? [a, ib, b] : [a, b]);
+    this.segmentF = new TrackSegment(ic ? [a, ic, c] : [a, c]);
 
     this.state = 0;
     this.E.active = true;
@@ -88,5 +87,17 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
       this.E.active = true;
       this.F.active = false;
     }
+  }
+
+  getSegmentE(): TrackSegment {
+    return this.segmentE;
+  }
+
+  getSegmentF(): TrackSegment {
+    return this.segmentF;
+  }
+
+  getId(): number {
+    return this.id;
   }
 }

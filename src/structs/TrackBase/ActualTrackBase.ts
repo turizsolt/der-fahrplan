@@ -6,13 +6,14 @@ import { Coordinate } from '../Geometry/Coordinate';
 import { TrackBase } from './TrackBase';
 
 export abstract class ActualTrackBase implements TrackBase {
-  readonly A: TrackEnd;
-  readonly B: TrackEnd;
-  readonly I: Coordinate;
-  readonly segment: TrackSegment;
+  protected A: TrackEnd;
+  protected B: TrackEnd;
+  protected I: Coordinate;
+  protected segment: TrackSegment;
   protected checkedList: Engine[] = [];
-  private _platformsBeside: Platform[] = [];
-  get platformsBeside() {
+  protected _platformsBeside: Platform[] = [];
+
+  getPlatformsBeside() {
     return this._platformsBeside;
   }
 
@@ -26,5 +27,17 @@ export abstract class ActualTrackBase implements TrackBase {
 
   addPlatform(platform: Platform) {
     this._platformsBeside.push(platform);
+  }
+
+  getSegment(): TrackSegment {
+    return this.segment;
+  }
+
+  getA(): TrackEnd {
+    return this.A;
+  }
+
+  getB(): TrackEnd {
+    return this.B;
   }
 }

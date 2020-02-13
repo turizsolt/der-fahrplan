@@ -1,38 +1,35 @@
-import * as BABYLON from 'babylonjs';
 import { Coordinate } from '../Geometry/Coordinate';
-import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
+import { Bezier } from '../Geometry/Bezier';
 
 export class TrackSegment {
   readonly length: number;
   readonly isCurve: boolean;
-  readonly curvePoints?: Coordinate[];
+  readonly curvePoints: Coordinate[];
+  private bezier: Bezier;
 
-  constructor(
-    a: Coordinate,
-    b: Coordinate,
-    i?: Coordinate,
-    mustCurve: boolean = false
-  ) {
-    if (!i && mustCurve) {
-      i = new Coordinate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
-    }
+  constructor(coordinates: Coordinate[]) {
+    this.bezier = new Bezier(coordinates);
+    this.curvePoints = this.bezier.getLinePoints(20);
+    this.length = Bezier.getLength(this.curvePoints);
+  }
 
-    if (i) {
-      const bezier = BABYLON.Curve3.CreateQuadraticBezier(
-        CoordinateToBabylonVector3(a),
-        CoordinateToBabylonVector3(i),
-        CoordinateToBabylonVector3(b),
-        20
-      );
-      this.curvePoints = bezier.getPoints();
-      this.length = bezier.length();
-      this.isCurve = true;
-    } else {
-      this.length = Math.sqrt(
-        Math.pow(Math.abs(a.x - b.x), 2) + Math.pow(Math.abs(a.z - b.z), 2)
-      );
-      this.curvePoints = [a, b];
-      this.isCurve = false;
-    }
+  getCurvePoints(): Coordinate[] {
+    return this.curvePoints;
+  }
+
+  getLength(): number {
+    return this.length;
+  }
+
+  getBezier(): Bezier {
+    return this.bezier;
+  }
+
+  getFirstPoint(): Coordinate {
+    return this.curvePoints[0];
+  }
+
+  getLastPoint(): Coordinate {
+    return this.curvePoints[this.curvePoints.length - 1];
   }
 }

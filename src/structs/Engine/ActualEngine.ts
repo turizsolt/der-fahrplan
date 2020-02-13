@@ -21,7 +21,7 @@ export class ActualEngine implements Engine {
 
   putOnTrack(track: Track) {
     this.track = track;
-    this.position = track.A.point;
+    this.position = track.getSegment().getFirstPoint();
     this.positionOnTrack = 0;
     track.checkin(this);
 
@@ -42,14 +42,14 @@ export class ActualEngine implements Engine {
     if (!this.movable) return;
 
     this.positionOnTrack += 1;
-    if (this.positionOnTrack > this.track.segment.length) {
-      const trackLength = this.track.segment.length;
-      if (this.track.B.connectedTo) {
+    if (this.positionOnTrack > this.track.getSegment().getLength()) {
+      const trackLength = this.track.getSegment().getLength();
+      if (this.track.getB().connectedTo) {
         this.track.checkout(this);
-        this.track.platformsBeside.map(platform => {
+        this.track.getPlatformsBeside().map(platform => {
           platform.checkout(this);
         });
-        this.track = this.track.B.connectedTo;
+        this.track = this.track.getB().connectedTo;
         this.track.checkin(this);
         this.positionOnTrack -= trackLength;
       } else {
@@ -65,14 +65,14 @@ export class ActualEngine implements Engine {
 
     this.positionOnTrack -= 1;
     if (this.positionOnTrack < 0) {
-      if (this.track.A.connectedTo) {
+      if (this.track.getA().connectedTo) {
         this.track.checkout(this);
-        this.track.platformsBeside.map(platform => {
+        this.track.getPlatformsBeside().map(platform => {
           platform.checkout(this);
         });
-        this.track = this.track.A.connectedTo;
+        this.track = this.track.getA().connectedTo;
         this.track.checkin(this);
-        const prevTrackLength = this.track.segment.length;
+        const prevTrackLength = this.track.getSegment().getLength();
         this.positionOnTrack += prevTrackLength;
       } else {
         this.positionOnTrack = 0;
@@ -85,7 +85,7 @@ export class ActualEngine implements Engine {
   stop() {
     this.movable = false;
 
-    this.track.platformsBeside.map(platform => {
+    this.track.getPlatformsBeside().map(platform => {
       if (this.isBeside(platform)) {
         this.callForArrivedPassengersAt(platform);
         platform.callForDepartingPassengers(this);
@@ -132,7 +132,7 @@ export class ActualEngine implements Engine {
   }
 
   private updateWhichPlatformsBeside() {
-    this.track.platformsBeside.map(platform => {
+    this.track.getPlatformsBeside().map(platform => {
       // todo checkins can be optimised, not just here
       if (this.isBeside(platform)) {
         if (!platform.isChecked(this)) {
@@ -146,31 +146,15 @@ export class ActualEngine implements Engine {
 
   // todo do somehow shorter
   private updatePosition() {
-    if (this.track.I) {
-      const percentage = this.positionOnTrack / this.track.segment.length;
-      this.position = Bezier.pointOnCurve(
-        percentage,
-        this.track.A.point,
-        this.track.I,
-        this.track.B.point
-      );
-      this.rotation = Bezier.directionOnCurve(
-        percentage,
-        this.track.A.point,
-        this.track.I,
-        this.track.B.point
-      );
-    } else {
-      const percentage = this.positionOnTrack / this.track.segment.length;
-      this.position = Bezier.pointOnLine(
-        percentage,
-        this.track.A.point,
-        this.track.B.point
-      );
-      this.rotation = Bezier.directionOnLine(
-        this.track.A.point,
-        this.track.B.point
-      );
-    }
+    const percentage =
+      this.positionOnTrack / this.track.getSegment().getLength();
+    this.position = this.track
+      .getSegment()
+      .getBezier()
+      .getPoint(percentage);
+    this.rotation = this.track
+      .getSegment()
+      .getBezier()
+      .getDirection(percentage);
   }
 }

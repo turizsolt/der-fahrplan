@@ -14,11 +14,13 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
     this.trackSwitch = trackSwitch;
 
     const switchBox = BABYLON.MeshBuilder.CreateBox(
-      'switchBox-' + this.trackSwitch.id,
+      'switchBox-' + this.trackSwitch.getId(),
       { height: 3, width: 3, depth: 3 },
       this.scene
     );
-    switchBox.position = CoordinateToBabylonVector3(this.trackSwitch.A.point);
+    switchBox.position = CoordinateToBabylonVector3(
+      this.trackSwitch.getSegment().getFirstPoint()
+    );
     switchBox.position.y = 10;
 
     var boxMaterial = new BABYLON.StandardMaterial('botMat', this.scene);
@@ -28,9 +30,10 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
     const track1 = BABYLON.MeshBuilder.CreateDashedLines(
       'track',
       {
-        points: this.trackSwitch.segmentE.curvePoints.map(
-          CoordinateToBabylonVector3
-        ),
+        points: this.trackSwitch
+          .getSegmentE()
+          .getCurvePoints()
+          .map(CoordinateToBabylonVector3),
         gapSize: 5,
         dashSize: 1
       },
@@ -41,9 +44,10 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
     const track2 = BABYLON.MeshBuilder.CreateDashedLines(
       'track',
       {
-        points: this.trackSwitch.segmentF.curvePoints.map(
-          CoordinateToBabylonVector3
-        ),
+        points: this.trackSwitch
+          .getSegmentF()
+          .getCurvePoints()
+          .map(CoordinateToBabylonVector3),
         gapSize: 5,
         dashSize: 1
       },
@@ -53,7 +57,10 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
 
     const track = BABYLON.Mesh.CreateLines(
       'lines',
-      this.trackSwitch.segment.curvePoints.map(CoordinateToBabylonVector3),
+      this.trackSwitch
+        .getSegment()
+        .getCurvePoints()
+        .map(CoordinateToBabylonVector3),
       this.scene,
       true
     );
@@ -65,7 +72,10 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
     if (this.mesh)
       this.mesh = BABYLON.Mesh.CreateLines(
         null,
-        this.trackSwitch.segment.curvePoints.map(CoordinateToBabylonVector3),
+        this.trackSwitch
+          .getSegment()
+          .getCurvePoints()
+          .map(CoordinateToBabylonVector3),
         null,
         null,
         this.mesh

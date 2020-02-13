@@ -27,25 +27,20 @@ export class Platform {
   ) {
     track.addPlatform(this);
 
-    var rot = new BABYLON.Vector3(
-      this.track.B.point.x - this.track.A.point.x,
-      0,
-      this.track.B.point.z - this.track.A.point.z
-    );
+    const segment = this.track.getSegment();
+    const a = segment.getFirstPoint();
+    const b = segment.getLastPoint();
+
+    var rot = new BABYLON.Vector3(b.x - a.x, 0, b.z - a.z);
     const rot4 = Math.atan2(rot.x, rot.z);
     const rotLeft = rot4 - Math.PI / 2;
     const rotRight = rot4 + Math.PI / 2;
 
-    var center = new BABYLON.Vector3(
-      (this.track.B.point.x + this.track.A.point.x) / 2,
-      0,
-      (this.track.B.point.z + this.track.A.point.z) / 2
-    );
+    var center = new BABYLON.Vector3((b.x + a.x) / 2, 0, (b.z + a.z) / 2);
 
     var dist = 1.6 + width / 2;
     var len = Math.sqrt(
-      Math.pow(Math.abs(this.track.A.point.x - this.track.B.point.x), 2) +
-        Math.pow(Math.abs(this.track.A.point.z - this.track.B.point.z), 2)
+      Math.pow(Math.abs(a.x - b.x), 2) + Math.pow(Math.abs(a.z - b.z), 2)
     );
     var shift = new BABYLON.Vector3(
       Math.sin(side === Side.Left ? rotLeft : rotRight) * 1,
@@ -55,9 +50,9 @@ export class Platform {
 
     var dist2 = start + (end - start) / 2;
     var shift2 = new BABYLON.Vector3(
-      this.track.A.point.x + (rot.x / len) * dist2,
+      a.x + (rot.x / len) * dist2,
       0,
-      this.track.A.point.z + (rot.z / len) * dist2
+      a.z + (rot.z / len) * dist2
     );
 
     var height = new BABYLON.Vector3(0, -0.75, 0);

@@ -16,7 +16,10 @@ export class TrackBabylonRenderer implements TrackRenderer {
     this.mesh = BABYLON.MeshBuilder.CreateLines(
       'track',
       {
-        points: this.track.segment.curvePoints.map(CoordinateToBabylonVector3)
+        points: this.track
+          .getSegment()
+          .getCurvePoints()
+          .map(CoordinateToBabylonVector3)
       },
       this.scene
     );

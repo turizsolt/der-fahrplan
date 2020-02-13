@@ -2,7 +2,7 @@ import { TrackBase } from '../TrackBase/TrackBase';
 import { Coordinate } from '../Geometry/Coordinate';
 
 export class TrackEnd {
-  readonly point: Coordinate;
+  // readonly point: Coordinate;
   readonly endOf: TrackBase;
   protected _connectedTo: TrackBase;
   get connectedTo() {
@@ -14,7 +14,7 @@ export class TrackEnd {
   }
 
   constructor(point: Coordinate, endOf: TrackBase) {
-    this.point = point;
+    // this.point = point;
     this.endOf = endOf;
   }
 

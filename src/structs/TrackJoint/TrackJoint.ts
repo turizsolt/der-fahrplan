@@ -5,6 +5,8 @@ import { babylonContainer } from '../inversify.config';
 import { Track } from '../Track/Track';
 import { TrackJointEnd } from './TrackJointEnd';
 import { TrackSwitch } from '../TrackSwitch/TrackSwitch';
+import { ActualTrack } from '../Track/ActualTrack';
+import { ActualTrackSwitch } from '../TrackSwitch/ActualTrackSwitch';
 
 // true lesz a B oldal
 const side = (b: boolean) => (b ? 'B' : 'A');
@@ -119,13 +121,13 @@ export class TrackJoint {
     ) {
       let t: Track;
       if (w && w.z !== undefined) {
-        t = new Track(jp, tp, wp);
+        t = new ActualTrack(jp, tp, wp);
       } else if (w) {
-        t = new Track(jp, tp);
+        t = new ActualTrack(jp, tp);
       }
 
-      this.setOneEnd(this.whichEnd(w, this, joint), t, t.B, 'B');
-      joint.setOneEnd(this.whichEnd(w, joint, this), t, t.A, 'A');
+      this.setOneEnd(this.whichEnd(w, this, joint), t, t.getB(), 'B');
+      joint.setOneEnd(this.whichEnd(w, joint, this), t, t.getA(), 'A');
 
       return { track: t };
     }
@@ -133,20 +135,23 @@ export class TrackJoint {
     if (!this.ends[this.whichEnd(w, this, joint)].isSet()) {
       const oldTrack = joint.ends[this.whichEnd(w, joint, this)].track;
 
-      const sw = new TrackSwitch(
-        oldTrack.A.point,
-        oldTrack.B.point,
+      const sw = new ActualTrackSwitch(
+        oldTrack.getSegment().getFirstPoint(),
+        oldTrack.getSegment().getLastPoint(),
         tp,
-        oldTrack.I,
+        oldTrack
+          .getSegment()
+          .getBezier()
+          .getIntermediate(),
         wp
       );
 
-      oldTrack.A.disconnect();
-      oldTrack.B.disconnect();
+      oldTrack.getA().disconnect();
+      oldTrack.getB().disconnect();
       // TODO (oldTrack as Track).mesh.setEnabled(false);
 
-      this.setOneEnd(this.whichEnd(w, this, joint), sw, sw.B, 'B');
-      joint.setOneEnd(this.whichEnd(w, joint, this), sw, sw.A, 'A');
+      this.setOneEnd(this.whichEnd(w, this, joint), sw, sw.getB(), 'B');
+      joint.setOneEnd(this.whichEnd(w, joint, this), sw, sw.getA(), 'A');
 
       return {};
     }
