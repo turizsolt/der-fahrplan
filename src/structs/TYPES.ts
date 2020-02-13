@@ -14,5 +14,8 @@ export const TYPES = {
   FactoryOfTrackSwitch: Symbol.for('Factory<TrackSwitch>'),
 
   PassengerRenderer: Symbol.for('PassengerRenderer'),
-  TrackJointRenderer: Symbol.for('TrackJointRenderer')
+
+  TrackJoint: Symbol.for('TrackJoint'),
+  TrackJointRenderer: Symbol.for('TrackJointRenderer'),
+  FactoryOfTrackJoint: Symbol.for('Factory<TrackJoint>')
 };

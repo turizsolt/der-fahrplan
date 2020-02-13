@@ -6,7 +6,9 @@ import { TYPES } from '../TYPES';
 import { Coordinate } from '../Geometry/Coordinate';
 import { Track } from './Track';
 import { ActualTrackBase } from '../TrackBase/ActualTrackBase';
+import { injectable } from 'inversify';
 
+@injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
   protected A: TrackEnd;
   protected B: TrackEnd;

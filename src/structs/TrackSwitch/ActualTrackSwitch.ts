@@ -7,7 +7,9 @@ import { babylonContainer } from '../inversify.config';
 import { TYPES } from '../TYPES';
 import { TrackSwitch } from './TrackSwitch';
 import { ActualTrackBase } from '../TrackBase/ActualTrackBase';
+import { injectable } from 'inversify';
 
+@injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   protected D: TrackEnd;
   protected E: TrackSwitchEnd;

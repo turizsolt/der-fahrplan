@@ -4,7 +4,9 @@ import { TrackEnd } from '../Track/TrackEnd';
 import { TrackSegment } from './TrackSegment';
 import { Coordinate } from '../Geometry/Coordinate';
 import { TrackBase } from './TrackBase';
+import { injectable } from 'inversify';
 
+@injectable()
 export abstract class ActualTrackBase implements TrackBase {
   protected A: TrackEnd;
   protected B: TrackEnd;

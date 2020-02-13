@@ -20,6 +20,8 @@ import { ActualTrack } from '../src/structs/Track/ActualTrack';
 import { TrackSwitch } from '../src/structs/TrackSwitch/TrackSwitch';
 import { ActualTrackSwitch } from '../src/structs/TrackSwitch/ActualTrackSwitch';
 import { Coordinate } from '../src/structs/Geometry/Coordinate';
+import { TrackJoint } from '../src/structs/TrackJoint/TrackJoint';
+import { ActualTrackJoint } from '../src/structs/TrackJoint/ActualTrackJoint';
 
 export const testContainer = new Container();
 testContainer
@@ -39,6 +41,7 @@ testContainer
 testContainer.bind<Land>(TYPES.Land).to(ActualLand);
 testContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
 testContainer.bind<Track>(TYPES.Track).to(ActualTrack);
+testContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 testContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
 
 testContainer
@@ -50,10 +53,10 @@ testContainer
   });
 
 testContainer
-  .bind<interfaces.Factory<Track>>('Factory<Track>')
+  .bind<interfaces.Factory<Track>>(TYPES.FactoryOfTrack)
   .toFactory<Track>(context => {
-    return (coordinates: Coordinate[]) => {
-      let track = context.container.get<Track>('Track');
+    return () => {
+      let track = context.container.get<Track>(TYPES.Track);
       // track.setSegment(coordinates);
       return track;
     };

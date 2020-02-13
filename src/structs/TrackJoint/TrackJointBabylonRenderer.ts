@@ -14,7 +14,7 @@ export class TrackJointBabylonRenderer implements TrackJointRenderer {
     this.trackJoint = trackJoint;
 
     this.mesh = BABYLON.MeshBuilder.CreateCylinder(
-      'm-' + this.trackJoint.id,
+      'm-' + this.trackJoint.getId(),
       {
         diameter: 5,
         tessellation: 24,
@@ -37,10 +37,12 @@ export class TrackJointBabylonRenderer implements TrackJointRenderer {
   }
 
   update() {
-    if (!this.trackJoint.removed) {
-      this.mesh.position = CoordinateToBabylonVector3(this.trackJoint.position);
+    if (!this.trackJoint.isRemoved()) {
+      this.mesh.position = CoordinateToBabylonVector3(
+        this.trackJoint.getPosition()
+      );
       this.mesh.position.y = -0.5;
-      this.mesh.rotation.y = this.trackJoint.rotation;
+      this.mesh.rotation.y = this.trackJoint.getRotation();
     } else {
       this.mesh.setEnabled(false);
     }

@@ -19,6 +19,8 @@ import { Track } from './Track/Track';
 import { TrackSwitch } from './TrackSwitch/TrackSwitch';
 import { ActualTrack } from './Track/ActualTrack';
 import { ActualTrackSwitch } from './TrackSwitch/ActualTrackSwitch';
+import { TrackJoint } from './TrackJoint/TrackJoint';
+import { ActualTrackJoint } from './TrackJoint/ActualTrackJoint';
 
 export const babylonContainer = new Container();
 babylonContainer
@@ -39,6 +41,7 @@ babylonContainer
 babylonContainer.bind<Land>(TYPES.Land).to(ActualLand);
 babylonContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
 babylonContainer.bind<Track>(TYPES.Track).to(ActualTrack);
+babylonContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 babylonContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
 
 babylonContainer

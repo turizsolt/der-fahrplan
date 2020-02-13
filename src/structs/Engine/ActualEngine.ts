@@ -7,7 +7,6 @@ import { TYPES } from '../TYPES';
 import { inject, injectable } from 'inversify';
 import { Engine } from './Engine';
 import { Platform } from '../Platform';
-import { Bezier } from '../Geometry/Bezier';
 
 @injectable()
 export class ActualEngine implements Engine {

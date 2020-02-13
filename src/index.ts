@@ -218,7 +218,7 @@ window.addEventListener('DOMContentLoaded', () => {
       pickResult.pickedMesh.id.startsWith('m-')
     ) {
       const id = parseInt(pickResult.pickedMesh.id.substring(2), 10);
-      const pos = markers.findIndex(x => x.id === id);
+      const pos = markers.findIndex(x => x.getId() === id);
       if (pos === -1) return;
 
       selected = markers[pos];
@@ -232,7 +232,8 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     } else {
       const position = snapXZ(mouseDownPoint);
-      const joint = new TrackJoint(position.x, position.z, mouseRotation);
+      const joint = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+      joint.init(position.x, position.z, mouseRotation);
       markers.push(joint);
 
       selected = joint;
