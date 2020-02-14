@@ -47,6 +47,12 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     } else if (coordinates1[last1].equalsTo(coordinates2[last2])) {
       this.segmentE = new TrackSegment(coordinates1.reverse(), true);
       this.segmentF = new TrackSegment(coordinates2.reverse(), true);
+    } else if (coordinates1[0].equalsTo(coordinates2[last2])) {
+      this.segmentE = new TrackSegment(coordinates1, true);
+      this.segmentF = new TrackSegment(coordinates2.reverse(), true);
+    } else if (coordinates1[last1].equalsTo(coordinates2[0])) {
+      this.segmentE = new TrackSegment(coordinates1.reverse(), true);
+      this.segmentF = new TrackSegment(coordinates2, true);
     } else {
       throw new Error('Segments has no meeting point');
     }
