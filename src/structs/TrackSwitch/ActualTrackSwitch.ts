@@ -7,6 +7,7 @@ import { TYPES } from '../TYPES';
 import { TrackSwitch } from './TrackSwitch';
 import { ActualTrackBase } from '../TrackBase/ActualTrackBase';
 import { injectable, inject } from 'inversify';
+import { WhichEnd } from '../Track/WhichEnd';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
@@ -33,9 +34,9 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     this.id = (Math.random() * 1000000) | 0;
     // (window as any).switches.push(this);
 
-    this.D = new TrackEnd(null, this);
-    this.E = new TrackSwitchEnd(null, this);
-    this.F = new TrackSwitchEnd(null, this);
+    this.D = new TrackEnd(WhichEnd.A, this);
+    this.E = new TrackSwitchEnd(WhichEnd.B, this);
+    this.F = new TrackSwitchEnd(WhichEnd.B, this);
 
     this.segmentE = new TrackSegment(coordinates1);
     this.segmentF = new TrackSegment(coordinates2);
@@ -77,6 +78,10 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     return this.segmentF;
   }
 
+  getSegment(): TrackSegment {
+    return this.state ? this.segmentF : this.segmentE;
+  }
+
   getE(): TrackSwitchEnd {
     return this.E;
   }
@@ -87,5 +92,9 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
   getId(): number {
     return this.id;
+  }
+
+  getState(): number {
+    return this.state;
   }
 }

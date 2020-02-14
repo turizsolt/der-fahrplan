@@ -11,4 +11,5 @@ export interface TrackSwitch extends TrackBase {
   getE(): TrackSwitchEnd;
   getF(): TrackSwitchEnd;
   getId(): number;
+  getState(): number;
 }

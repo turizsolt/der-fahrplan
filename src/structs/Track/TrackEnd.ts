@@ -1,9 +1,10 @@
 import { TrackBase } from '../TrackBase/TrackBase';
-import { Coordinate } from '../Geometry/Coordinate';
+import { WhichEnd } from './WhichEnd';
 
 export class TrackEnd {
   // readonly point: Coordinate;
   readonly endOf: TrackBase;
+  protected which: WhichEnd;
   protected _connectedTo: TrackBase = null;
   get connectedTo() {
     return this._connectedTo;
@@ -13,8 +14,8 @@ export class TrackEnd {
     return this._connectedToEnd;
   }
 
-  constructor(point: Coordinate, endOf: TrackBase) {
-    // this.point = point;
+  constructor(which: WhichEnd, endOf: TrackBase) {
+    this.which = which;
     this.endOf = endOf;
   }
 
@@ -33,5 +34,9 @@ export class TrackEnd {
       this._connectedToEnd = null;
       temp.disconnect();
     }
+  }
+
+  getWhichEnd(): WhichEnd {
+    return this.which;
   }
 }

@@ -6,6 +6,7 @@ import { Coordinate } from '../Geometry/Coordinate';
 import { Track } from './Track';
 import { ActualTrackBase } from '../TrackBase/ActualTrackBase';
 import { injectable, inject } from 'inversify';
+import { WhichEnd } from './WhichEnd';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
@@ -15,8 +16,8 @@ export class ActualTrack extends ActualTrackBase implements Track {
   @inject(TYPES.TrackRenderer) private renderer: TrackRenderer;
 
   init(coordinates: Coordinate[]): Track {
-    this.A = new TrackEnd(null, this);
-    this.B = new TrackEnd(null, this);
+    this.A = new TrackEnd(WhichEnd.A, this);
+    this.B = new TrackEnd(WhichEnd.B, this);
     this.segment = new TrackSegment(coordinates);
     this.renderer.init(this);
     return this;

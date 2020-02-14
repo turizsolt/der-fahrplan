@@ -11,6 +11,7 @@ import { Platform } from '../Platform';
 @injectable()
 export class ActualEngine implements Engine {
   private track: TrackBase;
+  private trackDirection: number = 1;
   private position: Coordinate;
   private rotation: number;
   private positionOnTrack: number;
@@ -28,6 +29,10 @@ export class ActualEngine implements Engine {
     this.update();
   }
 
+  getTrackOn(): TrackBase {
+    return this.track;
+  }
+
   getPosition(): Coordinate {
     return this.position;
   }
@@ -36,48 +41,93 @@ export class ActualEngine implements Engine {
     return this.rotation;
   }
 
-  // TODO should have refactor, when AB-BA pairing will considering as well
   forward() {
     if (!this.movable) return;
+    if (this.trackDirection === 1) {
+      this.moveTowardsB();
+    } else {
+      this.moveTowardsA();
+    }
+  }
 
-    this.positionOnTrack += 1;
-    if (this.positionOnTrack > this.track.getSegment().getLength()) {
-      const trackLength = this.track.getSegment().getLength();
-      if (this.track.getB().connectedTo) {
-        this.track.checkout(this);
-        this.track.getPlatformsBeside().map(platform => {
-          platform.checkout(this);
-        });
-        this.track = this.track.getB().connectedTo;
-        this.track.checkin(this);
-        this.positionOnTrack -= trackLength;
+  backward() {
+    if (!this.movable) return;
+
+    if (this.trackDirection === 1) {
+      this.moveTowardsA();
+    } else {
+      this.moveTowardsB();
+    }
+  }
+
+  private moveTowardsA() {
+    // megy elore
+    this.positionOnTrack -= 1;
+
+    const trackLength = this.track.getSegment().getLength();
+    if (this.positionOnTrack < 0) {
+      // ha tulment
+
+      const nextTrackEnd = this.track.getA().connectedToEnd;
+      if (nextTrackEnd) {
+        // van tovabb
+        if (nextTrackEnd.getWhichEnd() === 'B') {
+          this.track.checkout(this);
+          this.track = this.track.getA().connectedTo;
+          this.track.checkin(this);
+          const prevTrackLength = this.track.getSegment().getLength();
+          this.positionOnTrack += prevTrackLength;
+        } else {
+          // 'B'
+          this.track.checkout(this);
+          this.track = this.track.getA().connectedTo;
+          this.track.checkin(this);
+          const overRun = -this.positionOnTrack;
+          this.positionOnTrack = overRun;
+          this.trackDirection = -this.trackDirection;
+        }
       } else {
-        this.positionOnTrack = trackLength;
+        // nincs tovabb, megall
+        this.positionOnTrack = 0;
       }
+    } else {
+      // ha nem ment tul - skip
     }
     this.update();
   }
 
-  // TODO should have refactor, when AB-BA pairing will considering as well
-  backward() {
-    if (!this.movable) return;
+  private moveTowardsB() {
+    // megy elore
+    this.positionOnTrack += 1;
 
-    this.positionOnTrack -= 1;
-    if (this.positionOnTrack < 0) {
-      if (this.track.getA().connectedTo) {
-        this.track.checkout(this);
-        this.track.getPlatformsBeside().map(platform => {
-          platform.checkout(this);
-        });
-        this.track = this.track.getA().connectedTo;
-        this.track.checkin(this);
-        const prevTrackLength = this.track.getSegment().getLength();
-        this.positionOnTrack += prevTrackLength;
+    const trackLength = this.track.getSegment().getLength();
+    if (this.positionOnTrack > trackLength) {
+      // ha tulment
+
+      const nextTrackEnd = this.track.getB().connectedToEnd;
+      if (nextTrackEnd) {
+        // van tovabb
+        if (nextTrackEnd.getWhichEnd() === 'A') {
+          this.track.checkout(this);
+          this.track = this.track.getB().connectedTo;
+          this.track.checkin(this);
+          this.positionOnTrack -= trackLength;
+        } else {
+          // 'B'
+          this.track.checkout(this);
+          this.track = this.track.getB().connectedTo;
+          this.track.checkin(this);
+          const overRun = this.positionOnTrack - trackLength;
+          this.positionOnTrack = this.track.getSegment().getLength() - overRun;
+          this.trackDirection = -this.trackDirection;
+        }
       } else {
-        this.positionOnTrack = 0;
+        // nincs tovabb, megall
+        this.positionOnTrack = trackLength;
       }
+    } else {
+      // ha nem ment tul - skip
     }
-
     this.update();
   }
 
