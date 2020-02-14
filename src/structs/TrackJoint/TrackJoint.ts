@@ -1,13 +1,16 @@
+import { WhichEnd } from '../Track/WhichEnd';
+import { TrackEnd } from '../Track/TrackEnd';
+
 export interface TrackJoint {
-  init(x: number, z: number, rot: number);
+  init(x: number, z: number, rot: number): TrackJoint;
   rotate(rot: number);
   remove();
   slope();
   equ();
-  ww(joint: TrackJoint);
+  computeMidpoint(joint: TrackJoint);
   whichEnd(w: any, one: TrackJoint, other: TrackJoint);
   connect(joint: TrackJoint);
-  setOneEnd(jointEnd, track, trackEnd, trackEndName);
+  setOneEnd(jointEnd: WhichEnd, trackEnd: TrackEnd);
   getPosition();
   getRotation();
   getEnds();

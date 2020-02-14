@@ -22,4 +22,9 @@ export class ActualTrack extends ActualTrackBase implements Track {
     this.renderer.init(this);
     return this;
   }
+
+  remove(): void {
+    super.remove();
+    this.renderer.update();
+  }
 }

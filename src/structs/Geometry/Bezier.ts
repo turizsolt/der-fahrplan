@@ -6,11 +6,15 @@ export class Bezier {
   private degree: number;
 
   constructor(coordinates: Coordinate[]) {
-    this.coordinates = coordinates;
-    this.degree = coordinates.length - 1;
+    this.coordinates = coordinates.filter(x => x !== undefined);
+    this.degree = this.coordinates.length - 1;
 
     if (this.degree < 1) throw new Error('Too few coordinates to Bezier');
     if (this.degree > 2) throw new Error('Too many coordinates to Bezier');
+  }
+
+  getCoordinates() {
+    return this.coordinates;
   }
 
   getIntermediate() {
@@ -18,8 +22,8 @@ export class Bezier {
     else return this.coordinates[1];
   }
 
-  getLinePoints(count: number): Coordinate[] {
-    if (this.degree === 1) return this.coordinates;
+  getLinePoints(count: number, mustManyPoints: boolean = false): Coordinate[] {
+    if (this.degree === 1 && !mustManyPoints) return this.coordinates;
 
     if (count < 2) throw new Error('Too few count to get points');
 

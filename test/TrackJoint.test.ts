@@ -3,6 +3,7 @@ import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import { testContainer } from './inversify.config';
 import { TYPES } from '../src/structs/TYPES';
+import { Coordinate } from '../src/structs/Geometry/Coordinate';
 chai.use(chaiAlmost());
 
 const newTrackJoint = (a, b, c) => {
@@ -11,7 +12,7 @@ const newTrackJoint = (a, b, c) => {
   return tj;
 };
 
-describe('Track joint equation', () => {
+describe('Track joint - equation', () => {
   it('a = 0 equ', () => {
     const j = newTrackJoint(0, 2, (0 / 180) * Math.PI);
     expect(j.slope()).almost(0);
@@ -37,23 +38,23 @@ describe('Track joint equation', () => {
   });
 });
 
-describe('Track joint connect', () => {
+describe('Track joint - define points', () => {
   it('general case', () => {
     const j1 = newTrackJoint(0, 0, (45 / 180) * Math.PI);
     const j2 = newTrackJoint(0, 20, (-45 / 180) * Math.PI);
-    expect(j1.ww(j2)).deep.almost({ z: 10, x: 10 });
+    expect(j1.computeMidpoint(j2)).deep.almost(new Coordinate(10, 0, 10));
   });
 
   it('aligned on x axis', () => {
     const j1 = newTrackJoint(0, 0, (0 / 180) * Math.PI);
     const j2 = newTrackJoint(0, 20, (0 / 180) * Math.PI);
-    expect(j1.ww(j2)).equals(true);
+    expect(j1.computeMidpoint(j2)).equals(undefined);
   });
 
   it('not aligned on x axis', () => {
     const j1 = newTrackJoint(10, 20, (0 / 180) * Math.PI);
     const j2 = newTrackJoint(0, 20, (0 / 180) * Math.PI);
-    expect(j1.ww(j2)).equals(false);
+    expect(j1.computeMidpoint(j2)).equals(false);
   });
 
   it('aligned on z axis', () => {
@@ -61,7 +62,7 @@ describe('Track joint connect', () => {
     const j2 = newTrackJoint(20, 0, (90 / 180) * Math.PI);
     expect(j1.slope()).equals(Infinity);
     expect(j2.slope()).equals(Infinity);
-    expect(j1.ww(j2)).equals(true);
+    expect(j1.computeMidpoint(j2)).equals(undefined);
   });
 
   it('not aligned on z axis', () => {
@@ -69,7 +70,7 @@ describe('Track joint connect', () => {
     const j2 = newTrackJoint(0, 20, (90 / 180) * Math.PI);
     expect(j1.slope()).equals(Infinity);
     expect(j2.slope()).equals(Infinity);
-    expect(j1.ww(j2)).deep.almost(false);
+    expect(j1.computeMidpoint(j2)).deep.almost(false);
   });
 
   it('aligned on angle', () => {
@@ -77,12 +78,12 @@ describe('Track joint connect', () => {
     const j2 = newTrackJoint(30, 30 * Math.sqrt(3), (30 / 180) * Math.PI);
     expect(j1.equ().b).almost(0);
     expect(j2.equ().b).almost(0);
-    expect(j1.ww(j2)).equals(true);
+    expect(j1.computeMidpoint(j2)).equals(undefined);
   });
 
   it('not aligned on angle', () => {
     const j1 = newTrackJoint(10, 0, (30 / 180) * Math.PI);
     const j2 = newTrackJoint(0, 20, (30 / 180) * Math.PI);
-    expect(j1.ww(j2)).deep.almost(false);
+    expect(j1.computeMidpoint(j2)).deep.almost(false);
   });
 });

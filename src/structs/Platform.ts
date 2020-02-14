@@ -31,31 +31,31 @@ export class Platform {
     const a = segment.getFirstPoint();
     const b = segment.getLastPoint();
 
-    var rot = new BABYLON.Vector3(b.x - a.x, 0, b.z - a.z);
+    var rot = new Coordinate(b.x - a.x, 0, b.z - a.z);
     const rot4 = Math.atan2(rot.x, rot.z);
     const rotLeft = rot4 - Math.PI / 2;
     const rotRight = rot4 + Math.PI / 2;
 
-    var center = new BABYLON.Vector3((b.x + a.x) / 2, 0, (b.z + a.z) / 2);
+    var center = new Coordinate((b.x + a.x) / 2, 0, (b.z + a.z) / 2);
 
     var dist = 1.6 + width / 2;
     var len = Math.sqrt(
       Math.pow(Math.abs(a.x - b.x), 2) + Math.pow(Math.abs(a.z - b.z), 2)
     );
-    var shift = new BABYLON.Vector3(
+    var shift = new Coordinate(
       Math.sin(side === Side.Left ? rotLeft : rotRight) * 1,
       0,
       Math.cos(side === Side.Left ? rotLeft : rotRight) * 1
     );
 
     var dist2 = start + (end - start) / 2;
-    var shift2 = new BABYLON.Vector3(
+    var shift2 = new Coordinate(
       a.x + (rot.x / len) * dist2,
       0,
       a.z + (rot.z / len) * dist2
     );
 
-    var height = new BABYLON.Vector3(0, -0.75, 0);
+    var height = new Coordinate(0, -0.75, 0);
     this.position = shift2.add(shift.scale(dist)).add(height);
     const rot1 = Math.atan2(rot.x, rot.z);
     this.rotation = rot1;

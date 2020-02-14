@@ -3,14 +3,12 @@ import { Coordinate } from '../Geometry/Coordinate';
 import { TYPES } from '../TYPES';
 import { Track } from '../Track/Track';
 import { TrackJointEnd } from './TrackJointEnd';
-import { ActualTrack } from '../Track/ActualTrack';
-import { ActualTrackSwitch } from '../TrackSwitch/ActualTrackSwitch';
 import { inject, injectable } from 'inversify';
 import { TrackJoint } from './TrackJoint';
-
-// true lesz a B oldal
-const side = (b: boolean) => (b ? 'B' : 'A');
-const otherSide = (ch: 'A' | 'B'): 'A' | 'B' => (ch === 'A' ? 'B' : 'A');
+import { TrackSwitch } from '../TrackSwitch/TrackSwitch';
+import { WhichEnd, otherEnd } from '../Track/WhichEnd';
+import { TrackEnd } from '../Track/TrackEnd';
+import { TrackBase } from '../TrackBase/TrackBase';
 
 @injectable()
 export class ActualTrackJoint implements TrackJoint {
@@ -18,12 +16,13 @@ export class ActualTrackJoint implements TrackJoint {
   private position: Coordinate;
   private rotation: number;
   private removed: boolean = false;
-  private ends: { A: TrackJointEnd; B: TrackJointEnd };
+  private ends: Record<WhichEnd, TrackJointEnd>;
 
   @inject(TYPES.TrackJointRenderer) private renderer: TrackJointRenderer;
   @inject(TYPES.FactoryOfTrack) TrackFactory: () => Track;
+  @inject(TYPES.FactoryOfTrackSwitch) TrackSwitchFactory: () => TrackSwitch;
 
-  init(x: number, z: number, rot: number) {
+  init(x: number, z: number, rot: number): TrackJoint {
     // console.log(`(${x}, ${z}) R${Math.round((rot * 180) / Math.PI)}`);
     this.id = (Math.random() * 1000000) | 0;
 
@@ -36,6 +35,7 @@ export class ActualTrackJoint implements TrackJoint {
     this.rotation = rot;
 
     this.renderer.init(this);
+    return this;
   }
 
   rotate(rot: number) {
@@ -70,92 +70,118 @@ export class ActualTrackJoint implements TrackJoint {
         };
   }
 
-  ww(joint: TrackJoint) {
+  computeMidpoint(joint: TrackJoint): undefined | false | Coordinate {
     const e1 = this.equ();
     const e2 = joint.equ();
 
-    if (e1.a === Infinity && e2.a === Infinity) return almost(e1.z, e2.z);
+    if (e1.a === Infinity && e2.a === Infinity)
+      return almost(e1.z, e2.z) ? undefined : false;
 
     if (e1.a === Infinity) {
       const x = e2.a * e1.z + e2.b;
       const z = e1.z;
-      return { x, z };
+      return new Coordinate(x, 0, z);
     }
 
     if (e2.a === Infinity) {
       const x = e1.a * e2.z + e1.b;
       const z = e2.z;
-      return { x, z };
+      return new Coordinate(x, 0, z);
     }
 
     if (almost(e1.a, e2.a)) {
-      return almost(e1.b, e2.b);
+      return almost(e1.b, e2.b) ? undefined : false;
     }
 
     const z = (e2.b - e1.b) / (e1.a - e2.a);
     const x = e1.a * z + e1.b;
-    return { x, z };
+    return new Coordinate(x, 0, z);
   }
 
-  whichEnd(w: any, one: TrackJoint, other: TrackJoint) {
-    const comparePosition = w === true ? other.getPosition() : w;
+  whichEnd(one: TrackJoint, w: any, other: TrackJoint): WhichEnd {
+    const comparePosition = w === undefined ? other.getPosition() : w;
     const direction = Math.atan2(
       comparePosition.x - one.getPosition().x,
       comparePosition.z - one.getPosition().z
     );
-    return side(almost(direction, one.getRotation()));
+    return almost(direction, one.getRotation()) ? WhichEnd.B : WhichEnd.A;
   }
 
-  connect(joint: TrackJoint) {
-    const w: any = this.ww(joint);
-    if (!w) return { track: null };
+  isEndEmpty(end: TrackJointEnd): boolean {
+    return !end.isSet();
+  }
 
-    const jp = new Coordinate(joint.getPosition().x, 0, joint.getPosition().z);
-    const tp = new Coordinate(this.position.x, 0, this.position.z);
-    const wp = new Coordinate(w.x, 0, w.z);
+  areBothEndsEmpty(oneEnd, otherEnd: TrackJointEnd): boolean {
+    return this.isEndEmpty(oneEnd) && this.isEndEmpty(otherEnd);
+  }
 
-    if (
-      !this.ends[this.whichEnd(w, this, joint)].isSet() &&
-      !joint.getEnds()[this.whichEnd(w, joint, this)].isSet()
-    ) {
-      let t: Track;
-      if (w && w.z !== undefined) {
-        t = this.TrackFactory().init([jp, wp, tp]);
-      } else if (w) {
-        t = this.TrackFactory().init([jp, tp]);
-      }
+  setOneEnd(jointEnd: WhichEnd, trackEnd: TrackEnd) {
+    const track = trackEnd.endOf;
+    this.ends[jointEnd].setEnd(track, trackEnd);
+    if (this.ends[otherEnd(jointEnd)].isSet()) {
+      this.ends.A.end.connect(this.ends.B.end);
+    }
+  }
 
-      this.setOneEnd(this.whichEnd(w, this, joint), t, t.getB(), 'B');
-      joint.setOneEnd(this.whichEnd(w, joint, this), t, t.getA(), 'A');
+  connect(other: TrackJoint) {
+    const midpoint = this.computeMidpoint(other);
+
+    // if there is no possible connection then return false
+    if (midpoint === false) {
+      return false;
+    }
+
+    // create coords for segment
+    const coordinates = [this.position, midpoint, other.getPosition()];
+
+    // determine which end is which
+    const thisEndLetter = this.whichEnd(this, midpoint, other);
+    const otherEndLetter = this.whichEnd(other, midpoint, this);
+    const thisEnd = this.ends[thisEndLetter];
+    const otherEnd = other.getEnds()[otherEndLetter];
+
+    if (this.areBothEndsEmpty(thisEnd, otherEnd)) {
+      const t = this.TrackFactory().init(coordinates);
+
+      this.setOneEnd(thisEndLetter, t.getA());
+      other.setOneEnd(otherEndLetter, t.getB());
 
       return { track: t };
     }
 
-    if (!this.ends[this.whichEnd(w, this, joint)].isSet()) {
-      const oldTrack = joint.getEnds()[this.whichEnd(w, joint, this)].track;
+    if (this.isEndEmpty(thisEnd)) {
+      const oldTrack: TrackBase = otherEnd.track;
+      const oldCoordinates = oldTrack.getSegment().getCoordinates();
 
-      const sw = new ActualTrackSwitch().init(
-        oldTrack.getSegment(),
-        w.z ? [jp, wp, tp] : [jp, tp]
-      );
+      const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
 
       oldTrack.getA().disconnect();
       oldTrack.getB().disconnect();
-      // TODO (oldTrack as Track).mesh.setEnabled(false);
+      oldTrack.remove();
 
-      this.setOneEnd(this.whichEnd(w, this, joint), sw, sw.getB(), 'B');
-      joint.setOneEnd(this.whichEnd(w, joint, this), sw, sw.getA(), 'A');
+      //this.setOneEnd(thisEndLetter, sw.getA());
+      //other.setOneEnd(otherEndLetter, sw.getB());
 
-      return {};
+      return { track: sw, removed: oldTrack };
     }
-  }
 
-  setOneEnd(jointEnd, track, trackEnd, trackEndName) {
-    console.log(jointEnd, trackEndName);
-    this.ends[jointEnd].setEnd(track, trackEnd);
-    if (this.ends[otherSide(jointEnd)].isSet()) {
-      this.ends.A.end.connect(this.ends.B.end);
+    if (this.isEndEmpty(otherEnd)) {
+      const oldTrack: TrackBase = thisEnd.track;
+      const oldCoordinates = oldTrack.getSegment().getCoordinates();
+
+      const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
+
+      oldTrack.getA().disconnect();
+      oldTrack.getB().disconnect();
+      oldTrack.remove();
+
+      //this.setOneEnd(thisEndLetter, sw.getB());
+      //other.setOneEnd(otherEndLetter, sw.getA());
+
+      return { track: sw, removed: oldTrack };
     }
+
+    return false;
   }
 
   getPosition() {

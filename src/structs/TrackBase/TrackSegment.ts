@@ -7,9 +7,9 @@ export class TrackSegment {
   readonly curvePoints: Coordinate[];
   private bezier: Bezier;
 
-  constructor(coordinates: Coordinate[]) {
+  constructor(coordinates: Coordinate[], mustManyPoints: boolean = false) {
     this.bezier = new Bezier(coordinates);
-    this.curvePoints = this.bezier.getLinePoints(20);
+    this.curvePoints = this.bezier.getLinePoints(20, mustManyPoints);
     this.length = Bezier.getLength(this.curvePoints);
   }
 
@@ -31,5 +31,9 @@ export class TrackSegment {
 
   getLastPoint(): Coordinate {
     return this.curvePoints[this.curvePoints.length - 1];
+  }
+
+  getCoordinates(): Coordinate[] {
+    return this.bezier.getCoordinates();
   }
 }

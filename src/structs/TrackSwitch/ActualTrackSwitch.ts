@@ -32,14 +32,25 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
   init(coordinates1: Coordinate[], coordinates2: Coordinate[]): TrackSwitch {
     this.id = (Math.random() * 1000000) | 0;
-    // (window as any).switches.push(this);
+    if (typeof window !== 'undefined') {
+      (window as any).switches.push(this);
+    }
 
     this.D = new TrackEnd(WhichEnd.A, this);
     this.E = new TrackSwitchEnd(WhichEnd.B, this);
     this.F = new TrackSwitchEnd(WhichEnd.B, this);
 
-    this.segmentE = new TrackSegment(coordinates1);
-    this.segmentF = new TrackSegment(coordinates2);
+    const last1 = coordinates1.length - 1;
+    const last2 = coordinates2.length - 1;
+    if (coordinates1[0].equalsTo(coordinates2[0])) {
+      this.segmentE = new TrackSegment(coordinates1, true);
+      this.segmentF = new TrackSegment(coordinates2, true);
+    } else if (coordinates1[last1].equalsTo(coordinates2[last2])) {
+      this.segmentE = new TrackSegment(coordinates1.reverse(), true);
+      this.segmentF = new TrackSegment(coordinates2.reverse(), true);
+    } else {
+      throw new Error('Segments has no meeting point');
+    }
 
     this.state = 0;
     this.E.active = true;
@@ -54,7 +65,6 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     if (this.checkedList.length > 0) return;
 
     this.state = 1 - this.state;
-
     this.renderer.update();
 
     if (this.state) {
@@ -68,6 +78,11 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
       this.E.active = true;
       this.F.active = false;
     }
+  }
+
+  remove(): void {
+    super.remove();
+    this.renderer.update();
   }
 
   getSegmentE(): TrackSegment {

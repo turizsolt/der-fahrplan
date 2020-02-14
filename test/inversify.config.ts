@@ -63,3 +63,11 @@ testContainer
       return context.container.get<TrackSwitch>(TYPES.TrackSwitch);
     };
   });
+
+testContainer
+  .bind<interfaces.Factory<TrackJoint>>(TYPES.FactoryOfTrackJoint)
+  .toFactory<TrackJoint>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<TrackJoint>(TYPES.TrackJoint);
+    };
+  });

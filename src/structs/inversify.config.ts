@@ -61,7 +61,7 @@ babylonContainer
   });
 
 babylonContainer
-  .bind<interfaces.Factory<TrackSwitch>>(TYPES.TrackSwitch)
+  .bind<interfaces.Factory<TrackSwitch>>(TYPES.FactoryOfTrackSwitch)
   .toFactory<TrackSwitch>((context: interfaces.Context) => {
     return () => {
       return context.container.get<TrackSwitch>(TYPES.TrackSwitch);
