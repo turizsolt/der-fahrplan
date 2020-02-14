@@ -4,11 +4,11 @@ import { Coordinate } from '../Geometry/Coordinate';
 export class TrackEnd {
   // readonly point: Coordinate;
   readonly endOf: TrackBase;
-  protected _connectedTo: TrackBase;
+  protected _connectedTo: TrackBase = null;
   get connectedTo() {
     return this._connectedTo;
   }
-  protected _connectedToEnd: TrackEnd;
+  protected _connectedToEnd: TrackEnd = null;
   get connectedToEnd() {
     return this._connectedToEnd;
   }

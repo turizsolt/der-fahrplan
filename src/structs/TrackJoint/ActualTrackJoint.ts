@@ -119,9 +119,9 @@ export class ActualTrackJoint implements TrackJoint {
     ) {
       let t: Track;
       if (w && w.z !== undefined) {
-        t = new ActualTrack(jp, tp, wp);
+        t = new ActualTrack().init([jp, wp, tp]);
       } else if (w) {
-        t = new ActualTrack(jp, tp);
+        t = new ActualTrack().init([jp, tp]);
       }
 
       this.setOneEnd(this.whichEnd(w, this, joint), t, t.getB(), 'B');
@@ -133,15 +133,9 @@ export class ActualTrackJoint implements TrackJoint {
     if (!this.ends[this.whichEnd(w, this, joint)].isSet()) {
       const oldTrack = joint.getEnds()[this.whichEnd(w, joint, this)].track;
 
-      const sw = new ActualTrackSwitch(
-        oldTrack.getSegment().getFirstPoint(),
-        oldTrack.getSegment().getLastPoint(),
-        tp,
-        oldTrack
-          .getSegment()
-          .getBezier()
-          .getIntermediate(),
-        wp
+      const sw = new ActualTrackSwitch().init(
+        oldTrack.getSegment(),
+        w.z ? [jp, wp, tp] : [jp, tp]
       );
 
       oldTrack.getA().disconnect();

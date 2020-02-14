@@ -3,20 +3,16 @@ import { TrackEnd } from '../Track/TrackEnd';
 import { TrackSegment } from '../TrackBase/TrackSegment';
 import { Coordinate } from '../Geometry/Coordinate';
 import { TrackSwitchRenderer } from './TrackSwitchRenderer';
-import { babylonContainer } from '../inversify.config';
 import { TYPES } from '../TYPES';
 import { TrackSwitch } from './TrackSwitch';
 import { ActualTrackBase } from '../TrackBase/ActualTrackBase';
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   protected D: TrackEnd;
   protected E: TrackSwitchEnd;
   protected F: TrackSwitchEnd;
-
-  protected IE: Coordinate;
-  protected IF: Coordinate;
 
   protected segmentE: TrackSegment;
   protected segmentF: TrackSegment;
@@ -29,46 +25,28 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     return this.state ? this.F : this.E;
   }
 
-  getI() {
-    return this.state ? this.IF : this.IE;
-  }
-
-  readonly id: number;
+  private id: number;
   private state: number;
-  private renderer: TrackSwitchRenderer;
+  @inject(TYPES.TrackSwitchRenderer) private renderer: TrackSwitchRenderer;
 
-  constructor(
-    a: Coordinate,
-    b: Coordinate,
-    c: Coordinate,
-    ib?: Coordinate,
-    ic?: Coordinate
-  ) {
-    super();
+  init(coordinates1: Coordinate[], coordinates2: Coordinate[]): TrackSwitch {
     this.id = (Math.random() * 1000000) | 0;
-    (window as any).switches.push(this);
+    // (window as any).switches.push(this);
 
-    this.D = new TrackEnd(a, this);
-    this.E = new TrackSwitchEnd(b, this);
-    this.F = new TrackSwitchEnd(c, this);
-    if (ib) {
-      this.IE = ib;
-    }
-    if (ic) {
-      this.IF = ic;
-    }
+    this.D = new TrackEnd(null, this);
+    this.E = new TrackSwitchEnd(null, this);
+    this.F = new TrackSwitchEnd(null, this);
 
-    this.segmentE = new TrackSegment(ib ? [a, ib, b] : [a, b]);
-    this.segmentF = new TrackSegment(ic ? [a, ic, c] : [a, c]);
+    this.segmentE = new TrackSegment(coordinates1);
+    this.segmentF = new TrackSegment(coordinates2);
 
     this.state = 0;
     this.E.active = true;
     this.F.active = false;
 
-    this.renderer = babylonContainer.get<TrackSwitchRenderer>(
-      TYPES.TrackSwitchRenderer
-    );
     this.renderer.init(this);
+
+    return this;
   }
 
   switch() {
@@ -97,6 +75,14 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
   getSegmentF(): TrackSegment {
     return this.segmentF;
+  }
+
+  getE(): TrackSwitchEnd {
+    return this.E;
+  }
+
+  getF(): TrackSwitchEnd {
+    return this.F;
   }
 
   getId(): number {

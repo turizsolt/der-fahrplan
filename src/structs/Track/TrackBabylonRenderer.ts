@@ -25,6 +25,4 @@ export class TrackBabylonRenderer implements TrackRenderer {
     );
     this.mesh.color = new BABYLON.Color3(0, 0, 0);
   }
-
-  update() {}
 }

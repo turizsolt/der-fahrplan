@@ -11,15 +11,12 @@ import { TrackRenderer } from '../src/structs/Track/TrackRenderer';
 import { TrackDummyRenderer } from '../src/structs/Track/TrackDummyRenderer';
 import { TrackSwitchRenderer } from '../src/structs/TrackSwitch/TrackSwitchRenderer';
 import { TrackSwitchDummyRenderer } from '../src/structs/TrackSwitch/TrackSwitchDummyRenderer';
-import { Land } from '../src/structs/Land/Land';
-import { ActualLand } from '../src/structs/Land/ActualLand';
 import { ActualEngine } from '../src/structs/Engine/ActualEngine';
 import { Engine } from '../src/structs/Engine/Engine';
 import { Track } from '../src/structs/Track/Track';
 import { ActualTrack } from '../src/structs/Track/ActualTrack';
 import { TrackSwitch } from '../src/structs/TrackSwitch/TrackSwitch';
 import { ActualTrackSwitch } from '../src/structs/TrackSwitch/ActualTrackSwitch';
-import { Coordinate } from '../src/structs/Geometry/Coordinate';
 import { TrackJoint } from '../src/structs/TrackJoint/TrackJoint';
 import { ActualTrackJoint } from '../src/structs/TrackJoint/ActualTrackJoint';
 
@@ -38,7 +35,6 @@ testContainer
   .bind<TrackSwitchRenderer>(TYPES.TrackSwitchRenderer)
   .to(TrackSwitchDummyRenderer);
 
-testContainer.bind<Land>(TYPES.Land).to(ActualLand);
 testContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
 testContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 testContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
@@ -56,14 +52,12 @@ testContainer
   .bind<interfaces.Factory<Track>>(TYPES.FactoryOfTrack)
   .toFactory<Track>(context => {
     return () => {
-      let track = context.container.get<Track>(TYPES.Track);
-      // track.setSegment(coordinates);
-      return track;
+      return context.container.get<Track>(TYPES.Track);
     };
   });
 
 testContainer
-  .bind<interfaces.Factory<TrackSwitch>>(TYPES.TrackSwitch)
+  .bind<interfaces.Factory<TrackSwitch>>(TYPES.FactoryOfTrackSwitch)
   .toFactory<TrackSwitch>((context: interfaces.Context) => {
     return () => {
       return context.container.get<TrackSwitch>(TYPES.TrackSwitch);
