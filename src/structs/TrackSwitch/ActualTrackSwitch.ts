@@ -26,7 +26,6 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     return this.state ? this.F : this.E;
   }
 
-  private id: number;
   private state: number;
   @inject(TYPES.TrackSwitchRenderer) private renderer: TrackSwitchRenderer;
 
@@ -94,7 +93,7 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   }
 
   getSegment(): TrackSegment {
-    return this.state ? this.segmentF : this.segmentE;
+    return this.state ? this.segmentE : this.segmentF;
   }
 
   getE(): TrackSwitchEnd {
@@ -103,10 +102,6 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
   getF(): TrackSwitchEnd {
     return this.F;
-  }
-
-  getId(): number {
-    return this.id;
   }
 
   getState(): number {

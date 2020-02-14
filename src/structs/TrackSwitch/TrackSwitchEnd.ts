@@ -1,6 +1,7 @@
 import { TrackSwitch } from './TrackSwitch';
 import { TrackBase } from '../TrackBase/TrackBase';
 import { TrackEnd } from '../Track/TrackEnd';
+import { TrackJoint } from '../TrackJoint/TrackJoint';
 
 export class TrackSwitchEnd extends TrackEnd {
   readonly endOf: TrackSwitch;
@@ -14,13 +15,14 @@ export class TrackSwitchEnd extends TrackEnd {
     this._active = a;
   }
 
-  connect(other: TrackEnd) {
+  connect(other: TrackEnd, joint?: TrackJoint) {
     this.phisicallyConnectedTo = other.endOf;
     this._phisicallyConnectedToEnd = other;
+    if (joint) this.jointTo = joint;
 
     if (this._active) {
       if (other.connectedTo !== this.endOf) {
-        other.connect(this);
+        other.connect(this, joint);
       }
       this.reconnect();
     }

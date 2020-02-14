@@ -115,11 +115,13 @@ export class ActualTrackJoint implements TrackJoint {
     return this.isEndEmpty(oneEnd) && this.isEndEmpty(otherEnd);
   }
 
-  setOneEnd(jointEnd: WhichEnd, trackEnd: TrackEnd) {
+  setOneEnd(jointEndLetter: WhichEnd, trackEnd: TrackEnd) {
     const track = trackEnd.endOf;
-    this.ends[jointEnd].setEnd(track, trackEnd);
-    if (this.ends[otherEnd(jointEnd)].isSet()) {
-      this.ends.A.end.connect(this.ends.B.end);
+    this.ends[jointEndLetter].setEnd(track, trackEnd);
+    if (this.ends[otherEnd(jointEndLetter)].isSet()) {
+      this.ends.A.end.connect(this.ends.B.end, this);
+    } else {
+      this.ends[jointEndLetter].end.setJointTo(this);
     }
   }
 
@@ -155,12 +157,15 @@ export class ActualTrackJoint implements TrackJoint {
 
       const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
 
+      const third = oldTrack.getA().getJointTo();
+
       oldTrack.getA().disconnect();
       oldTrack.getB().disconnect();
       oldTrack.remove();
 
-      //this.setOneEnd(thisEndLetter, sw.getA());
-      //other.setOneEnd(otherEndLetter, sw.getB());
+      other.setOneEnd(otherEndLetter, sw.getA());
+      this.setOneEnd(thisEndLetter, sw.getE());
+      third.setOneEnd(thisEndLetter, sw.getF());
 
       return { track: sw, removed: oldTrack };
     }
@@ -171,12 +176,15 @@ export class ActualTrackJoint implements TrackJoint {
 
       const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
 
+      const third = oldTrack.getB().getJointTo();
+
       oldTrack.getA().disconnect();
       oldTrack.getB().disconnect();
       oldTrack.remove();
 
-      //this.setOneEnd(thisEndLetter, sw.getB());
-      //other.setOneEnd(otherEndLetter, sw.getA());
+      this.setOneEnd(thisEndLetter, sw.getA());
+      other.setOneEnd(otherEndLetter, sw.getE());
+      third.setOneEnd(otherEndLetter, sw.getF());
 
       return { track: sw, removed: oldTrack };
     }

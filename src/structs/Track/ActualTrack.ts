@@ -16,6 +16,7 @@ export class ActualTrack extends ActualTrackBase implements Track {
   @inject(TYPES.TrackRenderer) private renderer: TrackRenderer;
 
   init(coordinates: Coordinate[]): Track {
+    this.id = (Math.random() * 1000000) | 0;
     this.A = new TrackEnd(WhichEnd.A, this);
     this.B = new TrackEnd(WhichEnd.B, this);
     this.segment = new TrackSegment(coordinates);

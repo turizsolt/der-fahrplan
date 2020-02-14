@@ -12,6 +12,7 @@ export interface TrackBase {
   getPlatformsBeside();
   getA(): TrackEnd;
   getB(): TrackEnd;
+  getId(): number;
 
   remove(): void;
   isRemoved(): boolean;

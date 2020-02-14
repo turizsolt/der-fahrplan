@@ -15,6 +15,7 @@ export abstract class ActualTrackBase implements TrackBase {
   protected checkedList: Engine[] = [];
   protected _platformsBeside: Platform[] = [];
   protected removed: boolean = false;
+  protected id: number;
 
   getPlatformsBeside() {
     return this._platformsBeside;
@@ -50,5 +51,9 @@ export abstract class ActualTrackBase implements TrackBase {
 
   isRemoved(): boolean {
     return this.removed;
+  }
+
+  getId(): number {
+    return this.id;
   }
 }
