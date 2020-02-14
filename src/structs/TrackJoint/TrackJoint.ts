@@ -16,4 +16,7 @@ export interface TrackJoint {
   getEnds();
   getId();
   isRemoved(): boolean;
+  select(): void;
+  deselect(): void;
+  isSelected(): boolean;
 }

@@ -17,6 +17,7 @@ export class ActualTrackJoint implements TrackJoint {
   private rotation: number;
   private removed: boolean = false;
   private ends: Record<WhichEnd, TrackJointEnd>;
+  private selected: boolean = false;
 
   @inject(TYPES.TrackJointRenderer) private renderer: TrackJointRenderer;
   @inject(TYPES.FactoryOfTrack) TrackFactory: () => Track;
@@ -39,8 +40,10 @@ export class ActualTrackJoint implements TrackJoint {
   }
 
   rotate(rot: number) {
-    this.rotation = rot;
-    this.renderer.update();
+    if (this.areBothEndsEmpty(this.ends.A, this.ends.B)) {
+      this.rotation = rot;
+      this.renderer.update();
+    }
   }
 
   remove() {
@@ -210,6 +213,20 @@ export class ActualTrackJoint implements TrackJoint {
 
   isRemoved(): boolean {
     return this.removed;
+  }
+
+  select(): void {
+    this.selected = true;
+    this.renderer.update();
+  }
+
+  deselect(): void {
+    this.selected = false;
+    this.renderer.update();
+  }
+
+  isSelected(): boolean {
+    return this.selected;
   }
 }
 

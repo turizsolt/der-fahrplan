@@ -9,6 +9,8 @@ export class TrackJointBabylonRenderer implements TrackJointRenderer {
   private mesh: BABYLON.Mesh;
   private trackJoint: TrackJoint;
   readonly scene: BABYLON.Scene;
+  private arrowMaterial: BABYLON.StandardMaterial;
+  private redArrowMaterial: BABYLON.StandardMaterial;
 
   init(trackJoint: TrackJoint): void {
     this.trackJoint = trackJoint;
@@ -27,17 +29,27 @@ export class TrackJointBabylonRenderer implements TrackJointRenderer {
       },
       this.scene
     );
-    const arrowMaterial = new BABYLON.StandardMaterial('arrow', this.scene);
-    arrowMaterial.diffuseTexture = new BABYLON.Texture(
+    this.arrowMaterial = new BABYLON.StandardMaterial('arrow', this.scene);
+    this.arrowMaterial.diffuseTexture = new BABYLON.Texture(
       'assets/arrow.png',
       this.scene
     );
-    this.mesh.material = arrowMaterial;
+    this.redArrowMaterial = new BABYLON.StandardMaterial(
+      'redArrow',
+      this.scene
+    );
+    this.redArrowMaterial.diffuseTexture = new BABYLON.Texture(
+      'assets/red_arrow.png',
+      this.scene
+    );
     this.update();
   }
 
   update() {
     if (!this.trackJoint.isRemoved()) {
+      this.mesh.material = this.trackJoint.isSelected()
+        ? this.redArrowMaterial
+        : this.arrowMaterial;
       this.mesh.position = CoordinateToBabylonVector3(
         this.trackJoint.getPosition()
       );

@@ -143,6 +143,7 @@ window.addEventListener('DOMContentLoaded', () => {
   let mouseRotation = 0;
   let selected = null;
   let previousSelected = markers[1];
+  markers[1].select();
 
   const mouseCone = BABYLON.MeshBuilder.CreateCylinder(
     'cone',
@@ -258,7 +259,9 @@ window.addEventListener('DOMContentLoaded', () => {
       //console.log('oups', previousSelected, selected);
     }
 
+    previousSelected.deselect();
     previousSelected = selected;
+    previousSelected.select();
     selected = null;
     move();
   });
