@@ -21,6 +21,7 @@ export class ActualTrackJoint implements TrackJoint {
   private ends: { A: TrackJointEnd; B: TrackJointEnd };
 
   @inject(TYPES.TrackJointRenderer) private renderer: TrackJointRenderer;
+  @inject(TYPES.FactoryOfTrack) TrackFactory: () => Track;
 
   init(x: number, z: number, rot: number) {
     // console.log(`(${x}, ${z}) R${Math.round((rot * 180) / Math.PI)}`);
@@ -119,9 +120,9 @@ export class ActualTrackJoint implements TrackJoint {
     ) {
       let t: Track;
       if (w && w.z !== undefined) {
-        t = new ActualTrack().init([jp, wp, tp]);
+        t = this.TrackFactory().init([jp, wp, tp]);
       } else if (w) {
-        t = new ActualTrack().init([jp, tp]);
+        t = this.TrackFactory().init([jp, tp]);
       }
 
       this.setOneEnd(this.whichEnd(w, this, joint), t, t.getB(), 'B');
