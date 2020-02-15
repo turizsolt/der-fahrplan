@@ -10,6 +10,7 @@ import { WhichEnd, otherEnd } from '../Track/WhichEnd';
 import { TrackEnd } from '../Track/TrackEnd';
 import { TrackBase } from '../TrackBase/TrackBase';
 import { Store } from '../Store/Store';
+import { ActualTrackSwitch } from '../TrackSwitch/ActualTrackSwitch';
 
 @injectable()
 export class ActualTrackJoint implements TrackJoint {
@@ -213,6 +214,8 @@ export class ActualTrackJoint implements TrackJoint {
 
     if (this.isEndEmpty(thisEnd)) {
       const oldTrack: TrackBase = otherEnd.track;
+      if (oldTrack.constructor.name === ActualTrackSwitch.name) return false;
+
       const oldCoordinates = oldTrack.getSegment().getCoordinates();
 
       const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
@@ -227,11 +230,16 @@ export class ActualTrackJoint implements TrackJoint {
       this.setOneEnd(thisEndLetter, sw.getE());
       third.setOneEnd(thisEndLetter, sw.getF());
 
+      console.log('first branch');
+      this.verbose();
+
       return { track: sw, removed: oldTrack };
     }
 
     if (this.isEndEmpty(otherEnd)) {
       const oldTrack: TrackBase = thisEnd.track;
+      if (oldTrack.constructor.name === ActualTrackSwitch.name) return false;
+
       const oldCoordinates = oldTrack.getSegment().getCoordinates();
 
       const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
@@ -245,6 +253,9 @@ export class ActualTrackJoint implements TrackJoint {
       this.setOneEnd(thisEndLetter, sw.getA());
       other.setOneEnd(otherEndLetter, sw.getE());
       third.setOneEnd(otherEndLetter, sw.getF());
+
+      console.log('second branch');
+      this.verbose();
 
       return { track: sw, removed: oldTrack };
     }
@@ -284,6 +295,13 @@ export class ActualTrackJoint implements TrackJoint {
 
   isSelected(): boolean {
     return this.selected;
+  }
+
+  verbose(): void {
+    console.log('joint ', this.id);
+    console.log('A ', this.ends.A.end && this.ends.A.end.getHash());
+    console.log('B ', this.ends.B.end && this.ends.B.end.getHash());
+    console.log('/joint');
   }
 }
 

@@ -40,4 +40,21 @@ export class ActualTrack extends ActualTrackBase implements Track {
     }
     return removable;
   }
+
+  verbose(): void {
+    console.log('track ', this.id, '(hash, conn,  joint)');
+    console.log(
+      'A ',
+      this.A.getHash(),
+      !!this.A.connectedToEnd && this.A.connectedToEnd.getHash(),
+      !!this.A.getJointTo() && this.A.getJointTo().getId()
+    );
+    console.log(
+      'B ',
+      this.B.getHash(),
+      !!this.B.connectedToEnd && this.B.connectedToEnd.getHash(),
+      !!this.B.getJointTo() && this.B.getJointTo().getId()
+    );
+    console.log('/track');
+  }
 }

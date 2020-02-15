@@ -5,6 +5,7 @@ import { babylonContainer } from '../structs/inversify.config';
 import { TYPES } from '../structs/TYPES';
 import { TrackSwitch } from '../structs/TrackSwitch/TrackSwitch';
 import { TrackJoint } from '../structs/TrackJoint/TrackJoint';
+import { Track } from '../structs/Track/Track';
 
 export class MouseController {
   private scene: BABYLON.Scene;
@@ -48,7 +49,27 @@ export class MouseController {
             break;
           }
 
-          sw.switch();
+          if (shiftKey) {
+            sw.verbose();
+          } else {
+            sw.switch();
+          }
+          break;
+
+        case 'trackCoin':
+          const t = storedObj as Track;
+          if (!t) {
+            console.log('t found', id, sw);
+            break;
+          }
+
+          if (shiftKey) {
+            t.verbose();
+          } else if (ctrlKey) {
+            if (t.isRemovable()) {
+              t.remove();
+            }
+          }
           break;
 
         case 'trackJoint':
@@ -59,7 +80,9 @@ export class MouseController {
           }
 
           const lastJoint = this.controller.getLastJoint();
-          if (ctrlKey) {
+          if (shiftKey) {
+            joint.verbose();
+          } else if (ctrlKey) {
             if (joint.remove()) {
               joint.deselect();
               if (lastJoint === joint) {

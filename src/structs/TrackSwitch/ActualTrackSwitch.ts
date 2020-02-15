@@ -122,4 +122,31 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   getState(): number {
     return this.state;
   }
+
+  verbose(): void {
+    console.log('switch ', this.id, '(hash, conn, phis, joint)');
+    console.log(
+      'A ',
+      this.D.getHash(),
+      !!this.D.connectedToEnd && this.D.connectedToEnd.getHash(),
+      !!this.D.getJointTo() && this.D.getJointTo().getId()
+    );
+    console.log(
+      'E ',
+      this.E.getHash(),
+      !!this.E.connectedToEnd && this.E.connectedToEnd.getHash(),
+      !!this.E.phisicallyCconnectedToEnd &&
+        this.E.phisicallyCconnectedToEnd.getHash(),
+      !!this.E.getJointTo() && this.E.getJointTo().getId()
+    );
+    console.log(
+      'F ',
+      this.F.getHash(),
+      !!this.F.connectedToEnd && this.F.connectedToEnd.getHash(),
+      !!this.F.phisicallyCconnectedToEnd &&
+        this.F.phisicallyCconnectedToEnd.getHash(),
+      !!this.F.getJointTo() && this.F.getJointTo().getId()
+    );
+    console.log('/switch');
+  }
 }

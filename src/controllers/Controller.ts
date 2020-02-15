@@ -84,7 +84,7 @@ export class Controller {
     this.lastJoint = joint;
     if (joint) {
       this.lastJoint.select();
-      this.setRotation(joint.getRotation());
+      // this.setRotation(joint.getRotation());
     }
   }
 

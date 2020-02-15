@@ -21,4 +21,6 @@ export interface TrackJoint {
   select(): void;
   deselect(): void;
   isSelected(): boolean;
+  verbose(): void;
+  getId(): string;
 }

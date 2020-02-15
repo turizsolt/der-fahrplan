@@ -6,7 +6,8 @@ export class Store {
   private elements: Record<string, any>;
   private counter: any = {
     ActualTrackJoint: { counter: 0, abbr: 'j' },
-    ActualTrack: { counter: 0, abbr: 't' }
+    ActualTrack: { counter: 0, abbr: 't' },
+    ActualTrackSwitch: { counter: 0, abbr: 's' }
   };
 
   init() {
