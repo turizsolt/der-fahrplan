@@ -15,15 +15,15 @@ export class GridDrawer {
       { width: 300, height: 300 },
       this.scene
     );
-    ground.position.y = -1.5;
+    ground.position.y = 0;
 
     for (let i = -150; i <= 150; i += 10) {
       const gridVer = BABYLON.MeshBuilder.CreateLines(
         'gridVer',
         {
           points: [
-            new BABYLON.Vector3(i, -1.49, -150),
-            new BABYLON.Vector3(i, -1.49, 150)
+            new BABYLON.Vector3(i, 0.01, -150),
+            new BABYLON.Vector3(i, 0.01, 150)
           ]
         },
         this.scene
@@ -34,8 +34,8 @@ export class GridDrawer {
         'gridHor',
         {
           points: [
-            new BABYLON.Vector3(-150, -1.49, i),
-            new BABYLON.Vector3(150, -1.49, i)
+            new BABYLON.Vector3(-150, 0.01, i),
+            new BABYLON.Vector3(150, 0.01, i)
           ]
         },
         this.scene

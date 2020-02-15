@@ -56,7 +56,6 @@ export class MouseController {
             lastJoint.connect(joint);
             this.controller.setLastJoint(joint);
           }
-          joint.write();
           break;
       }
     } else {

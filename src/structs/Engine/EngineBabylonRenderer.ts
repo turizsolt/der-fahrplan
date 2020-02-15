@@ -30,6 +30,7 @@ export class EngineBabylonRenderer implements EngineRenderer {
     this.renderEngine.position = CoordinateToBabylonVector3(
       this.engine.getPosition()
     );
+    this.renderEngine.position.y = 1.5;
     this.renderEngine.rotation.y = this.engine.getRotation();
   }
 }

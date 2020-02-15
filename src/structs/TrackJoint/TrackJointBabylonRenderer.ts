@@ -53,7 +53,7 @@ export class TrackJointBabylonRenderer implements TrackJointRenderer {
       this.mesh.position = CoordinateToBabylonVector3(
         this.trackJoint.getPosition()
       );
-      this.mesh.position.y = -0.5;
+      this.mesh.position.y = 0.5;
       this.mesh.rotation.y = this.trackJoint.getRotation();
     } else {
       this.mesh.setEnabled(false);

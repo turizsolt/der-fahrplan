@@ -41,6 +41,7 @@ export class MouseRenderer {
 
   update(position, rotation, viewMode) {
     this.mouseMesh.position = position;
+    this.mouseMesh.position.y = 0.49;
     this.mouseMesh.rotation.y = rotation;
     this.mouseMesh.setEnabled(viewMode === 1);
   }

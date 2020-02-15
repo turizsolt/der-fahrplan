@@ -3,82 +3,92 @@ import { TrackSwitchRenderer } from './TrackSwitchRenderer';
 import { injectable } from 'inversify';
 import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
 import { TrackSwitch } from './TrackSwitch';
+import { curveToTube } from '../Track/TrackBabylonRenderer';
+import { Coordinate } from '../Geometry/Coordinate';
+import { Bezier } from '../Geometry/Bezier';
 
 @injectable()
 export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
-  private mesh: BABYLON.LinesMesh;
+  private mesh: BABYLON.Mesh;
   private trackSwitch: TrackSwitch;
   readonly scene: BABYLON.Scene;
 
   init(trackSwitch: TrackSwitch): void {
     this.trackSwitch = trackSwitch;
 
-    const switchBox = BABYLON.MeshBuilder.CreateBox(
+    const switchBox = BABYLON.MeshBuilder.CreateCylinder(
       'clickable-switchBox-' + this.trackSwitch.getId(),
-      { height: 3, width: 3, depth: 3 },
+      {
+        diameter: 3,
+        tessellation: 24,
+        height: 1
+      },
       this.scene
     );
-    switchBox.position = CoordinateToBabylonVector3(
-      this.trackSwitch.getSegment().getFirstPoint()
+
+    // TODO beutify
+    let coord, coord1, coord2: Coordinate;
+    let len = 0;
+    let len1 = Bezier.getLength(
+      this.trackSwitch
+        .getSegmentE()
+        .getBezier()
+        .getCoordinates()
     );
-    switchBox.position.y = 10;
+    let len2 = Bezier.getLength(
+      this.trackSwitch
+        .getSegmentF()
+        .getBezier()
+        .getCoordinates()
+    );
+    let shorter = Math.min(len1, len2);
+    do {
+      len += 1;
+      coord1 = this.trackSwitch
+        .getSegmentE()
+        .getBezier()
+        .getPoint(len / len1);
+      coord2 = this.trackSwitch
+        .getSegmentF()
+        .getBezier()
+        .getPoint(len / len2);
+      coord = coord1.midpoint(coord2);
+      console.log(len, coord1.distance2d(coord2));
+    } while (coord1.distance2d(coord2) < 5 && len < shorter);
+
+    switchBox.position = CoordinateToBabylonVector3(coord);
 
     var boxMaterial = new BABYLON.StandardMaterial('botMat', this.scene);
     boxMaterial.diffuseColor = BABYLON.Color3.Red();
     switchBox.material = boxMaterial;
 
-    const track1 = BABYLON.MeshBuilder.CreateDashedLines(
-      'track',
-      {
-        points: this.trackSwitch
-          .getSegmentE()
-          .getCurvePoints()
-          .map(CoordinateToBabylonVector3),
-        gapSize: 5,
-        dashSize: 1
-      },
-      this.scene
-    );
-    track1.color = new BABYLON.Color3(0, 0, 0);
+    const curveE = this.trackSwitch
+      .getSegmentE()
+      .getCurvePoints()
+      .map(CoordinateToBabylonVector3);
+    curveToTube(curveE, false);
 
-    const track2 = BABYLON.MeshBuilder.CreateDashedLines(
-      'track',
-      {
-        points: this.trackSwitch
-          .getSegmentF()
-          .getCurvePoints()
-          .map(CoordinateToBabylonVector3),
-        gapSize: 5,
-        dashSize: 1
-      },
-      this.scene
-    );
-    track2.color = new BABYLON.Color3(0, 0, 0);
+    const curveF = this.trackSwitch
+      .getSegmentF()
+      .getCurvePoints()
+      .map(CoordinateToBabylonVector3);
+    curveToTube(curveF, false);
 
-    const track = BABYLON.Mesh.CreateLines(
-      'lines',
-      this.trackSwitch
-        .getSegment()
-        .getCurvePoints()
-        .map(CoordinateToBabylonVector3),
-      this.scene,
-      true
-    );
-    track.color = new BABYLON.Color3(0, 0, 0);
-    this.mesh = track;
+    const curve = this.trackSwitch
+      .getSegment()
+      .getCurvePoints()
+      .map(CoordinateToBabylonVector3);
+    this.mesh = curveToTube(curve);
   }
 
   update() {
-    if (this.mesh)
-      this.mesh = BABYLON.Mesh.CreateLines(
-        null,
-        this.trackSwitch
-          .getSegment()
-          .getCurvePoints()
-          .map(CoordinateToBabylonVector3),
-        null,
-        null,
-        this.mesh
-      );
+    if (this.mesh) {
+      const curve = this.trackSwitch
+        .getSegment()
+        .getCurvePoints()
+        .map(CoordinateToBabylonVector3);
+
+      this.mesh = curveToTube(curve, true, this.mesh);
+    }
   }
 }

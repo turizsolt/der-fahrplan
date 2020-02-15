@@ -31,10 +31,6 @@ export class ActualTrackJoint implements TrackJoint {
     this.store = this.StoreFactory();
     this.id = this.store.register(this);
 
-    console.log(
-      `${this.id}:: (${x}, ${z}) R${Math.round((rot * 180) / Math.PI)}`
-    );
-
     this.ends = {
       A: new TrackJointEnd(),
       B: new TrackJointEnd()
@@ -45,12 +41,6 @@ export class ActualTrackJoint implements TrackJoint {
 
     this.renderer.init(this);
     return this;
-  }
-
-  write() {
-    console.log(
-      `${this.id}:: ${this.ends.A.end.getHash()} ${this.ends.B.end.getHash()}`
-    );
   }
 
   rotate(rot: number) {

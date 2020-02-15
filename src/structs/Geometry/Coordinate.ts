@@ -16,4 +16,18 @@ export class Coordinate {
   equalsTo(other: Coordinate): boolean {
     return this.x === other.x && this.y === other.y && this.z === other.z;
   }
+
+  midpoint(other: Coordinate): Coordinate {
+    return new Coordinate(
+      (this.x + other.x) / 2,
+      (this.y + other.y) / 2,
+      (this.z + other.z) / 2
+    );
+  }
+
+  distance2d(other: Coordinate): number {
+    return Math.sqrt(
+      Math.pow(this.x - other.x, 2) + Math.pow(this.z - other.z, 2)
+    );
+  }
 }
