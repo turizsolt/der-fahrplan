@@ -13,4 +13,5 @@ export interface TrackSwitch extends TrackBase {
   getId(): string;
   getState(): number;
   verbose(): void;
+  update(): void;
 }

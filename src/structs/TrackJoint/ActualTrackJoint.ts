@@ -293,6 +293,7 @@ export class ActualTrackJoint implements TrackJoint {
           .getTracksEnd(oldTrack);
       }
 
+      (oldTrack as Track).verbose();
       oldTrack.getA().disconnect();
       oldTrack.getB().disconnect();
       oldTrack.remove();
@@ -307,6 +308,7 @@ export class ActualTrackJoint implements TrackJoint {
       //third.setOneEnd(otherEndLetter, sw.getF());
 
       console.log('first || second branch');
+      sw.verbose();
       this.verbose();
 
       return { track: sw, removed: oldTrack };

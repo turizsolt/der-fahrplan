@@ -13,6 +13,14 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
   private meshE: BABYLON.Mesh;
   private meshF: BABYLON.Mesh;
   private meshSB: BABYLON.Mesh;
+
+  private bal: BABYLON.Mesh;
+  private balE: BABYLON.Mesh;
+  private balF: BABYLON.Mesh;
+
+  private phE: BABYLON.Mesh;
+  private phF: BABYLON.Mesh;
+
   private trackSwitch: TrackSwitch;
   readonly scene: BABYLON.Scene;
 
@@ -82,6 +90,60 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
       .getCurvePoints()
       .map(CoordinateToBabylonVector3);
     this.mesh = curveToTube(curve);
+
+    const cAl = Bezier.getLength(
+      this.trackSwitch
+        .getSegment()
+        .getBezier()
+        .getCoordinates()
+    );
+    const cA = this.trackSwitch
+      .getSegment()
+      .getBezier()
+      .getPoint(4 / cAl);
+    this.bal = ballon(cA, this.trackSwitch.getA().connectedToEnd ? 1 : 0);
+
+    const cEl = Bezier.getLength(
+      this.trackSwitch
+        .getSegmentE()
+        .getBezier()
+        .getCoordinates()
+    );
+    const cE = this.trackSwitch
+      .getSegmentE()
+      .getBezier()
+      .getPoint(1 - 4 / cEl);
+    this.balE = ballon(cE, this.trackSwitch.getF().connectedToEnd ? 1 : 0);
+
+    const cFl = Bezier.getLength(
+      this.trackSwitch
+        .getSegmentF()
+        .getBezier()
+        .getCoordinates()
+    );
+    const cF = this.trackSwitch
+      .getSegmentF()
+      .getBezier()
+      .getPoint(1 - 4 / cFl);
+    this.balF = ballon(cF, this.trackSwitch.getE().connectedToEnd ? 1 : 0);
+
+    const pE = this.trackSwitch
+      .getSegmentE()
+      .getBezier()
+      .getPoint(1 - 7 / cEl);
+    this.phE = ballon(
+      pE,
+      this.trackSwitch.getF().phisicallyCconnectedToEnd ? 2 : 0
+    );
+
+    const pF = this.trackSwitch
+      .getSegmentF()
+      .getBezier()
+      .getPoint(1 - 7 / cFl);
+    this.phF = ballon(
+      pF,
+      this.trackSwitch.getE().phisicallyCconnectedToEnd ? 2 : 0
+    );
   }
 
   update() {
@@ -98,7 +160,52 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
           .map(CoordinateToBabylonVector3);
 
         this.mesh = curveToTube(curve, true, this.mesh);
+
+        ballonUpdate(this.trackSwitch.getA().connectedToEnd ? 1 : 0, this.bal);
+        ballonUpdate(this.trackSwitch.getF().connectedToEnd ? 1 : 0, this.balE);
+        ballonUpdate(this.trackSwitch.getE().connectedToEnd ? 1 : 0, this.balF);
+
+        ballonUpdate(
+          this.trackSwitch.getF().phisicallyCconnectedToEnd ? 2 : 0,
+          this.phE
+        );
+        ballonUpdate(
+          this.trackSwitch.getE().phisicallyCconnectedToEnd ? 2 : 0,
+          this.phF
+        );
       }
     }
   }
 }
+
+const colors = [
+  BABYLON.Color3.Purple(),
+  BABYLON.Color3.Green(),
+  BABYLON.Color3.Teal()
+];
+
+const ballon = (coord, color) => {
+  const ballon = BABYLON.MeshBuilder.CreateCylinder(
+    'ballon',
+    {
+      diameter: 3,
+      tessellation: 24,
+      height: 1
+    },
+    this.scene
+  );
+
+  ballon.position = CoordinateToBabylonVector3(coord);
+
+  var boxMaterial = new BABYLON.StandardMaterial('botMat', this.scene);
+  boxMaterial.diffuseColor = colors[color];
+  ballon.material = boxMaterial;
+
+  return ballon;
+};
+
+const ballonUpdate = (color, mesh) => {
+  var boxMaterial = new BABYLON.StandardMaterial('botMat', this.scene);
+  boxMaterial.diffuseColor = colors[color];
+  mesh.material = boxMaterial;
+};

@@ -123,6 +123,10 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     return this.state;
   }
 
+  update(): void {
+    this.renderer.update();
+  }
+
   verbose(): void {
     console.log('switch ', this.id, '(hash, conn, phis, joint)');
     console.log(

@@ -26,6 +26,28 @@ export class TrackSwitchEnd extends TrackEnd {
       }
       this.reconnect();
     }
+
+    this.endOf.update();
+  }
+
+  disconnect() {
+    console.log('TTTdisco', this.getHash());
+    if (this.connectedToEnd) {
+      const temp = this.connectedToEnd;
+      this._connectedTo = null;
+      this._connectedToEnd = null;
+      temp.disconnect();
+
+      if (
+        this.phisicallyCconnectedToEnd &&
+        this.phisicallyCconnectedToEnd.removed
+      ) {
+        this.phisicallyConnectedTo = null;
+        this._phisicallyConnectedToEnd = null;
+      }
+    }
+
+    this.endOf.update();
   }
 
   reconnect() {
@@ -39,6 +61,8 @@ export class TrackSwitchEnd extends TrackEnd {
         this.phisicallyCconnectedToEnd.connect(this);
       }
     }
+
+    this.endOf.update();
   }
 
   isActive(): boolean {

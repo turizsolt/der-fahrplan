@@ -8,6 +8,7 @@ export class TrackEnd {
   protected which: WhichEnd;
   protected _connectedTo: TrackBase = null;
   protected jointTo: TrackJoint;
+  public removed: boolean = false;
   get connectedTo() {
     return this._connectedTo;
   }
@@ -28,9 +29,13 @@ export class TrackEnd {
     if (other.connectedTo !== this.endOf) {
       other.connect(this, joint);
     }
+
+    this.endOf.update();
   }
 
   disconnect() {
+    console.log('disco', this.getHash());
+
     // console.log(
     //   'disco',
     //   this.getHash(),
@@ -42,9 +47,12 @@ export class TrackEnd {
       this._connectedToEnd = null;
       temp.disconnect();
     }
+    this.endOf.update();
   }
 
   remove() {
+    console.log('removing...');
+    this.removed = true;
     this.disconnect();
     if (this.jointTo) {
       this.jointTo.removeEnd(this);

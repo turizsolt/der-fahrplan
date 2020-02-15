@@ -17,4 +17,5 @@ export interface TrackBase {
   remove(): boolean;
   isRemovable(): boolean;
   isRemoved(): boolean;
+  update(): void;
 }

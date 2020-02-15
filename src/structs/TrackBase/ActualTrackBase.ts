@@ -64,4 +64,6 @@ export abstract class ActualTrackBase implements TrackBase {
   getId(): string {
     return this.id;
   }
+
+  update(): void {}
 }
