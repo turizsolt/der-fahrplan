@@ -32,6 +32,12 @@ export class MouseController {
       this.scene.pointerY
     );
 
+    if (!pickedPoint) return;
+
     this.controller.setMousePoint(pickedPoint);
+  }
+
+  handleWheel(delta, ctrlKey) {
+    this.controller.changeRotation(delta * (ctrlKey ? 15 : 45));
   }
 }

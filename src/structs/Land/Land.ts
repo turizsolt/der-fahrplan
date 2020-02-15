@@ -1,5 +1,6 @@
 import { Engine } from '../Engine/Engine';
+import { Controller } from '../../controllers/Controller';
 
 export interface Land {
-  init(markers: any[]): Engine;
+  init(controller: Controller): Engine;
 }

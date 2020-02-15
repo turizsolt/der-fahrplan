@@ -46,7 +46,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     (window as any).switches = [];
     const land = babylonContainer.get<Land>(TYPES.Land);
-    const engine = land.init(markers);
+    const engine = land.init(controller);
 
     const gridDrawer = new GridDrawer();
     gridDrawer.setScene(scene);
@@ -84,5 +84,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('pointermove', () => {
     mouseController.handleMouseMove();
+  });
+
+  window.addEventListener('wheel', e => {
+    mouseController.handleWheel(Math.sign(e.deltaY), e.altKey);
   });
 });

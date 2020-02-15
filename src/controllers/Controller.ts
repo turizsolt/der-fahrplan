@@ -20,7 +20,7 @@ export class Controller {
 
   setScene(scene: BABYLON.Scene) {
     this.scene = scene;
-    this.mouseRenderer = new MouseRenderer().init(scene);
+    this.mouseRenderer = new MouseRenderer().init(this.scene);
   }
 
   nextViewMode() {
@@ -69,12 +69,26 @@ export class Controller {
     return (this.pickedRotationDegree / 180) * Math.PI;
   }
 
+  private lastJoint: TrackJoint;
+
+  setLastJoint(joint: TrackJoint): void {
+    if (this.lastJoint) this.lastJoint.deselect();
+    this.lastJoint = joint;
+    this.lastJoint.select();
+  }
+
   createJoint(pickedPoint) {
     if (this.viewMode !== 1) return;
     // todo antipattern to get here
     const joint = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
     const snappedPoint = snapXZ(pickedPoint);
     joint.init(snappedPoint.x, snappedPoint.z, this.getPickedRotationRad());
+
+    if (this.lastJoint) {
+      this.lastJoint.connect(joint);
+    }
+
+    this.setLastJoint(joint);
   }
 
   setMousePoint(pickedPoint) {

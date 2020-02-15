@@ -34,6 +34,7 @@ export class MouseRenderer {
     );
     mouseMesh.material = arrowMaterial;
     this.mouseMesh = mouseMesh;
+    this.mouseMesh.setEnabled(false);
 
     return this;
   }
