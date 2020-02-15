@@ -42,6 +42,10 @@ export class KeyController {
 
   private enabledD = true;
   private enabledQ = true;
+  private enabledZ = true;
+  private enabledX = true;
+  private enabledC = true;
+  private enabledV = true;
 
   handleKeyCommands(engine: Engine) {
     this.scene.registerAfterRender(() => {
@@ -66,13 +70,52 @@ export class KeyController {
       }
 
       if (this.map['q'] || this.map['Q']) {
-        console.log('q');
         if (this.enabledQ) {
           this.controller.nextViewMode();
           this.enabledQ = false;
           setTimeout(() => {
             this.enabledQ = true;
           }, 500);
+        }
+      }
+
+      if (this.map['z'] || this.map['Z']) {
+        if (this.enabledZ) {
+          this.controller.changeRotation(-15);
+          this.enabledZ = false;
+          setTimeout(() => {
+            this.enabledZ = true;
+          }, 100);
+        }
+      }
+
+      if (this.map['x'] || this.map['X']) {
+        if (this.enabledX) {
+          this.controller.changeRotation(+15);
+          this.enabledX = false;
+          setTimeout(() => {
+            this.enabledX = true;
+          }, 100);
+        }
+      }
+
+      if (this.map['c'] || this.map['C']) {
+        if (this.enabledC) {
+          this.controller.changeRotation(-45);
+          this.enabledC = false;
+          setTimeout(() => {
+            this.enabledC = true;
+          }, 100);
+        }
+      }
+
+      if (this.map['v'] || this.map['V']) {
+        if (this.enabledV) {
+          this.controller.changeRotation(+45);
+          this.enabledV = false;
+          setTimeout(() => {
+            this.enabledV = true;
+          }, 100);
         }
       }
     });

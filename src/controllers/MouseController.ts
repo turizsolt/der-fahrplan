@@ -1,8 +1,9 @@
 import * as BABYLON from 'babylonjs';
-import { Engine } from '../structs/Engine/Engine';
+import { Controller } from './Controller';
 
 export class MouseController {
   private scene: BABYLON.Scene;
+  private controller: Controller;
 
   constructor() {}
 
@@ -10,9 +11,27 @@ export class MouseController {
     this.scene = scene;
   }
 
-  handleMouseDown() {}
+  setController(controller: Controller) {
+    this.controller = controller;
+  }
+
+  handleMouseDown() {
+    const { pickedPoint } = this.scene.pick(
+      this.scene.pointerX,
+      this.scene.pointerY
+    );
+
+    this.controller.createJoint(pickedPoint);
+  }
 
   handleMouseUp() {}
 
-  handleMouseMove() {}
+  handleMouseMove() {
+    const { pickedPoint } = this.scene.pick(
+      this.scene.pointerX,
+      this.scene.pointerY
+    );
+
+    this.controller.setMousePoint(pickedPoint);
+  }
 }
