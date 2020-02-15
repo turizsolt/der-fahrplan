@@ -162,7 +162,9 @@ export class ActualTrackJoint implements TrackJoint {
       comparePosition.x - one.getPosition().x,
       comparePosition.z - one.getPosition().z
     );
-    return almost(direction, one.getRotation()) ? WhichEnd.B : WhichEnd.A;
+    return almostDirection(direction, one.getRotation())
+      ? WhichEnd.B
+      : WhichEnd.A;
   }
 
   isEndEmpty(end: TrackJointEnd): boolean {
@@ -287,4 +289,12 @@ export class ActualTrackJoint implements TrackJoint {
 
 function almost(a, b) {
   return Math.abs(a - b) < 0.00001;
+}
+
+function almostDirection(a, b) {
+  const diff = Math.abs(a - b);
+  const small = 0.00001;
+  return (
+    diff < small || (2 * Math.PI - small < diff && diff < 2 * Math.PI + small)
+  );
 }
