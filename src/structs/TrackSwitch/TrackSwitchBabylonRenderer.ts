@@ -41,7 +41,7 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
         .getBezier()
         .getCoordinates()
     );
-    let shorter = Math.min(len1, len2);
+    let shorter = Math.min(len1, len2) - 3;
     do {
       len += 1;
       coord1 = this.trackSwitch
@@ -53,7 +53,6 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
         .getBezier()
         .getPoint(len / len2);
       coord = coord1.midpoint(coord2);
-      console.log(len, coord1.distance2d(coord2));
     } while (coord1.distance2d(coord2) < 5 && len < shorter);
 
     switchBox.position = CoordinateToBabylonVector3(coord);

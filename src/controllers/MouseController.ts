@@ -33,6 +33,8 @@ export class MouseController {
       this.scene.pointerY
     );
 
+    if (!pickedMesh) return;
+
     const meshId = pickedMesh.id;
     if (meshId.startsWith('clickable-')) {
       const [_, type, id] = meshId.split('-');
@@ -41,11 +43,21 @@ export class MouseController {
       switch (type) {
         case 'switchBox':
           const sw = storedObj as TrackSwitch;
+          if (!sw) {
+            console.log('sw found', id, sw);
+            break;
+          }
+
           sw.switch();
           break;
 
         case 'trackJoint':
           const joint = storedObj as TrackJoint;
+          if (!joint) {
+            console.log('joint found', id, joint);
+            break;
+          }
+
           const lastJoint = this.controller.getLastJoint();
           if (lastJoint === joint) {
             joint.deselect();

@@ -10,7 +10,7 @@ export class Controller {
   private canvas: HTMLElement;
   private scene: BABYLON.Scene;
   private mouseRenderer: MouseRenderer;
-  private snappedPoint: BABYLON.Vector3;
+  private snappedPoint: BABYLON.Vector3 = new BABYLON.Vector3(0, 0, 0);
 
   setCameraAndCanvas(camera, canvas) {
     this.camera = camera;
