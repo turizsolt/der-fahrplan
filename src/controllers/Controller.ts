@@ -85,7 +85,7 @@ export class Controller {
     return this.lastJoint;
   }
 
-  createJoint(pickedPoint) {
+  createJoint(pickedPoint, lastStays) {
     if (this.viewMode !== 1) return;
     // todo antipattern to get here
     const joint = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
@@ -96,7 +96,7 @@ export class Controller {
       this.lastJoint.connect(joint);
     }
 
-    this.setLastJoint(joint);
+    if (!lastStays) this.setLastJoint(joint);
   }
 
   setMousePoint(pickedPoint) {

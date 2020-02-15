@@ -10,6 +10,9 @@ import { Bezier } from '../Geometry/Bezier';
 @injectable()
 export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
   private mesh: BABYLON.Mesh;
+  private meshE: BABYLON.Mesh;
+  private meshF: BABYLON.Mesh;
+  private meshSB: BABYLON.Mesh;
   private trackSwitch: TrackSwitch;
   readonly scene: BABYLON.Scene;
 
@@ -60,18 +63,19 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
     var boxMaterial = new BABYLON.StandardMaterial('botMat', this.scene);
     boxMaterial.diffuseColor = BABYLON.Color3.Red();
     switchBox.material = boxMaterial;
+    this.meshSB = switchBox;
 
     const curveE = this.trackSwitch
       .getSegmentE()
       .getCurvePoints()
       .map(CoordinateToBabylonVector3);
-    curveToTube(curveE, false);
+    this.meshE = curveToTube(curveE, false);
 
     const curveF = this.trackSwitch
       .getSegmentF()
       .getCurvePoints()
       .map(CoordinateToBabylonVector3);
-    curveToTube(curveF, false);
+    this.meshF = curveToTube(curveF, false);
 
     const curve = this.trackSwitch
       .getSegment()
@@ -82,12 +86,19 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
 
   update() {
     if (this.mesh) {
-      const curve = this.trackSwitch
-        .getSegment()
-        .getCurvePoints()
-        .map(CoordinateToBabylonVector3);
+      if (this.trackSwitch.isRemoved()) {
+        this.mesh.setEnabled(false);
+        this.meshE.setEnabled(false);
+        this.meshF.setEnabled(false);
+        this.meshSB.setEnabled(false);
+      } else {
+        const curve = this.trackSwitch
+          .getSegment()
+          .getCurvePoints()
+          .map(CoordinateToBabylonVector3);
 
-      this.mesh = curveToTube(curve, true, this.mesh);
+        this.mesh = curveToTube(curve, true, this.mesh);
+      }
     }
   }
 }

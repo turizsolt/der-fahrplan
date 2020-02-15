@@ -10,6 +10,11 @@ export class TrackJointEnd {
     this.end = end;
   }
 
+  unsetEnd() {
+    this.track = null;
+    this.end = null;
+  }
+
   isSet(): boolean {
     return !!this.track;
   }

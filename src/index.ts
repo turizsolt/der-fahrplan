@@ -74,8 +74,8 @@ window.addEventListener('DOMContentLoaded', () => {
     renderEngine.resize();
   });
 
-  window.addEventListener('pointerdown', () => {
-    mouseController.handleMouseDown();
+  window.addEventListener('pointerdown', e => {
+    mouseController.handleMouseDown(e.ctrlKey, e.shiftKey);
   });
 
   window.addEventListener('pointerup', () => {

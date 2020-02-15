@@ -45,8 +45,16 @@ export abstract class ActualTrackBase implements TrackBase {
     return this.B;
   }
 
-  remove(): void {
-    this.removed = true;
+  remove(): boolean {
+    if (this.isRemovable()) {
+      this.removed = true;
+      return true;
+    }
+    return false;
+  }
+
+  isRemovable(): boolean {
+    return this.checkedList.length === 0;
   }
 
   isRemoved(): boolean {

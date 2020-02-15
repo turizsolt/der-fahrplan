@@ -27,7 +27,7 @@ export class MouseController {
     this.controller = controller;
   }
 
-  handleMouseDown() {
+  handleMouseDown(ctrlKey, shiftKey) {
     const { pickedPoint, pickedMesh } = this.scene.pick(
       this.scene.pointerX,
       this.scene.pointerY
@@ -59,19 +59,28 @@ export class MouseController {
           }
 
           const lastJoint = this.controller.getLastJoint();
-          if (lastJoint === joint) {
-            joint.deselect();
-            this.controller.setLastJoint(null);
-          } else if (!lastJoint) {
-            this.controller.setLastJoint(joint);
+          if (ctrlKey) {
+            if (joint.remove()) {
+              joint.deselect();
+              if (lastJoint === joint) {
+                this.controller.setLastJoint(null);
+              }
+            }
           } else {
-            lastJoint.connect(joint);
-            this.controller.setLastJoint(joint);
+            if (lastJoint === joint) {
+              joint.deselect();
+              this.controller.setLastJoint(null);
+            } else if (!lastJoint) {
+              this.controller.setLastJoint(joint);
+            } else {
+              lastJoint.connect(joint);
+              this.controller.setLastJoint(joint);
+            }
+            break;
           }
-          break;
       }
     } else {
-      this.controller.createJoint(pickedPoint);
+      this.controller.createJoint(pickedPoint, shiftKey);
     }
   }
 

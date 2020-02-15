@@ -87,9 +87,16 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     }
   }
 
-  remove(): void {
-    super.remove();
-    this.renderer.update();
+  remove(): boolean {
+    const removable = super.remove();
+    //console.log('remTS', removable);
+    if (removable) {
+      this.D.remove();
+      this.E.remove();
+      this.F.remove();
+      this.renderer.update();
+    }
+    return removable;
   }
 
   getSegmentE(): TrackSegment {

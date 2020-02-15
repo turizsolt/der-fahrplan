@@ -5,6 +5,8 @@ export interface TrackJoint {
   init(x: number, z: number, rot: number): TrackJoint;
   rotate(rot: number);
   remove();
+  isRemovable(): boolean;
+  removeEnd(end: TrackEnd): void;
   slope();
   equ();
   computeMidpoint(joint: TrackJoint);

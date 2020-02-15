@@ -14,6 +14,7 @@ export interface TrackBase {
   getB(): TrackEnd;
   getId(): string;
 
-  remove(): void;
+  remove(): boolean;
+  isRemovable(): boolean;
   isRemoved(): boolean;
 }

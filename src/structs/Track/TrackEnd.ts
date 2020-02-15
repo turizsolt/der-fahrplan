@@ -31,11 +31,23 @@ export class TrackEnd {
   }
 
   disconnect() {
+    // console.log(
+    //   'disco',
+    //   this.getHash(),
+    //   this.connectedToEnd && this.connectedToEnd.getHash()
+    // );
     if (this.connectedToEnd) {
       const temp = this.connectedToEnd;
       this._connectedTo = null;
       this._connectedToEnd = null;
       temp.disconnect();
+    }
+  }
+
+  remove() {
+    this.disconnect();
+    if (this.jointTo) {
+      this.jointTo.removeEnd(this);
     }
   }
 

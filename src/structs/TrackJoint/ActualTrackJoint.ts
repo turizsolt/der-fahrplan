@@ -50,9 +50,60 @@ export class ActualTrackJoint implements TrackJoint {
     }
   }
 
+  isRemovable(): boolean {
+    var removable = true;
+    if (this.ends.A.isSet()) {
+      removable = removable && this.ends.A.track.isRemovable();
+    }
+    if (this.ends.B.isSet()) {
+      removable = removable && this.ends.B.track.isRemovable();
+    }
+    return removable;
+  }
+
   remove() {
-    this.removed = true;
-    this.renderer.update();
+    // console.log(
+    //   'r TJ',
+    //   this.getId(),
+    //   this.isRemovable(),
+    //   this.ends.A.end && this.ends.A.end.getHash(),
+    //   this.ends.B.end && this.ends.B.end.getHash()
+    // );
+    if (this.isRemovable()) {
+      //   console.log('isset', this.ends.A.isSet(), this.ends.B.isSet());
+      if (this.ends.A.isSet()) {
+        // console.log('A');
+        this.ends.A.track.remove();
+        this.ends.A.unsetEnd();
+      }
+      //   console.log('isset2', this.ends.A.isSet(), this.ends.B.isSet());
+      if (this.ends.B.isSet()) {
+        // console.log('B');
+        this.ends.B.track.remove();
+        this.ends.B.unsetEnd();
+      }
+      //   console.log('isset3', this.ends.A.isSet(), this.ends.B.isSet());
+      this.removed = true;
+      this.renderer.update();
+      return true;
+    }
+    return false;
+  }
+
+  removeEnd(end: TrackEnd) {
+    // console.log(
+    //   'remEnd',
+    //   this.id,
+    //   end.getHash(),
+    //   this.ends.A.end && this.ends.A.end.getHash(),
+    //   this.ends.B.end && this.ends.B.end.getHash()
+    // );
+    if (this.ends.A.end === end) {
+      this.ends.A.unsetEnd();
+    }
+    if (this.ends.B.end === end) {
+      this.ends.B.unsetEnd();
+    }
   }
 
   slope() {

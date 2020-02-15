@@ -30,8 +30,14 @@ export class ActualTrack extends ActualTrackBase implements Track {
     return this;
   }
 
-  remove(): void {
-    super.remove();
-    this.renderer.update();
+  remove(): boolean {
+    // console.log('r T', this.getId(), this.isRemovable());
+    const removable = super.remove();
+    if (removable) {
+      this.A.remove();
+      this.B.remove();
+      this.renderer.update();
+    }
+    return removable;
   }
 }
