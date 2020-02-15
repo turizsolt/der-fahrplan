@@ -9,10 +9,11 @@ import { TrackSwitch } from '../TrackSwitch/TrackSwitch';
 import { WhichEnd, otherEnd } from '../Track/WhichEnd';
 import { TrackEnd } from '../Track/TrackEnd';
 import { TrackBase } from '../TrackBase/TrackBase';
+import { Store } from '../Store/Store';
 
 @injectable()
 export class ActualTrackJoint implements TrackJoint {
-  private id: number;
+  private id: string;
   private position: Coordinate;
   private rotation: number;
   private removed: boolean = false;
@@ -23,9 +24,16 @@ export class ActualTrackJoint implements TrackJoint {
   @inject(TYPES.FactoryOfTrack) TrackFactory: () => Track;
   @inject(TYPES.FactoryOfTrackSwitch) TrackSwitchFactory: () => TrackSwitch;
 
+  @inject(TYPES.FactoryOfStore) StoreFactory: () => Store;
+  private store: Store;
+
   init(x: number, z: number, rot: number): TrackJoint {
-    // console.log(`(${x}, ${z}) R${Math.round((rot * 180) / Math.PI)}`);
-    this.id = (Math.random() * 1000000) | 0;
+    this.store = this.StoreFactory();
+    this.id = this.store.register(this);
+
+    console.log(
+      `${this.id}:: (${x}, ${z}) R${Math.round((rot * 180) / Math.PI)}`
+    );
 
     this.ends = {
       A: new TrackJointEnd(),
@@ -37,6 +45,12 @@ export class ActualTrackJoint implements TrackJoint {
 
     this.renderer.init(this);
     return this;
+  }
+
+  write() {
+    console.log(
+      `${this.id}:: ${this.ends.A.end.getHash()} ${this.ends.B.end.getHash()}`
+    );
   }
 
   rotate(rot: number) {

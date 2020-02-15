@@ -8,6 +8,7 @@ import { TrackSwitch } from './TrackSwitch';
 import { ActualTrackBase } from '../TrackBase/ActualTrackBase';
 import { injectable, inject } from 'inversify';
 import { WhichEnd } from '../Track/WhichEnd';
+import { Store } from '../Store/Store';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
@@ -29,11 +30,12 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   private state: number;
   @inject(TYPES.TrackSwitchRenderer) private renderer: TrackSwitchRenderer;
 
+  @inject(TYPES.FactoryOfStore) StoreFactory: () => Store;
+  private store: Store;
+
   init(coordinates1: Coordinate[], coordinates2: Coordinate[]): TrackSwitch {
-    this.id = (Math.random() * 1000000) | 0;
-    if (typeof window !== 'undefined') {
-      (window as any).switches.push(this);
-    }
+    this.store = this.StoreFactory();
+    this.id = this.store.register(this);
 
     this.D = new TrackEnd(WhichEnd.A, this);
     this.E = new TrackSwitchEnd(WhichEnd.B, this);

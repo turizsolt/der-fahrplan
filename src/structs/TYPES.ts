@@ -1,6 +1,9 @@
 export const TYPES = {
   Land: Symbol.for('Land'),
 
+  Store: Symbol.for('Store'),
+  FactoryOfStore: Symbol.for('Factory<Store>'),
+
   Engine: Symbol.for('Engine'),
   EngineRenderer: Symbol.for('EngineRenderer'),
   FactoryOfEngine: Symbol.for('Factory<Engine>'),

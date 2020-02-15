@@ -72,9 +72,17 @@ export class Controller {
   private lastJoint: TrackJoint;
 
   setLastJoint(joint: TrackJoint): void {
-    if (this.lastJoint) this.lastJoint.deselect();
+    if (this.lastJoint) {
+      this.lastJoint.deselect();
+    }
     this.lastJoint = joint;
-    this.lastJoint.select();
+    if (joint) {
+      this.lastJoint.select();
+    }
+  }
+
+  getLastJoint(): TrackJoint {
+    return this.lastJoint;
   }
 
   createJoint(pickedPoint) {

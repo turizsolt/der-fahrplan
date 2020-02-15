@@ -16,7 +16,7 @@ export class TrackJointBabylonRenderer implements TrackJointRenderer {
     this.trackJoint = trackJoint;
 
     this.mesh = BABYLON.MeshBuilder.CreateCylinder(
-      'm-' + this.trackJoint.getId(),
+      'clickable-trackJoint-' + this.trackJoint.getId(),
       {
         diameter: 5,
         tessellation: 24,

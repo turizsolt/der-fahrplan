@@ -19,6 +19,7 @@ import { TrackSwitch } from '../src/structs/TrackSwitch/TrackSwitch';
 import { ActualTrackSwitch } from '../src/structs/TrackSwitch/ActualTrackSwitch';
 import { TrackJoint } from '../src/structs/TrackJoint/TrackJoint';
 import { ActualTrackJoint } from '../src/structs/TrackJoint/ActualTrackJoint';
+import { Store } from '../src/structs/Store/Store';
 
 export const testContainer = new Container();
 testContainer
@@ -39,6 +40,19 @@ testContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
 testContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 testContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 testContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
+testContainer.bind<Store>(TYPES.Store).to(Store);
+
+let store: Store = null;
+testContainer
+  .bind<interfaces.Factory<Store>>(TYPES.FactoryOfStore)
+  .toFactory<Store>((context: interfaces.Context) => {
+    return () => {
+      if (!store) {
+        store = context.container.get<Store>(TYPES.Store).init();
+      }
+      return store;
+    };
+  });
 
 testContainer
   .bind<interfaces.Factory<Engine>>(TYPES.FactoryOfEngine)

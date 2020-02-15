@@ -21,6 +21,7 @@ import { ActualTrack } from './Track/ActualTrack';
 import { ActualTrackSwitch } from './TrackSwitch/ActualTrackSwitch';
 import { TrackJoint } from './TrackJoint/TrackJoint';
 import { ActualTrackJoint } from './TrackJoint/ActualTrackJoint';
+import { Store } from './Store/Store';
 
 export const babylonContainer = new Container();
 babylonContainer
@@ -43,6 +44,19 @@ babylonContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
 babylonContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 babylonContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 babylonContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
+babylonContainer.bind<Store>(TYPES.Store).to(Store);
+
+let store: Store = null;
+babylonContainer
+  .bind<interfaces.Factory<Store>>(TYPES.FactoryOfStore)
+  .toFactory<Store>((context: interfaces.Context) => {
+    return () => {
+      if (!store) {
+        store = context.container.get<Store>(TYPES.Store).init();
+      }
+      return store;
+    };
+  });
 
 babylonContainer
   .bind<interfaces.Factory<Engine>>(TYPES.FactoryOfEngine)

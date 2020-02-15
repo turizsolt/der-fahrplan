@@ -14,7 +14,7 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
     this.trackSwitch = trackSwitch;
 
     const switchBox = BABYLON.MeshBuilder.CreateBox(
-      'switchBox-' + this.trackSwitch.getId(),
+      'clickable-switchBox-' + this.trackSwitch.getId(),
       { height: 3, width: 3, depth: 3 },
       this.scene
     );
