@@ -75,15 +75,15 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     this.renderer.update();
 
     if (this.state) {
-      this.F.reconnect();
-      this.E.disconnect();
       this.F.active = true;
       this.E.active = false;
+      this.F.reconnect();
+      this.E.disconnect();
     } else {
-      this.E.reconnect();
-      this.F.disconnect();
       this.E.active = true;
       this.F.active = false;
+      this.E.reconnect();
+      this.F.disconnect();
     }
   }
 

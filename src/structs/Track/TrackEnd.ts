@@ -66,4 +66,8 @@ export class TrackEnd {
   getHash(): string {
     return this.which + this.endOf.getId();
   }
+
+  isActive(): boolean {
+    return true;
+  }
 }

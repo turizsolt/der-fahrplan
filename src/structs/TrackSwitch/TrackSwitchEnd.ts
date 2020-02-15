@@ -29,12 +29,19 @@ export class TrackSwitchEnd extends TrackEnd {
   }
 
   reconnect() {
-    if (this.phisicallyCconnectedToEnd) {
+    if (
+      this.phisicallyCconnectedToEnd &&
+      this.phisicallyCconnectedToEnd.isActive()
+    ) {
       this._connectedTo = this.phisicallyConnectedTo;
       this._connectedToEnd = this.phisicallyCconnectedToEnd;
       if (this.phisicallyCconnectedToEnd.connectedTo !== this.endOf) {
         this.phisicallyCconnectedToEnd.connect(this);
       }
     }
+  }
+
+  isActive(): boolean {
+    return this._active;
   }
 }
