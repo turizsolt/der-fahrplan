@@ -58,11 +58,17 @@ export class Controller {
     this.pickedRotationDegree += changeBy;
     if (this.pickedRotationDegree < -180) this.pickedRotationDegree += 360;
     if (this.pickedRotationDegree > 180) this.pickedRotationDegree -= 360;
-    this.mouseRenderer.update(
-      this.snappedPoint,
-      this.getPickedRotationRad(),
-      this.viewMode
-    );
+    if (this.mouseRenderer) {
+      this.mouseRenderer.update(
+        this.snappedPoint,
+        this.getPickedRotationRad(),
+        this.viewMode
+      );
+    }
+  }
+
+  setRotation(changeTo: number) {
+    this.changeRotation(changeTo - this.pickedRotationDegree);
   }
 
   getPickedRotationRad(): number {
@@ -78,6 +84,7 @@ export class Controller {
     this.lastJoint = joint;
     if (joint) {
       this.lastJoint.select();
+      this.setRotation(joint.getRotation());
     }
   }
 
