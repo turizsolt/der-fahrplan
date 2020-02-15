@@ -1,5 +1,6 @@
 import { WhichEnd } from '../Track/WhichEnd';
 import { TrackEnd } from '../Track/TrackEnd';
+import { TrackBase } from '../TrackBase/TrackBase';
 
 export interface TrackJoint {
   init(x: number, z: number, rot: number): TrackJoint;
@@ -23,4 +24,5 @@ export interface TrackJoint {
   isSelected(): boolean;
   verbose(): void;
   getId(): string;
+  getTracksEnd(track: TrackBase): WhichEnd | undefined;
 }

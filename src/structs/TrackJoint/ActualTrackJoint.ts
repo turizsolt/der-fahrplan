@@ -163,6 +163,12 @@ export class ActualTrackJoint implements TrackJoint {
       comparePosition.x - one.getPosition().x,
       comparePosition.z - one.getPosition().z
     );
+    console.log(
+      'whichend',
+      almostDirection(direction, one.getRotation()),
+      direction,
+      one.getRotation()
+    );
     return almostDirection(direction, one.getRotation())
       ? WhichEnd.B
       : WhichEnd.A;
@@ -187,7 +193,10 @@ export class ActualTrackJoint implements TrackJoint {
   }
 
   connect(other: TrackJoint) {
+    console.log('====CONNECT====');
     const midpoint = this.computeMidpoint(other);
+
+    console.log('midpoint', midpoint);
 
     // if there is no possible connection then return false
     if (midpoint === false) {
@@ -196,12 +205,24 @@ export class ActualTrackJoint implements TrackJoint {
 
     // create coords for segment
     const coordinates = [this.position, midpoint, other.getPosition()];
+    console.log('coordinates', coordinates);
 
     // determine which end is which
     const thisEndLetter = this.whichEnd(this, midpoint, other);
-    const otherEndLetter = this.whichEnd(other, midpoint, this);
     const thisEnd = this.ends[thisEndLetter];
+    console.log(
+      'this end',
+      thisEndLetter,
+      thisEnd.track && thisEnd.track.getId()
+    );
+
+    const otherEndLetter = this.whichEnd(other, midpoint, this);
     const otherEnd = other.getEnds()[otherEndLetter];
+    console.log(
+      'other end',
+      otherEndLetter,
+      otherEnd.track && otherEnd.track.getId()
+    );
 
     if (this.areBothEndsEmpty(thisEnd, otherEnd)) {
       const t = this.TrackFactory().init(coordinates);
@@ -212,55 +233,92 @@ export class ActualTrackJoint implements TrackJoint {
       return { track: t };
     }
 
-    if (this.isEndEmpty(thisEnd)) {
-      const oldTrack: TrackBase = otherEnd.track;
+    if (this.isEndEmpty(thisEnd) || this.isEndEmpty(otherEnd)) {
+      const oldTrack: TrackBase = thisEnd.track || otherEnd.track;
       if (oldTrack.constructor.name === ActualTrackSwitch.name) return false;
 
       const oldCoordinates = oldTrack.getSegment().getCoordinates();
 
       const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
 
-      const third = oldTrack.getA().getJointTo();
+      const thirdA = oldTrack.getA().getJointTo();
+      const thirdB = oldTrack.getB().getJointTo();
+      console.log(
+        'third wheel',
+        this.getId(),
+        other.getId(),
+        thirdA.getId(),
+        thirdB.getId()
+      );
+
+      //const third = thirdA === this || thirdA === other ? thirdB : thirdA;
+      let third, second, peak, peakLetter, secondLetter;
+      if (thirdA === this) {
+        third = thirdB;
+        peak = this;
+        peakLetter = thisEndLetter;
+        second = other;
+        secondLetter = otherEndLetter;
+      } else if (thirdB === this) {
+        third = thirdA;
+        peak = this;
+        peakLetter = thisEndLetter;
+        second = other;
+        secondLetter = otherEndLetter;
+      } else if (thirdA === other) {
+        third = thirdB;
+        peak = other;
+        peakLetter = otherEndLetter;
+        second = this;
+        secondLetter = thisEndLetter;
+      } else if (thirdB === other) {
+        third = thirdA;
+        peak = other;
+        peakLetter = otherEndLetter;
+        second = this;
+        secondLetter = thisEndLetter;
+      }
+
+      let thirdLetter;
+      if (oldTrack.getA().getJointTo() === peak) {
+        thirdLetter = oldTrack
+          .getB()
+          .getJointTo()
+          .getTracksEnd(oldTrack);
+      }
+      if (oldTrack.getB().getJointTo() === peak) {
+        thirdLetter = oldTrack
+          .getA()
+          .getJointTo()
+          .getTracksEnd(oldTrack);
+      }
 
       oldTrack.getA().disconnect();
       oldTrack.getB().disconnect();
       oldTrack.remove();
 
-      other.setOneEnd(otherEndLetter, sw.getA());
-      this.setOneEnd(thisEndLetter, sw.getE());
-      third.setOneEnd(thisEndLetter, sw.getF());
+      ///////////////const thirdLetter = this.whichEnd(third, midpoint, other);
 
-      console.log('first branch');
-      this.verbose();
+      peak.setOneEnd(peakLetter, sw.getA());
+      second.setOneEnd(secondLetter, sw.getE());
+      third.setOneEnd(thirdLetter, sw.getF());
+      //this.setOneEnd(thisEndLetter, sw.getA());
+      //other.setOneEnd(otherEndLetter, sw.getE());
+      //third.setOneEnd(otherEndLetter, sw.getF());
 
-      return { track: sw, removed: oldTrack };
-    }
-
-    if (this.isEndEmpty(otherEnd)) {
-      const oldTrack: TrackBase = thisEnd.track;
-      if (oldTrack.constructor.name === ActualTrackSwitch.name) return false;
-
-      const oldCoordinates = oldTrack.getSegment().getCoordinates();
-
-      const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
-
-      const third = oldTrack.getB().getJointTo();
-
-      oldTrack.getA().disconnect();
-      oldTrack.getB().disconnect();
-      oldTrack.remove();
-
-      this.setOneEnd(thisEndLetter, sw.getA());
-      other.setOneEnd(otherEndLetter, sw.getE());
-      third.setOneEnd(otherEndLetter, sw.getF());
-
-      console.log('second branch');
+      console.log('first || second branch');
       this.verbose();
 
       return { track: sw, removed: oldTrack };
     }
 
     return false;
+  }
+
+  getTracksEnd(track: TrackBase): WhichEnd | undefined {
+    if (this.ends.A.track === track) return WhichEnd.A;
+    if (this.ends.B.track === track) return WhichEnd.B;
+    return undefined;
   }
 
   getPosition() {
