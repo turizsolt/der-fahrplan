@@ -3,11 +3,23 @@ import { TrackRenderer } from './TrackRenderer';
 import { injectable } from 'inversify';
 import { Track } from './Track';
 import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
+import {
+  ballon,
+  ballonUpdate
+} from '../TrackSwitch/TrackSwitchBabylonRenderer';
+import { Bezier } from '../Geometry/Bezier';
 
 @injectable()
 export class TrackBabylonRenderer implements TrackRenderer {
   private mesh: BABYLON.Mesh;
   private meshTC: BABYLON.Mesh;
+
+  private balA: BABYLON.Mesh;
+  private balB: BABYLON.Mesh;
+
+  private phA: BABYLON.Mesh;
+  private phB: BABYLON.Mesh;
+
   private track: Track;
   readonly scene: BABYLON.Scene;
 
@@ -42,12 +54,54 @@ export class TrackBabylonRenderer implements TrackRenderer {
     boxMaterial.diffuseColor = BABYLON.Color3.Blue();
     trackCoin.material = boxMaterial;
     this.meshTC = trackCoin;
+
+    const cl = Bezier.getLength(
+      this.track
+        .getSegment()
+        .getBezier()
+        .getCoordinates()
+    );
+
+    const cA = this.track
+      .getSegment()
+      .getBezier()
+      .getPoint(4 / cl);
+    this.balA = ballon(cA, this.track.getA().getConnectedTrack() ? 1 : 0);
+
+    const cB = this.track
+      .getSegment()
+      .getBezier()
+      .getPoint(1 - 4 / cl);
+    this.balB = ballon(cB, this.track.getB().getConnectedTrack() ? 1 : 0);
+
+    const pA = this.track
+      .getSegment()
+      .getBezier()
+      .getPoint(7 / cl);
+    this.phA = ballon(pA, this.track.getA().getConnectedEnd() ? 2 : 0);
+
+    const pB = this.track
+      .getSegment()
+      .getBezier()
+      .getPoint(1 - 7 / cl);
+    this.phB = ballon(pB, this.track.getB().getConnectedEnd() ? 2 : 0);
   }
 
   update(): void {
-    if (this.track.isRemoved) {
+    if (this.track.isRemoved()) {
       this.mesh.setEnabled(false);
       this.meshTC.setEnabled(false);
+
+      this.balA.setEnabled(false);
+      this.balB.setEnabled(false);
+      this.phA.setEnabled(false);
+      this.phB.setEnabled(false);
+    } else {
+      ballonUpdate(this.track.getA().getConnectedTrack() ? 1 : 0, this.balA);
+      ballonUpdate(this.track.getB().getConnectedTrack() ? 1 : 0, this.balB);
+
+      ballonUpdate(this.track.getA().getConnectedEnd() ? 2 : 0, this.phA);
+      ballonUpdate(this.track.getB().getConnectedEnd() ? 2 : 0, this.phB);
     }
   }
 }

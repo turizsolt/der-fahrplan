@@ -30,8 +30,8 @@ describe('Track connection', () => {
 
     t1.getB().connect(t2.getA());
 
-    expect(t1.getB().connectedToEnd).equals(t2.getA());
-    expect(t2.getA().connectedToEnd).equals(t1.getB());
+    expect(t1.getB().getConnectedEnd()).equals(t2.getA());
+    expect(t2.getA().getConnectedEnd()).equals(t1.getB());
   });
 
   it('two track are disconnected', () => {
@@ -41,8 +41,8 @@ describe('Track connection', () => {
     t1.getB().connect(t2.getA());
     t2.getA().disconnect();
 
-    expect(t1.getB().connectedToEnd).equals(null);
-    expect(t2.getA().connectedToEnd).equals(null);
+    expect(t1.getB().getConnectedEnd()).equals(null);
+    expect(t2.getA().getConnectedEnd()).equals(null);
   });
 
   it('track, switch are connected', () => {
@@ -51,8 +51,8 @@ describe('Track connection', () => {
 
     t.getB().connect(s.getA());
 
-    expect(t.getB().connectedToEnd).equals(s.getA());
-    expect(s.getA().connectedToEnd).equals(t.getB());
+    expect(t.getB().getConnectedEnd()).equals(s.getA());
+    expect(s.getA().getConnectedEnd()).equals(t.getB());
   });
 
   it('switch and two tracks are connected', () => {
@@ -63,15 +63,15 @@ describe('Track connection', () => {
     s.getE().connect(t1.getA());
     s.getF().connect(t2.getA());
 
-    expect(s.getB().connectedToEnd).equals(t1.getA());
-    expect(t1.getA().connectedToEnd).equals(s.getB());
-    expect(t2.getA().connectedToEnd).equals(null);
+    expect(s.getB().getConnectedEnd()).equals(t1.getA());
+    expect(t1.getA().getConnectedEnd()).equals(s.getB());
+    expect(t2.getA().getConnectedEnd()).equals(null);
 
     s.switch();
 
-    expect(s.getB().connectedToEnd).equals(t2.getA());
-    expect(t1.getA().connectedToEnd).equals(null);
-    expect(t2.getA().connectedToEnd).equals(s.getB());
+    expect(s.getB().getConnectedEnd()).equals(t2.getA());
+    expect(t1.getA().getConnectedEnd()).equals(null);
+    expect(t2.getA().getConnectedEnd()).equals(s.getB());
   });
 
   it('switch and opposing are connected', () => {
@@ -81,16 +81,18 @@ describe('Track connection', () => {
     s1.getF().connect(s2.getE());
     s1.switch();
 
-    expect(s1.getF().connectedToEnd).equals(s2.getE());
-    expect(s2.getE().connectedToEnd).equals(s1.getF());
+    expect(s1.getF().getConnectedEnd()).equals(s2.getE());
+    expect(s2.getE().getConnectedEnd()).equals(s1.getF());
 
     s1.switch();
     s2.switch();
 
-    expect(s1.getF().phisicallyCconnectedToEnd).equals(s2.getE());
-    expect(s2.getE().phisicallyCconnectedToEnd).equals(s1.getF());
+    expect(s1.getF().getConnectedEnd()).equals(s2.getE());
+    expect(s2.getE().getConnectedEnd()).equals(s1.getF());
 
-    expect(s1.getF().connectedToEnd).equals(null);
-    expect(s2.getE().connectedToEnd).equals(null);
+    expect(s1.getF().getConnectedEnd()).equals(null);
+    expect(s2.getE().getConnectedEnd()).equals(null);
   });
 });
+
+// TODO atgondolni mi miert hasal el az uj rendszerben

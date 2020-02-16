@@ -163,12 +163,12 @@ export class ActualTrackJoint implements TrackJoint {
       comparePosition.x - one.getPosition().x,
       comparePosition.z - one.getPosition().z
     );
-    console.log(
-      'whichend',
-      almostDirection(direction, one.getRotation()),
-      direction,
-      one.getRotation()
-    );
+    // console.log(
+    //   'whichend',
+    //   almostDirection(direction, one.getRotation()),
+    //   direction,
+    //   one.getRotation()
+    // );
     return almostDirection(direction, one.getRotation())
       ? WhichEnd.B
       : WhichEnd.A;
@@ -183,7 +183,7 @@ export class ActualTrackJoint implements TrackJoint {
   }
 
   setOneEnd(jointEndLetter: WhichEnd, trackEnd: TrackEnd) {
-    const track = trackEnd.endOf;
+    const track = trackEnd.getTrack();
     this.ends[jointEndLetter].setEnd(track, trackEnd);
     if (this.ends[otherEnd(jointEndLetter)].isSet()) {
       this.ends.A.end.connect(this.ends.B.end, this);
@@ -193,10 +193,10 @@ export class ActualTrackJoint implements TrackJoint {
   }
 
   connect(other: TrackJoint) {
-    console.log('====CONNECT====');
+    //console.log('====CONNECT====');
     const midpoint = this.computeMidpoint(other);
 
-    console.log('midpoint', midpoint);
+    //console.log('midpoint', midpoint);
 
     // if there is no possible connection then return false
     if (midpoint === false) {
@@ -205,24 +205,24 @@ export class ActualTrackJoint implements TrackJoint {
 
     // create coords for segment
     const coordinates = [this.position, midpoint, other.getPosition()];
-    console.log('coordinates', coordinates);
+    //console.log('coordinates', coordinates);
 
     // determine which end is which
     const thisEndLetter = this.whichEnd(this, midpoint, other);
     const thisEnd = this.ends[thisEndLetter];
-    console.log(
-      'this end',
-      thisEndLetter,
-      thisEnd.track && thisEnd.track.getId()
-    );
+    // console.log(
+    //   'this end',
+    //   thisEndLetter,
+    //   thisEnd.track && thisEnd.track.getId()
+    // );
 
     const otherEndLetter = this.whichEnd(other, midpoint, this);
     const otherEnd = other.getEnds()[otherEndLetter];
-    console.log(
-      'other end',
-      otherEndLetter,
-      otherEnd.track && otherEnd.track.getId()
-    );
+    // console.log(
+    //   'other end',
+    //   otherEndLetter,
+    //   otherEnd.track && otherEnd.track.getId()
+    // );
 
     if (this.areBothEndsEmpty(thisEnd, otherEnd)) {
       const t = this.TrackFactory().init(coordinates);
@@ -243,13 +243,13 @@ export class ActualTrackJoint implements TrackJoint {
 
       const thirdA = oldTrack.getA().getJointTo();
       const thirdB = oldTrack.getB().getJointTo();
-      console.log(
-        'third wheel',
-        this.getId(),
-        other.getId(),
-        thirdA.getId(),
-        thirdB.getId()
-      );
+      //   console.log(
+      //     'third wheel',
+      //     this.getId(),
+      //     other.getId(),
+      //     thirdA.getId(),
+      //     thirdB.getId()
+      //   );
 
       //const third = thirdA === this || thirdA === other ? thirdB : thirdA;
       let third, second, peak, peakLetter, secondLetter;
@@ -293,9 +293,9 @@ export class ActualTrackJoint implements TrackJoint {
           .getTracksEnd(oldTrack);
       }
 
-      (oldTrack as Track).verbose();
-      oldTrack.getA().disconnect();
-      oldTrack.getB().disconnect();
+      //(oldTrack as Track).verbose();
+      //oldTrack.getA().disconnect();
+      //oldTrack.getB().disconnect();
       oldTrack.remove();
 
       ///////////////const thirdLetter = this.whichEnd(third, midpoint, other);
@@ -307,9 +307,9 @@ export class ActualTrackJoint implements TrackJoint {
       //other.setOneEnd(otherEndLetter, sw.getE());
       //third.setOneEnd(otherEndLetter, sw.getF());
 
-      console.log('first || second branch');
-      sw.verbose();
-      this.verbose();
+      //console.log('first || second branch');
+      //sw.verbose();
+      //this.verbose();
 
       return { track: sw, removed: oldTrack };
     }

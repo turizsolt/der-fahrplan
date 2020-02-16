@@ -60,8 +60,8 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     }
 
     this.state = 0;
-    this.E.active = true;
-    this.F.active = false;
+    this.E.setActive(true);
+    this.F.setActive(false);
 
     this.renderer.init(this);
 
@@ -72,19 +72,16 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     if (this.checkedList.length > 0) return;
 
     this.state = 1 - this.state;
-    this.renderer.update();
 
     if (this.state) {
-      this.F.active = true;
-      this.E.active = false;
-      this.F.reconnect();
-      this.E.disconnect();
+      this.E.setActive(false);
+      this.F.setActive(true);
     } else {
-      this.E.active = true;
-      this.F.active = false;
-      this.E.reconnect();
-      this.F.disconnect();
+      this.E.setActive(true);
+      this.F.setActive(false);
     }
+
+    this.renderer.update();
   }
 
   remove(): boolean {
@@ -128,29 +125,29 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   }
 
   verbose(): void {
-    console.log('switch ', this.id, '(hash, conn, phis, joint)');
-    console.log(
-      'A ',
-      this.D.getHash(),
-      !!this.D.connectedToEnd && this.D.connectedToEnd.getHash(),
-      !!this.D.getJointTo() && this.D.getJointTo().getId()
-    );
-    console.log(
-      'E ',
-      this.E.getHash(),
-      !!this.E.connectedToEnd && this.E.connectedToEnd.getHash(),
-      !!this.E.phisicallyCconnectedToEnd &&
-        this.E.phisicallyCconnectedToEnd.getHash(),
-      !!this.E.getJointTo() && this.E.getJointTo().getId()
-    );
-    console.log(
-      'F ',
-      this.F.getHash(),
-      !!this.F.connectedToEnd && this.F.connectedToEnd.getHash(),
-      !!this.F.phisicallyCconnectedToEnd &&
-        this.F.phisicallyCconnectedToEnd.getHash(),
-      !!this.F.getJointTo() && this.F.getJointTo().getId()
-    );
-    console.log('/switch');
+    // console.log('switch ', this.id, '(hash, conn, phis, joint)');
+    // console.log(
+    //   'A ',
+    //   this.D.getHash(),
+    //   !!this.D.connectedToEnd && this.D.connectedToEnd.getHash(),
+    //   !!this.D.getJointTo() && this.D.getJointTo().getId()
+    // );
+    // console.log(
+    //   'E ',
+    //   this.E.getHash(),
+    //   !!this.E.connectedToEnd && this.E.connectedToEnd.getHash(),
+    //   !!this.E.phisicallyCconnectedToEnd &&
+    //     this.E.phisicallyCconnectedToEnd.getHash(),
+    //   !!this.E.getJointTo() && this.E.getJointTo().getId()
+    // );
+    // console.log(
+    //   'F ',
+    //   this.F.getHash(),
+    //   !!this.F.connectedToEnd && this.F.connectedToEnd.getHash(),
+    //   !!this.F.phisicallyCconnectedToEnd &&
+    //     this.F.phisicallyCconnectedToEnd.getHash(),
+    //   !!this.F.getJointTo() && this.F.getJointTo().getId()
+    // );
+    // console.log('/switch');
   }
 }

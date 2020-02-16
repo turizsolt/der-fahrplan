@@ -101,7 +101,7 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
       .getSegment()
       .getBezier()
       .getPoint(4 / cAl);
-    this.bal = ballon(cA, this.trackSwitch.getA().connectedToEnd ? 1 : 0);
+    this.bal = ballon(cA, this.trackSwitch.getA().getConnectedTrack() ? 1 : 0);
 
     const cEl = Bezier.getLength(
       this.trackSwitch
@@ -113,7 +113,7 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
       .getSegmentE()
       .getBezier()
       .getPoint(1 - 4 / cEl);
-    this.balE = ballon(cE, this.trackSwitch.getF().connectedToEnd ? 1 : 0);
+    this.balE = ballon(cE, this.trackSwitch.getF().getConnectedTrack() ? 1 : 0);
 
     const cFl = Bezier.getLength(
       this.trackSwitch
@@ -125,25 +125,19 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
       .getSegmentF()
       .getBezier()
       .getPoint(1 - 4 / cFl);
-    this.balF = ballon(cF, this.trackSwitch.getE().connectedToEnd ? 1 : 0);
+    this.balF = ballon(cF, this.trackSwitch.getE().getConnectedTrack() ? 1 : 0);
 
     const pE = this.trackSwitch
       .getSegmentE()
       .getBezier()
       .getPoint(1 - 7 / cEl);
-    this.phE = ballon(
-      pE,
-      this.trackSwitch.getF().phisicallyCconnectedToEnd ? 2 : 0
-    );
+    this.phE = ballon(pE, this.trackSwitch.getF().getConnectedEnd() ? 2 : 0);
 
     const pF = this.trackSwitch
       .getSegmentF()
       .getBezier()
       .getPoint(1 - 7 / cFl);
-    this.phF = ballon(
-      pF,
-      this.trackSwitch.getE().phisicallyCconnectedToEnd ? 2 : 0
-    );
+    this.phF = ballon(pF, this.trackSwitch.getE().getConnectedEnd() ? 2 : 0);
   }
 
   update() {
@@ -153,6 +147,12 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
         this.meshE.setEnabled(false);
         this.meshF.setEnabled(false);
         this.meshSB.setEnabled(false);
+
+        this.bal.setEnabled(false);
+        this.balE.setEnabled(false);
+        this.balF.setEnabled(false);
+        this.phE.setEnabled(false);
+        this.phF.setEnabled(false);
       } else {
         const curve = this.trackSwitch
           .getSegment()
@@ -161,16 +161,25 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
 
         this.mesh = curveToTube(curve, true, this.mesh);
 
-        ballonUpdate(this.trackSwitch.getA().connectedToEnd ? 1 : 0, this.bal);
-        ballonUpdate(this.trackSwitch.getF().connectedToEnd ? 1 : 0, this.balE);
-        ballonUpdate(this.trackSwitch.getE().connectedToEnd ? 1 : 0, this.balF);
+        ballonUpdate(
+          this.trackSwitch.getA().getConnectedTrack() ? 1 : 0,
+          this.bal
+        );
+        ballonUpdate(
+          this.trackSwitch.getF().getConnectedTrack() ? 1 : 0,
+          this.balE
+        );
+        ballonUpdate(
+          this.trackSwitch.getE().getConnectedTrack() ? 1 : 0,
+          this.balF
+        );
 
         ballonUpdate(
-          this.trackSwitch.getF().phisicallyCconnectedToEnd ? 2 : 0,
+          this.trackSwitch.getF().getConnectedEnd() ? 2 : 0,
           this.phE
         );
         ballonUpdate(
-          this.trackSwitch.getE().phisicallyCconnectedToEnd ? 2 : 0,
+          this.trackSwitch.getE().getConnectedEnd() ? 2 : 0,
           this.phF
         );
       }
@@ -184,11 +193,11 @@ const colors = [
   BABYLON.Color3.Teal()
 ];
 
-const ballon = (coord, color) => {
+export const ballon = (coord, color) => {
   const ballon = BABYLON.MeshBuilder.CreateCylinder(
     'ballon',
     {
-      diameter: 3,
+      diameter: 2,
       tessellation: 24,
       height: 1
     },
@@ -204,7 +213,7 @@ const ballon = (coord, color) => {
   return ballon;
 };
 
-const ballonUpdate = (color, mesh) => {
+export const ballonUpdate = (color, mesh) => {
   var boxMaterial = new BABYLON.StandardMaterial('botMat', this.scene);
   boxMaterial.diffuseColor = colors[color];
   mesh.material = boxMaterial;

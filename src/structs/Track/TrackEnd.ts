@@ -1,66 +1,76 @@
-import { TrackBase } from '../TrackBase/TrackBase';
 import { WhichEnd } from './WhichEnd';
+import { TrackBase } from '../TrackBase/TrackBase';
 import { TrackJoint } from '../TrackJoint/TrackJoint';
 
 export class TrackEnd {
-  // readonly point: Coordinate;
-  readonly endOf: TrackBase;
-  protected which: WhichEnd;
-  protected _connectedTo: TrackBase = null;
+  protected whichEnd: WhichEnd;
+  protected endOf: TrackBase;
+  protected connectedEnd: TrackEnd;
   protected jointTo: TrackJoint;
-  public removed: boolean = false;
-  get connectedTo() {
-    return this._connectedTo;
-  }
-  protected _connectedToEnd: TrackEnd = null;
-  get connectedToEnd() {
-    return this._connectedToEnd;
-  }
 
   constructor(which: WhichEnd, endOf: TrackBase) {
-    this.which = which;
+    this.whichEnd = which;
     this.endOf = endOf;
   }
 
-  connect(other: TrackEnd, joint?: TrackJoint) {
-    this._connectedTo = other.endOf;
-    this._connectedToEnd = other;
+  connect(otherEnd: TrackEnd, joint?: TrackJoint) {
+    if (this.connectedEnd) return;
+
+    this.connectedEnd = otherEnd;
     if (joint) this.jointTo = joint;
-    if (other.connectedTo !== this.endOf) {
-      other.connect(this, joint);
+
+    if (!otherEnd.isConnectedTo(this)) {
+      otherEnd.connect(this, joint);
     }
 
     this.endOf.update();
   }
 
-  disconnect() {
-    console.log('disco', this.getHash());
+  isConnectedTo(otherEnd: TrackEnd) {
+    return this.connectedEnd === otherEnd;
+  }
 
-    // console.log(
-    //   'disco',
-    //   this.getHash(),
-    //   this.connectedToEnd && this.connectedToEnd.getHash()
-    // );
-    if (this.connectedToEnd) {
-      const temp = this.connectedToEnd;
-      this._connectedTo = null;
-      this._connectedToEnd = null;
+  disconnect() {
+    if (!this.connectedEnd) return;
+
+    const temp = this.connectedEnd;
+    this.connectedEnd = null;
+    if (temp.isConnectedTo(this)) {
       temp.disconnect();
     }
+
     this.endOf.update();
   }
 
   remove() {
-    console.log('removing...');
-    this.removed = true;
     this.disconnect();
     if (this.jointTo) {
       this.jointTo.removeEnd(this);
     }
+    this.jointTo = null; // todo i'm not sure
+  }
+
+  update() {
+    this.endOf.update();
+  }
+
+  getTrack(): TrackBase {
+    return this.endOf;
+  }
+
+  getConnectedTrack(): TrackBase {
+    if (this.isActive() && this.connectedEnd && this.connectedEnd.isActive()) {
+      return this.connectedEnd.getTrack();
+    }
+    return null;
+  }
+
+  getConnectedEnd(): TrackEnd {
+    return this.connectedEnd;
   }
 
   getWhichEnd(): WhichEnd {
-    return this.which;
+    return this.whichEnd;
   }
 
   getJointTo(): TrackJoint {
@@ -72,7 +82,7 @@ export class TrackEnd {
   }
 
   getHash(): string {
-    return this.which + this.endOf.getId();
+    return this.whichEnd + this.endOf.getId();
   }
 
   isActive(): boolean {

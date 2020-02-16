@@ -46,17 +46,20 @@ export class ActualTrack extends ActualTrackBase implements Track {
   }
 
   verbose(): void {
+    this.update();
     console.log('track ', this.id, '(hash, conn,  joint)');
     console.log(
       'A ',
       this.A.getHash(),
-      !!this.A.connectedToEnd && this.A.connectedToEnd.getHash(),
+      !!this.A.getConnectedEnd() && this.A.getConnectedEnd().getHash(),
+      !!this.A.getConnectedTrack() && this.A.getConnectedTrack().getId(),
       !!this.A.getJointTo() && this.A.getJointTo().getId()
     );
     console.log(
       'B ',
       this.B.getHash(),
-      !!this.B.connectedToEnd && this.B.connectedToEnd.getHash(),
+      !!this.B.getConnectedEnd() && this.B.getConnectedEnd().getHash(),
+      !!this.B.getConnectedTrack() && this.B.getConnectedTrack().getId(),
       !!this.B.getJointTo() && this.B.getJointTo().getId()
     );
     console.log('/track');

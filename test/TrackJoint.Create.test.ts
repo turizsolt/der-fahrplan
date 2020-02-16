@@ -84,30 +84,15 @@ describe('Track joint - create', () => {
     const tr3 = r3.track as Track;
     const tr3b = r3b.track as Track;
 
-    expect(tr1.getB().connectedToEnd).equals(tr2.getA());
-    expect(tr2.getB().connectedToEnd).equals(tr3.getA());
+    expect(tr1.getB().getConnectedEnd()).equals(tr2.getA());
+    expect(tr2.getB().getConnectedEnd()).equals(tr3.getA());
 
     const rs = j2.connect(j3b);
     const sw = rs.track as TrackSwitch;
 
-    // console.log(
-    //   tr1.getId(),
-    //   tr2.getId(),
-    //   tr3.getId(),
-    //   tr3b.getId(),
-    //   sw.getId()
-    // );
-    // console.log(
-    //   sw.getA().connectedToEnd && sw.getA().connectedToEnd.getHash(),
-    //   sw.getE().phisicallyCconnectedToEnd &&
-    //     sw.getE().phisicallyCconnectedToEnd.getHash(),
-    //   sw.getF().phisicallyCconnectedToEnd &&
-    //     sw.getF().phisicallyCconnectedToEnd.getHash()
-    // );
-
-    expect(tr1.getB().connectedToEnd).equals(sw.getA());
-    expect(sw.getE().phisicallyCconnectedToEnd).equals(tr3b.getA());
-    expect(sw.getF().phisicallyCconnectedToEnd).equals(tr3.getA());
+    expect(tr1.getB().getConnectedEnd()).equals(sw.getA());
+    expect(sw.getE().getConnectedEnd()).equals(tr3b.getA());
+    expect(sw.getF().getConnectedEnd()).equals(tr3.getA());
   });
 
   it('creates new switch among tracks in opposite direction', () => {
@@ -129,29 +114,14 @@ describe('Track joint - create', () => {
     const tr3 = r3.track as Track;
     const tr1b = r1b.track as Track;
 
-    expect(tr1.getB().connectedToEnd).equals(tr2.getA());
-    expect(tr2.getB().connectedToEnd).equals(tr3.getA());
+    expect(tr1.getB().getConnectedEnd()).equals(tr2.getA());
+    expect(tr2.getB().getConnectedEnd()).equals(tr3.getA());
 
     const rs = j2b.connect(j3);
     const sw = rs.track as TrackSwitch;
 
-    // console.log(
-    //   tr1.getId(),
-    //   tr2.getId(),
-    //   tr3.getId(),
-    //   tr1b.getId(),
-    //   sw.getId()
-    // );
-    // console.log(
-    //   sw.getA().connectedToEnd && sw.getA().connectedToEnd.getHash(),
-    //   sw.getE().phisicallyCconnectedToEnd &&
-    //     sw.getE().phisicallyCconnectedToEnd.getHash(),
-    //   sw.getF().phisicallyCconnectedToEnd &&
-    //     sw.getF().phisicallyCconnectedToEnd.getHash()
-    // );
-
-    expect(tr3.getA().connectedToEnd).equals(sw.getA());
-    expect(sw.getE().phisicallyCconnectedToEnd).equals(tr1b.getB());
-    expect(sw.getF().phisicallyCconnectedToEnd).equals(tr1.getB());
+    expect(tr3.getA().getConnectedEnd()).equals(sw.getA());
+    expect(sw.getE().getConnectedEnd()).equals(tr1b.getB());
+    expect(sw.getF().getConnectedEnd()).equals(tr1.getB());
   });
 });

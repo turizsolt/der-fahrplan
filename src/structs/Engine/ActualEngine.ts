@@ -68,23 +68,29 @@ export class ActualEngine implements Engine {
     if (this.positionOnTrack < 0) {
       // ha tulment
 
-      const nextTrackEnd = this.track.getA().connectedToEnd;
+      const nextTrackEnd = this.track.getA().getConnectedTrack();
       if (nextTrackEnd) {
         // van tovabb
-        if (nextTrackEnd.getWhichEnd() === 'B') {
+        if (
+          this.track
+            .getA()
+            .getConnectedEnd()
+            .getWhichEnd() === 'B'
+        ) {
           this.track.checkout(this);
-          this.track = this.track.getA().connectedTo;
+          this.track = this.track.getA().getConnectedTrack();
           this.track.checkin(this);
           const prevTrackLength = this.track.getSegment().getLength();
           this.positionOnTrack += prevTrackLength;
         } else {
           // 'B'
           this.track.checkout(this);
-          this.track = this.track.getA().connectedTo;
+          this.track = this.track.getA().getConnectedTrack();
           this.track.checkin(this);
           const overRun = -this.positionOnTrack;
           this.positionOnTrack = overRun;
           this.trackDirection = -this.trackDirection;
+          // console.log('direction changed to', this.trackDirection);
         }
       } else {
         // nincs tovabb, megall
@@ -104,22 +110,28 @@ export class ActualEngine implements Engine {
     if (this.positionOnTrack > trackLength) {
       // ha tulment
 
-      const nextTrackEnd = this.track.getB().connectedToEnd;
+      const nextTrackEnd = this.track.getB().getConnectedTrack();
       if (nextTrackEnd) {
         // van tovabb
-        if (nextTrackEnd.getWhichEnd() === 'A') {
+        if (
+          this.track
+            .getB()
+            .getConnectedEnd()
+            .getWhichEnd() === 'A'
+        ) {
           this.track.checkout(this);
-          this.track = this.track.getB().connectedTo;
+          this.track = this.track.getB().getConnectedTrack();
           this.track.checkin(this);
           this.positionOnTrack -= trackLength;
         } else {
           // 'B'
           this.track.checkout(this);
-          this.track = this.track.getB().connectedTo;
+          this.track = this.track.getB().getConnectedTrack();
           this.track.checkin(this);
           const overRun = this.positionOnTrack - trackLength;
           this.positionOnTrack = this.track.getSegment().getLength() - overRun;
           this.trackDirection = -this.trackDirection;
+          // console.log('direction changed to', this.trackDirection);
         }
       } else {
         // nincs tovabb, megall
@@ -157,6 +169,7 @@ export class ActualEngine implements Engine {
   }
 
   update() {
+    // console.log(this.track.getId(), this.trackDirection, this.positionOnTrack);
     this.updatePosition();
     this.updateWhichPlatformsBeside();
     this.updateCarriedPassengersPosition();
