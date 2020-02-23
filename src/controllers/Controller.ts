@@ -24,7 +24,7 @@ export class Controller {
   }
 
   nextViewMode() {
-    this.setViewMode((this.viewMode + 1) % 2);
+    this.setViewMode((this.viewMode + 1) % 3);
   }
 
   setViewMode(viewMode) {

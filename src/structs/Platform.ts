@@ -55,7 +55,7 @@ export class Platform {
       a.z + (rot.z / len) * dist2
     );
 
-    var height = new Coordinate(0, -0.75, 0);
+    var height = new Coordinate(0, 0.75, 0);
     this.position = shift2.add(shift.scale(dist)).add(height);
     const rot1 = Math.atan2(rot.x, rot.z);
     this.rotation = rot1;

@@ -13,7 +13,13 @@ export class PassengerGenerator {
     this.tick();
   }
 
+  addToList(platform: Platform) {
+    this.platformList.push(platform);
+  }
+
   tick() {
+    if (this.platformList.length === 0) return;
+
     if (Math.random() < 0.8) {
       const length = this.platformList.length;
       const fromIdx = (Math.random() * length) | 0;

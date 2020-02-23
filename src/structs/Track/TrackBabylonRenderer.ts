@@ -31,7 +31,7 @@ export class TrackBabylonRenderer implements TrackRenderer {
       .getCurvePoints()
       .map(CoordinateToBabylonVector3);
 
-    this.mesh = curveToTube(curve);
+    this.mesh = curveToTube(curve, true, null, this.track.getId());
 
     const trackCoin = BABYLON.MeshBuilder.CreateCylinder(
       'clickable-trackCoin-' + this.track.getId(),
@@ -106,9 +106,9 @@ export class TrackBabylonRenderer implements TrackRenderer {
   }
 }
 
-export const curveToTube = (curve, normal = true, prevMesh = null) => {
+export const curveToTube = (curve, normal = true, prevMesh = null, id = '') => {
   const tube = BABYLON.Mesh.CreateTube(
-    'tube',
+    'clickable-track-' + id,
     curve,
     normal ? 0.5 : 0.2,
     16,
