@@ -86,6 +86,14 @@ window.addEventListener('DOMContentLoaded', () => {
     mouseController.handleMouseMove();
   });
 
+  canvas.addEventListener('pointerenter', () => {
+    console.log('enter');
+  });
+
+  canvas.addEventListener('pointerleave', () => {
+    console.log('leave');
+  });
+
   window.addEventListener('wheel', e => {
     mouseController.handleWheel(Math.sign(e.deltaY), e.altKey);
   });
