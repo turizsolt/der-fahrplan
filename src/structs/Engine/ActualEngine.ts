@@ -1,28 +1,22 @@
 import { Passenger } from '../Passenger/Passenger';
 import { Track } from '../Track/Track';
 import { TrackBase } from '../TrackBase/TrackBase';
-import { Coordinate } from '../Geometry/Coordinate';
 import { EngineRenderer } from './EngineRenderer';
 import { TYPES } from '../TYPES';
 import { inject, injectable } from 'inversify';
 import { Engine } from './Engine';
 import { Platform } from '../Platform';
+import { PositionOnTrack } from './PositionOnTrack';
+import { Ray } from '../Geometry/Ray';
 
 @injectable()
 export class ActualEngine implements Engine {
-  private track: TrackBase;
-  private trackDirection: number = 1;
-  private position: Coordinate;
-  private rotation: number;
-  private positionOnTrack: number;
-  private movable: boolean = true;
+  private positionOnTrack: PositionOnTrack;
   private carriedPassengers: Passenger[] = [];
   @inject(TYPES.EngineRenderer) private renderer: EngineRenderer;
 
-  putOnTrack(track: Track) {
-    this.track = track;
-    this.position = track.getSegment().getFirstPoint();
-    this.positionOnTrack = 0;
+  putOnTrack(track: Track): void {
+    this.positionOnTrack = new PositionOnTrack(track, this);
     track.checkin(this);
 
     this.renderer.init(this);
@@ -30,193 +24,72 @@ export class ActualEngine implements Engine {
   }
 
   getTrackOn(): TrackBase {
-    return this.track;
+    return this.positionOnTrack.getTrack();
   }
 
-  getPosition(): Coordinate {
-    return this.position;
+  getRay(): Ray {
+    return this.positionOnTrack.getRay();
   }
 
-  getRotation(): number {
-    return this.rotation;
-  }
-
-  forward() {
-    if (!this.movable) return;
-    if (this.trackDirection === 1) {
-      this.moveTowardsB();
-    } else {
-      this.moveTowardsA();
-    }
-  }
-
-  backward() {
-    if (!this.movable) return;
-
-    if (this.trackDirection === 1) {
-      this.moveTowardsA();
-    } else {
-      this.moveTowardsB();
-    }
-  }
-
-  private moveTowardsA() {
-    // megy elore
-    this.positionOnTrack -= 1;
-
-    const trackLength = this.track.getSegment().getLength();
-    if (this.positionOnTrack < 0) {
-      // ha tulment
-
-      const nextTrackEnd = this.track.getA().getConnectedTrack();
-      if (nextTrackEnd) {
-        // van tovabb
-        if (
-          this.track
-            .getA()
-            .getConnectedEnd()
-            .getWhichEnd() === 'B'
-        ) {
-          this.track.checkout(this);
-          this.track = this.track.getA().getConnectedTrack();
-          this.track.checkin(this);
-          const prevTrackLength = this.track.getSegment().getLength();
-          this.positionOnTrack += prevTrackLength;
-        } else {
-          // 'B'
-          this.track.checkout(this);
-          this.track = this.track.getA().getConnectedTrack();
-          this.track.checkin(this);
-          const overRun = -this.positionOnTrack;
-          this.positionOnTrack = overRun;
-          this.trackDirection = -this.trackDirection;
-          // console.log('direction changed to', this.trackDirection);
-        }
-      } else {
-        // nincs tovabb, megall
-        this.positionOnTrack = 0;
-      }
-    } else {
-      // ha nem ment tul - skip
-    }
+  forward(): void {
+    this.positionOnTrack.move(1);
     this.update();
   }
 
-  private moveTowardsB() {
-    // megy elore
-    this.positionOnTrack += 1;
-
-    const trackLength = this.track.getSegment().getLength();
-    if (this.positionOnTrack > trackLength) {
-      // ha tulment
-
-      const nextTrackEnd = this.track.getB().getConnectedTrack();
-      if (nextTrackEnd) {
-        // van tovabb
-        if (
-          this.track
-            .getB()
-            .getConnectedEnd()
-            .getWhichEnd() === 'A'
-        ) {
-          this.track.checkout(this);
-          this.track = this.track.getB().getConnectedTrack();
-          this.track.checkin(this);
-          this.positionOnTrack -= trackLength;
-        } else {
-          // 'B'
-          this.track.checkout(this);
-          this.track = this.track.getB().getConnectedTrack();
-          this.track.checkin(this);
-          const overRun = this.positionOnTrack - trackLength;
-          this.positionOnTrack = this.track.getSegment().getLength() - overRun;
-          this.trackDirection = -this.trackDirection;
-          // console.log('direction changed to', this.trackDirection);
-        }
-      } else {
-        // nincs tovabb, megall
-        this.positionOnTrack = trackLength;
-      }
-    } else {
-      // ha nem ment tul - skip
-    }
+  backward(): void {
+    this.positionOnTrack.move(-1);
     this.update();
   }
 
-  stop() {
-    this.movable = false;
-
-    this.track.getPlatformsBeside().map(platform => {
-      if (this.isBeside(platform)) {
-        this.callForArrivedPassengersAt(platform);
-        platform.callForDepartingPassengers(this);
-      }
-    });
+  stop(): void {
+    this.getTrackOn()
+      .getPlatformsBeside()
+      .map(platform => {
+        if (this.positionOnTrack.isBeside(platform)) {
+          this.callForArrivedPassengersAt(platform);
+          platform.callForDepartingPassengers(this);
+        }
+      });
   }
 
-  resume() {
-    this.movable = true;
-  }
-
-  getOn(passenger: Passenger) {
+  getOn(passenger: Passenger): void {
     this.carriedPassengers.push(passenger);
   }
 
-  getOff(passenger: Passenger) {
+  getOff(passenger: Passenger): void {
     this.carriedPassengers = this.carriedPassengers.filter(
       x => x !== passenger
     );
   }
 
-  update() {
-    // console.log(this.track.getId(), this.trackDirection, this.positionOnTrack);
-    this.updatePosition();
+  update(): void {
     this.updateWhichPlatformsBeside();
     this.updateCarriedPassengersPosition();
     this.renderer.update();
   }
 
-  private callForArrivedPassengersAt(platform: Platform) {
+  private callForArrivedPassengersAt(platform: Platform): void {
     this.carriedPassengers.map(passenger => {
       passenger.checkShouldGetOffAt(platform);
     });
   }
 
-  private isBeside(platform: Platform) {
-    return (
-      platform.start <= this.positionOnTrack &&
-      this.positionOnTrack <= platform.end
-    );
-  }
-
-  private updateCarriedPassengersPosition() {
+  private updateCarriedPassengersPosition(): void {
     this.carriedPassengers.map(passenger => passenger.updatePosition());
   }
 
-  private updateWhichPlatformsBeside() {
-    this.track.getPlatformsBeside().map(platform => {
-      // todo checkins can be optimised, not just here
-      if (this.isBeside(platform)) {
-        if (!platform.isChecked(this)) {
-          platform.checkin(this);
+  private updateWhichPlatformsBeside(): void {
+    this.getTrackOn()
+      .getPlatformsBeside()
+      .map(platform => {
+        // todo checkins can be optimised, not just here
+        if (this.positionOnTrack.isBeside(platform)) {
+          if (!platform.isChecked(this)) {
+            platform.checkin(this);
+          }
+        } else {
+          platform.checkout(this);
         }
-      } else {
-        platform.checkout(this);
-      }
-    });
-  }
-
-  // todo do somehow shorter
-  private updatePosition() {
-    const percentage =
-      this.positionOnTrack / this.track.getSegment().getLength();
-    this.position = this.track
-      .getSegment()
-      .getBezier()
-      .getPoint(percentage);
-    this.rotation = this.track
-      .getSegment()
-      .getBezier()
-      .getDirection(percentage);
+      });
   }
 }

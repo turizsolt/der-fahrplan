@@ -1,4 +1,5 @@
 import { Coordinate } from './Coordinate';
+import { Ray } from './Ray';
 
 // TODO subclasses for each degree
 export class Bezier {
@@ -47,6 +48,10 @@ export class Bezier {
       length += Bezier.getSectionLength(coordinate[i], coordinate[i + 1]);
     }
     return length;
+  }
+
+  getRay(percentage: number): Ray {
+    return new Ray(this.getPoint(percentage), this.getDirection(percentage));
   }
 
   getPoint(percentage: number): Coordinate {

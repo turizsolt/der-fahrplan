@@ -1,17 +1,15 @@
 import { Passenger } from '../Passenger/Passenger';
 import { Track } from '../Track/Track';
-import { Coordinate } from '../Geometry/Coordinate';
 import { TrackBase } from '../TrackBase/TrackBase';
+import { Ray } from '../Geometry/Ray';
 
 export interface Engine {
-  putOnTrack(track: Track);
-  forward();
-  backward();
-  stop();
-  resume();
-  getOn(passenger: Passenger);
-  getOff(passenger: Passenger);
-  getPosition(): Coordinate;
-  getRotation(): number;
+  putOnTrack(track: Track): void;
+  forward(): void;
+  backward(): void;
+  stop(): void;
+  getOn(passenger: Passenger): void;
+  getOff(passenger: Passenger): void;
+  getRay(): Ray;
   getTrackOn(): TrackBase;
 }

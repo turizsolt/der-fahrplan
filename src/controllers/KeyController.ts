@@ -50,12 +50,10 @@ export class KeyController {
   handleKeyCommands(engine: Engine) {
     this.scene.registerAfterRender(() => {
       if (this.map['w'] || this.map['W']) {
-        engine.resume();
         engine.forward();
       }
 
       if (this.map['s'] || this.map['S']) {
-        engine.resume();
         engine.backward();
       }
 

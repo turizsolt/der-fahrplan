@@ -28,7 +28,7 @@ describe('Engine', () => {
     e.putOnTrack(t);
     e.forward();
 
-    expect(e.getPosition()).deep.equals(new Coordinate(1, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(1, 0, 0));
   });
 
   it('stays on track forward', () => {
@@ -40,7 +40,7 @@ describe('Engine', () => {
       e.forward();
     }
 
-    expect(e.getPosition()).deep.equals(new Coordinate(10, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(10, 0, 0));
   });
 
   it('moves backward', () => {
@@ -51,7 +51,7 @@ describe('Engine', () => {
     e.forward();
     e.backward();
 
-    expect(e.getPosition()).deep.equals(new Coordinate(0, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(0, 0, 0));
   });
 
   it('stays on track backward', () => {
@@ -63,7 +63,7 @@ describe('Engine', () => {
     e.backward();
     e.backward();
 
-    expect(e.getPosition()).deep.equals(new Coordinate(0, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(0, 0, 0));
   });
 
   it('moves to next track', () => {
@@ -74,14 +74,14 @@ describe('Engine', () => {
     const e = EngineFactory();
     e.putOnTrack(t1);
 
-    expect(e.getPosition()).deep.equals(new Coordinate(0, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(0, 0, 0));
     expect(e.getTrackOn()).equals(t1);
 
     for (let i = 0; i < 11; i++) {
       e.forward();
     }
 
-    expect(e.getPosition()).deep.equals(new Coordinate(11, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(11, 0, 0));
     expect(e.getTrackOn()).equals(t2);
   });
 
@@ -93,14 +93,14 @@ describe('Engine', () => {
     const e = EngineFactory();
     e.putOnTrack(t1);
 
-    expect(e.getPosition()).deep.equals(new Coordinate(0, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(0, 0, 0));
     expect(e.getTrackOn()).equals(t1);
 
     for (let i = 0; i < 16; i++) {
       e.forward();
     }
 
-    expect(e.getPosition()).deep.equals(new Coordinate(16, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(16, 0, 0));
     expect(e.getTrackOn()).equals(t2);
   });
 
@@ -116,14 +116,14 @@ describe('Engine', () => {
       e.forward();
     }
 
-    expect(e.getPosition()).deep.equals(new Coordinate(0, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(0, 0, 0));
     expect(e.getTrackOn()).equals(t1);
 
     for (let i = 0; i < 16; i++) {
       e.backward();
     }
 
-    expect(e.getPosition()).deep.equals(new Coordinate(16, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(16, 0, 0));
     expect(e.getTrackOn()).equals(t2);
   });
 
@@ -135,18 +135,18 @@ describe('Engine', () => {
     const e = EngineFactory();
     e.putOnTrack(t);
 
-    expect(e.getPosition()).deep.equals(new Coordinate(10, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(10, 0, 0));
     expect(e.getTrackOn()).equals(t);
 
     e.backward();
 
-    expect(e.getPosition()).deep.equals(new Coordinate(10, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(10, 0, 0));
     expect(e.getTrackOn()).equals(t);
 
     s.switch();
     e.backward();
 
-    expect(e.getPosition()).deep.equals(new Coordinate(9, 0, 0));
+    expect(e.getRay().coord).deep.equals(new Coordinate(9, 0, 0));
     expect(e.getTrackOn()).equals(s);
 
     expect(s.getState()).equals(1);

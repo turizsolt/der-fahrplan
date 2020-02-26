@@ -27,10 +27,9 @@ export class EngineBabylonRenderer implements EngineRenderer {
   }
 
   update() {
-    this.renderEngine.position = CoordinateToBabylonVector3(
-      this.engine.getPosition()
-    );
+    const ray = this.engine.getRay();
+    this.renderEngine.position = CoordinateToBabylonVector3(ray.coord);
     this.renderEngine.position.y = 1.5;
-    this.renderEngine.rotation.y = this.engine.getRotation();
+    this.renderEngine.rotation.y = ray.dirXZ;
   }
 }
