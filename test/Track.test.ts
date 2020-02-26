@@ -65,13 +65,19 @@ describe('Track connection', () => {
 
     expect(s.getB().getConnectedEnd()).equals(t1.getA());
     expect(t1.getA().getConnectedEnd()).equals(s.getB());
-    expect(t2.getA().getConnectedEnd()).equals(null);
+    expect(t1.getA().getConnectedTrack()).equals(s.getB().getTrack());
+
+    expect(t2.getA().getConnectedEnd()).equals(s.getF());
+    expect(t2.getA().getConnectedTrack()).equals(null);
 
     s.switch();
 
     expect(s.getB().getConnectedEnd()).equals(t2.getA());
-    expect(t1.getA().getConnectedEnd()).equals(null);
+    expect(t1.getA().getConnectedEnd()).equals(s.getE());
+    expect(t1.getA().getConnectedTrack()).equals(null);
+
     expect(t2.getA().getConnectedEnd()).equals(s.getB());
+    expect(t2.getA().getConnectedTrack()).equals(s.getB().getTrack());
   });
 
   it('switch and opposing are connected', () => {
@@ -90,8 +96,8 @@ describe('Track connection', () => {
     expect(s1.getF().getConnectedEnd()).equals(s2.getE());
     expect(s2.getE().getConnectedEnd()).equals(s1.getF());
 
-    expect(s1.getF().getConnectedEnd()).equals(null);
-    expect(s2.getE().getConnectedEnd()).equals(null);
+    expect(s1.getF().getConnectedTrack()).equals(null);
+    expect(s2.getE().getConnectedTrack()).equals(null);
   });
 });
 
