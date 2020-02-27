@@ -44,17 +44,17 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     const last1 = coordinates1.length - 1;
     const last2 = coordinates2.length - 1;
     if (coordinates1[0].equalsTo(coordinates2[0])) {
-      this.segmentE = new TrackSegment(coordinates1, true);
-      this.segmentF = new TrackSegment(coordinates2, true);
+      this.segmentE = new TrackSegment(coordinates1);
+      this.segmentF = new TrackSegment(coordinates2);
     } else if (coordinates1[last1].equalsTo(coordinates2[last2])) {
-      this.segmentE = new TrackSegment(coordinates1.reverse(), true);
-      this.segmentF = new TrackSegment(coordinates2.reverse(), true);
+      this.segmentE = new TrackSegment(coordinates1.reverse());
+      this.segmentF = new TrackSegment(coordinates2.reverse());
     } else if (coordinates1[0].equalsTo(coordinates2[last2])) {
-      this.segmentE = new TrackSegment(coordinates1, true);
-      this.segmentF = new TrackSegment(coordinates2.reverse(), true);
+      this.segmentE = new TrackSegment(coordinates1);
+      this.segmentF = new TrackSegment(coordinates2.reverse());
     } else if (coordinates1[last1].equalsTo(coordinates2[0])) {
-      this.segmentE = new TrackSegment(coordinates1.reverse(), true);
-      this.segmentF = new TrackSegment(coordinates2, true);
+      this.segmentE = new TrackSegment(coordinates1.reverse());
+      this.segmentF = new TrackSegment(coordinates2);
     } else {
       throw new Error('Segments has no meeting point');
     }

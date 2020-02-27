@@ -55,12 +55,10 @@ export class TrackBabylonRenderer implements TrackRenderer {
     trackCoin.material = boxMaterial;
     this.meshTC = trackCoin;
 
-    const cl = Bezier.getLength(
-      this.track
-        .getSegment()
-        .getBezier()
-        .getCoordinates()
-    );
+    const cl = this.track
+      .getSegment()
+      .getBezier()
+      .getLength();
 
     const cA = this.track
       .getSegment()

@@ -1,5 +1,5 @@
 import { Coordinate } from '../Coordinate';
-import { Bezier } from './Bezier';
+import { Bezier, DEFAULT_PRECISION } from './Bezier';
 
 export class BezierQuadratic extends Bezier {
   constructor(coordinates: Coordinate[]) {
@@ -41,5 +41,17 @@ export class BezierQuadratic extends Bezier {
     );
 
     return Math.atan2(curveDerived.x, curveDerived.z);
+  }
+
+  getLength(count: number = DEFAULT_PRECISION): number {
+    if (count < 2) throw new Error('Too few count to get points');
+
+    let length = 0;
+    let prevPoint = this.getPoint(0);
+    for (let i = 1; i < count; i++) {
+      const thisPoint = this.getPoint(i / (count - 1));
+      length += prevPoint.distance2d(thisPoint);
+    }
+    return length;
   }
 }

@@ -26,9 +26,13 @@ export class BezierLinear extends Bezier {
     );
   }
 
-  getDirection(percentage: number): number {
+  getDirection(_: number): number {
     const [start, end] = this.coordinates;
     const lineDerived = new Coordinate(end.x - start.x, 0, end.z - start.z);
     return Math.atan2(lineDerived.x, lineDerived.z);
+  }
+
+  getLength(_: number): number {
+    return this.coordinates[0].distance2d(this.coordinates[1]);
   }
 }

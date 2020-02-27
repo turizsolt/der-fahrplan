@@ -8,10 +8,10 @@ export class TrackSegment {
   readonly curvePoints: Coordinate[];
   private bezier: Bezier;
 
-  constructor(coordinates: Coordinate[], mustManyPoints: boolean = false) {
+  constructor(coordinates: Coordinate[]) {
     this.bezier = BezierCreater.Create(coordinates);
-    this.curvePoints = this.bezier.getLinePoints(20, mustManyPoints);
-    this.length = Bezier.getLength(this.curvePoints);
+    this.curvePoints = this.bezier.getLinePoints();
+    this.length = this.bezier.getLength();
   }
 
   getCurvePoints(): Coordinate[] {

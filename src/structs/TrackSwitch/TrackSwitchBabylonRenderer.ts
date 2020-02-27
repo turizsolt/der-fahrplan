@@ -40,18 +40,15 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
     // TODO beutify
     let coord, coord1, coord2: Coordinate;
     let len = 0;
-    let len1 = Bezier.getLength(
-      this.trackSwitch
-        .getSegmentE()
-        .getBezier()
-        .getCoordinates()
-    );
-    let len2 = Bezier.getLength(
-      this.trackSwitch
-        .getSegmentF()
-        .getBezier()
-        .getCoordinates()
-    );
+    let len1 = this.trackSwitch
+      .getSegmentE()
+      .getBezier()
+      .getLength();
+
+    let len2 = this.trackSwitch
+      .getSegmentF()
+      .getBezier()
+      .getLength();
     let shorter = Math.min(len1, len2) - 3;
     do {
       len += 1;
@@ -91,36 +88,31 @@ export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
       .map(CoordinateToBabylonVector3);
     this.mesh = curveToTube(curve);
 
-    const cAl = Bezier.getLength(
-      this.trackSwitch
-        .getSegment()
-        .getBezier()
-        .getCoordinates()
-    );
+    const cAl = this.trackSwitch
+      .getSegment()
+      .getBezier()
+      .getLength();
     const cA = this.trackSwitch
       .getSegment()
       .getBezier()
       .getPoint(4 / cAl);
     this.bal = ballon(cA, this.trackSwitch.getA().getConnectedTrack() ? 1 : 0);
 
-    const cEl = Bezier.getLength(
-      this.trackSwitch
-        .getSegmentE()
-        .getBezier()
-        .getCoordinates()
-    );
+    const cEl = this.trackSwitch
+      .getSegmentE()
+      .getBezier()
+      .getLength();
+
     const cE = this.trackSwitch
       .getSegmentE()
       .getBezier()
       .getPoint(1 - 4 / cEl);
     this.balE = ballon(cE, this.trackSwitch.getF().getConnectedTrack() ? 1 : 0);
 
-    const cFl = Bezier.getLength(
-      this.trackSwitch
-        .getSegmentF()
-        .getBezier()
-        .getCoordinates()
-    );
+    const cFl = this.trackSwitch
+      .getSegmentF()
+      .getBezier()
+      .getLength();
     const cF = this.trackSwitch
       .getSegmentF()
       .getBezier()
