@@ -8,7 +8,7 @@ import { Coordinate } from '../Geometry/Coordinate';
 export interface TrackJoint {
   init(x: number, z: number, rot: number): TrackJoint;
   rotate(rot: number): void;
-  remove(): void;
+  remove(): boolean;
   isRemovable(): boolean;
   removeEnd(end: TrackEnd): void;
 
