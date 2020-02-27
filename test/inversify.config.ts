@@ -24,6 +24,7 @@ import { PlatformRenderer } from '../src/structs/Platform/PlatformRenderer';
 import { PlatformDummyRenderer } from '../src/structs/Platform/PlatformDummyRenderer';
 import { Platform } from '../src/structs/Platform/Platform';
 import { ActualPlatform } from '../src/structs/Platform/ActualPlatform';
+import { TrackJointConnector } from '../src/structs/TrackJoint/TrackJointConnector';
 
 export const testContainer = new Container();
 testContainer
@@ -49,7 +50,25 @@ testContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 testContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
 testContainer.bind<Platform>(TYPES.Platform).to(ActualPlatform);
 testContainer.bind<Store>(TYPES.Store).to(Store);
+testContainer
+  .bind<TrackJointConnector>(TYPES.TrackJointConnector)
+  .to(TrackJointConnector);
 
+let connector: TrackJointConnector = null;
+testContainer
+  .bind<interfaces.Factory<TrackJointConnector>>(
+    TYPES.FactoryOfTrackJointConnector
+  )
+  .toFactory<TrackJointConnector>((context: interfaces.Context) => {
+    return () => {
+      if (!connector) {
+        connector = context.container.get<TrackJointConnector>(
+          TYPES.TrackJointConnector
+        );
+      }
+      return connector;
+    };
+  });
 let store: Store = null;
 testContainer
   .bind<interfaces.Factory<Store>>(TYPES.FactoryOfStore)

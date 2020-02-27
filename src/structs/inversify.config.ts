@@ -26,6 +26,7 @@ import { PlatformRenderer } from './Platform/PlatformRenderer';
 import { PlatformBabylonRenderer } from './Platform/PlatformBabylonRenderer';
 import { Platform } from './Platform/Platform';
 import { ActualPlatform } from './Platform/ActualPlatform';
+import { TrackJointConnector } from './TrackJoint/TrackJointConnector';
 
 export const babylonContainer = new Container();
 babylonContainer
@@ -54,6 +55,25 @@ babylonContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 babylonContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
 babylonContainer.bind<Platform>(TYPES.Platform).to(ActualPlatform);
 babylonContainer.bind<Store>(TYPES.Store).to(Store);
+babylonContainer
+  .bind<TrackJointConnector>(TYPES.TrackJointConnector)
+  .to(TrackJointConnector);
+
+let connector: TrackJointConnector = null;
+babylonContainer
+  .bind<interfaces.Factory<TrackJointConnector>>(
+    TYPES.FactoryOfTrackJointConnector
+  )
+  .toFactory<TrackJointConnector>((context: interfaces.Context) => {
+    return () => {
+      if (!connector) {
+        connector = context.container.get<TrackJointConnector>(
+          TYPES.TrackJointConnector
+        );
+      }
+      return connector;
+    };
+  });
 
 let store: Store = null;
 babylonContainer
