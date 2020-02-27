@@ -51,6 +51,7 @@ export class BezierQuadratic extends Bezier {
     for (let i = 1; i < count; i++) {
       const thisPoint = this.getPoint(i / (count - 1));
       length += prevPoint.distance2d(thisPoint);
+      prevPoint = thisPoint;
     }
     return length;
   }
