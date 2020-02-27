@@ -7,7 +7,7 @@ import {
   ballon,
   ballonUpdate
 } from '../TrackSwitch/TrackSwitchBabylonRenderer';
-import { Bezier } from '../Geometry/Bezier';
+import { Bezier } from '../Geometry/Bezier/Bezier';
 
 @injectable()
 export class TrackBabylonRenderer implements TrackRenderer {

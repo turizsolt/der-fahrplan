@@ -5,7 +5,7 @@ import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
 import { TrackSwitch } from './TrackSwitch';
 import { curveToTube } from '../Track/TrackBabylonRenderer';
 import { Coordinate } from '../Geometry/Coordinate';
-import { Bezier } from '../Geometry/Bezier';
+import { Bezier } from '../Geometry/Bezier/Bezier';
 
 @injectable()
 export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {

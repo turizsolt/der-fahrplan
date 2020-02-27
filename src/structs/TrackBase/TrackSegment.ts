@@ -1,5 +1,6 @@
 import { Coordinate } from '../Geometry/Coordinate';
-import { Bezier } from '../Geometry/Bezier';
+import { Bezier } from '../Geometry/Bezier/Bezier';
+import { BezierCreater } from '../Geometry/Bezier/BezierCreater';
 
 export class TrackSegment {
   readonly length: number;
@@ -8,7 +9,7 @@ export class TrackSegment {
   private bezier: Bezier;
 
   constructor(coordinates: Coordinate[], mustManyPoints: boolean = false) {
-    this.bezier = new Bezier(coordinates);
+    this.bezier = BezierCreater.Create(coordinates);
     this.curvePoints = this.bezier.getLinePoints(20, mustManyPoints);
     this.length = Bezier.getLength(this.curvePoints);
   }
