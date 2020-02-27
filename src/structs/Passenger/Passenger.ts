@@ -10,7 +10,7 @@ export class Passenger {
   public onPlatform: Platform = null;
   public onEngine: Engine = null;
   public position: Coordinate;
-  public shift: Coordinate;
+  public offset: Coordinate;
   private renderer: PassengerRenderer;
 
   constructor(readonly to: Platform, readonly from: Platform) {
@@ -19,13 +19,13 @@ export class Passenger {
 
     const dist = Math.random() * 2;
     const rad = Math.random() * Math.PI * 2;
-    this.shift = new Coordinate(Math.sin(rad) * dist, 0, Math.cos(rad) * dist);
+    this.offset = new Coordinate(
+      Math.sin(rad) * dist,
+      2.5,
+      Math.cos(rad) * dist
+    );
 
-    this.position = from
-      .getPosition()
-      .clone()
-      .add(new Coordinate(0, 2.5, 0))
-      .add(this.shift);
+    this.position = from.getPosition().add(this.offset);
 
     this.renderer = babylonContainer.get<PassengerRenderer>(
       TYPES.PassengerRenderer
@@ -35,21 +35,14 @@ export class Passenger {
 
   updatePosition() {
     if (this.onPlatform) {
-      this.position = this.onPlatform
-        .getPosition()
-        .clone()
-        .add(new Coordinate(0, 2.5, 0).add(this.shift));
+      this.position = this.onPlatform.getPosition().add(this.offset);
     } else if (this.onEngine) {
-      this.position = this.onEngine
-        .getRay()
-        .coord.clone()
-        .add(new Coordinate(0, 2.5, 0).add(this.shift));
+      this.position = this.onEngine.getPosition().add(this.offset);
     }
     this.renderer.update();
   }
 
   checkTrain(engine: Engine) {
-    console.log('check engine', this.id);
     engine.getOn(this);
     this.onEngine = engine;
 

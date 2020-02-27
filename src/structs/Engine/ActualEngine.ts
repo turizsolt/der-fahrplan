@@ -8,6 +8,7 @@ import { Engine } from './Engine';
 import { Platform } from '../Platform/Platform';
 import { PositionOnTrack } from './PositionOnTrack';
 import { Ray } from '../Geometry/Ray';
+import { Coordinate } from '../Geometry/Coordinate';
 
 @injectable()
 export class ActualEngine implements Engine {
@@ -29,6 +30,10 @@ export class ActualEngine implements Engine {
 
   getRay(): Ray {
     return this.positionOnTrack.getRay();
+  }
+
+  getPosition(): Coordinate {
+    return this.positionOnTrack.getRay().coord;
   }
 
   forward(): void {
