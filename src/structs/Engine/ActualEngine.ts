@@ -5,7 +5,7 @@ import { EngineRenderer } from './EngineRenderer';
 import { TYPES } from '../TYPES';
 import { inject, injectable } from 'inversify';
 import { Engine } from './Engine';
-import { Platform } from '../Platform';
+import { Platform } from '../Platform/Platform';
 import { PositionOnTrack } from './PositionOnTrack';
 import { Ray } from '../Geometry/Ray';
 

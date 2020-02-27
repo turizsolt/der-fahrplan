@@ -1,5 +1,5 @@
 import { Engine } from '../Engine/Engine';
-import { Platform } from '../Platform';
+import { Platform } from '../Platform/Platform';
 import { TrackSegment } from './TrackSegment';
 import { TrackEnd } from '../Track/TrackEnd';
 

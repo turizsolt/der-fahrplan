@@ -1,5 +1,5 @@
 import { Engine } from '../Engine/Engine';
-import { Platform } from '../Platform';
+import { Platform } from '../Platform/Platform';
 import { PassengerRenderer } from './PassengerRenderer';
 import { Coordinate } from '../Geometry/Coordinate';
 import { TYPES } from '../TYPES';
@@ -21,7 +21,8 @@ export class Passenger {
     const rad = Math.random() * Math.PI * 2;
     this.shift = new Coordinate(Math.sin(rad) * dist, 0, Math.cos(rad) * dist);
 
-    this.position = from.position
+    this.position = from
+      .getPosition()
       .clone()
       .add(new Coordinate(0, 2.5, 0))
       .add(this.shift);
@@ -34,13 +35,14 @@ export class Passenger {
 
   updatePosition() {
     if (this.onPlatform) {
-      this.position = this.onPlatform.position
+      this.position = this.onPlatform
+        .getPosition()
         .clone()
         .add(new Coordinate(0, 2.5, 0).add(this.shift));
     } else if (this.onEngine) {
       this.position = this.onEngine
-        .getPosition()
-        .clone()
+        .getRay()
+        .coord.clone()
         .add(new Coordinate(0, 2.5, 0).add(this.shift));
     }
     this.renderer.update();

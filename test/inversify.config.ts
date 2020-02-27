@@ -20,6 +20,10 @@ import { ActualTrackSwitch } from '../src/structs/TrackSwitch/ActualTrackSwitch'
 import { TrackJoint } from '../src/structs/TrackJoint/TrackJoint';
 import { ActualTrackJoint } from '../src/structs/TrackJoint/ActualTrackJoint';
 import { Store } from '../src/structs/Store/Store';
+import { PlatformRenderer } from '../src/structs/Platform/PlatformRenderer';
+import { PlatformDummyRenderer } from '../src/structs/Platform/PlatformDummyRenderer';
+import { Platform } from '../src/structs/Platform/Platform';
+import { ActualPlatform } from '../src/structs/Platform/ActualPlatform';
 
 export const testContainer = new Container();
 testContainer
@@ -35,11 +39,15 @@ testContainer.bind<TrackRenderer>(TYPES.TrackRenderer).to(TrackDummyRenderer);
 testContainer
   .bind<TrackSwitchRenderer>(TYPES.TrackSwitchRenderer)
   .to(TrackSwitchDummyRenderer);
+testContainer
+  .bind<PlatformRenderer>(TYPES.PlatformRenderer)
+  .to(PlatformDummyRenderer);
 
 testContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
 testContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 testContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 testContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
+testContainer.bind<Platform>(TYPES.Platform).to(ActualPlatform);
 testContainer.bind<Store>(TYPES.Store).to(Store);
 
 let store: Store = null;
@@ -83,5 +91,13 @@ testContainer
   .toFactory<TrackJoint>((context: interfaces.Context) => {
     return () => {
       return context.container.get<TrackJoint>(TYPES.TrackJoint);
+    };
+  });
+
+testContainer
+  .bind<interfaces.Factory<Platform>>(TYPES.FactoryOfPlatform)
+  .toFactory<Platform>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Platform>(TYPES.Platform);
     };
   });

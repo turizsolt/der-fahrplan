@@ -1,5 +1,5 @@
 import { TrackBase } from '../TrackBase/TrackBase';
-import { Platform } from '../Platform';
+import { Platform } from '../Platform/Platform';
 import { Engine } from './Engine';
 import { Ray } from '../Geometry/Ray';
 import { TrackEnd } from '../Track/TrackEnd';
@@ -35,7 +35,7 @@ export class PositionOnTrack {
   }
 
   isBeside(platform: Platform): boolean {
-    return platform.start <= this.position && this.position <= platform.end;
+    return platform.isBeside(this.position);
   }
 
   private getPercentage(): number {

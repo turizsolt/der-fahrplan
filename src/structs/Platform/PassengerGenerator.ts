@@ -1,5 +1,5 @@
 import * as BABYLON from 'babylonjs';
-import { Passenger } from './Passenger/Passenger';
+import { Passenger } from '../Passenger/Passenger';
 import { Platform } from './Platform';
 
 export class PassengerGenerator {

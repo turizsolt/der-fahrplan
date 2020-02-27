@@ -22,6 +22,10 @@ import { ActualTrackSwitch } from './TrackSwitch/ActualTrackSwitch';
 import { TrackJoint } from './TrackJoint/TrackJoint';
 import { ActualTrackJoint } from './TrackJoint/ActualTrackJoint';
 import { Store } from './Store/Store';
+import { PlatformRenderer } from './Platform/PlatformRenderer';
+import { PlatformBabylonRenderer } from './Platform/PlatformBabylonRenderer';
+import { Platform } from './Platform/Platform';
+import { ActualPlatform } from './Platform/ActualPlatform';
 
 export const babylonContainer = new Container();
 babylonContainer
@@ -39,11 +43,16 @@ babylonContainer
 babylonContainer
   .bind<TrackSwitchRenderer>(TYPES.TrackSwitchRenderer)
   .to(TrackSwitchBabylonRenderer);
+babylonContainer
+  .bind<PlatformRenderer>(TYPES.PlatformRenderer)
+  .to(PlatformBabylonRenderer);
+
 babylonContainer.bind<Land>(TYPES.Land).to(ActualLand);
 babylonContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
 babylonContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 babylonContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 babylonContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
+babylonContainer.bind<Platform>(TYPES.Platform).to(ActualPlatform);
 babylonContainer.bind<Store>(TYPES.Store).to(Store);
 
 let store: Store = null;
@@ -79,5 +88,13 @@ babylonContainer
   .toFactory<TrackSwitch>((context: interfaces.Context) => {
     return () => {
       return context.container.get<TrackSwitch>(TYPES.TrackSwitch);
+    };
+  });
+
+babylonContainer
+  .bind<interfaces.Factory<Platform>>(TYPES.FactoryOfPlatform)
+  .toFactory<Platform>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Platform>(TYPES.Platform);
     };
   });

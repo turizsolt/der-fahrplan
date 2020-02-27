@@ -3,6 +3,7 @@ import { Passenger } from './Passenger';
 import { PassengerRenderer } from './PassengerRenderer';
 import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
 import { injectable } from 'inversify';
+import { ColorToBabylonColor3 } from '../ColorToBabylonColor3';
 
 @injectable()
 export class PassengerBabylonRenderer implements PassengerRenderer {
@@ -21,7 +22,9 @@ export class PassengerBabylonRenderer implements PassengerRenderer {
     this.mesh.position = CoordinateToBabylonVector3(this.passenger.position);
 
     var boxMaterial = new BABYLON.StandardMaterial('boxMat', this.scene);
-    boxMaterial.diffuseColor = this.passenger.to.color;
+    boxMaterial.diffuseColor = ColorToBabylonColor3(
+      this.passenger.to.getColor()
+    );
     this.mesh.material = boxMaterial;
   }
 

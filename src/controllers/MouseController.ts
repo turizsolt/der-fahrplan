@@ -7,9 +7,10 @@ import { TrackSwitch } from '../structs/TrackSwitch/TrackSwitch';
 import { TrackJoint } from '../structs/TrackJoint/TrackJoint';
 import { Track } from '../structs/Track/Track';
 import { Coordinate } from '../structs/Geometry/Coordinate';
-import { Platform } from '../structs/Platform';
-import { Side } from '../structs/Side';
-import { PassengerGenerator } from '../structs/PassengerGenerator';
+import { Platform } from '../structs/Platform/Platform';
+import { Side } from '../structs/Platform/Side';
+import { PassengerGenerator } from '../structs/Platform/PassengerGenerator';
+import { Color } from '../structs/Color';
 
 export class MouseController {
   private scene: BABYLON.Scene;
@@ -18,12 +19,17 @@ export class MouseController {
   private store: Store;
 
   private passengerGenerator: PassengerGenerator;
+  private platformFactory: () => Platform;
 
   constructor() {
     const StoreFactory = babylonContainer.get<() => Store>(
       TYPES.FactoryOfStore
     );
     this.store = StoreFactory();
+
+    this.platformFactory = babylonContainer.get<() => Platform>(
+      TYPES.FactoryOfPlatform
+    );
 
     this.passengerGenerator = new PassengerGenerator([], null);
   }
@@ -187,7 +193,7 @@ export class MouseController {
           );
           if (t1 === this.platformFrom.track) {
             console.log('create');
-            const pl = new Platform(
+            const pl = this.platformFactory().init(
               this.nameList[this.colorCount],
               t1,
               p[0],
@@ -196,7 +202,6 @@ export class MouseController {
               Side.Left,
               this.colorList[this.colorCount]
             );
-            pl.render(null);
             this.passengerGenerator.addToList(pl);
             console.log(pl);
 
@@ -208,12 +213,12 @@ export class MouseController {
   }
 
   nameList: string[] = ['A', 'B', 'C', 'D', 'E'];
-  colorList: BABYLON.Color3[] = [
-    BABYLON.Color3.Teal(),
-    BABYLON.Color3.Blue(),
-    BABYLON.Color3.Green(),
-    BABYLON.Color3.Yellow(),
-    BABYLON.Color3.Magenta()
+  colorList: Color[] = [
+    new Color(1, 0, 0),
+    new Color(1, 1, 0),
+    new Color(0, 1, 0),
+    new Color(0, 1, 1),
+    new Color(0, 0, 1)
   ];
   colorCount: number = 0;
 

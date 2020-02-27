@@ -18,6 +18,10 @@ export const TYPES = {
 
   PassengerRenderer: Symbol.for('PassengerRenderer'),
 
+  Platform: Symbol.for('Platform'),
+  PlatformRenderer: Symbol.for('PlatformRenderer'),
+  FactoryOfPlatform: Symbol.for('Factory<Platform>'),
+
   TrackJoint: Symbol.for('TrackJoint'),
   TrackJointRenderer: Symbol.for('TrackJointRenderer'),
   FactoryOfTrackJoint: Symbol.for('Factory<TrackJoint>')
