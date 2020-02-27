@@ -2,6 +2,7 @@ import { TrackBase } from '../TrackBase/TrackBase';
 import { Platform } from '../Platform';
 import { Engine } from './Engine';
 import { Ray } from '../Geometry/Ray';
+import { TrackEnd } from '../Track/TrackEnd';
 
 export class PositionOnTrack {
   constructor(
@@ -26,10 +27,6 @@ export class PositionOnTrack {
     return this.track;
   }
 
-  private getPercentage(): number {
-    return this.position / this.track.getSegment().getLength();
-  }
-
   getRay(): Ray {
     return this.track
       .getSegment()
@@ -41,30 +38,19 @@ export class PositionOnTrack {
     return platform.start <= this.position && this.position <= platform.end;
   }
 
+  private getPercentage(): number {
+    return this.position / this.track.getLength();
+  }
+
   private moveTowardsA(): void {
     this.position -= 1;
 
     if (this.position < 0) {
-      const nextTrackEnd = this.track.getA().getConnectedTrack();
-      if (nextTrackEnd) {
-        const isConnectedEndIsOpposite =
-          this.track
-            .getA()
-            .getConnectedEnd()
-            .getWhichEnd() === 'B';
-        this.track.checkout(this.engine);
-        this.track = this.track.getA().getConnectedTrack();
-        this.track.checkin(this.engine);
-        if (isConnectedEndIsOpposite) {
-          const prevTrackLength = this.track.getSegment().getLength();
-          this.position += prevTrackLength;
-        } else {
-          const overRun = -this.position;
-          this.position = overRun;
-          this.direction = -this.direction;
-        }
+      const end = this.track.getA();
+      if (end.hasConnectedTrack()) {
+        this.moveNextOnA(end);
       } else {
-        this.position = 0;
+        this.stopOnA();
       }
     }
   }
@@ -72,30 +58,66 @@ export class PositionOnTrack {
   private moveTowardsB(): void {
     this.position += 1;
 
-    const trackLength = this.track.getSegment().getLength();
+    const trackLength = this.track.getLength();
     if (this.position > trackLength) {
-      const nextTrackEnd = this.track.getB().getConnectedTrack();
-      if (nextTrackEnd) {
-        const isConnectedEndIsOpposite =
-          this.track
-            .getB()
-            .getConnectedEnd()
-            .getWhichEnd() === 'A';
-
-        this.track.checkout(this.engine);
-        this.track = this.track.getB().getConnectedTrack();
-        this.track.checkin(this.engine);
-
-        if (isConnectedEndIsOpposite) {
-          this.position -= trackLength;
-        } else {
-          const overRun = this.position - trackLength;
-          this.position = this.track.getSegment().getLength() - overRun;
-          this.direction = -this.direction;
-        }
+      const end = this.track.getB();
+      if (end.hasConnectedTrack()) {
+        this.moveNextOnB(end, trackLength);
       } else {
-        this.position = trackLength;
+        this.stopOnB();
       }
     }
+  }
+
+  private moveNextOnA(end: TrackEnd) {
+    this.moveToNextTrack(end);
+    if (end.isSwitchingEnds()) {
+      this.movePositionAB();
+    } else {
+      this.movePositionAA();
+    }
+  }
+
+  private moveNextOnB(end: TrackEnd, oldTrackLength: number) {
+    this.moveToNextTrack(end);
+    if (end.isSwitchingEnds()) {
+      this.movePositionBA(oldTrackLength);
+    } else {
+      this.movePositionBB(oldTrackLength);
+    }
+  }
+
+  private moveToNextTrack(end: TrackEnd) {
+    this.track.checkout(this.engine);
+    this.track = end.getConnectedTrack();
+    this.track.checkin(this.engine);
+  }
+
+  private movePositionAA() {
+    const overRun = -this.position;
+    this.position = overRun;
+    this.direction = -this.direction;
+  }
+
+  private movePositionAB() {
+    this.position += this.track.getLength();
+  }
+
+  private movePositionBA(oldTrackLength: number) {
+    this.position -= oldTrackLength;
+  }
+
+  private movePositionBB(oldTrackLength: number) {
+    const overRun = this.position - oldTrackLength;
+    this.position = this.track.getLength() - overRun;
+    this.direction = -this.direction;
+  }
+
+  private stopOnA() {
+    this.position = 0;
+  }
+
+  private stopOnB() {
+    this.position = this.track.getLength();
   }
 }

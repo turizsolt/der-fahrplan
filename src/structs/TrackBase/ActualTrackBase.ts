@@ -45,6 +45,10 @@ export abstract class ActualTrackBase implements TrackBase {
     return this.B;
   }
 
+  getLength(): number {
+    return this.getSegment().getLength();
+  }
+
   remove(): boolean {
     if (this.isRemovable()) {
       this.removed = true;

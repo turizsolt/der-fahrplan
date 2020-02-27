@@ -59,10 +59,14 @@ export class TrackEnd {
   }
 
   getConnectedTrack(): TrackBase {
-    if (this.isActive() && this.connectedEnd && this.connectedEnd.isActive()) {
+    if (this.hasConnectedTrack()) {
       return this.connectedEnd.getTrack();
     }
     return null;
+  }
+
+  hasConnectedTrack(): boolean {
+    return this.isActive() && this.connectedEnd && this.connectedEnd.isActive();
   }
 
   getConnectedEnd(): TrackEnd {
@@ -87,5 +91,10 @@ export class TrackEnd {
 
   isActive(): boolean {
     return true;
+  }
+
+  isSwitchingEnds(): boolean {
+    if (!this.getConnectedEnd()) return null;
+    return this.getWhichEnd() !== this.getConnectedEnd().getWhichEnd();
   }
 }

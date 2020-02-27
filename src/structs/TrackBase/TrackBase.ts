@@ -13,6 +13,7 @@ export interface TrackBase {
   getA(): TrackEnd;
   getB(): TrackEnd;
   getId(): string;
+  getLength(): number;
 
   remove(): boolean;
   isRemovable(): boolean;
