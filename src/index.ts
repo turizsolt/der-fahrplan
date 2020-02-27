@@ -7,7 +7,9 @@ import { TYPES } from './structs/TYPES';
 import { KeyController } from './controllers/KeyController';
 import { GridDrawer } from './controllers/GridDrawer';
 import { MouseController } from './controllers/MouseController';
-import { Controller } from './controllers/Controller';
+import { OldController } from './controllers/OldController';
+import { InputController } from './controllers/InputController';
+import { BabylonVector3ToCoordinate } from './structs/BabylonVector3ToCoordinate';
 
 window.addEventListener('DOMContentLoaded', () => {
   const canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
@@ -15,8 +17,7 @@ window.addEventListener('DOMContentLoaded', () => {
   ) as HTMLCanvasElement;
   const renderEngine = new BABYLON.Engine(canvas, true);
 
-  let markers: TrackJoint[] = [];
-  const controller = new Controller();
+  //   const controller = new OldController();
 
   const createScene = () => {
     const scene = new BABYLON.Scene(renderEngine);
@@ -30,7 +31,7 @@ window.addEventListener('DOMContentLoaded', () => {
       new BABYLON.Vector3(0, 0, 0),
       scene
     );
-    controller.setCameraAndCanvas(camera, canvas as HTMLElement);
+    // controller.setCameraAndCanvas(camera, canvas as HTMLElement);
 
     const light = new BABYLON.DirectionalLight(
       'DirectionalLight',
@@ -46,25 +47,27 @@ window.addEventListener('DOMContentLoaded', () => {
 
     (window as any).switches = [];
     const land = babylonContainer.get<Land>(TYPES.Land);
-    const engine = land.init(controller);
+    const engine = land.init(null); //controller);
 
     const gridDrawer = new GridDrawer();
     gridDrawer.setScene(scene);
     gridDrawer.drawGrid();
 
-    const keyController = new KeyController();
-    keyController.setScene(scene);
-    keyController.setController(controller);
-    keyController.handleKeys();
-    keyController.handleKeyCommands(engine);
+    // const keyController = new KeyController();
+    // keyController.setScene(scene);
+    // keyController.setController(controller);
+    // keyController.handleKeys();
+    // keyController.handleKeyCommands(engine);
 
     return scene;
   };
   const scene = createScene();
-  controller.setScene(scene);
-  const mouseController = new MouseController();
-  mouseController.setScene(scene);
-  mouseController.setController(controller);
+  //   controller.setScene(scene);
+  //   const mouseController = new MouseController();
+  //   mouseController.setScene(scene);
+  //   mouseController.setController(controller);
+
+  const inputController = new InputController(scene);
 
   renderEngine.runRenderLoop(() => {
     scene.render();
@@ -74,16 +77,16 @@ window.addEventListener('DOMContentLoaded', () => {
     renderEngine.resize();
   });
 
-  window.addEventListener('pointerdown', e => {
-    mouseController.handleMouseDown(e.ctrlKey, e.shiftKey);
+  canvas.addEventListener('pointerdown', e => {
+    inputController.down(e);
   });
 
-  window.addEventListener('pointerup', () => {
-    mouseController.handleMouseUp();
+  canvas.addEventListener('pointerup', e => {
+    inputController.up(e);
   });
 
-  window.addEventListener('pointermove', () => {
-    mouseController.handleMouseMove();
+  canvas.addEventListener('pointermove', e => {
+    inputController.move(e);
   });
 
   canvas.addEventListener('pointerenter', () => {
@@ -95,6 +98,6 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   window.addEventListener('wheel', e => {
-    mouseController.handleWheel(Math.sign(e.deltaY), e.altKey);
+    inputController.wheel(e);
   });
 });

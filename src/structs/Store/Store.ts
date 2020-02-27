@@ -32,4 +32,8 @@ export class Store {
   get<T>(id: string): T {
     return this.elements[id];
   }
+
+  getAll() {
+    return this.elements;
+  }
 }

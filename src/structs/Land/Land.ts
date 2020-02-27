@@ -1,6 +1,6 @@
 import { Engine } from '../Engine/Engine';
-import { Controller } from '../../controllers/Controller';
+import { OldController } from '../../controllers/OldController';
 
 export interface Land {
-  init(controller: Controller): Engine;
+  init(controller: OldController): Engine;
 }

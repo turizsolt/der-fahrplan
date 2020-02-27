@@ -1,11 +1,11 @@
 import * as BABYLON from 'babylonjs';
 import { Engine } from '../structs/Engine/Engine';
-import { Controller } from './Controller';
+import { OldController } from './OldController';
 
 export class KeyController {
   private map: Record<string, boolean>;
   private scene: BABYLON.Scene;
-  private controller: Controller;
+  private controller: OldController;
 
   constructor() {}
 
@@ -13,7 +13,7 @@ export class KeyController {
     this.scene = scene;
   }
 
-  setController(controller: Controller) {
+  setController(controller: OldController) {
     this.controller = controller;
   }
 

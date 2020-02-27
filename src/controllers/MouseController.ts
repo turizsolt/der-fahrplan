@@ -1,5 +1,5 @@
 import * as BABYLON from 'babylonjs';
-import { Controller } from './Controller';
+import { OldController } from './OldController';
 import { Store } from '../structs/Store/Store';
 import { babylonContainer } from '../structs/inversify.config';
 import { TYPES } from '../structs/TYPES';
@@ -14,7 +14,7 @@ import { Color } from '../structs/Color';
 
 export class MouseController {
   private scene: BABYLON.Scene;
-  private controller: Controller;
+  private controller: OldController;
 
   private store: Store;
 
@@ -38,7 +38,7 @@ export class MouseController {
     this.scene = scene;
   }
 
-  setController(controller: Controller) {
+  setController(controller: OldController) {
     this.controller = controller;
   }
 

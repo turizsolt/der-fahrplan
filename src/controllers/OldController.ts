@@ -4,7 +4,7 @@ import { TYPES } from '../structs/TYPES';
 import { TrackJoint } from '../structs/TrackJoint/TrackJoint';
 import { MouseRenderer } from './MouseRenderer';
 
-export class Controller {
+export class OldController {
   private viewMode = 0;
   private camera: BABYLON.Camera;
   private canvas: HTMLElement;
