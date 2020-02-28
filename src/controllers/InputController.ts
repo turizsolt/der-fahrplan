@@ -90,33 +90,37 @@ export class InputController {
   up(event: PointerEvent) {
     let props = this.convert(event);
     if (this.downProps.point.coord.equalsTo(props.point.coord)) {
+      let ready = false;
       if (this.downProps.mesh) {
         const meshId = this.downProps.mesh.id;
         if (meshId.startsWith('clickable-')) {
           const [_, type, id] = meshId.split('-');
           const storedObj = this.store.get(id);
 
-          let renderer = storedObj.getRenderer();
-          if (renderer.isSelected()) {
-            renderer.setSelected(false);
+          if (storedObj) {
+            let renderer = storedObj.getRenderer();
+            if (renderer.isSelected()) {
+              renderer.setSelected(false);
 
-            this.selected = null;
-            this.selectedMesh = null;
-          } else {
-            if (this.selected) {
-              this.selected.getRenderer().setSelected(false);
+              this.selected = null;
+              this.selectedMesh = null;
+            } else {
+              if (this.selected) {
+                this.selected.getRenderer().setSelected(false);
+              }
+
+              renderer.setSelected(true);
+
+              this.selected = storedObj;
+              this.selectedMesh = this.downProps.mesh;
             }
-
-            renderer.setSelected(true);
-
-            this.selected = storedObj;
-            this.selectedMesh = this.downProps.mesh;
+            ready = true;
           }
         }
-        props = this.convert(event);
       }
 
-      if (props) this.inputHandler.click(this.downProps);
+      if (!ready && props) this.inputHandler.click(this.downProps);
+      if (ready && props) this.inputHandler.cancel();
     } else {
       if (props) this.inputHandler.up(this.downProps, props);
     }

@@ -25,7 +25,7 @@ export class ActualLand implements Land {
 
     //controller.setLastJoint(j4);
 
-    const engine = this.engineFactory();
+    const engine = this.engineFactory().init();
     engine.putOnTrack(tr0);
 
     return engine;

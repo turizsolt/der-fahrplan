@@ -67,7 +67,7 @@ export class CreateTrackInputHandler implements InputHandler {
     this.pathMesh.setEnabled(false);
   }
 
-  down(props: InputProps) {
+  down(props: InputProps): void {
     if (!props.snappedJoint) {
       this.fromMesh.setEnabled(true);
       this.fromMesh.position = CoordinateToBabylonVector3(
@@ -90,7 +90,7 @@ export class CreateTrackInputHandler implements InputHandler {
     this.pathMesh.setEnabled(true);
   }
 
-  roam(props: InputProps) {
+  roam(props: InputProps): void {
     this.fromMesh.position = CoordinateToBabylonVector3(
       props.snappedPoint.coord
     );
@@ -98,7 +98,7 @@ export class CreateTrackInputHandler implements InputHandler {
     this.fromMesh.setEnabled(!props.snappedJoint);
   }
 
-  move(downProps: InputProps, props: InputProps) {
+  move(downProps: InputProps, props: InputProps): void {
     this.toMesh.position = CoordinateToBabylonVector3(props.snappedPoint.coord);
     this.toMesh.rotation.y = props.wheelRad;
     this.toMesh.setEnabled(!props.snappedJoint);
@@ -124,7 +124,7 @@ export class CreateTrackInputHandler implements InputHandler {
     );
   }
 
-  click(downProps: InputProps) {
+  click(downProps: InputProps): void {
     if (!downProps.snappedJoint) {
       const tj = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
       tj.init(
@@ -135,7 +135,7 @@ export class CreateTrackInputHandler implements InputHandler {
     }
   }
 
-  up(downProps: InputProps, props: InputProps) {
+  up(downProps: InputProps, props: InputProps): void {
     let j1, j2;
     if (downProps.snappedJoint) {
       j1 = downProps.snappedJoint;
@@ -161,6 +161,12 @@ export class CreateTrackInputHandler implements InputHandler {
 
     j2.connect(j1);
 
+    this.fromMesh.setEnabled(false);
+    this.toMesh.setEnabled(false);
+    this.pathMesh.setEnabled(false);
+  }
+
+  cancel(): void {
     this.fromMesh.setEnabled(false);
     this.toMesh.setEnabled(false);
     this.pathMesh.setEnabled(false);

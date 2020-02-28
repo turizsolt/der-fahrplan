@@ -9,12 +9,19 @@ import { Platform } from '../Platform/Platform';
 import { PositionOnTrack } from './PositionOnTrack';
 import { Ray } from '../Geometry/Ray';
 import { Coordinate } from '../Geometry/Coordinate';
+import { ActualBaseBrick } from '../Base/ActualBaseBrick';
+import { BaseRenderer } from '../Base/BaseRenderer';
 
 @injectable()
-export class ActualEngine implements Engine {
+export class ActualEngine extends ActualBaseBrick implements Engine {
   private positionOnTrack: PositionOnTrack;
   private carriedPassengers: Passenger[] = [];
   @inject(TYPES.EngineRenderer) private renderer: EngineRenderer;
+
+  init(): Engine {
+    super.initStore();
+    return this;
+  }
 
   putOnTrack(track: Track): void {
     this.positionOnTrack = new PositionOnTrack(track, this);
@@ -96,5 +103,9 @@ export class ActualEngine implements Engine {
           platform.checkout(this);
         }
       });
+  }
+
+  getRenderer(): BaseRenderer {
+    return this.renderer;
   }
 }
