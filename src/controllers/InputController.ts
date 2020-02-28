@@ -16,6 +16,7 @@ import { TrackBase } from '../structs/TrackBase/TrackBase';
 import { TrackJoint } from '../structs/TrackJoint/TrackJoint';
 import { ActualTrackJoint } from '../structs/TrackJoint/ActualTrackJoint';
 import { InputProps } from './InputProps';
+import { BaseBrick } from '../structs/Base/BaseBrick';
 
 export class InputController {
   private mode: string = 'CREATE_TRACK';
@@ -23,9 +24,14 @@ export class InputController {
 
   private inputHandler: InputHandler;
 
+  private downProps: InputProps;
+  private selectedMesh: BABYLON.AbstractMesh;
+  private selected: BaseBrick;
+
   constructor(private scene: BABYLON.Scene) {
     this.inputHandler = new CreateTrackInputHandler();
 
+    this.downProps = null;
     this.store = babylonContainer.get<() => Store>(TYPES.FactoryOfStore)();
   }
 
@@ -43,10 +49,10 @@ export class InputController {
     const jointList: TrackJoint[] = [];
     for (let elem of Object.keys(list)) {
       if (list[elem].constructor.name === ActualTrack.name) {
-        trackList.push(list[elem]);
+        trackList.push(list[elem] as TrackBase);
       }
       if (list[elem].constructor.name === ActualTrackJoint.name) {
-        jointList.push(list[elem]);
+        jointList.push(list[elem] as TrackJoint);
       }
     }
 
@@ -57,7 +63,9 @@ export class InputController {
       snappedPositionOnTrack: snapPositionOnTrack(point, trackList),
       snappedJoint: snapJoint(point, jointList),
       wheelDeg: this.wheelRotation,
-      wheelRad: (this.wheelRotation / 180) * Math.PI
+      wheelRad: (this.wheelRotation / 180) * Math.PI,
+      selected: this.selected,
+      selectedMesh: this.selectedMesh
     };
     ret.snappedPoint.dirXZ = ret.wheelRad;
 
@@ -66,17 +74,53 @@ export class InputController {
 
   down(event: PointerEvent) {
     const props = this.convert(event);
+    this.downProps = props;
     if (props) this.inputHandler.down(props);
   }
 
   move(event: PointerEvent) {
     const props = this.convert(event);
-    if (props) this.inputHandler.move(props);
+    if (this.downProps) {
+      if (props) this.inputHandler.move(this.downProps, props);
+    } else {
+      if (props) this.inputHandler.roam(props);
+    }
   }
 
   up(event: PointerEvent) {
-    const props = this.convert(event);
-    if (props) this.inputHandler.up(props);
+    let props = this.convert(event);
+    if (this.downProps.point.coord.equalsTo(props.point.coord)) {
+      if (this.downProps.mesh) {
+        const meshId = this.downProps.mesh.id;
+        if (meshId.startsWith('clickable-')) {
+          const [_, type, id] = meshId.split('-');
+          const storedObj = this.store.get(id);
+
+          let renderer = storedObj.getRenderer();
+          if (renderer.isSelected()) {
+            renderer.setSelected(false);
+
+            this.selected = null;
+            this.selectedMesh = null;
+          } else {
+            if (this.selected) {
+              this.selected.getRenderer().setSelected(false);
+            }
+
+            renderer.setSelected(true);
+
+            this.selected = storedObj;
+            this.selectedMesh = this.downProps.mesh;
+          }
+        }
+        props = this.convert(event);
+      }
+
+      if (props) this.inputHandler.click(this.downProps);
+    } else {
+      if (props) this.inputHandler.up(this.downProps, props);
+    }
+    this.downProps = null;
   }
 
   private wheelRotation = 0;
@@ -88,6 +132,6 @@ export class InputController {
     if (this.wheelRotation > 180) this.wheelRotation -= 360;
 
     const props = this.convert(null);
-    if (props) this.inputHandler.move(props);
+    if (props) this.move(null);
   }
 }

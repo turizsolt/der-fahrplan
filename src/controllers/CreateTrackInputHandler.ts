@@ -1,7 +1,6 @@
 import * as BABYLON from 'babylonjs';
 import { InputHandler } from './InputHandler';
 import { Coordinate } from '../structs/Geometry/Coordinate';
-import { Ray } from '../structs/Geometry/Ray';
 import { InputProps } from './InputProps';
 import { babylonContainer } from '../structs/inversify.config';
 import { TrackJoint } from '../structs/TrackJoint/TrackJoint';
@@ -11,8 +10,6 @@ import { BezierCreater } from '../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../structs/CoordinateToBabylonVector3';
 
 export class CreateTrackInputHandler implements InputHandler {
-  private downProps: InputProps;
-
   private fromMesh: BABYLON.Mesh;
   private toMesh: BABYLON.Mesh;
   private pathMesh: BABYLON.Mesh;
@@ -71,9 +68,6 @@ export class CreateTrackInputHandler implements InputHandler {
   }
 
   down(props: InputProps) {
-    //console.log('dn', props);
-    this.downProps = props;
-
     if (!props.snappedJoint) {
       this.fromMesh.setEnabled(true);
       this.fromMesh.position = CoordinateToBabylonVector3(
@@ -96,90 +90,79 @@ export class CreateTrackInputHandler implements InputHandler {
     this.pathMesh.setEnabled(true);
   }
 
-  move(props: InputProps) {
-    if (!this.downProps) {
-      this.fromMesh.position = CoordinateToBabylonVector3(
+  roam(props: InputProps) {
+    this.fromMesh.position = CoordinateToBabylonVector3(
+      props.snappedPoint.coord
+    );
+    this.fromMesh.rotation.y = props.wheelRad;
+    this.fromMesh.setEnabled(!props.snappedJoint);
+  }
+
+  move(downProps: InputProps, props: InputProps) {
+    this.toMesh.position = CoordinateToBabylonVector3(props.snappedPoint.coord);
+    this.toMesh.rotation.y = props.wheelRad;
+    this.toMesh.setEnabled(!props.snappedJoint);
+
+    if (props.snappedJoint) {
+      props.snappedPoint.dirXZ = props.snappedJoint.getRotation();
+    }
+
+    const midpoint = downProps.snappedPoint.computeMidpoint(props.snappedPoint);
+    const midpointCoord: Coordinate = midpoint === false ? undefined : midpoint;
+
+    this.pathMesh.setEnabled(midpoint !== false);
+    this.pathMesh = curveToTube(
+      BezierCreater.Create([
+        downProps.snappedPoint.coord,
+        midpointCoord,
         props.snappedPoint.coord
-      );
-      this.fromMesh.rotation.y = props.wheelRad;
-      this.fromMesh.setEnabled(!props.snappedJoint);
-    } else {
-      this.toMesh.position = CoordinateToBabylonVector3(
-        props.snappedPoint.coord
-      );
-      this.toMesh.rotation.y = props.wheelRad;
-      this.toMesh.setEnabled(!props.snappedJoint);
+      ])
+        .getLinePoints()
+        .map(CoordinateToBabylonVector3),
+      false,
+      this.pathMesh
+    );
+  }
 
-      if (props.snappedJoint) {
-        props.snappedPoint.dirXZ = props.snappedJoint.getRotation();
-      }
-
-      const midpoint = this.downProps.snappedPoint.computeMidpoint(
-        props.snappedPoint
-      );
-      const midpointCoord: Coordinate =
-        midpoint === false ? undefined : midpoint;
-
-      this.pathMesh.setEnabled(midpoint !== false);
-      this.pathMesh = curveToTube(
-        BezierCreater.Create([
-          this.downProps.snappedPoint.coord,
-          midpointCoord,
-          props.snappedPoint.coord
-        ])
-          .getLinePoints()
-          .map(CoordinateToBabylonVector3),
-        false,
-        this.pathMesh
+  click(downProps: InputProps) {
+    if (!downProps.snappedJoint) {
+      const tj = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+      tj.init(
+        downProps.snappedPoint.coord.x,
+        downProps.snappedPoint.coord.z,
+        downProps.wheelRad
       );
     }
   }
 
-  up(props: InputProps) {
-    if (this.downProps.point.coord.equalsTo(props.point.coord)) {
-      console.log('click');
-
-      if (!this.downProps.snappedJoint) {
-        const tj = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
-        tj.init(
-          this.downProps.snappedPoint.coord.x,
-          this.downProps.snappedPoint.coord.z,
-          this.downProps.wheelRad
-        );
-      }
+  up(downProps: InputProps, props: InputProps) {
+    let j1, j2;
+    if (downProps.snappedJoint) {
+      j1 = downProps.snappedJoint;
     } else {
-      console.log('moved and up');
-
-      let j1, j2;
-      if (this.downProps.snappedJoint) {
-        j1 = this.downProps.snappedJoint;
-      } else {
-        j1 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
-        j1.init(
-          this.downProps.snappedPoint.coord.x,
-          this.downProps.snappedPoint.coord.z,
-          this.downProps.wheelRad
-        );
-      }
-
-      if (props.snappedJoint) {
-        j2 = props.snappedJoint;
-      } else {
-        j2 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
-        j2.init(
-          props.snappedPoint.coord.x,
-          props.snappedPoint.coord.z,
-          props.wheelRad
-        );
-      }
-
-      j2.connect(j1);
+      j1 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+      j1.init(
+        downProps.snappedPoint.coord.x,
+        downProps.snappedPoint.coord.z,
+        downProps.wheelRad
+      );
     }
+
+    if (props.snappedJoint) {
+      j2 = props.snappedJoint;
+    } else {
+      j2 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+      j2.init(
+        props.snappedPoint.coord.x,
+        props.snappedPoint.coord.z,
+        props.wheelRad
+      );
+    }
+
+    j2.connect(j1);
 
     this.fromMesh.setEnabled(false);
     this.toMesh.setEnabled(false);
     this.pathMesh.setEnabled(false);
-
-    this.downProps = null;
   }
 }

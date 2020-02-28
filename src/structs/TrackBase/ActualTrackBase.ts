@@ -5,9 +5,12 @@ import { TrackSegment } from './TrackSegment';
 import { Coordinate } from '../Geometry/Coordinate';
 import { TrackBase } from './TrackBase';
 import { injectable } from 'inversify';
+import { ActualBaseBrick } from '../Base/ActualBaseBrick';
+import { BaseRenderer } from '../Base/BaseRenderer';
 
 @injectable()
-export abstract class ActualTrackBase implements TrackBase {
+export abstract class ActualTrackBase extends ActualBaseBrick
+  implements TrackBase {
   protected A: TrackEnd;
   protected B: TrackEnd;
   protected I: Coordinate;
@@ -15,7 +18,8 @@ export abstract class ActualTrackBase implements TrackBase {
   protected checkedList: Engine[] = [];
   protected _platformsBeside: Platform[] = [];
   protected removed: boolean = false;
-  protected id: string;
+
+  abstract getRenderer(): BaseRenderer;
 
   getPlatformsBeside() {
     return this._platformsBeside;
@@ -63,10 +67,6 @@ export abstract class ActualTrackBase implements TrackBase {
 
   isRemoved(): boolean {
     return this.removed;
-  }
-
-  getId(): string {
-    return this.id;
   }
 
   update(): void {}

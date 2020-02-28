@@ -1,9 +1,10 @@
 import { injectable } from 'inversify';
 import * as shortid from 'shortid';
+import { BaseBrick } from '../Base/BaseBrick';
 
 @injectable()
 export class Store {
-  private elements: Record<string, any>;
+  private elements: Record<string, BaseBrick>;
   private counter: any = {
     ActualTrackJoint: { counter: 0, abbr: 'j' },
     ActualTrack: { counter: 0, abbr: 't' },
@@ -18,7 +19,7 @@ export class Store {
     return this;
   }
 
-  register<T>(object: T): string {
+  register(object: BaseBrick): string {
     let id = shortid.generate();
     if (this.counter[object.constructor.name]) {
       let x = this.counter[object.constructor.name];
@@ -29,11 +30,11 @@ export class Store {
     return id;
   }
 
-  get<T>(id: string): T {
+  get(id: string): BaseBrick {
     return this.elements[id];
   }
 
-  getAll() {
+  getAll(): Record<string, BaseBrick> {
     return this.elements;
   }
 }

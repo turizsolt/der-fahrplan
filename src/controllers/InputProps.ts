@@ -16,4 +16,7 @@ export interface InputProps {
 
   wheelDeg: number;
   wheelRad: number;
+
+  selected: Object;
+  selectedMesh: BABYLON.AbstractMesh;
 }

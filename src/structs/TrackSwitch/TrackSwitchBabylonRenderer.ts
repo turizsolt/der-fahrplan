@@ -5,10 +5,11 @@ import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
 import { TrackSwitch } from './TrackSwitch';
 import { curveToTube } from '../Track/TrackBabylonRenderer';
 import { Coordinate } from '../Geometry/Coordinate';
-import { Bezier } from '../Geometry/Bezier/Bezier';
+import { BaseBabylonRenderer } from '../Base/BaseBabylonRenderer';
 
 @injectable()
-export class TrackSwitchBabylonRenderer implements TrackSwitchRenderer {
+export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
+  implements TrackSwitchRenderer {
   private mesh: BABYLON.Mesh;
   private meshE: BABYLON.Mesh;
   private meshF: BABYLON.Mesh;

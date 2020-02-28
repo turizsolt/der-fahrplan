@@ -2,8 +2,9 @@ import { Engine } from '../Engine/Engine';
 import { Platform } from '../Platform/Platform';
 import { TrackSegment } from './TrackSegment';
 import { TrackEnd } from '../Track/TrackEnd';
+import { BaseBrick } from '../Base/BaseBrick';
 
-export interface TrackBase {
+export interface TrackBase extends BaseBrick {
   checkin(engine: Engine);
   checkout(engine: Engine);
   addPlatform(platform: Platform);

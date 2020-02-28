@@ -7,7 +7,7 @@ import { Track } from './Track';
 import { ActualTrackBase } from '../TrackBase/ActualTrackBase';
 import { injectable, inject } from 'inversify';
 import { WhichEnd } from './WhichEnd';
-import { Store } from '../Store/Store';
+import { BaseRenderer } from '../Base/BaseRenderer';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
@@ -16,12 +16,8 @@ export class ActualTrack extends ActualTrackBase implements Track {
   protected segment: TrackSegment;
   @inject(TYPES.TrackRenderer) private renderer: TrackRenderer;
 
-  @inject(TYPES.FactoryOfStore) StoreFactory: () => Store;
-  private store: Store;
-
   init(coordinates: Coordinate[]): Track {
-    this.store = this.StoreFactory();
-    this.id = this.store.register(this);
+    super.initStore();
 
     this.A = new TrackEnd(WhichEnd.A, this);
     this.B = new TrackEnd(WhichEnd.B, this);
@@ -35,7 +31,6 @@ export class ActualTrack extends ActualTrackBase implements Track {
   }
 
   remove(): boolean {
-    // console.log('r T', this.getId(), this.isRemovable());
     const removable = super.remove();
     if (removable) {
       this.A.remove();
@@ -63,5 +58,9 @@ export class ActualTrack extends ActualTrackBase implements Track {
       !!this.B.getJointTo() && this.B.getJointTo().getId()
     );
     console.log('/track');
+  }
+
+  getRenderer(): BaseRenderer {
+    return this.renderer;
   }
 }
