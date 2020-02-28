@@ -30,6 +30,11 @@ export class Store {
     return id;
   }
 
+  unregister(object: BaseBrick): void {
+    let id = object.getId();
+    delete this.elements[id];
+  }
+
   get(id: string): BaseBrick {
     return this.elements[id];
   }

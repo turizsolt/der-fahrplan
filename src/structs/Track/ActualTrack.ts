@@ -36,6 +36,8 @@ export class ActualTrack extends ActualTrackBase implements Track {
       this.A.remove();
       this.B.remove();
       this.renderer.update();
+
+      this.store.unregister(this);
     }
     return removable;
   }

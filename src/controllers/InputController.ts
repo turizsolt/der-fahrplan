@@ -17,6 +17,7 @@ import { TrackJoint } from '../structs/TrackJoint/TrackJoint';
 import { ActualTrackJoint } from '../structs/TrackJoint/ActualTrackJoint';
 import { InputProps } from './InputProps';
 import { BaseBrick } from '../structs/Base/BaseBrick';
+import { ActualTrackSwitch } from '../structs/TrackSwitch/ActualTrackSwitch';
 
 export class InputController {
   private mode: string = 'CREATE_TRACK';
@@ -48,7 +49,10 @@ export class InputController {
     const trackList: TrackBase[] = [];
     const jointList: TrackJoint[] = [];
     for (let elem of Object.keys(list)) {
-      if (list[elem].constructor.name === ActualTrack.name) {
+      if (
+        list[elem].constructor.name === ActualTrack.name ||
+        list[elem].constructor.name === ActualTrackSwitch.name
+      ) {
         trackList.push(list[elem] as TrackBase);
       }
       if (list[elem].constructor.name === ActualTrackJoint.name) {
@@ -137,5 +141,39 @@ export class InputController {
 
     const props = this.convert(null);
     if (props) this.move(null);
+  }
+
+  keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {}
+
+  keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    if (!this.selected) return;
+
+    switch (key) {
+      case 'Delete':
+        this.selected.getRenderer().process('delete');
+        break;
+
+      case 'Enter':
+        this.selected.getRenderer().process('stop');
+        break;
+
+      case 'S':
+        this.selected.getRenderer().process('switch');
+        break;
+    }
+  }
+
+  keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    if (!this.selected) return;
+
+    switch (key) {
+      case 'ArrowUp':
+        this.selected.getRenderer().process('forward');
+        break;
+
+      case 'ArrowDown':
+        this.selected.getRenderer().process('backward');
+        break;
+    }
   }
 }

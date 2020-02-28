@@ -9,7 +9,7 @@ export abstract class ActualBaseBrick implements BaseBrick {
   protected id: string;
 
   @inject(TYPES.FactoryOfStore) StoreFactory: () => Store;
-  private store: Store;
+  protected store: Store;
 
   abstract getRenderer(): BaseRenderer;
 

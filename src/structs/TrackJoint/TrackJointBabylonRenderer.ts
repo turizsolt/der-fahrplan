@@ -64,10 +64,6 @@ export class TrackJointBabylonRenderer extends BaseBabylonRenderer
 
   process(command: string): void {
     switch (command) {
-      case 'deselect':
-        this.setSelected(false);
-        break;
-
       case 'delete':
         this.trackJoint.remove();
         break;

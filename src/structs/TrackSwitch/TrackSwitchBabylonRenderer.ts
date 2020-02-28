@@ -15,6 +15,9 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
   private meshF: BABYLON.Mesh;
   private meshSB: BABYLON.Mesh;
 
+  private matSel: BABYLON.StandardMaterial;
+  private matNorm: BABYLON.StandardMaterial;
+
   private bal: BABYLON.Mesh;
   private balE: BABYLON.Mesh;
   private balF: BABYLON.Mesh;
@@ -66,9 +69,12 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
 
     switchBox.position = CoordinateToBabylonVector3(coord);
 
-    var boxMaterial = new BABYLON.StandardMaterial('botMat', this.scene);
-    boxMaterial.diffuseColor = BABYLON.Color3.Red();
-    switchBox.material = boxMaterial;
+    this.matNorm = new BABYLON.StandardMaterial('boxMat', this.scene);
+    this.matNorm.diffuseColor = new BABYLON.Color3(1, 0, 0);
+
+    this.matSel = new BABYLON.StandardMaterial('boxMat', this.scene);
+    this.matSel.diffuseColor = new BABYLON.Color3(1, 0, 1);
+    switchBox.material = this.matNorm;
     this.meshSB = switchBox;
 
     const curveE = this.trackSwitch
@@ -147,6 +153,8 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
         this.phE.setEnabled(false);
         this.phF.setEnabled(false);
       } else {
+        this.meshSB.material = this.selected ? this.matSel : this.matNorm;
+
         const curve = this.trackSwitch
           .getSegment()
           .getCurvePoints()
@@ -176,6 +184,18 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
           this.phF
         );
       }
+    }
+  }
+
+  process(command: string) {
+    switch (command) {
+      case 'switch':
+        this.trackSwitch.switch();
+        break;
+
+      case 'delete':
+        this.trackSwitch.remove();
+        break;
     }
   }
 }

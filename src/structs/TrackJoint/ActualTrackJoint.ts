@@ -71,6 +71,8 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
       }
       this.removed = true;
       this.renderer.update();
+
+      this.store.unregister(this);
       return true;
     }
     return false;

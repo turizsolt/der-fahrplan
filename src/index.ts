@@ -1,23 +1,16 @@
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
-import { TrackJoint } from './structs/TrackJoint/TrackJoint';
 import { babylonContainer } from './structs/inversify.config';
 import { Land } from './structs/Land/Land';
 import { TYPES } from './structs/TYPES';
-import { KeyController } from './controllers/KeyController';
 import { GridDrawer } from './controllers/GridDrawer';
-import { MouseController } from './controllers/MouseController';
-import { OldController } from './controllers/OldController';
 import { InputController } from './controllers/InputController';
-import { BabylonVector3ToCoordinate } from './structs/BabylonVector3ToCoordinate';
 
 window.addEventListener('DOMContentLoaded', () => {
   const canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
     'renderCanvas'
   ) as HTMLCanvasElement;
   const renderEngine = new BABYLON.Engine(canvas, true);
-
-  //   const controller = new OldController();
 
   const createScene = () => {
     const scene = new BABYLON.Scene(renderEngine);
@@ -31,7 +24,6 @@ window.addEventListener('DOMContentLoaded', () => {
       new BABYLON.Vector3(0, 0, 0),
       scene
     );
-    // controller.setCameraAndCanvas(camera, canvas as HTMLElement);
 
     const light = new BABYLON.DirectionalLight(
       'DirectionalLight',
@@ -53,19 +45,68 @@ window.addEventListener('DOMContentLoaded', () => {
     gridDrawer.setScene(scene);
     gridDrawer.drawGrid();
 
-    // const keyController = new KeyController();
-    // keyController.setScene(scene);
-    // keyController.setController(controller);
-    // keyController.handleKeys();
-    // keyController.handleKeyCommands(engine);
+    this.scene = scene;
+    this.map = {};
+    this.scene.actionManager = new BABYLON.ActionManager(this.scene);
+
+    const modifier = key => {
+      const list = ['Shift', 'Control', 'Alt'];
+      return list.includes(key);
+    };
+
+    const upper = key => {
+      return key[0].toUpperCase() + key.slice(1);
+    };
+
+    this.scene.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        BABYLON.ActionManager.OnKeyDownTrigger,
+        evt => {
+          const key = upper(evt.sourceEvent.key);
+          if (!this.map[key]) {
+            if (!modifier(key)) {
+              inputController.keyDown(key, {
+                shift: this.map['Shift'],
+                ctrl: this.map['Control']
+              });
+            }
+          }
+          this.map[key] = evt.sourceEvent.type == 'keydown';
+        }
+      )
+    );
+
+    this.scene.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        BABYLON.ActionManager.OnKeyUpTrigger,
+        evt => {
+          const key = upper(evt.sourceEvent.key);
+          if (!modifier(key)) {
+            inputController.keyUp(key, {
+              shift: this.map['Shift'],
+              ctrl: this.map['Control']
+            });
+          }
+
+          this.map[key] = evt.sourceEvent.type == 'keydown';
+        }
+      )
+    );
+
+    this.scene.registerAfterRender(() => {
+      for (let key of Object.keys(this.map)) {
+        if (this.map[key] && !modifier(key)) {
+          inputController.keyHold(key, {
+            shift: this.map['Shift'],
+            ctrl: this.map['Control']
+          });
+        }
+      }
+    });
 
     return scene;
   };
   const scene = createScene();
-  //   controller.setScene(scene);
-  //   const mouseController = new MouseController();
-  //   mouseController.setScene(scene);
-  //   mouseController.setController(controller);
 
   const inputController = new InputController(scene);
 
@@ -79,6 +120,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   canvas.addEventListener('pointerdown', e => {
     inputController.down(e);
+    if (e.button === 1) {
+      e.preventDefault();
+      return false;
+    }
   });
 
   canvas.addEventListener('pointerup', e => {
@@ -89,15 +134,20 @@ window.addEventListener('DOMContentLoaded', () => {
     inputController.move(e);
   });
 
-  canvas.addEventListener('pointerenter', () => {
-    console.log('enter');
-  });
+  canvas.addEventListener('pointerenter', () => {});
 
-  canvas.addEventListener('pointerleave', () => {
-    console.log('leave');
-  });
+  canvas.addEventListener('pointerleave', () => {});
+
+  canvas.addEventListener('focus', () => {});
+
+  canvas.addEventListener('blur', () => {});
 
   window.addEventListener('wheel', e => {
     inputController.wheel(e);
+  });
+
+  document.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    return false;
   });
 });

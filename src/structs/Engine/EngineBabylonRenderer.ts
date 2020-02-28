@@ -41,4 +41,20 @@ export class EngineBabylonRenderer extends BaseBabylonRenderer
     this.renderEngine.rotation.y = ray.dirXZ;
     this.renderEngine.material = this.selected ? this.matSel : this.matNorm;
   }
+
+  process(command: string) {
+    switch (command) {
+      case 'forward':
+        this.engine.forward();
+        break;
+
+      case 'backward':
+        this.engine.backward();
+        break;
+
+      case 'stop':
+        this.engine.stop();
+        break;
+    }
+  }
 }

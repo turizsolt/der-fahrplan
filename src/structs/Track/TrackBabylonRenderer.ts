@@ -15,6 +15,9 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
   private mesh: BABYLON.Mesh;
   private meshTC: BABYLON.Mesh;
 
+  private matSel: BABYLON.StandardMaterial;
+  private matNorm: BABYLON.StandardMaterial;
+
   private balA: BABYLON.Mesh;
   private balB: BABYLON.Mesh;
 
@@ -51,9 +54,12 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
 
     trackCoin.position = CoordinateToBabylonVector3(coord);
 
-    var boxMaterial = new BABYLON.StandardMaterial('botMat', this.scene);
-    boxMaterial.diffuseColor = BABYLON.Color3.Blue();
-    trackCoin.material = boxMaterial;
+    this.matNorm = new BABYLON.StandardMaterial('boxMat', this.scene);
+    this.matNorm.diffuseColor = new BABYLON.Color3(0, 0, 1);
+
+    this.matSel = new BABYLON.StandardMaterial('boxMat', this.scene);
+    this.matSel.diffuseColor = new BABYLON.Color3(1, 0, 1);
+    trackCoin.material = this.matNorm;
     this.meshTC = trackCoin;
 
     const cl = this.track
@@ -96,11 +102,21 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
       this.phA.setEnabled(false);
       this.phB.setEnabled(false);
     } else {
+      this.meshTC.material = this.selected ? this.matSel : this.matNorm;
+
       ballonUpdate(this.track.getA().getConnectedTrack() ? 1 : 0, this.balA);
       ballonUpdate(this.track.getB().getConnectedTrack() ? 1 : 0, this.balB);
 
       ballonUpdate(this.track.getA().getConnectedEnd() ? 2 : 0, this.phA);
       ballonUpdate(this.track.getB().getConnectedEnd() ? 2 : 0, this.phB);
+    }
+  }
+
+  process(command: string) {
+    switch (command) {
+      case 'delete':
+        this.track.remove();
+        break;
     }
   }
 }

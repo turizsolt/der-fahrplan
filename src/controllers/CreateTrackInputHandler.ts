@@ -69,14 +69,18 @@ export class CreateTrackInputHandler implements InputHandler {
 
   down(props: InputProps): void {
     if (!props.snappedJoint) {
-      this.fromMesh.setEnabled(true);
+      this.fromMesh.setEnabled(
+        !props.snappedJoint && !props.snappedPositionOnTrack
+      );
       this.fromMesh.position = CoordinateToBabylonVector3(
         props.snappedPoint.coord
       );
       this.fromMesh.rotation.y = props.wheelRad;
     }
 
-    this.toMesh.setEnabled(true);
+    this.toMesh.setEnabled(
+      !props.snappedJoint && !props.snappedPositionOnTrack
+    );
     this.toMesh.position = CoordinateToBabylonVector3(props.snappedPoint.coord);
     this.toMesh.rotation.y = props.wheelRad;
 
@@ -87,7 +91,7 @@ export class CreateTrackInputHandler implements InputHandler {
       false,
       this.pathMesh
     );
-    this.pathMesh.setEnabled(true);
+    this.pathMesh.setEnabled(!props.snappedJoint);
   }
 
   roam(props: InputProps): void {
@@ -95,7 +99,9 @@ export class CreateTrackInputHandler implements InputHandler {
       props.snappedPoint.coord
     );
     this.fromMesh.rotation.y = props.wheelRad;
-    this.fromMesh.setEnabled(!props.snappedJoint);
+    this.fromMesh.setEnabled(
+      !props.snappedJoint && !props.snappedPositionOnTrack
+    );
   }
 
   move(downProps: InputProps, props: InputProps): void {
@@ -137,6 +143,7 @@ export class CreateTrackInputHandler implements InputHandler {
 
   up(downProps: InputProps, props: InputProps): void {
     let j1, j2;
+    let deletable: TrackJoint[] = [];
     if (downProps.snappedJoint) {
       j1 = downProps.snappedJoint;
     } else {
@@ -146,6 +153,7 @@ export class CreateTrackInputHandler implements InputHandler {
         downProps.snappedPoint.coord.z,
         downProps.wheelRad
       );
+      deletable.push(j1);
     }
 
     if (props.snappedJoint) {
@@ -157,9 +165,13 @@ export class CreateTrackInputHandler implements InputHandler {
         props.snappedPoint.coord.z,
         props.wheelRad
       );
+      deletable.push(j2);
     }
 
-    j2.connect(j1);
+    const ret = j2.connect(j1);
+    if (!ret) {
+      deletable.map(j => j.remove());
+    }
 
     this.fromMesh.setEnabled(false);
     this.toMesh.setEnabled(false);

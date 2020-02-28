@@ -11,6 +11,7 @@ export interface InputProps {
     distance: number;
     track: TrackBase;
     position: number;
+    segment: string;
   };
   snappedJoint: TrackJoint;
 
