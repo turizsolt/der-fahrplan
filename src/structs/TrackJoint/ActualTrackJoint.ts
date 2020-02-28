@@ -7,13 +7,13 @@ import { TrackJoint } from './TrackJoint';
 import { WhichEnd, otherEnd } from '../Track/WhichEnd';
 import { TrackEnd } from '../Track/TrackEnd';
 import { TrackBase } from '../TrackBase/TrackBase';
-import { Store } from '../Store/Store';
 import { Ray } from '../Geometry/Ray';
 import { TrackJointConnector } from './TrackJointConnector';
+import { ActualBaseBrick } from '../Base/ActualBaseBrick';
+import { BaseRenderer } from '../Base/BaseRenderer';
 
 @injectable()
-export class ActualTrackJoint implements TrackJoint {
-  private id: string;
+export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   private ray: Ray;
   private removed: boolean = false;
   private ends: Record<WhichEnd, TrackJointEnd>;
@@ -24,14 +24,10 @@ export class ActualTrackJoint implements TrackJoint {
   TrackJointConnectorFactory: () => TrackJointConnector;
   private connector: TrackJointConnector;
 
-  @inject(TYPES.FactoryOfStore) StoreFactory: () => Store;
-  private store: Store;
-
   init(x: number, z: number, rot: number): TrackJoint {
-    this.store = this.StoreFactory();
-    this.connector = this.TrackJointConnectorFactory();
+    super.initStore();
 
-    this.id = this.store.register(this);
+    this.connector = this.TrackJointConnectorFactory();
 
     this.ends = {
       A: new TrackJointEnd(),
@@ -133,10 +129,6 @@ export class ActualTrackJoint implements TrackJoint {
     return this.ends;
   }
 
-  getId() {
-    return this.id;
-  }
-
   isRemoved(): boolean {
     return this.removed;
   }
@@ -160,5 +152,9 @@ export class ActualTrackJoint implements TrackJoint {
     console.log('A ', this.ends.A.end && this.ends.A.end.getHash());
     console.log('B ', this.ends.B.end && this.ends.B.end.getHash());
     console.log('/joint');
+  }
+
+  getRenderer(): BaseRenderer {
+    return this.renderer;
   }
 }

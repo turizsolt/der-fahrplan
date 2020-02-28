@@ -6,4 +6,9 @@ import { injectable } from 'inversify';
 export class TrackJointDummyRenderer implements TrackJointRenderer {
   init(_: TrackJoint): void {}
   update() {}
+  setSelected(_: boolean): void {}
+  process(_: string): void {}
+  isSelected(): boolean {
+    return null;
+  }
 }

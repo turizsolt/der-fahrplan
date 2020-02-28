@@ -4,8 +4,10 @@ import { TrackBase } from '../TrackBase/TrackBase';
 import { Ray } from '../Geometry/Ray';
 import { TrackJointEnd } from './TrackJointEnd';
 import { Coordinate } from '../Geometry/Coordinate';
+import { TrackJointRenderer } from './TrackJointRenderer';
+import { BaseBrick } from '../Base/BaseBrick';
 
-export interface TrackJoint {
+export interface TrackJoint extends BaseBrick {
   init(x: number, z: number, rot: number): TrackJoint;
   rotate(rot: number): void;
   remove(): boolean;
@@ -24,7 +26,6 @@ export interface TrackJoint {
   deselect(): void;
   isSelected(): boolean;
   verbose(): void;
-  getId(): string;
   getTracksEnd(track: TrackBase): WhichEnd | undefined;
 
   isEndEmpty(end: TrackJointEnd): boolean;

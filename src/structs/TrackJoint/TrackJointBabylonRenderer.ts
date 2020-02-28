@@ -3,9 +3,11 @@ import { TrackJoint } from './TrackJoint';
 import { TrackJointRenderer } from './TrackJointRenderer';
 import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
 import { injectable } from 'inversify';
+import { BaseBabylonRenderer } from '../Base/BaseBabylonRenderer';
 
 @injectable()
-export class TrackJointBabylonRenderer implements TrackJointRenderer {
+export class TrackJointBabylonRenderer extends BaseBabylonRenderer
+  implements TrackJointRenderer {
   private mesh: BABYLON.Mesh;
   private trackJoint: TrackJoint;
   readonly scene: BABYLON.Scene;
@@ -47,7 +49,7 @@ export class TrackJointBabylonRenderer implements TrackJointRenderer {
 
   update() {
     if (!this.trackJoint.isRemoved()) {
-      this.mesh.material = this.trackJoint.isSelected()
+      this.mesh.material = this.selected
         ? this.redArrowMaterial
         : this.arrowMaterial;
       this.mesh.position = CoordinateToBabylonVector3(
@@ -57,6 +59,18 @@ export class TrackJointBabylonRenderer implements TrackJointRenderer {
       this.mesh.rotation.y = this.trackJoint.getRotation();
     } else {
       this.mesh.setEnabled(false);
+    }
+  }
+
+  process(command: string): void {
+    switch (command) {
+      case 'deselect':
+        this.setSelected(false);
+        break;
+
+      case 'delete':
+        this.trackJoint.remove();
+        break;
     }
   }
 }
