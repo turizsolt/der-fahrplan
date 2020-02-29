@@ -5,16 +5,17 @@ import { Platform } from './Platform';
 export class PassengerGenerator {
   private interval: number;
 
-  constructor(
-    readonly platformList: Platform[],
-    readonly scene: BABYLON.Scene
-  ) {
+  constructor(private platformList: Platform[], readonly scene: BABYLON.Scene) {
     this.interval = (setInterval(() => this.tick(), 2000) as unknown) as number;
     this.tick();
   }
 
   addToList(platform: Platform) {
     this.platformList.push(platform);
+  }
+
+  removeFromList(platform: Platform) {
+    this.platformList = this.platformList.filter(x => x !== platform);
   }
 
   tick() {

@@ -4,12 +4,15 @@ import { Platform } from './Platform';
 import { ColorToBabylonColor3 } from '../ColorToBabylonColor3';
 import { PlatformRenderer } from './PlatformRenderer';
 import { injectable } from 'inversify';
+import { BaseBabylonRenderer } from '../Base/BaseBabylonRenderer';
 
 @injectable()
-export class PlatformBabylonRenderer implements PlatformRenderer {
+export class PlatformBabylonRenderer extends BaseBabylonRenderer
+  implements PlatformRenderer {
   private mesh: BABYLON.Mesh;
 
-  private blue: BABYLON.StandardMaterial;
+  private matNorm: BABYLON.StandardMaterial;
+  private matSel: BABYLON.StandardMaterial;
   private platform: Platform;
   private scene: BABYLON.Scene;
 
@@ -17,7 +20,7 @@ export class PlatformBabylonRenderer implements PlatformRenderer {
     this.platform = platform;
 
     this.mesh = BABYLON.MeshBuilder.CreateBox(
-      'platform-' + this.platform.getId(),
+      'clickable-platform-' + this.platform.getId(),
       {
         width: this.platform.getWidth(),
         height: 1.5,
@@ -30,10 +33,29 @@ export class PlatformBabylonRenderer implements PlatformRenderer {
     );
     this.mesh.rotation.y = this.platform.getRotation();
 
-    this.blue = new BABYLON.StandardMaterial('blue', this.scene);
-    this.blue.diffuseColor = ColorToBabylonColor3(this.platform.getColor());
+    this.matNorm = new BABYLON.StandardMaterial('blue', this.scene);
+    this.matNorm.diffuseColor = ColorToBabylonColor3(this.platform.getColor());
+    this.matSel = new BABYLON.StandardMaterial('blue', this.scene);
+    this.matSel.diffuseColor = BABYLON.Color3.White();
 
-    this.mesh.material = this.blue;
+    this.mesh.material = this.matNorm;
     return this.mesh;
+  }
+
+  update(): void {
+    if (this.platform.isRemoved()) {
+      this.mesh.setEnabled(false);
+    } else {
+      this.mesh.setEnabled(true);
+      this.mesh.material = this.selected ? this.matSel : this.matNorm;
+    }
+  }
+
+  process(command: string) {
+    switch (command) {
+      case 'delete':
+        this.platform.remove();
+        break;
+    }
   }
 }

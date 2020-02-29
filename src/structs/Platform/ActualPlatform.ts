@@ -8,9 +8,12 @@ import { Color } from '../Color';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../TYPES';
 import { PlatformRenderer } from './PlatformRenderer';
+import { ActualBaseBrick } from '../Base/ActualBaseBrick';
+import { BaseRenderer } from '../Base/BaseRenderer';
+import { PassengerGenerator } from './PassengerGenerator';
 
 @injectable()
-export class ActualPlatform implements Platform {
+export class ActualPlatform extends ActualBaseBrick implements Platform {
   private position: Coordinate;
   private rotation: number;
   private carList: Engine[];
@@ -23,10 +26,13 @@ export class ActualPlatform implements Platform {
   private width: number;
   private side: Side;
   private color: Color;
+  private removed: boolean = false;
+  private pg: PassengerGenerator;
+
   @inject(TYPES.PlatformRenderer) private renderer: PlatformRenderer;
 
-  getId() {
-    return this.no;
+  getRenderer(): BaseRenderer {
+    return this.renderer;
   }
 
   getWidth() {
@@ -54,8 +60,11 @@ export class ActualPlatform implements Platform {
     end: number,
     width: number,
     side: Side,
-    color: Color
+    color: Color,
+    pg: PassengerGenerator
   ): Platform {
+    super.initStore();
+
     const segment = track.getSegment();
     const a = segment.getFirstPoint();
     const b = segment.getLastPoint();
@@ -70,6 +79,7 @@ export class ActualPlatform implements Platform {
     this.width = width;
     this.side = side;
     this.color = color;
+    this.pg = pg;
 
     track.addPlatform(this);
 
@@ -138,5 +148,17 @@ export class ActualPlatform implements Platform {
 
   isBeside(position: number): boolean {
     return this.start <= position && position <= this.end;
+  }
+
+  remove(): boolean {
+    this.store.unregister(this);
+    this.pg.removeFromList(this);
+    this.removed = true;
+    this.renderer.update();
+    return true;
+  }
+
+  isRemoved(): boolean {
+    return this.removed;
   }
 }

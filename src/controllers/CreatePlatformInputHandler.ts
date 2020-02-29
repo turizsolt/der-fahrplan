@@ -162,7 +162,8 @@ export class CreatePlatformInputHandler implements InputHandler {
         Math.max(pot.position, dpot.position),
         5,
         side > 0 ? Side.Left : Side.Right,
-        randomColor()
+        randomColor(),
+        this.passengerGenerator
       );
       this.passengerGenerator.addToList(pl);
     }
