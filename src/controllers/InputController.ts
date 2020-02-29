@@ -19,6 +19,7 @@ import { InputProps } from './InputProps';
 import { BaseBrick } from '../structs/Base/BaseBrick';
 import { ActualTrackSwitch } from '../structs/TrackSwitch/ActualTrackSwitch';
 import { CameraInputHandler } from './CameraInputHandler';
+import { SelectInputHandler } from './SelectInputHandler';
 
 export class InputController {
   private mode: string = 'CREATE_TRACK';
@@ -36,7 +37,9 @@ export class InputController {
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera
   ) {
-    this.inputHandler = new CameraInputHandler(camera); //new CreateTrackInputHandler();
+    this.inputHandler = new SelectInputHandler();
+    //new CameraInputHandler(camera);
+    //new CreateTrackInputHandler();
 
     this.downProps = null;
     this.store = babylonContainer.get<() => Store>(TYPES.FactoryOfStore)();
@@ -135,37 +138,12 @@ export class InputController {
     let props = this.convert(event);
 
     if (this.downProps.point.coord.equalsTo(props.point.coord)) {
-      let ready = false;
-      if (this.downProps.mesh) {
-        const meshId = this.downProps.mesh.id;
-        if (meshId.startsWith('clickable-')) {
-          const [_, type, id] = meshId.split('-');
-          const storedObj = this.store.get(id);
-
-          if (storedObj) {
-            let renderer = storedObj.getRenderer();
-            if (renderer.isSelected()) {
-              renderer.setSelected(false);
-
-              this.selected = null;
-              this.selectedMesh = null;
-            } else {
-              if (this.selected) {
-                this.selected.getRenderer().setSelected(false);
-              }
-
-              renderer.setSelected(true);
-
-              this.selected = storedObj;
-              this.selectedMesh = this.downProps.mesh;
-            }
-            ready = true;
-          }
-        }
+      let ready = this.selectIfPossible();
+      if (ready) {
+        this.inputHandler.cancel();
+      } else {
+        this.inputHandler.click(this.downProps, event);
       }
-
-      if (!ready) this.inputHandler.click(this.downProps, event);
-      if (ready) this.inputHandler.cancel();
     } else {
       this.inputHandler.up(this.downProps, props, event);
     }
@@ -173,6 +151,34 @@ export class InputController {
   }
 
   private wheelRotation = 0;
+
+  private selectIfPossible() {
+    let ready = false;
+    if (this.downProps.mesh) {
+      const meshId = this.downProps.mesh.id;
+      if (meshId.startsWith('clickable-')) {
+        const [_, type, id] = meshId.split('-');
+        const storedObj = this.store.get(id);
+        if (storedObj) {
+          let renderer = storedObj.getRenderer();
+          if (renderer.isSelected()) {
+            renderer.setSelected(false);
+            this.selected = null;
+            this.selectedMesh = null;
+          } else {
+            if (this.selected) {
+              this.selected.getRenderer().setSelected(false);
+            }
+            renderer.setSelected(true);
+            this.selected = storedObj;
+            this.selectedMesh = this.downProps.mesh;
+          }
+          ready = true;
+        }
+      }
+    }
+    return ready;
+  }
 
   wheel(event: WheelEvent) {
     if (this.mouseButtons[1]) {
