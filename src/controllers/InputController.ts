@@ -180,7 +180,10 @@ export class InputController {
   up(event: PointerEvent) {
     let props = this.convert(event);
 
-    if (this.downProps.point.coord.equalsTo(props.point.coord)) {
+    if (
+      this.downProps.point &&
+      this.downProps.point.coord.equalsTo(props.point.coord)
+    ) {
       let ready = this.selectIfPossible();
       if (ready) {
         this.inputHandler.cancel();

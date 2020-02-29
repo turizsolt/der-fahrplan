@@ -95,9 +95,11 @@ export class CreateTrackInputHandler implements InputHandler {
   }
 
   roam(props: InputProps, event: PointerEvent): void {
-    this.fromMesh.position = CoordinateToBabylonVector3(
-      props.snappedPoint.coord
-    );
+    if (props.snappedPoint) {
+      this.fromMesh.position = CoordinateToBabylonVector3(
+        props.snappedPoint.coord
+      );
+    }
     this.fromMesh.rotation.y = props.wheelRad;
     this.fromMesh.setEnabled(
       !props.snappedJoint && !props.snappedPositionOnTrack
