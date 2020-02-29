@@ -22,11 +22,19 @@ import { CameraInputHandler } from './CameraInputHandler';
 import { SelectInputHandler } from './SelectInputHandler';
 import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
 
+export enum InputMode {
+  CAMERA = 'CAMERA',
+  SELECT = 'SELECT',
+  CREATE_TRACK = 'CREATE_TRACK',
+  CREATE_PLATFORM = 'CREATE_PLATFORM'
+}
+
 export class InputController {
-  private mode: string = 'CREATE_TRACK';
+  private mode: InputMode = InputMode.CAMERA;
   private store: Store;
 
   private inputHandler: InputHandler;
+  private inputHandlers: Record<InputMode, InputHandler>;
 
   private downProps: InputProps;
   private selectedMesh: BABYLON.AbstractMesh;
@@ -38,10 +46,43 @@ export class InputController {
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera
   ) {
-    this.inputHandler = new CreatePlatformInputHandler();
-    //new SelectInputHandler();
-    //new CameraInputHandler(camera);
-    //new CreateTrackInputHandler();
+    document.getElementById('input-cam').addEventListener('click', () => {
+      this.inputHandler.cancel();
+      this.mode = InputMode.CAMERA;
+      this.inputHandler = this.inputHandlers[this.mode];
+      updBoxes(this.mode);
+    });
+
+    document.getElementById('input-sel').addEventListener('click', () => {
+      this.inputHandler.cancel();
+      this.mode = InputMode.SELECT;
+      this.inputHandler = this.inputHandlers[this.mode];
+      updBoxes(this.mode);
+    });
+
+    document.getElementById('input-nt').addEventListener('click', () => {
+      this.inputHandler.cancel();
+      this.mode = InputMode.CREATE_TRACK;
+      this.inputHandler = this.inputHandlers[this.mode];
+      updBoxes(this.mode);
+    });
+
+    document.getElementById('input-np').addEventListener('click', () => {
+      this.inputHandler.cancel();
+      this.mode = InputMode.CREATE_PLATFORM;
+      this.inputHandler = this.inputHandlers[this.mode];
+      updBoxes(this.mode);
+    });
+
+    this.inputHandlers = {
+      [InputMode.CAMERA]: new CameraInputHandler(camera),
+      [InputMode.SELECT]: new SelectInputHandler(),
+      [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(),
+      [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler()
+    };
+
+    this.inputHandler = this.inputHandlers[this.mode];
+    updBoxes(this.mode);
 
     this.downProps = null;
     this.store = babylonContainer.get<() => Store>(TYPES.FactoryOfStore)();
@@ -199,6 +240,37 @@ export class InputController {
   keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {}
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    switch (key) {
+      case 'U':
+        this.inputHandler.cancel();
+        this.mode = InputMode.CAMERA;
+        this.inputHandler = this.inputHandlers[this.mode];
+        updBoxes(this.mode);
+        break;
+
+      case 'I':
+        this.inputHandler.cancel();
+        this.mode = InputMode.SELECT;
+        this.inputHandler = this.inputHandlers[this.mode];
+        updBoxes(this.mode);
+        break;
+
+      case 'O':
+        console.log('o');
+        this.inputHandler.cancel();
+        this.mode = InputMode.CREATE_TRACK;
+        this.inputHandler = this.inputHandlers[this.mode];
+        updBoxes(this.mode);
+        break;
+
+      case 'P':
+        this.inputHandler.cancel();
+        this.mode = InputMode.CREATE_PLATFORM;
+        this.inputHandler = this.inputHandlers[this.mode];
+        updBoxes(this.mode);
+        break;
+    }
+
     if (!this.selected) return;
 
     switch (key) {
@@ -229,4 +301,20 @@ export class InputController {
         break;
     }
   }
+}
+
+const choices = {
+  [InputMode.CAMERA]: 'input-cam',
+  [InputMode.SELECT]: 'input-sel',
+  [InputMode.CREATE_TRACK]: 'input-nt',
+  [InputMode.CREATE_PLATFORM]: 'input-np'
+};
+
+function updBoxes(chosen: InputMode) {
+  document.getElementById('input-cam').classList.remove('selected');
+  document.getElementById('input-sel').classList.remove('selected');
+  document.getElementById('input-nt').classList.remove('selected');
+  document.getElementById('input-np').classList.remove('selected');
+
+  document.getElementById(choices[chosen]).classList.add('selected');
 }
