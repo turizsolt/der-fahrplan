@@ -8,7 +8,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 // copies the assets folder into dist folder
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 // output folder location
-const distFolder = './dist';
+const distFolder = './build';
 
 module.exports = {
   mode: 'development',
