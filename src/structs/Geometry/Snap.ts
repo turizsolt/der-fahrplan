@@ -33,7 +33,7 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
         if (c < distance) {
           distance = c;
           track = thisTrack;
-          position = (i / (linePoints.length - 1)) * track.getLength();
+          position = i / (linePoints.length - 1);
         }
       }
     } else {
@@ -47,7 +47,7 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
         if (c < distance) {
           distance = c;
           track = thisTrack;
-          position = (i / (linePoints.length - 1)) * track.getLength();
+          position = i / (linePoints.length - 1);
           segment = 'E';
         }
       }
@@ -62,7 +62,7 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
         if (c < distance) {
           distance = c;
           track = thisTrack;
-          position = (i / (linePoints2.length - 1)) * track.getLength();
+          position = i / (linePoints2.length - 1);
           segment = 'F';
         }
       }

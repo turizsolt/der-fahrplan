@@ -20,6 +20,7 @@ import { BaseBrick } from '../structs/Base/BaseBrick';
 import { ActualTrackSwitch } from '../structs/TrackSwitch/ActualTrackSwitch';
 import { CameraInputHandler } from './CameraInputHandler';
 import { SelectInputHandler } from './SelectInputHandler';
+import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
 
 export class InputController {
   private mode: string = 'CREATE_TRACK';
@@ -37,7 +38,8 @@ export class InputController {
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera
   ) {
-    this.inputHandler = new SelectInputHandler();
+    this.inputHandler = new CreatePlatformInputHandler();
+    //new SelectInputHandler();
     //new CameraInputHandler(camera);
     //new CreateTrackInputHandler();
 

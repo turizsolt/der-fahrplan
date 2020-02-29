@@ -56,6 +56,13 @@ export class ActualPlatform implements Platform {
     side: Side,
     color: Color
   ): Platform {
+    const segment = track.getSegment();
+    const a = segment.getFirstPoint();
+    const b = segment.getLastPoint();
+    const segLen = segment.getLength();
+    start = start * segLen;
+    end = end * segLen;
+
     this.no = no;
     this.track = track;
     this.start = start;
@@ -69,10 +76,6 @@ export class ActualPlatform implements Platform {
     // TODO rewrite to more simple, and to follow curvy sections as well
     // new type like TrackSequence (startPos, [tracks], endPos)
     // create an object param in init
-
-    const segment = this.track.getSegment();
-    const a = segment.getFirstPoint();
-    const b = segment.getLastPoint();
 
     var rot = new Coordinate(b.x - a.x, 0, b.z - a.z);
     const rot4 = Math.atan2(rot.x, rot.z);
