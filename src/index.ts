@@ -11,15 +11,15 @@ window.addEventListener('DOMContentLoaded', () => {
     'renderCanvas'
   ) as HTMLCanvasElement;
   const renderEngine = new BABYLON.Engine(canvas, true);
-
+  let camera: BABYLON.ArcRotateCamera;
   const createScene = () => {
     const scene = new BABYLON.Scene(renderEngine);
     scene.clearColor = new BABYLON.Color4(0, 1, 0, 1);
 
-    const camera = new BABYLON.ArcRotateCamera(
+    camera = new BABYLON.ArcRotateCamera(
       'Camera',
-      1,
-      0.8,
+      0,
+      0,
       180, // 300,
       new BABYLON.Vector3(0, 0, 0),
       scene
@@ -39,7 +39,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     (window as any).switches = [];
     const land = babylonContainer.get<Land>(TYPES.Land);
-    const engine = land.init(null); //controller);
+    land.init();
 
     const gridDrawer = new GridDrawer();
     gridDrawer.setScene(scene);
@@ -108,7 +108,7 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   const scene = createScene();
 
-  const inputController = new InputController(scene);
+  const inputController = new InputController(scene, camera);
 
   renderEngine.runRenderLoop(() => {
     scene.render();

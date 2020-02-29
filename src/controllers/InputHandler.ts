@@ -1,10 +1,10 @@
 import { InputProps } from './InputProps';
 
 export interface InputHandler {
-  down(props: InputProps): void;
-  up(downprops: InputProps, props: InputProps): void;
-  move(downprops: InputProps, props: InputProps): void;
-  click(props: InputProps): void;
-  roam(props: InputProps): void;
+  down(props: InputProps, event: PointerEvent): void;
+  up(downprops: InputProps, props: InputProps, event: PointerEvent): void;
+  move(downprops: InputProps, props: InputProps, event: PointerEvent): void;
+  click(props: InputProps, event: PointerEvent): void;
+  roam(props: InputProps, event: PointerEvent): void;
   cancel(): void;
 }

@@ -67,7 +67,7 @@ export class CreateTrackInputHandler implements InputHandler {
     this.pathMesh.setEnabled(false);
   }
 
-  down(props: InputProps): void {
+  down(props: InputProps, event: PointerEvent): void {
     if (!props.snappedJoint) {
       this.fromMesh.setEnabled(
         !props.snappedJoint && !props.snappedPositionOnTrack
@@ -94,7 +94,7 @@ export class CreateTrackInputHandler implements InputHandler {
     this.pathMesh.setEnabled(!props.snappedJoint);
   }
 
-  roam(props: InputProps): void {
+  roam(props: InputProps, event: PointerEvent): void {
     this.fromMesh.position = CoordinateToBabylonVector3(
       props.snappedPoint.coord
     );
@@ -104,7 +104,7 @@ export class CreateTrackInputHandler implements InputHandler {
     );
   }
 
-  move(downProps: InputProps, props: InputProps): void {
+  move(downProps: InputProps, props: InputProps, event: PointerEvent): void {
     this.toMesh.position = CoordinateToBabylonVector3(props.snappedPoint.coord);
     this.toMesh.rotation.y = props.wheelRad;
     this.toMesh.setEnabled(!props.snappedJoint);
@@ -130,7 +130,7 @@ export class CreateTrackInputHandler implements InputHandler {
     );
   }
 
-  click(downProps: InputProps): void {
+  click(downProps: InputProps, event: PointerEvent): void {
     if (!downProps.snappedJoint) {
       const tj = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
       tj.init(
@@ -141,7 +141,7 @@ export class CreateTrackInputHandler implements InputHandler {
     }
   }
 
-  up(downProps: InputProps, props: InputProps): void {
+  up(downProps: InputProps, props: InputProps, event: PointerEvent): void {
     let j1, j2;
     let deletable: TrackJoint[] = [];
     if (downProps.snappedJoint) {

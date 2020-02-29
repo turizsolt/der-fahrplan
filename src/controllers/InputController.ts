@@ -18,6 +18,7 @@ import { ActualTrackJoint } from '../structs/TrackJoint/ActualTrackJoint';
 import { InputProps } from './InputProps';
 import { BaseBrick } from '../structs/Base/BaseBrick';
 import { ActualTrackSwitch } from '../structs/TrackSwitch/ActualTrackSwitch';
+import { CameraInputHandler } from './CameraInputHandler';
 
 export class InputController {
   private mode: string = 'CREATE_TRACK';
@@ -29,8 +30,13 @@ export class InputController {
   private selectedMesh: BABYLON.AbstractMesh;
   private selected: BaseBrick;
 
-  constructor(private scene: BABYLON.Scene) {
-    this.inputHandler = new CreateTrackInputHandler();
+  private mouseButtons: boolean[] = [];
+
+  constructor(
+    private scene: BABYLON.Scene,
+    private camera: BABYLON.ArcRotateCamera
+  ) {
+    this.inputHandler = new CameraInputHandler(camera); //new CreateTrackInputHandler();
 
     this.downProps = null;
     this.store = babylonContainer.get<() => Store>(TYPES.FactoryOfStore)();
@@ -42,7 +48,31 @@ export class InputController {
       this.scene.pointerY
     );
 
-    if (!pickedPoint) return null;
+    if (!pickedPoint) {
+      const ret = {
+        point: null,
+        mesh: pickedMesh,
+        snappedPoint: null,
+        snappedPositionOnTrack: null,
+        snappedJoint: null,
+        wheelDeg: this.wheelRotation,
+        wheelRad: (this.wheelRotation / 180) * Math.PI,
+        selected: this.selected,
+        selectedMesh: this.selectedMesh,
+        cameraRadius: this.camera.radius,
+        cameraAlpha: this.camera.alpha,
+        cameraBeta: this.camera.beta,
+        pointerX: this.scene.pointerX,
+        pointerY: this.scene.pointerY,
+        targetX: this.camera.target.x,
+        targetZ: this.camera.target.z,
+        fromX: this.camera.position.x,
+        fromY: this.camera.position.y,
+        fromZ: this.camera.position.z
+      };
+
+      return ret;
+    }
 
     const point: Ray = new Ray(BabylonVector3ToCoordinate(pickedPoint), 0);
     const list = this.store.getAll();
@@ -69,7 +99,17 @@ export class InputController {
       wheelDeg: this.wheelRotation,
       wheelRad: (this.wheelRotation / 180) * Math.PI,
       selected: this.selected,
-      selectedMesh: this.selectedMesh
+      selectedMesh: this.selectedMesh,
+      cameraRadius: this.camera.radius,
+      cameraAlpha: this.camera.alpha,
+      cameraBeta: this.camera.beta,
+      pointerX: this.scene.pointerX,
+      pointerY: this.scene.pointerY,
+      targetX: this.camera.target.x,
+      targetZ: this.camera.target.z,
+      fromX: this.camera.position.x,
+      fromY: this.camera.position.y,
+      fromZ: this.camera.position.z
     };
     ret.snappedPoint.dirXZ = ret.wheelRad;
 
@@ -79,20 +119,21 @@ export class InputController {
   down(event: PointerEvent) {
     const props = this.convert(event);
     this.downProps = props;
-    if (props) this.inputHandler.down(props);
+    this.inputHandler.down(props, event);
   }
 
   move(event: PointerEvent) {
     const props = this.convert(event);
     if (this.downProps) {
-      if (props) this.inputHandler.move(this.downProps, props);
+      this.inputHandler.move(this.downProps, props, event);
     } else {
-      if (props) this.inputHandler.roam(props);
+      this.inputHandler.roam(props, event);
     }
   }
 
   up(event: PointerEvent) {
     let props = this.convert(event);
+
     if (this.downProps.point.coord.equalsTo(props.point.coord)) {
       let ready = false;
       if (this.downProps.mesh) {
@@ -123,10 +164,10 @@ export class InputController {
         }
       }
 
-      if (!ready && props) this.inputHandler.click(this.downProps);
-      if (ready && props) this.inputHandler.cancel();
+      if (!ready) this.inputHandler.click(this.downProps, event);
+      if (ready) this.inputHandler.cancel();
     } else {
-      if (props) this.inputHandler.up(this.downProps, props);
+      this.inputHandler.up(this.downProps, props, event);
     }
     this.downProps = null;
   }
@@ -134,13 +175,17 @@ export class InputController {
   private wheelRotation = 0;
 
   wheel(event: WheelEvent) {
-    const changeBy = 45 * Math.sign(event.deltaY);
-    this.wheelRotation += changeBy;
-    if (this.wheelRotation < -180) this.wheelRotation += 360;
-    if (this.wheelRotation > 180) this.wheelRotation -= 360;
+    if (this.mouseButtons[1]) {
+      this.camera.radius += 5 * Math.sign(event.deltaY);
+    } else {
+      const changeBy = 45 * Math.sign(event.deltaY);
+      this.wheelRotation += changeBy;
+      if (this.wheelRotation < -180) this.wheelRotation += 360;
+      if (this.wheelRotation > 180) this.wheelRotation -= 360;
 
-    const props = this.convert(null);
-    if (props) this.move(null);
+      const props = this.convert(null);
+      if (props.point) this.move(null);
+    }
   }
 
   keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {}
