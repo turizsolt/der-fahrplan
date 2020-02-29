@@ -20,4 +20,4 @@ deploy:
   skip_cleanup: true
   script: rsync -r --delete-after --quiet $TRAVIS_BUILD_DIR/build/* git@zsiri.eu:/var/www/der-fahrplan
   on:
-    branch: feature/level-builder
+    branch: master
