@@ -11,6 +11,7 @@ import { Ray } from '../Geometry/Ray';
 import { Coordinate } from '../Geometry/Coordinate';
 import { ActualBaseBrick } from '../Base/ActualBaseBrick';
 import { BaseRenderer } from '../Base/BaseRenderer';
+import { Store } from '../Store/Store';
 
 @injectable()
 export class ActualEngine extends ActualBaseBrick implements Engine {
@@ -23,8 +24,17 @@ export class ActualEngine extends ActualBaseBrick implements Engine {
     return this;
   }
 
-  putOnTrack(track: Track): void {
-    this.positionOnTrack = new PositionOnTrack(track, this);
+  putOnTrack(
+    track: TrackBase,
+    position: number = 0,
+    direction: number = 1
+  ): void {
+    this.positionOnTrack = new PositionOnTrack(
+      track,
+      this,
+      position,
+      direction
+    );
     track.checkin(this);
 
     this.renderer.init(this);
@@ -107,5 +117,26 @@ export class ActualEngine extends ActualBaseBrick implements Engine {
 
   getRenderer(): BaseRenderer {
     return this.renderer;
+  }
+
+  persist(): Object {
+    return {
+      id: this.getId(),
+      type: 'Engine',
+
+      track: this.positionOnTrack.getTrack().getId(),
+      position: this.positionOnTrack.getRay().coord,
+      direction: this.positionOnTrack.getRay().dirXZ
+    };
+  }
+
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init();
+    this.putOnTrack(
+      store.get(obj.track) as TrackBase,
+      obj.position,
+      obj.direction
+    );
   }
 }

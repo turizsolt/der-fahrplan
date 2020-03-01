@@ -1,6 +1,13 @@
 import { injectable } from 'inversify';
 import * as shortid from 'shortid';
 import { BaseBrick } from '../Base/BaseBrick';
+import { babylonContainer } from '../inversify.config';
+import { Platform } from '../Platform/Platform';
+import { TYPES } from '../TYPES';
+import { Track } from '../Track/Track';
+import { TrackSwitch } from '../TrackSwitch/TrackSwitch';
+import { TrackJoint } from '../TrackJoint/TrackJoint';
+import { Engine } from '../Engine/Engine';
 
 @injectable()
 export class Store {
@@ -19,13 +26,8 @@ export class Store {
     return this;
   }
 
-  register(object: BaseBrick): string {
-    let id = shortid.generate();
-    if (this.counter[object.constructor.name]) {
-      let x = this.counter[object.constructor.name];
-      x.counter++;
-      id = x.abbr + x.counter;
-    }
+  register(object: BaseBrick, presetId: string = null): string {
+    let id = presetId || shortid.generate();
     this.elements[id] = object;
     return id;
   }
@@ -41,5 +43,61 @@ export class Store {
 
   getAll(): Record<string, BaseBrick> {
     return this.elements;
+  }
+
+  persistAll(): Object {
+    const ret = [];
+    for (let key of Object.keys(this.elements)) {
+      ret.push(this.elements[key].persist());
+    }
+    return ret;
+  }
+
+  loadAll(arr: any[]) {
+    const fx = a => {
+      switch (a) {
+        case 'Engine':
+          return 0;
+        case 'Platform':
+          return 1;
+        case 'TrackJoint':
+          return 2;
+        case 'TrackSwitch':
+          return 3;
+        case 'Track':
+          return 4;
+        default:
+          return 999;
+      }
+    };
+
+    arr.sort((a, b) => {
+      return fx(b.type) - fx(a.type);
+    });
+
+    arr.map(elem => {
+      let brick: BaseBrick;
+      switch (elem.type) {
+        case 'Platform':
+          brick = babylonContainer.get<Platform>(TYPES.Platform);
+          break;
+        case 'Track':
+          brick = babylonContainer.get<Track>(TYPES.Track);
+          break;
+        case 'TrackSwitch':
+          brick = babylonContainer.get<TrackSwitch>(TYPES.TrackSwitch);
+          break;
+        case 'TrackJoint':
+          brick = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+          break;
+        case 'Engine':
+          brick = babylonContainer.get<Engine>(TYPES.Engine);
+          break;
+      }
+
+      if (brick) {
+        brick.load(elem, this);
+      }
+    });
   }
 }

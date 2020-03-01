@@ -7,7 +7,7 @@ import { BaseBrick } from '../Base/BaseBrick';
 
 export interface Engine extends BaseBrick {
   init(): Engine;
-  putOnTrack(track: Track): void;
+  putOnTrack(track: Track, position?: number, direction?: number): void;
   forward(): void;
   backward(): void;
   stop(): void;

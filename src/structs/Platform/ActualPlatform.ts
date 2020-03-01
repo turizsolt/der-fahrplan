@@ -11,6 +11,7 @@ import { PlatformRenderer } from './PlatformRenderer';
 import { ActualBaseBrick } from '../Base/ActualBaseBrick';
 import { BaseRenderer } from '../Base/BaseRenderer';
 import { PassengerGenerator } from './PassengerGenerator';
+import { Store } from '../Store/Store';
 
 @injectable()
 export class ActualPlatform extends ActualBaseBrick implements Platform {
@@ -19,7 +20,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
   private carList: Engine[];
   private passengerList: Passenger[] = [];
 
-  private no: string;
   private track: TrackBase;
   private start: number;
   private end: number;
@@ -54,7 +54,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
   }
 
   init(
-    no: string,
     track: TrackBase,
     start: number,
     end: number,
@@ -72,7 +71,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     start = start * segLen;
     end = end * segLen;
 
-    this.no = no;
     this.track = track;
     this.start = start;
     this.end = end;
@@ -160,5 +158,36 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
 
   isRemoved(): boolean {
     return this.removed;
+  }
+
+  persist(): Object {
+    return {
+      id: this.getId(),
+      type: 'Platform',
+
+      track: this.track,
+      start: this.start,
+      end: this.end,
+      side: this.side,
+      color: {
+        red: this.color.red,
+        green: this.color.green,
+        blue: this.color.blue
+      },
+      width: this.width
+    };
+  }
+
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(
+      store.get(obj.track) as TrackBase,
+      obj.start,
+      obj.end,
+      obj.width,
+      obj.side,
+      obj.color,
+      null
+    );
   }
 }

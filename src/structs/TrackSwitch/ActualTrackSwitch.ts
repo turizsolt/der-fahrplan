@@ -9,6 +9,7 @@ import { ActualTrackBase } from '../TrackBase/ActualTrackBase';
 import { injectable, inject } from 'inversify';
 import { WhichEnd } from '../Track/WhichEnd';
 import { BaseRenderer } from '../Base/BaseRenderer';
+import { Store } from '../Store/Store';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
@@ -150,5 +151,29 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
   getRenderer(): BaseRenderer {
     return this.renderer;
+  }
+
+  persist(): Object {
+    return {
+      id: this.getId(),
+      type: 'TrackSwitch',
+
+      segmentE: this.segmentE.persist(),
+      segmentF: this.segmentF.persist()
+    };
+  }
+
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(
+      obj.segmentE.map(a => new Coordinate(a.x, a.y, a.z)),
+      obj.segmentF.map(a => new Coordinate(a.x, a.y, a.z))
+    );
+  }
+
+  getEnd(e: string): TrackEnd {
+    if (e === 'E') return this.getE();
+    if (e === 'F') return this.getF();
+    return super.getEnd(e);
   }
 }

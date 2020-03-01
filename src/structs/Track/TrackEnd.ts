@@ -97,4 +97,12 @@ export class TrackEnd {
     if (!this.getConnectedEnd()) return null;
     return this.getWhichEnd() !== this.getConnectedEnd().getWhichEnd();
   }
+
+  persist(): Object {
+    return {
+      whichEnd: this.whichEnd,
+      endOf: this.endOf.getId(),
+      jointTo: this.jointTo.getId()
+    };
+  }
 }

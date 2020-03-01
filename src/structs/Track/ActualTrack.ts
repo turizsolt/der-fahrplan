@@ -8,6 +8,7 @@ import { ActualTrackBase } from '../TrackBase/ActualTrackBase';
 import { injectable, inject } from 'inversify';
 import { WhichEnd } from './WhichEnd';
 import { BaseRenderer } from '../Base/BaseRenderer';
+import { Store } from '../Store/Store';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
@@ -64,5 +65,19 @@ export class ActualTrack extends ActualTrackBase implements Track {
 
   getRenderer(): BaseRenderer {
     return this.renderer;
+  }
+
+  persist(): Object {
+    return {
+      id: this.getId(),
+      type: 'Track',
+
+      segment: this.segment.persist()
+    };
+  }
+
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(obj.segment.map(a => new Coordinate(a.x, a.y, a.z)));
   }
 }

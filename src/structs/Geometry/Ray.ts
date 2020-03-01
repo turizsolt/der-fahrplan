@@ -73,4 +73,13 @@ export class Ray {
       ? WhichEnd.B
       : WhichEnd.A;
   }
+
+  persist(): Object {
+    return {
+      x: this.coord.x,
+      y: this.coord.y,
+      z: this.coord.z,
+      dirXZ: this.dirXZ
+    };
+  }
 }

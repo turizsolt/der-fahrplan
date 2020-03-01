@@ -279,6 +279,28 @@ export class InputController {
         this.inputHandler = this.inputHandlers[this.mode];
         updBoxes(this.mode);
         break;
+
+      case 'K':
+        const download = (content, fileName, contentType) => {
+          var a = document.createElement('a');
+          var file = new Blob([content], { type: contentType });
+          a.href = URL.createObjectURL(file);
+          a.download = fileName;
+          a.click();
+        };
+
+        const data = {
+          data: this.store.persistAll(),
+          _version: 1,
+          _format: 'fahrplan'
+        };
+
+        const fileName = `${new Date().toISOString()}.${(Math.random() *
+          90000) |
+          (0 + 100000)}.fahrplan`;
+
+        download(JSON.stringify(data), fileName, 'application/json');
+        break;
     }
 
     if (!this.selected) return;
@@ -310,6 +332,10 @@ export class InputController {
         this.selected.getRenderer().process('backward');
         break;
     }
+  }
+
+  load(data: any) {
+    this.store.loadAll(data);
   }
 }
 

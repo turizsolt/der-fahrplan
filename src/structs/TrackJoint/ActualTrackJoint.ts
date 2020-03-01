@@ -11,6 +11,7 @@ import { Ray } from '../Geometry/Ray';
 import { TrackJointConnector } from './TrackJointConnector';
 import { ActualBaseBrick } from '../Base/ActualBaseBrick';
 import { BaseRenderer } from '../Base/BaseRenderer';
+import { Store } from '../Store/Store';
 
 @injectable()
 export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
@@ -158,5 +159,42 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
 
   getRenderer(): BaseRenderer {
     return this.renderer;
+  }
+
+  persist(): Object {
+    return {
+      id: this.getId(),
+      type: 'TrackJoint',
+
+      ray: this.ray.persist(),
+      A: this.ends.A.isSet()
+        ? {
+            track: this.ends.A.track.getId(),
+            whichEnd: this.ends.A.end.getWhichEnd()
+          }
+        : null,
+      B: this.ends.B.isSet()
+        ? {
+            track: this.ends.B.track.getId(),
+            whichEnd: this.ends.B.end.getWhichEnd()
+          }
+        : null
+    };
+  }
+
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(obj.ray.x, obj.ray.z, obj.ray.dirXZ);
+
+    const trA: TrackBase = obj.A ? (store.get(obj.A.track) as TrackBase) : null;
+    const trB: TrackBase = obj.B ? (store.get(obj.B.track) as TrackBase) : null;
+
+    if (obj.A) {
+      this.setOneEnd(WhichEnd.A, trA.getEnd(obj.A.whichEnd));
+    }
+
+    if (obj.B) {
+      this.setOneEnd(WhichEnd.B, trB.getEnd(obj.B.whichEnd));
+    }
   }
 }

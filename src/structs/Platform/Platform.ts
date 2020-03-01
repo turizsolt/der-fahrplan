@@ -25,7 +25,6 @@ export interface Platform extends BaseBrick {
   isRemoved(): boolean;
 
   init(
-    no: string,
     track: TrackBase,
     start: number,
     end: number,

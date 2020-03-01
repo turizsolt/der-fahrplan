@@ -150,4 +150,49 @@ window.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     return false;
   });
+  document.addEventListener(
+    'dragover',
+    function(event) {
+      event.preventDefault();
+    },
+    false
+  );
+
+  document.addEventListener(
+    'drop',
+    function(event) {
+      // cancel default actions
+      event.preventDefault();
+
+      var i = 0,
+        files = event.dataTransfer.files,
+        len = files.length;
+
+      for (; i < len; i++) {
+        var reader = new FileReader();
+        reader.onload = function(event) {
+          var contents = (event.target as any).result;
+
+          try {
+            const obj = JSON.parse(contents);
+
+            if (!obj._version) throw new Error();
+            if (!obj._format || obj._format !== 'fahrplan') throw new Error();
+            inputController.load(obj.data);
+          } catch {
+            console.error('Not proper JSON, hey!');
+          }
+        };
+
+        reader.onerror = function(event) {
+          console.error(
+            'File could not be read! Code ' + (event.target as any).error.code
+          );
+        };
+
+        reader.readAsText(files[i]);
+      }
+    },
+    false
+  );
 });

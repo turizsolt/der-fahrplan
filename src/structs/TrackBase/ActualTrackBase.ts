@@ -70,4 +70,10 @@ export abstract class ActualTrackBase extends ActualBaseBrick
   }
 
   update(): void {}
+
+  getEnd(e: string): TrackEnd {
+    if (e === 'A') return this.getA();
+    if (e === 'B') return this.getB();
+    return null;
+  }
 }

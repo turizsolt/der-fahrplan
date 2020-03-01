@@ -12,10 +12,16 @@ export abstract class ActualBaseBrick implements BaseBrick {
   protected store: Store;
 
   abstract getRenderer(): BaseRenderer;
+  abstract persist(): Object;
+  abstract load(obj: Object, store: Store): void;
 
   protected initStore() {
     this.store = this.StoreFactory();
-    this.id = this.store.register(this);
+    this.id = this.store.register(this, this.id);
+  }
+
+  presetId(id: string) {
+    this.id = id;
   }
 
   getId() {

@@ -20,4 +20,6 @@ export interface TrackBase extends BaseBrick {
   isRemovable(): boolean;
   isRemoved(): boolean;
   update(): void;
+
+  getEnd(e: string): TrackEnd;
 }

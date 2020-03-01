@@ -37,4 +37,8 @@ export class TrackSegment {
   getCoordinates(): Coordinate[] {
     return this.bezier.getCoordinates();
   }
+
+  persist(): Object {
+    return this.getCoordinates().map(a => ({ x: a.x, y: a.y, z: a.z }));
+  }
 }

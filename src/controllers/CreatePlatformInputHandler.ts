@@ -156,7 +156,6 @@ export class CreatePlatformInputHandler implements InputHandler {
       // console.log(side, p.x, p.y, p.z);
 
       const pl = this.platformFactory().init(
-        randomName(),
         pot.track,
         Math.min(pot.position, dpot.position),
         Math.max(pot.position, dpot.position),
@@ -178,14 +177,6 @@ export class CreatePlatformInputHandler implements InputHandler {
     this.toMesh.setEnabled(false);
     this.pathMesh.setEnabled(false);
   }
-}
-
-function randomName() {
-  let v = '';
-  for (let i = 0; i < 6; i++) {
-    v += '0123456789abcdef'.charAt[(Math.random() * 16) | 0];
-  }
-  return v;
 }
 
 function randomColor() {
