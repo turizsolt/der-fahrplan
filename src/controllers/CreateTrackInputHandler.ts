@@ -115,6 +115,10 @@ export class CreateTrackInputHandler implements InputHandler {
       props.snappedPoint.dirXZ = props.snappedJoint.getRotation();
     }
 
+    if (downProps.snappedJoint) {
+      downProps.snappedPoint.dirXZ = downProps.snappedJoint.getRotation();
+    }
+
     const midpoint = downProps.snappedPoint.computeMidpoint(props.snappedPoint);
     const midpointCoord: Coordinate = midpoint === false ? undefined : midpoint;
 
