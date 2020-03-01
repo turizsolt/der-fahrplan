@@ -1,2 +1,0 @@
-git pull
-yarn start &

@@ -8,58 +8,54 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 // copies the assets folder into dist folder
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 // output folder location
-const distFolder = "./dist";
+const distFolder = './build';
 
 module.exports = {
-    mode: 'development',
-    entry: './src/index.ts',
-    plugins: [
-        new CleanWebpackPlugin(),
-        new HtmlWebpackPlugin({
-            template: 'src/index.ejs'
-        }),
-        new CopyWebpackPlugin([
-            { from: 'src/assets', to: 'assets' },
-        ])
-    ],
-    devtool: 'inline-source-map',
-    devServer: {
-        contentBase: distFolder,
-        host: '0.0.0.0',
-        public: 'zsiri.eu:8080',
-    },
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/
-            },
-            {
-                test: /\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ]
-            }
-        ]
-    },
-    optimization: {
-        splitChunks: {
-            cacheGroups: {
-                commons: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name: "vendors",
-                    chunks: "all"
-                }
-            }
+  mode: 'development',
+  entry: './src/index.ts',
+  plugins: [
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: 'src/index.ejs'
+    }),
+    new CopyWebpackPlugin([{ from: 'src/assets', to: 'assets' }])
+  ],
+  devtool: 'inline-source-map',
+  devServer: {
+    contentBase: distFolder,
+    host: '0.0.0.0',
+    //public: 'zsiri.eu:8080',
+    public: 'localhost:8080'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      }
+    ]
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
         }
-    },
-    resolve: {
-        extensions: [ ".tsx", ".ts", ".js" ]
-    },
-    output: {
-        filename: '[name].bundle.js',
-        path: path.resolve(__dirname, distFolder)
+      }
     }
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js']
+  },
+  output: {
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, distFolder)
+  }
 };
