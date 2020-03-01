@@ -2,6 +2,7 @@ import * as BABYLON from 'babylonjs';
 import { Ray } from '../structs/Geometry/Ray';
 import { TrackJoint } from '../structs/TrackJoint/TrackJoint';
 import { TrackBase } from '../structs/TrackBase/TrackBase';
+import { BaseBrick } from '../structs/Base/BaseBrick';
 
 export interface InputProps {
   point: Ray;
@@ -13,12 +14,19 @@ export interface InputProps {
     position: number;
     segment: string;
   };
+
   snappedJoint: TrackJoint;
+  snappedJointOnTrack: null | {
+    distance: number;
+    track: TrackBase;
+    position: number;
+    segment: string;
+  };
 
   wheelDeg: number;
   wheelRad: number;
 
-  selected: Object;
+  selected: BaseBrick;
   selectedMesh: BABYLON.AbstractMesh;
 
   cameraRadius: number;

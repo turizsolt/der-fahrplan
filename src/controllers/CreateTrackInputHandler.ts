@@ -137,7 +137,7 @@ export class CreateTrackInputHandler implements InputHandler {
   }
 
   click(downProps: InputProps, event: PointerEvent): void {
-    if (!downProps.snappedJoint) {
+    if (!downProps.snappedJoint && !downProps.snappedPositionOnTrack) {
       const tj = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
       tj.init(
         downProps.snappedPoint.coord.x,
@@ -148,37 +148,46 @@ export class CreateTrackInputHandler implements InputHandler {
   }
 
   up(downProps: InputProps, props: InputProps, event: PointerEvent): void {
-    let j1, j2;
-    let deletable: TrackJoint[] = [];
-    if (downProps.snappedJoint) {
-      j1 = downProps.snappedJoint;
-    } else {
-      j1 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
-      j1.init(
-        downProps.snappedPoint.coord.x,
-        downProps.snappedPoint.coord.z,
-        downProps.wheelRad
-      );
-      deletable.push(j1);
-    }
+    if (
+      !downProps.snappedPoint.coord.equalsTo(props.snappedPoint.coord) &&
+      (!props.snappedJointOnTrack ||
+        props.snappedJointOnTrack.position === 0 ||
+        props.snappedJointOnTrack.position === 1) &&
+      (!downProps.snappedJointOnTrack ||
+        downProps.snappedJointOnTrack.position === 0 ||
+        downProps.snappedJointOnTrack.position === 1)
+    ) {
+      let j1, j2;
+      let deletable: TrackJoint[] = [];
+      if (downProps.snappedJoint) {
+        j1 = downProps.snappedJoint;
+      } else {
+        j1 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+        j1.init(
+          downProps.snappedPoint.coord.x,
+          downProps.snappedPoint.coord.z,
+          downProps.wheelRad
+        );
+        deletable.push(j1);
+      }
 
-    if (props.snappedJoint) {
-      j2 = props.snappedJoint;
-    } else {
-      j2 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
-      j2.init(
-        props.snappedPoint.coord.x,
-        props.snappedPoint.coord.z,
-        props.wheelRad
-      );
-      deletable.push(j2);
-    }
+      if (props.snappedJoint) {
+        j2 = props.snappedJoint;
+      } else {
+        j2 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+        j2.init(
+          props.snappedPoint.coord.x,
+          props.snappedPoint.coord.z,
+          props.wheelRad
+        );
+        deletable.push(j2);
+      }
 
-    const ret = j2.connect(j1);
-    if (!ret) {
-      deletable.map(j => j.remove());
+      const ret = j2.connect(j1);
+      if (!ret) {
+        deletable.map(j => j.remove());
+      }
     }
-
     this.fromMesh.setEnabled(false);
     this.toMesh.setEnabled(false);
     this.pathMesh.setEnabled(false);

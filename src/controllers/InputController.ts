@@ -101,6 +101,7 @@ export class InputController {
         snappedPoint: null,
         snappedPositionOnTrack: null,
         snappedJoint: null,
+        snappedJointOnTrack: null,
         wheelDeg: this.wheelRotation,
         wheelRad: (this.wheelRotation / 180) * Math.PI,
         selected: this.selected,
@@ -142,6 +143,7 @@ export class InputController {
       snappedPoint: snapXZ(point),
       snappedPositionOnTrack: snapPositionOnTrack(point, trackList),
       snappedJoint: snapJoint(point, jointList),
+      snappedJointOnTrack: snapPositionOnTrack(snapXZ(point), trackList),
       wheelDeg: this.wheelRotation,
       wheelRad: (this.wheelRotation / 180) * Math.PI,
       selected: this.selected,
@@ -178,13 +180,15 @@ export class InputController {
   }
 
   up(event: PointerEvent) {
+    if (!this.downProps) return;
+
     let props = this.convert(event);
 
     if (
       this.downProps.point &&
       this.downProps.point.coord.equalsTo(props.point.coord)
     ) {
-      let ready = this.selectIfPossible();
+      let ready = this.selectIfPossible(event);
       if (ready) {
         this.inputHandler.cancel();
       } else {
@@ -198,7 +202,7 @@ export class InputController {
 
   private wheelRotation = 0;
 
-  private selectIfPossible() {
+  private selectIfPossible(event: PointerEvent) {
     let ready = false;
     if (this.downProps.mesh) {
       const meshId = this.downProps.mesh.id;
@@ -206,18 +210,22 @@ export class InputController {
         const [_, type, id] = meshId.split('-');
         const storedObj = this.store.get(id);
         if (storedObj) {
-          let renderer = storedObj.getRenderer();
-          if (renderer.isSelected()) {
-            renderer.setSelected(false);
-            this.selected = null;
-            this.selectedMesh = null;
+          if (event.button === 2) {
+            storedObj.getRenderer().process('switch');
           } else {
-            if (this.selected) {
-              this.selected.getRenderer().setSelected(false);
+            let renderer = storedObj.getRenderer();
+            if (renderer.isSelected()) {
+              renderer.setSelected(false);
+              this.selected = null;
+              this.selectedMesh = null;
+            } else {
+              if (this.selected) {
+                this.selected.getRenderer().setSelected(false);
+              }
+              renderer.setSelected(true);
+              this.selected = storedObj;
+              this.selectedMesh = this.downProps.mesh;
             }
-            renderer.setSelected(true);
-            this.selected = storedObj;
-            this.selectedMesh = this.downProps.mesh;
           }
           ready = true;
         }
@@ -259,7 +267,6 @@ export class InputController {
         break;
 
       case 'O':
-        console.log('o');
         this.inputHandler.cancel();
         this.mode = InputMode.CREATE_TRACK;
         this.inputHandler = this.inputHandlers[this.mode];
