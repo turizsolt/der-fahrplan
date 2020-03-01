@@ -8,7 +8,7 @@ import { BaseBabylonRenderer } from '../Base/BaseBabylonRenderer';
 @injectable()
 export class EngineBabylonRenderer extends BaseBabylonRenderer
   implements EngineRenderer {
-  private renderEngine: BABYLON.Mesh;
+  private mesh: BABYLON.Mesh;
   private engine: Engine;
   readonly scene: BABYLON.Scene;
 
@@ -18,7 +18,7 @@ export class EngineBabylonRenderer extends BaseBabylonRenderer
   init(engine: Engine) {
     this.engine = engine;
 
-    this.renderEngine = BABYLON.MeshBuilder.CreateBox(
+    this.mesh = BABYLON.MeshBuilder.CreateBox(
       'clickable-engine-' + this.engine.getId(),
       { height: 3, width: 3, depth: 10 },
       this.scene
@@ -29,17 +29,21 @@ export class EngineBabylonRenderer extends BaseBabylonRenderer
 
     this.matSel = new BABYLON.StandardMaterial('boxMat', this.scene);
     this.matSel.diffuseColor = new BABYLON.Color3(1, 0, 1);
-    this.renderEngine.material = this.matNorm;
+    this.mesh.material = this.matNorm;
 
     this.update();
   }
 
   update() {
-    const ray = this.engine.getRay();
-    this.renderEngine.position = CoordinateToBabylonVector3(ray.coord);
-    this.renderEngine.position.y = 1.5;
-    this.renderEngine.rotation.y = ray.dirXZ;
-    this.renderEngine.material = this.selected ? this.matSel : this.matNorm;
+    if (this.engine.isRemoved()) {
+      this.mesh.setEnabled(false);
+    } else {
+      const ray = this.engine.getRay();
+      this.mesh.position = CoordinateToBabylonVector3(ray.coord);
+      this.mesh.position.y = 1.5;
+      this.mesh.rotation.y = ray.dirXZ;
+      this.mesh.material = this.selected ? this.matSel : this.matNorm;
+    }
   }
 
   process(command: string) {
@@ -54,6 +58,10 @@ export class EngineBabylonRenderer extends BaseBabylonRenderer
 
       case 'stop':
         this.engine.stop();
+        break;
+
+      case 'delete':
+        this.engine.remove();
         break;
     }
   }

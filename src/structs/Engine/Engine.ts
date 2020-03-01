@@ -16,4 +16,6 @@ export interface Engine extends BaseBrick {
   getPosition(): Coordinate;
   getRay(): Ray;
   getTrackOn(): TrackBase;
+  remove(): boolean;
+  isRemoved(): boolean;
 }

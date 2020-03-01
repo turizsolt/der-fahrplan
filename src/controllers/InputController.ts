@@ -21,12 +21,14 @@ import { ActualTrackSwitch } from '../structs/TrackSwitch/ActualTrackSwitch';
 import { CameraInputHandler } from './CameraInputHandler';
 import { SelectInputHandler } from './SelectInputHandler';
 import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
+import { CreateEngineInputHandler } from './CreateEngineInputHandler';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
   SELECT = 'SELECT',
   CREATE_TRACK = 'CREATE_TRACK',
-  CREATE_PLATFORM = 'CREATE_PLATFORM'
+  CREATE_PLATFORM = 'CREATE_PLATFORM',
+  CREATE_ENGINE = 'CREATE_ENGINE'
 }
 
 export class InputController {
@@ -74,11 +76,19 @@ export class InputController {
       updBoxes(this.mode);
     });
 
+    document.getElementById('input-ne').addEventListener('click', () => {
+      this.inputHandler.cancel();
+      this.mode = InputMode.CREATE_ENGINE;
+      this.inputHandler = this.inputHandlers[this.mode];
+      updBoxes(this.mode);
+    });
+
     this.inputHandlers = {
       [InputMode.CAMERA]: new CameraInputHandler(camera),
       [InputMode.SELECT]: new SelectInputHandler(),
       [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(),
-      [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler()
+      [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(),
+      [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler()
     };
 
     this.inputHandler = this.inputHandlers[this.mode];
@@ -280,6 +290,13 @@ export class InputController {
         updBoxes(this.mode);
         break;
 
+      case '9':
+        this.inputHandler.cancel();
+        this.mode = InputMode.CREATE_ENGINE;
+        this.inputHandler = this.inputHandlers[this.mode];
+        updBoxes(this.mode);
+        break;
+
       case 'K':
         const download = (content, fileName, contentType) => {
           var a = document.createElement('a');
@@ -343,7 +360,8 @@ const choices = {
   [InputMode.CAMERA]: 'input-cam',
   [InputMode.SELECT]: 'input-sel',
   [InputMode.CREATE_TRACK]: 'input-nt',
-  [InputMode.CREATE_PLATFORM]: 'input-np'
+  [InputMode.CREATE_PLATFORM]: 'input-np',
+  [InputMode.CREATE_ENGINE]: 'input-ne'
 };
 
 function updBoxes(chosen: InputMode) {
@@ -351,6 +369,7 @@ function updBoxes(chosen: InputMode) {
   document.getElementById('input-sel').classList.remove('selected');
   document.getElementById('input-nt').classList.remove('selected');
   document.getElementById('input-np').classList.remove('selected');
+  document.getElementById('input-ne').classList.remove('selected');
 
   document.getElementById(choices[chosen]).classList.add('selected');
 }

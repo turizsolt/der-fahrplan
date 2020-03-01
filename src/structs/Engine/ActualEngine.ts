@@ -17,6 +17,8 @@ import { Store } from '../Store/Store';
 export class ActualEngine extends ActualBaseBrick implements Engine {
   private positionOnTrack: PositionOnTrack;
   private carriedPassengers: Passenger[] = [];
+  private removed: boolean = false;
+
   @inject(TYPES.EngineRenderer) private renderer: EngineRenderer;
 
   init(): Engine {
@@ -117,6 +119,17 @@ export class ActualEngine extends ActualBaseBrick implements Engine {
 
   getRenderer(): BaseRenderer {
     return this.renderer;
+  }
+
+  remove(): boolean {
+    this.removed = true;
+    this.store.unregister(this);
+    this.renderer.update();
+    return true;
+  }
+
+  isRemoved(): boolean {
+    return this.removed;
   }
 
   persist(): Object {

@@ -10,7 +10,9 @@ export class PositionOnTrack {
     private engine: Engine,
     private position: number = 0,
     private direction: number = 1
-  ) {}
+  ) {
+    this.position = position * track.getSegment().getLength();
+  }
 
   move(distance: number) {
     const product = this.direction * distance;
