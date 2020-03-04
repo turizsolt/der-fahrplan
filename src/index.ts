@@ -19,9 +19,9 @@ window.addEventListener('DOMContentLoaded', () => {
     camera = new BABYLON.ArcRotateCamera(
       'Camera',
       0,
-      0,
-      180, // 300,
-      new BABYLON.Vector3(0, 0, 0),
+      0.8,
+      30, // 300,
+      new BABYLON.Vector3(0, 0, 10),
       scene
     );
 
