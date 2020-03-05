@@ -215,7 +215,11 @@ export class InputController {
   private selectIfPossible(event: PointerEvent) {
     let ready = false;
     if (this.downProps.mesh) {
-      const meshId = this.downProps.mesh.id;
+      let meshId = this.downProps.mesh.id;
+      if (meshId.includes('.')) {
+        meshId = meshId.slice(0, meshId.indexOf('.'));
+      }
+      console.log(meshId);
       if (meshId.startsWith('clickable-')) {
         const [_, type, id] = meshId.split('-');
         const storedObj = this.store.get(id);

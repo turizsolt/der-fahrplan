@@ -14,18 +14,19 @@ export class ActualLand implements Land {
     j1.init(0, 0, 0);
     const j2 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
     j2.init(0, 20, 0);
-    // const j3 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
-    // j3.init(20, 40, Math.PI / 2);
-    // const j4 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
-    // j4.init(40, 40, Math.PI / 2);
-    const { track: tr0 } = j2.connect(j1);
-    // j3.connect(j2);
-    // j4.connect(j3);
+    const j3 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+    j3.init(10, 40, Math.PI / 4);
+    const j4 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+    j4.init(20, 60, 0);
+    j2.connect(j1);
+    const { track } = j3.connect(j2);
+    j4.connect(j3);
 
-    // const engine = this.engineFactory().init();
-    // engine.putOnTrack(tr0);
+    setTimeout(() => {
+      const engine = this.engineFactory();
+      engine.init().putOnTrack(track);
+    }, 500);
 
-    // return engine;
     return null;
   }
 }

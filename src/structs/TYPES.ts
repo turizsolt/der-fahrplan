@@ -27,5 +27,8 @@ export const TYPES = {
   FactoryOfTrackJoint: Symbol.for('Factory<TrackJoint>'),
 
   TrackJointConnector: Symbol.for('TrackJointConnector'),
-  FactoryOfTrackJointConnector: Symbol.for('Factory<TrackJointConnector>')
+  FactoryOfTrackJointConnector: Symbol.for('Factory<TrackJointConnector>'),
+
+  MeshProvider: Symbol.for('MeshProvider'),
+  FactoryOfMeshProvider: Symbol.for('Factory<MeshProvider>')
 };

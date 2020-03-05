@@ -22,7 +22,7 @@ export class TrackJointBabylonRenderer extends BaseBabylonRenderer
       {
         diameter: 5,
         tessellation: 24,
-        height: 1,
+        height: 0.01,
         faceUV: [
           new BABYLON.Vector4(0, 0, 1, 1),
           new BABYLON.Vector4(1, 1, 1, 1)
@@ -55,7 +55,7 @@ export class TrackJointBabylonRenderer extends BaseBabylonRenderer
       this.mesh.position = CoordinateToBabylonVector3(
         this.trackJoint.getPosition()
       );
-      this.mesh.position.y = 0.5;
+      this.mesh.position.y = 0;
       this.mesh.rotation.y = this.trackJoint.getRotation();
     } else {
       this.mesh.setEnabled(false);
