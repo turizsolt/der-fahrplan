@@ -1,7 +1,7 @@
 import { Coordinate } from '../Coordinate';
 import { Ray } from '../Ray';
 
-export const DEFAULT_PRECISION: number = 25;
+export const DEFAULT_PRECISION: number = 9;
 
 export abstract class Bezier {
   protected coordinates: Coordinate[];
