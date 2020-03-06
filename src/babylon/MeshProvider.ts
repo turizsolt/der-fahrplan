@@ -52,12 +52,12 @@ export class MeshProvider {
     );
   }
 
-  createEngineMesh(name: string) {
+  createEngineMesh(name: string):BABYLON.AbstractMesh {
     const clone = this.engine.clone(name, null);
     return clone;
   }
 
-  createSleeperMesh(ray: Ray) {
+  createSleeperMesh(ray: Ray):BABYLON.AbstractMesh {
     const mesh = BABYLON.MeshBuilder.CreateBox(
       'sleeper',
       { height: 0.1, width: 3, depth: 1 },
@@ -69,7 +69,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createRailSegmentMesh([p, q]: Ray[]) {
+  createRailSegmentMesh([p, q]: Ray[]):BABYLON.AbstractMesh {
     const up = 1.5;
     const dn = 1.1;
     const w = 0.2;
@@ -100,7 +100,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createBedSegmentMesh([p, q]: Ray[]) {
+  createBedSegmentMesh([p, q]: Ray[]):BABYLON.AbstractMesh {
     const p0 = p.fromHere(Left, 3).setY(0);
     const p1 = p.fromHere(Left, 2).setY(1);
     const p2 = p.fromHere(Right, 2).setY(1);

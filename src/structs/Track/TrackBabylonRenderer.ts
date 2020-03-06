@@ -21,15 +21,15 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
     const bezier = this.track.getSegment().getBezier();
     const len = this.track.getSegment().getLength();
 
-    bezier
+    const bedSegmentMeshes = bezier
       .getLinePairRays()
       .map(v => this.meshProvider.createBedSegmentMesh(v));
 
-    bezier
+    const sleeperMeshes = bezier
       .getLineOffRays(Math.floor(len / 2))
       .map(v => this.meshProvider.createSleeperMesh(v));
 
-    bezier
+    const leftRailMeshes = bezier
       .getLinePairRays()
       .map(([r1, r2]) =>
         this.meshProvider.createRailSegmentMesh([
@@ -38,7 +38,7 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
         ])
       );
 
-    bezier
+    const rightRailMeshes = bezier
       .getLinePairRays()
       .map(([r1, r2]) =>
         this.meshProvider.createRailSegmentMesh([
@@ -46,6 +46,13 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
           r2.fromHere(Right, 1)
         ])
       );
+
+    this.meshes = [
+      ...bedSegmentMeshes,
+      ...sleeperMeshes,
+      ...leftRailMeshes,
+      ...rightRailMeshes
+    ];
   }
 
   update(): void {}

@@ -11,4 +11,5 @@ export class TrackJointDummyRenderer implements TrackJointRenderer {
   isSelected(): boolean {
     return null;
   }
+  remove(): void {}
 }

@@ -11,4 +11,5 @@ export class TrackSwitchDummyRenderer implements TrackSwitchRenderer {
   process(command: string): void {}
   init(_: TrackSwitch): void {}
   update() {}
+  remove(): void {}
 }

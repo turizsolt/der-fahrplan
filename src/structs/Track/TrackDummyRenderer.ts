@@ -11,4 +11,5 @@ export class TrackDummyRenderer implements TrackRenderer {
   process(command: string): void {}
   init(_: Track): void {}
   update(): void {}
+  remove(): void {}
 }
