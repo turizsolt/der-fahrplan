@@ -1,191 +1,104 @@
 import * as BABYLON from 'babylonjs';
 import { TrackSwitchRenderer } from './TrackSwitchRenderer';
-import { injectable } from 'inversify';
-import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
+import { injectable, inject } from 'inversify';
 import { TrackSwitch } from './TrackSwitch';
-import { curveToTube } from '../Track/TrackBabylonRenderer';
-import { Coordinate } from '../Geometry/Coordinate';
 import { BaseBabylonRenderer } from '../Base/BaseBabylonRenderer';
+import { TYPES } from '../TYPES';
+import { MeshProvider } from '../../babylon/MeshProvider';
+import { Left, Right } from '../Geometry/Directions';
+import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
 
 @injectable()
 export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
   implements TrackSwitchRenderer {
-  private mesh: BABYLON.Mesh;
-  private meshE: BABYLON.Mesh;
-  private meshF: BABYLON.Mesh;
-  private meshSB: BABYLON.Mesh;
-
-  private matSel: BABYLON.StandardMaterial;
-  private matNorm: BABYLON.StandardMaterial;
-
-  private bal: BABYLON.Mesh;
-  private balE: BABYLON.Mesh;
-  private balF: BABYLON.Mesh;
-
-  private phE: BABYLON.Mesh;
-  private phF: BABYLON.Mesh;
-
   private trackSwitch: TrackSwitch;
-  readonly scene: BABYLON.Scene;
+  @inject(TYPES.FactoryOfMeshProvider)
+  private meshProviderFactory: () => MeshProvider;
+  private meshProvider: MeshProvider;
 
   init(trackSwitch: TrackSwitch): void {
     this.trackSwitch = trackSwitch;
+    this.meshProvider = this.meshProviderFactory();
 
-    const switchBox = BABYLON.MeshBuilder.CreateCylinder(
-      'clickable-switchBox-' + this.trackSwitch.getId(),
-      {
-        diameter: 3,
-        tessellation: 24,
-        height: 1
-      },
-      this.scene
-    );
+    const bezierE = this.trackSwitch.getSegmentE().getBezier();
+    const lenE = this.trackSwitch.getSegmentE().getLength();
 
-    // TODO beutify
-    let coord, coord1, coord2: Coordinate;
-    let len = 0;
-    let len1 = this.trackSwitch
-      .getSegmentE()
-      .getBezier()
-      .getLength();
+    const bedSegmentMeshesE = bezierE
+      .getLinePairRays()
+      .map(v => this.meshProvider.createBedSegmentMesh(v));
 
-    let len2 = this.trackSwitch
-      .getSegmentF()
-      .getBezier()
-      .getLength();
-    let shorter = Math.min(len1, len2) - 3;
-    do {
-      len += 1;
-      coord1 = this.trackSwitch
-        .getSegmentE()
-        .getBezier()
-        .getPoint(len / len1);
-      coord2 = this.trackSwitch
-        .getSegmentF()
-        .getBezier()
-        .getPoint(len / len2);
-      coord = coord1.midpoint(coord2);
-    } while (coord1.distance2d(coord2) < 5 && len < shorter);
+    const sleeperMeshesE = bezierE
+      .getLineOffRays(lenE / Math.floor(lenE))
+      .map(v => this.meshProvider.createSleeperMesh(v));
 
-    switchBox.position = CoordinateToBabylonVector3(coord);
+    const leftRailMeshesE = bezierE
+      .getLinePairRays()
+      .map(seg =>
+        this.meshProvider.createRailSegmentMesh([
+          seg.a.fromHere(Left, 1),
+          seg.b.fromHere(Left, 1)
+        ])
+      );
 
-    this.matNorm = new BABYLON.StandardMaterial('boxMat', this.scene);
-    this.matNorm.diffuseColor = new BABYLON.Color3(1, 0, 0);
+    const rightRailMeshesE = bezierE
+      .getLinePairRays()
+      .map(seg =>
+        this.meshProvider.createRailSegmentMesh([
+          seg.a.fromHere(Right, 1),
+          seg.b.fromHere(Right, 1)
+        ])
+      );
 
-    this.matSel = new BABYLON.StandardMaterial('boxMat', this.scene);
-    this.matSel.diffuseColor = new BABYLON.Color3(1, 0, 1);
-    switchBox.material = this.matNorm;
-    this.meshSB = switchBox;
+    ////////////
 
-    const curveE = this.trackSwitch
-      .getSegmentE()
-      .getCurvePoints()
-      .map(CoordinateToBabylonVector3);
-    this.meshE = curveToTube(curveE, false);
+    const bezier = this.trackSwitch.getSegmentF().getBezier();
+    const len = this.trackSwitch.getSegmentF().getLength();
 
-    const curveF = this.trackSwitch
-      .getSegmentF()
-      .getCurvePoints()
-      .map(CoordinateToBabylonVector3);
-    this.meshF = curveToTube(curveF, false);
+    const bedSegmentMeshes = bezier
+      .getLinePairRays()
+      .map(v => this.meshProvider.createBedSegmentMesh(v));
 
-    const curve = this.trackSwitch
-      .getSegment()
-      .getCurvePoints()
-      .map(CoordinateToBabylonVector3);
-    this.mesh = curveToTube(curve);
+    const sleeperMeshes = bezier
+      .getLineOffRays(len / Math.floor(len))
+      .map(v => this.meshProvider.createSleeperMesh(v));
 
-    const cAl = this.trackSwitch
-      .getSegment()
-      .getBezier()
-      .getLength();
-    const cA = this.trackSwitch
-      .getSegment()
-      .getBezier()
-      .getPoint(4 / cAl);
-    this.bal = ballon(cA, this.trackSwitch.getA().getConnectedTrack() ? 1 : 0);
+    const leftRailMeshes = bezier
+      .getLinePairRays()
+      .map(seg =>
+        this.meshProvider.createRailSegmentMesh([
+          seg.a.fromHere(Left, 1),
+          seg.b.fromHere(Left, 1)
+        ])
+      );
 
-    const cEl = this.trackSwitch
-      .getSegmentE()
-      .getBezier()
-      .getLength();
+    const rightRailMeshes = bezier
+      .getLinePairRays()
+      .map(seg =>
+        this.meshProvider.createRailSegmentMesh([
+          seg.a.fromHere(Right, 1),
+          seg.b.fromHere(Right, 1)
+        ])
+      );
 
-    const cE = this.trackSwitch
-      .getSegmentE()
-      .getBezier()
-      .getPoint(1 - 4 / cEl);
-    this.balE = ballon(cE, this.trackSwitch.getF().getConnectedTrack() ? 1 : 0);
+    ////////////////
 
-    const cFl = this.trackSwitch
-      .getSegmentF()
-      .getBezier()
-      .getLength();
-    const cF = this.trackSwitch
-      .getSegmentF()
-      .getBezier()
-      .getPoint(1 - 4 / cFl);
-    this.balF = ballon(cF, this.trackSwitch.getE().getConnectedTrack() ? 1 : 0);
+    const r = this.trackSwitch.naturalSplitPoints();
+    r.map(p => ballon(p.setY(2).coord, BABYLON.Color3.Red));
 
-    const pE = this.trackSwitch
-      .getSegmentE()
-      .getBezier()
-      .getPoint(1 - 7 / cEl);
-    this.phE = ballon(pE, this.trackSwitch.getF().getConnectedEnd() ? 2 : 0);
-
-    const pF = this.trackSwitch
-      .getSegmentF()
-      .getBezier()
-      .getPoint(1 - 7 / cFl);
-    this.phF = ballon(pF, this.trackSwitch.getE().getConnectedEnd() ? 2 : 0);
+    this.meshes = [
+      ...bedSegmentMeshesE,
+      ...sleeperMeshesE,
+      ...leftRailMeshesE,
+      ...rightRailMeshesE,
+      ///
+      ...bedSegmentMeshes,
+      ...sleeperMeshes,
+      ...leftRailMeshes,
+      ...rightRailMeshes
+    ];
   }
 
-  update() {
-    if (this.mesh) {
-      if (this.trackSwitch.isRemoved()) {
-        this.mesh.setEnabled(false);
-        this.meshE.setEnabled(false);
-        this.meshF.setEnabled(false);
-        this.meshSB.setEnabled(false);
-
-        this.bal.setEnabled(false);
-        this.balE.setEnabled(false);
-        this.balF.setEnabled(false);
-        this.phE.setEnabled(false);
-        this.phF.setEnabled(false);
-      } else {
-        this.meshSB.material = this.selected ? this.matSel : this.matNorm;
-
-        const curve = this.trackSwitch
-          .getSegment()
-          .getCurvePoints()
-          .map(CoordinateToBabylonVector3);
-
-        this.mesh = curveToTube(curve, true, this.mesh);
-
-        ballonUpdate(
-          this.trackSwitch.getA().getConnectedTrack() ? 1 : 0,
-          this.bal
-        );
-        ballonUpdate(
-          this.trackSwitch.getF().getConnectedTrack() ? 1 : 0,
-          this.balE
-        );
-        ballonUpdate(
-          this.trackSwitch.getE().getConnectedTrack() ? 1 : 0,
-          this.balF
-        );
-
-        ballonUpdate(
-          this.trackSwitch.getF().getConnectedEnd() ? 2 : 0,
-          this.phE
-        );
-        ballonUpdate(
-          this.trackSwitch.getE().getConnectedEnd() ? 2 : 0,
-          this.phF
-        );
-      }
-    }
-  }
+  update() {}
 
   process(command: string) {
     switch (command) {
@@ -200,34 +113,16 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
   }
 }
 
-const colors = [
-  BABYLON.Color3.Purple(),
-  BABYLON.Color3.Green(),
-  BABYLON.Color3.Teal()
-];
-
 export const ballon = (coord, color) => {
   const ballon = BABYLON.MeshBuilder.CreateCylinder(
     'ballon',
     {
       diameter: 2,
-      tessellation: 24,
+      tessellation: 6,
       height: 1
     },
-    this.scene
+    null
   );
-
   ballon.position = CoordinateToBabylonVector3(coord);
-
-  var boxMaterial = new BABYLON.StandardMaterial('botMat', this.scene);
-  boxMaterial.diffuseColor = colors[color];
-  ballon.material = boxMaterial;
-
   return ballon;
-};
-
-export const ballonUpdate = (color, mesh) => {
-  var boxMaterial = new BABYLON.StandardMaterial('botMat', this.scene);
-  boxMaterial.diffuseColor = colors[color];
-  mesh.material = boxMaterial;
 };

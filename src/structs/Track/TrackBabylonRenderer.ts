@@ -26,24 +26,24 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
       .map(v => this.meshProvider.createBedSegmentMesh(v));
 
     const sleeperMeshes = bezier
-      .getLineOffRays(Math.floor(len / 2))
+      .getLineOffRays(len / Math.floor(len))
       .map(v => this.meshProvider.createSleeperMesh(v));
 
     const leftRailMeshes = bezier
       .getLinePairRays()
-      .map(([r1, r2]) =>
+      .map(seg =>
         this.meshProvider.createRailSegmentMesh([
-          r1.fromHere(Left, 1),
-          r2.fromHere(Left, 1)
+          seg.a.fromHere(Left, 1),
+          seg.b.fromHere(Left, 1)
         ])
       );
 
     const rightRailMeshes = bezier
       .getLinePairRays()
-      .map(([r1, r2]) =>
+      .map(seg =>
         this.meshProvider.createRailSegmentMesh([
-          r1.fromHere(Right, 1),
-          r2.fromHere(Right, 1)
+          seg.a.fromHere(Right, 1),
+          seg.b.fromHere(Right, 1)
         ])
       );
 

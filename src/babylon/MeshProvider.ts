@@ -3,6 +3,7 @@ import { injectable } from 'inversify';
 import { Ray } from '../structs/Geometry/Ray';
 import { CoordinateToBabylonVector3 } from '../structs/CoordinateToBabylonVector3';
 import { Left, Right } from '../structs/Geometry/Directions';
+import { RayPair } from '../structs/Geometry/RayPair';
 
 @injectable()
 export class MeshProvider {
@@ -52,12 +53,12 @@ export class MeshProvider {
     );
   }
 
-  createEngineMesh(name: string):BABYLON.AbstractMesh {
+  createEngineMesh(name: string): BABYLON.AbstractMesh {
     const clone = this.engine.clone(name, null);
     return clone;
   }
 
-  createSleeperMesh(ray: Ray):BABYLON.AbstractMesh {
+  createSleeperMesh(ray: Ray): BABYLON.AbstractMesh {
     const mesh = BABYLON.MeshBuilder.CreateBox(
       'sleeper',
       { height: 0.1, width: 3, depth: 1 },
@@ -69,7 +70,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createRailSegmentMesh([p, q]: Ray[]):BABYLON.AbstractMesh {
+  createRailSegmentMesh([p, q]: Ray[]): BABYLON.AbstractMesh {
     const up = 1.5;
     const dn = 1.1;
     const w = 0.2;
@@ -100,16 +101,16 @@ export class MeshProvider {
     return mesh;
   }
 
-  createBedSegmentMesh([p, q]: Ray[]):BABYLON.AbstractMesh {
-    const p0 = p.fromHere(Left, 3).setY(0);
-    const p1 = p.fromHere(Left, 2).setY(1);
-    const p2 = p.fromHere(Right, 2).setY(1);
-    const p3 = p.fromHere(Right, 3).setY(0);
+  createBedSegmentMesh(seg: RayPair): BABYLON.AbstractMesh {
+    const p0 = seg.a.fromHere(Left, 3).setY(0);
+    const p1 = seg.a.fromHere(Left, 2).setY(1);
+    const p2 = seg.a.fromHere(Right, 2).setY(1);
+    const p3 = seg.a.fromHere(Right, 3).setY(0);
 
-    const q0 = q.fromHere(Left, 3).setY(0);
-    const q1 = q.fromHere(Left, 2).setY(1);
-    const q2 = q.fromHere(Right, 2).setY(1);
-    const q3 = q.fromHere(Right, 3).setY(0);
+    const q0 = seg.b.fromHere(Left, 3).setY(0);
+    const q1 = seg.b.fromHere(Left, 2).setY(1);
+    const q2 = seg.b.fromHere(Right, 2).setY(1);
+    const q3 = seg.b.fromHere(Right, 3).setY(0);
 
     const triangles = [
       ...rect(p0, q0, p1, q1),

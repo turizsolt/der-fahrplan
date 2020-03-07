@@ -73,6 +73,12 @@ export class Ray {
     return new Ray(this.coord.add(shift), this.dirXZ);
   }
 
+  fromHereAbs(rad: number, dist: number): Ray {
+    const shift = new Coordinate(Math.sin(rad) * dist, 0, Math.cos(rad) * dist);
+
+    return new Ray(this.coord.add(shift), rad);
+  }
+
   setY(y: number): Ray {
     return new Ray(new Coordinate(this.coord.x, y, this.coord.z), this.dirXZ);
   }

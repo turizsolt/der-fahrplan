@@ -10,6 +10,7 @@ import { injectable, inject } from 'inversify';
 import { WhichEnd } from '../Track/WhichEnd';
 import { BaseRenderer } from '../Base/BaseRenderer';
 import { Store } from '../Store/Store';
+import { Ray } from '../Geometry/Ray';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
@@ -175,5 +176,40 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     if (e === 'E') return this.getE();
     if (e === 'F') return this.getF();
     return super.getEnd(e);
+  }
+
+  naturalSplitPoints(): Ray[] {
+    const bezierE = this.getSegmentE().getBezier();
+    const bezierF = this.getSegmentF().getBezier();
+
+    let same = true;
+    let dist = 0;
+    while (same) {
+      const pE = bezierE.getRayByDistance(dist);
+      const pF = bezierF.getRayByDistance(dist);
+
+      same = pE.coord.equalsTo(pF.coord);
+      dist++;
+    }
+    dist -= 2;
+
+    const ret0 = bezierE.getRayByDistance(dist);
+    //////
+
+    let close = true;
+    while (close) {
+      const pE = bezierE.getRayByDistance(dist);
+      const pF = bezierF.getRayByDistance(dist);
+
+      close = pE.coord.distance2d(pF.coord) < 4;
+      dist++;
+    }
+    dist -= 2;
+
+    return [
+      ret0,
+      bezierE.getRayByDistance(dist),
+      bezierF.getRayByDistance(dist)
+    ];
   }
 }

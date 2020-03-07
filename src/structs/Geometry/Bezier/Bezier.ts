@@ -1,7 +1,9 @@
 import { Coordinate } from '../Coordinate';
 import { Ray } from '../Ray';
+import { RayPair } from '../RayPair';
 
 export const DEFAULT_PRECISION: number = 9;
+export const DEFAULT_DISTANCE: number = 2;
 
 export abstract class Bezier {
   protected coordinates: Coordinate[];
@@ -24,6 +26,24 @@ export abstract class Bezier {
     return new Ray(this.getPoint(percentage), this.getDirection(percentage));
   }
 
+  getRayByDistance(distance: number): Ray {
+    const segments = this.getLinePairRays();
+    let segment = 0;
+
+    let sdist = segments[segment].getLength();
+    let pos = distance;
+
+    while (pos > sdist && segment < segments.length - 1) {
+      pos -= sdist;
+      segment++;
+      sdist = segments[segment].getLength();
+    }
+
+    if (segment < segments.length)
+      return segments[segment].getPointAtDistance(pos);
+    return null;
+  }
+
   getLinePoints(count: number = DEFAULT_PRECISION): Coordinate[] {
     if (count < 2) throw new Error('Too few count to get points');
 
@@ -44,25 +64,48 @@ export abstract class Bezier {
     return points;
   }
 
-  getLineOffRays(count: number = DEFAULT_PRECISION): Ray[] {
-    if (count < 2) throw new Error('Too few count to get points');
-
+  getLineOffRays(
+    step: number = DEFAULT_DISTANCE,
+    count: number = DEFAULT_PRECISION
+  ): Ray[] {
     const points = [];
-    count = count * 2 - 1;
-    for (let i = 1; i < count; i += 2) {
-      points.push(this.getRay(i / (count - 1)));
+    const segments = this.getLinePairRays(count);
+    const length = this.getLength();
+    let segment = 0;
+    let gone = 0;
+    let pos = 0;
+
+    const put = () => {
+      points.push(segments[segment].getPointAtDistance(pos));
+    };
+
+    put();
+    let sdist;
+    while (gone < length) {
+      sdist = segments[segment].getLength();
+      pos = pos + step;
+      gone = gone + step;
+
+      while (pos > sdist && segment < segments.length - 1) {
+        pos -= sdist;
+        segment++;
+        sdist = segments[segment].getLength();
+      }
+
+      if (gone < length) put();
     }
-    return points;
+
+    return points.filter((v, i) => i % 2 === 1);
   }
 
-  getLinePairRays(count: number = DEFAULT_PRECISION): Ray[][] {
+  getLinePairRays(count: number = DEFAULT_PRECISION): RayPair[] {
     if (count < 2) throw new Error('Too few count to get points');
 
     const pointPairs = [];
     let last = this.getRay(0);
     for (let i = 1; i < count; i++) {
       const now = this.getRay(i / (count - 1));
-      pointPairs.push([last, now]);
+      pointPairs.push(new RayPair(last, now));
       last = now;
     }
     return pointPairs;

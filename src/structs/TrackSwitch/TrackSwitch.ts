@@ -2,6 +2,7 @@ import { TrackBase } from '../TrackBase/TrackBase';
 import { TrackSegment } from '../TrackBase/TrackSegment';
 import { Coordinate } from '../Geometry/Coordinate';
 import { TrackSwitchEnd } from './TrackSwitchEnd';
+import { Ray } from '../Geometry/Ray';
 
 export interface TrackSwitch extends TrackBase {
   init(coordinates1: Coordinate[], coordinates2: Coordinate[]): TrackSwitch;
@@ -13,4 +14,6 @@ export interface TrackSwitch extends TrackBase {
   getState(): number;
   verbose(): void;
   update(): void;
+
+  naturalSplitPoints(): Ray[];
 }
