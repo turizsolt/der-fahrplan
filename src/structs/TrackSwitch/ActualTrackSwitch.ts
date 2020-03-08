@@ -11,6 +11,7 @@ import { WhichEnd } from '../Track/WhichEnd';
 import { BaseRenderer } from '../Base/BaseRenderer';
 import { Store } from '../Store/Store';
 import { Ray } from '../Geometry/Ray';
+import { Left, Right } from '../Geometry/Directions';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
@@ -20,6 +21,8 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
   protected segmentE: TrackSegment;
   protected segmentF: TrackSegment;
+  protected segmentLeft: TrackSegment;
+  protected segmentRight: TrackSegment;
 
   getA() {
     return this.D;
@@ -41,20 +44,37 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
     const last1 = coordinates1.length - 1;
     const last2 = coordinates2.length - 1;
+    let tempE: TrackSegment, tempF: TrackSegment;
     if (coordinates1[0].equalsTo(coordinates2[0])) {
-      this.segmentE = new TrackSegment(coordinates1);
-      this.segmentF = new TrackSegment(coordinates2);
+      tempE = new TrackSegment(coordinates1);
+      tempF = new TrackSegment(coordinates2);
     } else if (coordinates1[last1].equalsTo(coordinates2[last2])) {
-      this.segmentE = new TrackSegment(coordinates1.reverse());
-      this.segmentF = new TrackSegment(coordinates2.reverse());
+      tempE = new TrackSegment(coordinates1.reverse());
+      tempF = new TrackSegment(coordinates2.reverse());
     } else if (coordinates1[0].equalsTo(coordinates2[last2])) {
-      this.segmentE = new TrackSegment(coordinates1);
-      this.segmentF = new TrackSegment(coordinates2.reverse());
+      tempE = new TrackSegment(coordinates1);
+      tempF = new TrackSegment(coordinates2.reverse());
     } else if (coordinates1[last1].equalsTo(coordinates2[0])) {
-      this.segmentE = new TrackSegment(coordinates1.reverse());
-      this.segmentF = new TrackSegment(coordinates2);
+      tempE = new TrackSegment(coordinates1.reverse());
+      tempF = new TrackSegment(coordinates2);
     } else {
       throw new Error('Segments has no meeting point');
+    }
+
+    this.segmentE = tempE;
+    this.segmentF = tempF;
+
+    if (
+      tempE
+        .getLineSegmentChain()
+        .copyMove(Right, 1)
+        .isIntersectsWithChain(tempF.getLineSegmentChain().copyMove(Left, 1))
+    ) {
+      this.segmentLeft = tempE;
+      this.segmentRight = tempF;
+    } else {
+      this.segmentLeft = tempF;
+      this.segmentRight = tempE;
     }
 
     this.state = 0;
@@ -101,6 +121,14 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
   getSegmentF(): TrackSegment {
     return this.segmentF;
+  }
+
+  getSegmentLeft(): TrackSegment {
+    return this.segmentLeft;
+  }
+
+  getSegmentRight(): TrackSegment {
+    return this.segmentRight;
   }
 
   getSegment(): TrackSegment {
@@ -179,37 +207,35 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   }
 
   naturalSplitPoints(): Ray[] {
-    const bezierE = this.getSegmentE().getBezier();
-    const bezierF = this.getSegmentF().getBezier();
+    const chainE = this.getSegmentLeft().getLineSegmentChain();
+    const chainF = this.getSegmentRight().getLineSegmentChain();
 
-    let same = true;
-    let dist = 0;
-    while (same) {
-      const pE = bezierE.getRayByDistance(dist);
-      const pF = bezierF.getRayByDistance(dist);
+    const leftE = chainE.copyMove(Right, 1).getLineSegments();
+    const rightF = chainF.copyMove(Left, 1).getLineSegments();
 
-      same = pE.coord.equalsTo(pF.coord);
-      dist++;
+    let peak = new Ray(new Coordinate(0, 0, 0), 0);
+
+    for (let i of leftE) {
+      for (let j of rightF) {
+        if (i.isIntersectsWith(j)) {
+          peak = new Ray(i.getIntersectionsWith(j)[0], 0);
+        }
+      }
     }
-    dist -= 2;
 
-    const ret0 = bezierE.getRayByDistance(dist);
-    //////
+    const left2E = chainE.copyMove(Right, 2).getLineSegments();
+    const right2F = chainF.copyMove(Left, 2).getLineSegments();
 
-    let close = true;
-    while (close) {
-      const pE = bezierE.getRayByDistance(dist);
-      const pF = bezierF.getRayByDistance(dist);
+    let peak2 = new Ray(new Coordinate(0, 0, 0), 0);
 
-      close = pE.coord.distance2d(pF.coord) < 4;
-      dist++;
+    for (let i of left2E) {
+      for (let j of right2F) {
+        if (i.isIntersectsWith(j)) {
+          peak2 = new Ray(i.getIntersectionsWith(j)[0], 0);
+        }
+      }
     }
-    dist -= 2;
 
-    return [
-      ret0,
-      bezierE.getRayByDistance(dist),
-      bezierF.getRayByDistance(dist)
-    ];
+    return [peak, peak2];
   }
 }

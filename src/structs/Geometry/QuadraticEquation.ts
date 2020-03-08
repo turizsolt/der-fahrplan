@@ -1,6 +1,5 @@
 export class QuadraticEquation {
   static solve(a: number, b: number, c: number): number[] {
-    console.log('quad', a, b, c);
     const d = b * b - 4 * a * c;
     if (d < 0) return [];
     if (d == 0) return [-b / (2 * a)];

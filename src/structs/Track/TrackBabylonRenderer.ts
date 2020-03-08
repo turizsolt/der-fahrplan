@@ -18,34 +18,26 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
   init(track: Track): void {
     this.track = track;
     this.meshProvider = this.meshProviderFactory();
-    const bezier = this.track.getSegment().getBezier();
+    const chain = this.track.getSegment().getLineSegmentChain();
     const len = this.track.getSegment().getLength();
 
-    const bedSegmentMeshes = bezier
-      .getLinePairRays()
+    const bedSegmentMeshes = chain
+      .getRayPairs()
       .map(v => this.meshProvider.createBedSegmentMesh(v));
 
-    const sleeperMeshes = bezier
-      .getLineOffRays(len / Math.floor(len))
+    const sleeperMeshes = chain
+      .getEvenlySpacedRays(len / Math.floor(len))
       .map(v => this.meshProvider.createSleeperMesh(v));
 
-    const leftRailMeshes = bezier
-      .getLinePairRays()
-      .map(seg =>
-        this.meshProvider.createRailSegmentMesh([
-          seg.a.fromHere(Left, 1),
-          seg.b.fromHere(Left, 1)
-        ])
-      );
+    const leftRailMeshes = chain
+      .copyMove(Left, 1)
+      .getRayPairs()
+      .map(rp => this.meshProvider.createRailSegmentMesh(rp));
 
-    const rightRailMeshes = bezier
-      .getLinePairRays()
-      .map(seg =>
-        this.meshProvider.createRailSegmentMesh([
-          seg.a.fromHere(Right, 1),
-          seg.b.fromHere(Right, 1)
-        ])
-      );
+    const rightRailMeshes = chain
+      .copyMove(Right, 1)
+      .getRayPairs()
+      .map(rp => this.meshProvider.createRailSegmentMesh(rp));
 
     this.meshes = [
       ...bedSegmentMeshes,

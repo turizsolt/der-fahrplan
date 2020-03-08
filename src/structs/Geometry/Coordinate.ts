@@ -34,8 +34,4 @@ export class Coordinate {
   whichDir2d(other: Coordinate): number {
     return Math.atan2(other.x - this.x, other.z - this.z);
   }
-
-  whichDir2db(other: Coordinate): number {
-    return Math.atan2(other.z - this.z, other.x - this.x);
-  }
 }

@@ -60,7 +60,8 @@ export class CreateTrackInputHandler implements InputHandler {
         new Coordinate(0, 0, 1),
         new Coordinate(0, 0, 2)
       ])
-        .getLinePoints()
+        .getLineSegmentChain()
+        .getPoints()
         .map(CoordinateToBabylonVector3),
       false
     );
@@ -86,7 +87,8 @@ export class CreateTrackInputHandler implements InputHandler {
 
     this.pathMesh = curveToTube(
       BezierCreater.Create([props.snappedPoint.coord, props.snappedPoint.coord])
-        .getLinePoints()
+        .getLineSegmentChain()
+        .getPoints()
         .map(CoordinateToBabylonVector3),
       false,
       this.pathMesh
@@ -129,7 +131,8 @@ export class CreateTrackInputHandler implements InputHandler {
         midpointCoord,
         props.snappedPoint.coord
       ])
-        .getLinePoints()
+        .getLineSegmentChain()
+        .getPoints()
         .map(CoordinateToBabylonVector3),
       false,
       this.pathMesh

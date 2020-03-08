@@ -1,8 +1,6 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import { Coordinate } from '../../src/structs/Geometry/Coordinate';
-import { Line } from '../../src/structs/Geometry/Line';
-import { Circle } from '../../src/structs/Geometry/Circle';
 import { LineSegment } from '../../src/structs/Geometry/LineSegment';
 chai.use(chaiAlmost(0.00001));
 

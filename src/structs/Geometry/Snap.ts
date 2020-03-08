@@ -26,7 +26,8 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
       const linePoints = thisTrack
         .getSegment()
         .getBezier()
-        .getLinePoints();
+        .getLineSegmentChain()
+        .getPoints();
       for (let i = 0; i < linePoints.length; i++) {
         const c = p.coord.distance2d(linePoints[i]);
 
@@ -40,7 +41,8 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
       const linePoints = (thisTrack as TrackSwitch)
         .getSegmentE()
         .getBezier()
-        .getLinePoints();
+        .getLineSegmentChain()
+        .getPoints();
       for (let i = 0; i < linePoints.length; i++) {
         const c = p.coord.distance2d(linePoints[i]);
 
@@ -55,7 +57,8 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
       const linePoints2 = (thisTrack as TrackSwitch)
         .getSegmentF()
         .getBezier()
-        .getLinePoints();
+        .getLineSegmentChain()
+        .getPoints();
       for (let i = 0; i < linePoints2.length; i++) {
         const c = p.coord.distance2d(linePoints2[i]);
 

@@ -9,6 +9,8 @@ export interface TrackSwitch extends TrackBase {
   switch();
   getSegmentE(): TrackSegment;
   getSegmentF(): TrackSegment;
+  getSegmentLeft(): TrackSegment;
+  getSegmentRight(): TrackSegment;
   getE(): TrackSwitchEnd;
   getF(): TrackSwitchEnd;
   getState(): number;

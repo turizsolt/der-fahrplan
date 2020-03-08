@@ -4,6 +4,7 @@ import { Ray } from '../structs/Geometry/Ray';
 import { CoordinateToBabylonVector3 } from '../structs/CoordinateToBabylonVector3';
 import { Left, Right } from '../structs/Geometry/Directions';
 import { RayPair } from '../structs/Geometry/RayPair';
+import { Line } from '../structs/Geometry/Line';
 
 @injectable()
 export class MeshProvider {
@@ -70,20 +71,103 @@ export class MeshProvider {
     return mesh;
   }
 
-  createRailSegmentMesh([p, q]: Ray[]): BABYLON.AbstractMesh {
+  createSwitchSleeperMesh(a: Ray, b: Ray): BABYLON.AbstractMesh {
+    const up = 1.1;
+    const dn = 1.0;
+    const w = 1.5;
+    const h = 0.5;
+
+    const lineA0 = Line.fromPointAndDir(
+      a.fromHere(Left, w).fromHere(0, h).coord,
+      a.dirXZ + Right
+    );
+    const lineB0 = Line.fromPointAndDir(
+      b.fromHere(Right, w).fromHere(0, h).coord,
+      b.dirXZ + Left
+    );
+    const cross0 = new Ray(lineA0.getIntersectionsWith(lineB0)[0], 0);
+
+    const lineA1 = Line.fromPointAndDir(
+      a.fromHere(Left, w).fromHere(0, -h).coord,
+      a.dirXZ + Right
+    );
+    const lineB1 = Line.fromPointAndDir(
+      b.fromHere(Right, w).fromHere(0, -h).coord,
+      b.dirXZ + Left
+    );
+    const cross1 = new Ray(lineA1.getIntersectionsWith(lineB1)[0], 0);
+
+    const pu0 = a
+      .fromHere(Left, w)
+      .fromHere(0, -h)
+      .setY(up);
+    const pu1 = a
+      .fromHere(Left, w)
+      .fromHere(0, h)
+      .setY(up);
+    const pu2 = cross0.setY(up);
+    const pu3 = b
+      .fromHere(Right, w)
+      .fromHere(0, h)
+      .setY(up);
+    const pu4 = b
+      .fromHere(Right, w)
+      .fromHere(0, -h)
+      .setY(up);
+    const pu5 = cross1.setY(up);
+
+    const pd0 = a
+      .fromHere(Left, w)
+      .fromHere(0, -h)
+      .setY(dn);
+    const pd1 = a
+      .fromHere(Left, w)
+      .fromHere(0, h)
+      .setY(dn);
+    const pd2 = cross0.setY(dn);
+    const pd3 = b
+      .fromHere(Right, w)
+      .fromHere(0, h)
+      .setY(dn);
+    const pd4 = b
+      .fromHere(Right, w)
+      .fromHere(0, -h)
+      .setY(dn);
+    const pd5 = cross1.setY(dn);
+
+    const triangles = [
+      ...sext(pu0, pu1, pu2, pu3, pu4, pu5),
+      ...sext(pd4, pd3, pd2, pd1, pd0, pd5),
+      ...rect(pu0, pu1, pd0, pd1),
+      ...rect(pu1, pu2, pd1, pd2),
+      ...rect(pu2, pu3, pd2, pd3),
+      ...rect(pu3, pu4, pd3, pd4),
+      ...rect(pu4, pu5, pd4, pd5),
+      ...rect(pu5, pu0, pd5, pd0)
+    ];
+    const mesh = new BABYLON.Mesh('switchSleeper', null);
+    const vertexData = new BABYLON.VertexData();
+    vertexData.positions = triangles;
+    vertexData.indices = ind(triangles);
+    vertexData.applyToMesh(mesh);
+    mesh.material = this.sleeperBrown;
+    return mesh;
+  }
+
+  createRailSegmentMesh(rp: RayPair): BABYLON.AbstractMesh {
     const up = 1.5;
     const dn = 1.1;
     const w = 0.2;
 
-    const pu0 = p.fromHere(Left, w).setY(up);
-    const pu1 = p.fromHere(Right, w).setY(up);
-    const pd1 = p.fromHere(Right, w).setY(dn);
-    const pd0 = p.fromHere(Left, w).setY(dn);
+    const pu0 = rp.a.fromHere(Right, w).setY(up);
+    const pu1 = rp.a.fromHere(Left, w).setY(up);
+    const pd1 = rp.a.fromHere(Left, w).setY(dn);
+    const pd0 = rp.a.fromHere(Right, w).setY(dn);
 
-    const qu0 = q.fromHere(Left, w).setY(up);
-    const qu1 = q.fromHere(Right, w).setY(up);
-    const qd1 = q.fromHere(Right, w).setY(dn);
-    const qd0 = q.fromHere(Left, w).setY(dn);
+    const qu0 = rp.b.fromHere(Right, w).setY(up);
+    const qu1 = rp.b.fromHere(Left, w).setY(up);
+    const qd1 = rp.b.fromHere(Left, w).setY(dn);
+    const qd0 = rp.b.fromHere(Right, w).setY(dn);
 
     const triangles = [
       ...rect(pu0, qu0, pu1, qu1), // up
@@ -102,15 +186,15 @@ export class MeshProvider {
   }
 
   createBedSegmentMesh(seg: RayPair): BABYLON.AbstractMesh {
-    const p0 = seg.a.fromHere(Left, 3).setY(0);
-    const p1 = seg.a.fromHere(Left, 2).setY(1);
-    const p2 = seg.a.fromHere(Right, 2).setY(1);
-    const p3 = seg.a.fromHere(Right, 3).setY(0);
+    const p0 = seg.a.fromHere(Right, 3).setY(0);
+    const p1 = seg.a.fromHere(Right, 2).setY(1);
+    const p2 = seg.a.fromHere(Left, 2).setY(1);
+    const p3 = seg.a.fromHere(Left, 3).setY(0);
 
-    const q0 = seg.b.fromHere(Left, 3).setY(0);
-    const q1 = seg.b.fromHere(Left, 2).setY(1);
-    const q2 = seg.b.fromHere(Right, 2).setY(1);
-    const q3 = seg.b.fromHere(Right, 3).setY(0);
+    const q0 = seg.b.fromHere(Right, 3).setY(0);
+    const q1 = seg.b.fromHere(Right, 2).setY(1);
+    const q2 = seg.b.fromHere(Left, 2).setY(1);
+    const q3 = seg.b.fromHere(Left, 3).setY(0);
 
     const triangles = [
       ...rect(p0, q0, p1, q1),
@@ -134,6 +218,10 @@ const tri = (a, b, c) => {
 
 const rect = (a, b, c, d) => {
   return [...tri(a, b, c), ...tri(c, b, d)];
+};
+
+const sext = (a, b, c, d, e, f) => {
+  return [...tri(b, a, f), ...tri(c, b, f), ...tri(d, c, f), ...tri(e, d, f)];
 };
 
 const ind = pos => {

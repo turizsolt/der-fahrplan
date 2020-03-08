@@ -1,5 +1,8 @@
 import { Ray } from './Ray';
 import { Coordinate } from './Coordinate';
+import { Line } from './Line';
+import { almost } from './Almost';
+import { Left } from './Directions';
 
 export class LineSegment {
   private constructor(public a: Coordinate, public b: Coordinate) {}
@@ -58,5 +61,28 @@ export class LineSegment {
       (this.b.x - this.a.x) * (p.z - this.a.z) -
         (this.b.z - this.a.z) * (p.x - this.a.x)
     );
+  }
+
+  toLine(): Line {
+    return Line.fromTwoPoints(this.a, this.b);
+  }
+
+  contains(p: Coordinate): boolean {
+    return almost(
+      this.a.distance2d(p) + this.b.distance2d(p),
+      this.getLength()
+    );
+  }
+
+  project(p: Coordinate): Ray {
+    const dir = this.getDir() + Left;
+    const line = Line.fromPointAndDir(p, dir);
+    const meAsLine = this.toLine();
+    const intersections = meAsLine.getIntersectionsWith(line);
+    if (intersections.length === 1 && this.contains(intersections[0])) {
+      return new Ray(intersections[0], this.getDir());
+    } else {
+      return null;
+    }
   }
 }
