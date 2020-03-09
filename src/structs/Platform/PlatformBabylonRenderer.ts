@@ -23,7 +23,7 @@ export class PlatformBabylonRenderer extends BaseBabylonRenderer
       'clickable-platform-' + this.platform.getId(),
       {
         width: this.platform.getWidth(),
-        height: 1.5,
+        height: 2.5,
         depth: this.platform.getLength()
       },
       this.scene

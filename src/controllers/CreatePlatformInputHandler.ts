@@ -159,7 +159,7 @@ export class CreatePlatformInputHandler implements InputHandler {
         pot.track,
         Math.min(pot.position, dpot.position),
         Math.max(pot.position, dpot.position),
-        5,
+        7.5,
         side > 0 ? Side.Left : Side.Right,
         randomColor(),
         this.passengerGenerator
