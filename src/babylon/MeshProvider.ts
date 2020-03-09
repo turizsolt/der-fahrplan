@@ -107,6 +107,18 @@ export class MeshProvider {
     return mesh;
   }
 
+  createSleeperJointMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateBox(
+      name,
+      { height: 1.5, width: 1, depth: 2 },
+      this.scene
+    );
+    mesh.position = CoordinateToBabylonVector3(ray.setY(0.75).coord);
+    mesh.rotation.y = ray.dirXZ;
+    mesh.material = this.railBlack;
+    return mesh;
+  }
+
   createSwitchSleeperMesh(a: Ray, b: Ray, name: string): BABYLON.AbstractMesh {
     const up = 1.1;
     const dn = 1.0;

@@ -15,42 +15,19 @@ export class CreateTrackInputHandler implements InputHandler {
   private pathMesh: BABYLON.Mesh;
 
   constructor() {
-    const mat = new BABYLON.StandardMaterial('arrow', null);
-    mat.diffuseTexture = new BABYLON.Texture('assets/arrow.png', null);
-
-    this.fromMesh = BABYLON.MeshBuilder.CreateCylinder(
-      'placeholder-1',
-      {
-        diameter: 3,
-        tessellation: 24,
-        height: 1,
-        faceUV: [
-          new BABYLON.Vector4(0, 0, 1, 1),
-          new BABYLON.Vector4(1, 1, 1, 1)
-        ],
-        updatable: true
-      },
+    this.fromMesh = BABYLON.MeshBuilder.CreateBox(
+      name,
+      { height: 1.5, width: 1, depth: 2 },
       null
     );
-    this.fromMesh.material = mat;
     this.fromMesh.setEnabled(false);
     this.fromMesh.isPickable = false;
 
-    this.toMesh = BABYLON.MeshBuilder.CreateCylinder(
-      'placeholder-2',
-      {
-        diameter: 3,
-        tessellation: 24,
-        height: 1,
-        faceUV: [
-          new BABYLON.Vector4(0, 0, 1, 1),
-          new BABYLON.Vector4(1, 1, 1, 1)
-        ],
-        updatable: true
-      },
+    this.toMesh = BABYLON.MeshBuilder.CreateBox(
+      name,
+      { height: 1.5, width: 1, depth: 2 },
       null
     );
-    this.toMesh.material = mat;
     this.toMesh.setEnabled(false);
     this.toMesh.isPickable = false;
 
@@ -61,8 +38,8 @@ export class CreateTrackInputHandler implements InputHandler {
         new Coordinate(0, 0, 2)
       ])
         .getLineSegmentChain()
-        .getPoints()
-        .map(CoordinateToBabylonVector3),
+        .getRays()
+        .map(x => CoordinateToBabylonVector3(x.setY(1.25).coord)),
       false
     );
     this.pathMesh.setEnabled(false);
@@ -76,6 +53,7 @@ export class CreateTrackInputHandler implements InputHandler {
       this.fromMesh.position = CoordinateToBabylonVector3(
         props.snappedPoint.coord
       );
+      this.fromMesh.position.y = 0.75;
       this.fromMesh.rotation.y = props.wheelRad;
     }
 
@@ -83,13 +61,14 @@ export class CreateTrackInputHandler implements InputHandler {
       !props.snappedJoint && !props.snappedPositionOnTrack
     );
     this.toMesh.position = CoordinateToBabylonVector3(props.snappedPoint.coord);
+    this.toMesh.position.y = 0.75;
     this.toMesh.rotation.y = props.wheelRad;
 
     this.pathMesh = curveToTube(
       BezierCreater.Create([props.snappedPoint.coord, props.snappedPoint.coord])
         .getLineSegmentChain()
-        .getPoints()
-        .map(CoordinateToBabylonVector3),
+        .getRays()
+        .map(x => CoordinateToBabylonVector3(x.setY(1.25).coord)),
       false,
       this.pathMesh
     );
@@ -101,6 +80,7 @@ export class CreateTrackInputHandler implements InputHandler {
       this.fromMesh.position = CoordinateToBabylonVector3(
         props.snappedPoint.coord
       );
+      this.fromMesh.position.y = 0.75;
     }
     this.fromMesh.rotation.y = props.wheelRad;
     this.fromMesh.setEnabled(
@@ -110,6 +90,7 @@ export class CreateTrackInputHandler implements InputHandler {
 
   move(downProps: InputProps, props: InputProps, event: PointerEvent): void {
     this.toMesh.position = CoordinateToBabylonVector3(props.snappedPoint.coord);
+    this.toMesh.position.y = 0.75;
     this.toMesh.rotation.y = props.wheelRad;
     this.toMesh.setEnabled(!props.snappedJoint);
 
@@ -132,8 +113,8 @@ export class CreateTrackInputHandler implements InputHandler {
         props.snappedPoint.coord
       ])
         .getLineSegmentChain()
-        .getPoints()
-        .map(CoordinateToBabylonVector3),
+        .getRays()
+        .map(x => CoordinateToBabylonVector3(x.setY(1.25).coord)),
       false,
       this.pathMesh
     );
