@@ -72,6 +72,24 @@ export class LineSegmentChain {
     return pairs;
   }
 
+  getRayPairsToPoint(p: Coordinate): RayPair[] {
+    const pairs = [];
+    let put = true;
+    for (let i = 1; i < this.rays.length; i++) {
+      const seg = LineSegment.fromTwoPoints(
+        this.rays[i - 1].coord,
+        this.rays[i].coord
+      );
+      if (seg.contains(p)) {
+        put = false;
+        pairs.push(new RayPair(this.rays[i - 1], new Ray(p, seg.getDir())));
+      } else {
+        if (put) pairs.push(new RayPair(this.rays[i - 1], this.rays[i]));
+      }
+    }
+    return pairs;
+  }
+
   getChainFromPoint(p: Coordinate): LineSegmentChain {
     const rays = [];
     let put = false;
@@ -82,6 +100,23 @@ export class LineSegmentChain {
       );
       if (seg.contains(p)) {
         put = true;
+        rays.push(new Ray(p, seg.getDir()));
+      }
+      if (put) rays.push(this.rays[i]);
+    }
+    return LineSegmentChain.fromRays(rays);
+  }
+
+  getChainToPoint(p: Coordinate): LineSegmentChain {
+    const rays = [];
+    let put = true;
+    for (let i = 1; i < this.rays.length; i++) {
+      const seg = LineSegment.fromTwoPoints(
+        this.rays[i - 1].coord,
+        this.rays[i].coord
+      );
+      if (seg.contains(p)) {
+        put = false;
         rays.push(new Ray(p, seg.getDir()));
       }
       if (put) rays.push(this.rays[i]);

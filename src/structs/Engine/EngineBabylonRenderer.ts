@@ -11,6 +11,7 @@ import { TYPES } from '../TYPES';
 export class EngineBabylonRenderer extends BaseBabylonRenderer
   implements EngineRenderer {
   private mesh: BABYLON.AbstractMesh;
+  private selectedMesh: BABYLON.AbstractMesh;
   private engine: Engine;
   readonly scene: BABYLON.Scene;
 
@@ -19,17 +20,18 @@ export class EngineBabylonRenderer extends BaseBabylonRenderer
   private meshProvider: MeshProvider;
 
   private lastSelected: boolean = false;
-  private highlight: BABYLON.HighlightLayer;
 
   init(engine: Engine) {
     this.meshProvider = this.meshProviderFactory();
     this.engine = engine;
-    this.highlight = new BABYLON.HighlightLayer('hl1', null);
 
     this.mesh = this.meshProvider.createEngineMesh(
       'clickable-engine-' + this.engine.getId()
     );
     this.mesh.setEnabled(true);
+
+    this.selectedMesh = this.meshProvider.createSelectorMesh();
+    this.selectedMesh.setEnabled(false);
 
     this.update();
   }
@@ -37,25 +39,25 @@ export class EngineBabylonRenderer extends BaseBabylonRenderer
   update() {
     if (this.engine.isRemoved()) {
       this.mesh.setEnabled(false);
+      this.selectedMesh.setEnabled(false);
     } else {
       const ray = this.engine.getRay();
       this.mesh.position = CoordinateToBabylonVector3(ray.coord);
       this.mesh.position.y = 4.2;
       this.mesh.rotation.y = ray.dirXZ + Math.PI / 2;
+
+      if (this.selected) {
+        this.selectedMesh.position = CoordinateToBabylonVector3(ray.coord);
+        this.selectedMesh.position.y = 10;
+      }
     }
 
     if (this.selected && !this.lastSelected) {
-      this.mesh
-        .getChildMeshes()
-        .map(ch =>
-          this.highlight.addMesh(ch as BABYLON.Mesh, BABYLON.Color3.Yellow())
-        );
+      this.selectedMesh.setEnabled(true);
     }
 
     if (!this.selected && this.lastSelected) {
-      this.mesh
-        .getChildMeshes()
-        .map(ch => this.highlight.removeMesh(ch as BABYLON.Mesh));
+      this.selectedMesh.setEnabled(false);
     }
 
     this.lastSelected = this.selected;

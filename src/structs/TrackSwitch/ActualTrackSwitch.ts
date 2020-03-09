@@ -109,7 +109,7 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
       this.D.remove();
       this.E.remove();
       this.F.remove();
-      this.renderer.update();
+      this.renderer.remove();
       this.store.unregister(this);
     }
     return removable;

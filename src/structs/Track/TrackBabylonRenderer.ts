@@ -6,6 +6,7 @@ import { BaseBabylonRenderer } from '../Base/BaseBabylonRenderer';
 import { Left, Right } from '../Geometry/Directions';
 import { TYPES } from '../TYPES';
 import { MeshProvider } from '../../babylon/MeshProvider';
+import { MaterialName } from '../../babylon/MaterialName';
 
 @injectable()
 export class TrackBabylonRenderer extends BaseBabylonRenderer
@@ -14,6 +15,7 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
   @inject(TYPES.FactoryOfMeshProvider)
   private meshProviderFactory: () => MeshProvider;
   private meshProvider: MeshProvider;
+  private selectableMeshes: BABYLON.AbstractMesh[];
 
   init(track: Track): void {
     this.track = track;
@@ -21,23 +23,25 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
     const chain = this.track.getSegment().getLineSegmentChain();
     const len = this.track.getSegment().getLength();
 
+    const name = 'clickable-track-' + this.track.getId();
+
     const bedSegmentMeshes = chain
       .getRayPairs()
-      .map(v => this.meshProvider.createBedSegmentMesh(v));
+      .map(v => this.meshProvider.createBedSegmentMesh(v, name));
 
     const sleeperMeshes = chain
       .getEvenlySpacedRays(len / Math.floor(len))
-      .map(v => this.meshProvider.createSleeperMesh(v));
+      .map(v => this.meshProvider.createSleeperMesh(v, name));
 
     const leftRailMeshes = chain
       .copyMove(Left, 1)
       .getRayPairs()
-      .map(rp => this.meshProvider.createRailSegmentMesh(rp));
+      .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
     const rightRailMeshes = chain
       .copyMove(Right, 1)
       .getRayPairs()
-      .map(rp => this.meshProvider.createRailSegmentMesh(rp));
+      .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
     this.meshes = [
       ...bedSegmentMeshes,
@@ -45,9 +49,31 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
       ...leftRailMeshes,
       ...rightRailMeshes
     ];
+
+    this.selectableMeshes = [...sleeperMeshes];
   }
 
-  update(): void {}
+  private lastSelected: boolean = false;
+
+  update() {
+    if (this.selected && !this.lastSelected) {
+      this.selectableMeshes.map(
+        x =>
+          (x.material = this.meshProvider.getMaterial(MaterialName.SelectorRed))
+      );
+    }
+
+    if (!this.selected && this.lastSelected) {
+      this.selectableMeshes.map(
+        x =>
+          (x.material = this.meshProvider.getMaterial(
+            MaterialName.SleeperBrown
+          ))
+      );
+    }
+
+    this.lastSelected = this.selected;
+  }
 
   process(command: string) {
     switch (command) {
