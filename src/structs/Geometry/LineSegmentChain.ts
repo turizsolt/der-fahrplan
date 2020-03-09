@@ -83,9 +83,8 @@ export class LineSegmentChain {
       if (seg.contains(p)) {
         put = true;
         rays.push(new Ray(p, seg.getDir()));
-      } else {
-        if (put) rays.push(this.rays[i]);
       }
+      if (put) rays.push(this.rays[i]);
     }
     return LineSegmentChain.fromRays(rays);
   }

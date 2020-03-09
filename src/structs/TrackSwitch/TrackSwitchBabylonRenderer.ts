@@ -76,43 +76,46 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
       maxRad / Math.floor(maxRad)
     );
 
-    console.log(sleeperPointsE, sleeperPointsF);
+    if (sleeperPointsE.length === sleeperPointsF.length) {
+      const sleeperMeshesTogether = zip(sleeperPointsE, sleeperPointsF).map(
+        ([a, b]) => this.meshProvider.createSwitchSleeperMesh(a, b)
+      );
 
-    const sleeperMeshesTogether = zip(sleeperPointsE, sleeperPointsF).map(
-      ([a, b]) => this.meshProvider.createSwitchSleeperMesh(a, b)
-    );
+      const lastE = sleeperPointsE.slice(-1)[0];
+      const lastF = sleeperPointsF.slice(-1)[0];
 
-    const lastE = sleeperPointsE.slice(-1)[0];
-    const lastF = sleeperPointsF.slice(-1)[0];
+      const shortChainE = chainE.getChainFromPoint(lastE.coord);
+      const lenE = shortChainE.getLength();
+      const shortChainF = chainF.getChainFromPoint(lastF.coord);
+      const lenF = shortChainF.getLength();
 
-    const shortChainE = chainE.getChainFromPoint(lastE.coord);
-    const lenE = shortChainE.getLength();
-    const shortChainF = chainF.getChainFromPoint(lastF.coord);
-    const lenF = shortChainF.getLength();
+      const magic = x => {
+        return x / (Math.round((x + 1) / 2) * 2 - 1);
+      };
 
-    const magic = x => {
-      return x / (Math.round((x + 1) / 2) * 2 - 1);
-    };
+      const sleeperMeshesE = shortChainE
+        .getEvenlySpacedRays(magic(lenE), true)
+        .map(v => this.meshProvider.createSleeperMesh(v));
 
-    const sleeperMeshesE = shortChainE
-      .getEvenlySpacedRays(magic(lenE), true)
-      .map(v => this.meshProvider.createSleeperMesh(v));
+      const sleeperMeshesF = shortChainF
+        .getEvenlySpacedRays(magic(lenF), true)
+        .map(v => this.meshProvider.createSleeperMesh(v));
 
-    const sleeperMeshesF = shortChainF
-      .getEvenlySpacedRays(magic(lenF), true)
-      .map(v => this.meshProvider.createSleeperMesh(v));
-
-    this.meshes = [
-      ...bedSegmentMeshesE,
-      ...bedSegmentMeshesF,
-      ...leftRailMeshes,
-      ...rightRailMeshes,
-      ...innerLeftRailMeshes,
-      ...innerRightRailMeshes,
-      ...sleeperMeshesTogether,
-      ...sleeperMeshesE,
-      ...sleeperMeshesF
-    ];
+      this.meshes = [
+        ...bedSegmentMeshesE,
+        ...bedSegmentMeshesF,
+        ...leftRailMeshes,
+        ...rightRailMeshes,
+        ...innerLeftRailMeshes,
+        ...innerRightRailMeshes,
+        ...sleeperMeshesTogether,
+        ...sleeperMeshesE,
+        ...sleeperMeshesF
+      ];
+    } else {
+      sleeperPointsE.map(x => ballon(x.setY(1.2).coord, BABYLON.Color3.White));
+      sleeperPointsF.map(x => ballon(x.setY(1.2).coord, BABYLON.Color3.White));
+    }
 
     const [peak] = this.trackSwitch.naturalSplitPoints();
     ballon(peak.setY(1.2).coord, BABYLON.Color3.White);

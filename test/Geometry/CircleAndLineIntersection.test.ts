@@ -36,6 +36,36 @@ describe('Line and circle intersection', () => {
     ]);
   });
 
+  it('through on the middle vertically .00001', () => {
+    const line = Line.fromTwoPoints(
+      new Coordinate(0.000001, 0, -0.000001),
+      new Coordinate(-0.000001, 0, 10.000003)
+    );
+    const circle = new Circle(new Coordinate(0, 0, 0), 9.476145);
+
+    const points: Coordinate[] = circle.getIntersectionsWithLine(line);
+
+    expect(points).deep.almost([
+      new Coordinate(0, 0, 9.476145),
+      new Coordinate(0, 0, -9.476145)
+    ]);
+  });
+
+  it('through on the middle vertically 101.00001', () => {
+    const line = Line.fromTwoPoints(
+      new Coordinate(101.000001, 0, 100.999999),
+      new Coordinate(100.999999, 0, 111.000003)
+    );
+    const circle = new Circle(new Coordinate(101, 0, 101), 9.476145);
+
+    const points: Coordinate[] = circle.getIntersectionsWithLine(line);
+
+    expect(points).deep.almost([
+      new Coordinate(101, 0, 110.476145),
+      new Coordinate(101, 0, 91.523855)
+    ]);
+  });
+
   it('through on the middle diagonally', () => {
     const line = Line.fromTwoPoints(
       new Coordinate(0, 0, 0),
