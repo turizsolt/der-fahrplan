@@ -1,17 +1,10 @@
-import { WhichEnd } from './WhichEnd';
 import { TrackBase } from '../TrackBase/TrackBase';
 import { TrackJoint } from '../TrackJoint/TrackJoint';
+import { End } from './End';
 
-export class TrackEnd {
-  protected whichEnd: WhichEnd;
-  protected endOf: TrackBase;
-  protected connectedEnd: TrackEnd;
+export class TrackEnd extends End<TrackBase> {
   protected jointTo: TrackJoint;
-
-  constructor(which: WhichEnd, endOf: TrackBase) {
-    this.whichEnd = which;
-    this.endOf = endOf;
-  }
+  protected connectedEnd: TrackEnd;
 
   connect(otherEnd: TrackEnd, joint?: TrackJoint) {
     if (this.connectedEnd) return;
@@ -26,55 +19,12 @@ export class TrackEnd {
     this.endOf.update();
   }
 
-  isConnectedTo(otherEnd: TrackEnd) {
-    return this.connectedEnd === otherEnd;
-  }
-
-  disconnect() {
-    if (!this.connectedEnd) return;
-
-    const temp = this.connectedEnd;
-    this.connectedEnd = null;
-    if (temp.isConnectedTo(this)) {
-      temp.disconnect();
-    }
-
-    this.endOf.update();
-  }
-
-  remove() {
-    this.disconnect();
-    if (this.jointTo) {
-      this.jointTo.removeEnd(this);
-    }
-    this.jointTo = null; // todo i'm not sure
-  }
-
-  update() {
-    this.endOf.update();
-  }
-
-  getTrack(): TrackBase {
-    return this.endOf;
-  }
-
-  getConnectedTrack(): TrackBase {
-    if (this.hasConnectedTrack()) {
-      return this.connectedEnd.getTrack();
-    }
-    return null;
-  }
-
-  hasConnectedTrack(): boolean {
+  hasConnectedEndOf(): boolean {
     return this.isActive() && this.connectedEnd && this.connectedEnd.isActive();
   }
 
-  getConnectedEnd(): TrackEnd {
-    return this.connectedEnd;
-  }
-
-  getWhichEnd(): WhichEnd {
-    return this.whichEnd;
+  isActive(): boolean {
+    return true;
   }
 
   getJointTo(): TrackJoint {
@@ -85,23 +35,9 @@ export class TrackEnd {
     this.jointTo = joint;
   }
 
-  getHash(): string {
-    return this.whichEnd + this.endOf.getId();
-  }
-
-  isActive(): boolean {
-    return true;
-  }
-
-  isSwitchingEnds(): boolean {
-    if (!this.getConnectedEnd()) return null;
-    return this.getWhichEnd() !== this.getConnectedEnd().getWhichEnd();
-  }
-
   persist(): Object {
     return {
-      whichEnd: this.whichEnd,
-      endOf: this.endOf.getId(),
+      ...super.persist(),
       jointTo: this.jointTo.getId()
     };
   }

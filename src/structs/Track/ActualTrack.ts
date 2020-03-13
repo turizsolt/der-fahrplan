@@ -50,14 +50,14 @@ export class ActualTrack extends ActualTrackBase implements Track {
       'A ',
       this.A.getHash(),
       !!this.A.getConnectedEnd() && this.A.getConnectedEnd().getHash(),
-      !!this.A.getConnectedTrack() && this.A.getConnectedTrack().getId(),
+      !!this.A.getConnectedEndOf() && this.A.getConnectedEndOf().getId(),
       !!this.A.getJointTo() && this.A.getJointTo().getId()
     );
     console.log(
       'B ',
       this.B.getHash(),
       !!this.B.getConnectedEnd() && this.B.getConnectedEnd().getHash(),
-      !!this.B.getConnectedTrack() && this.B.getConnectedTrack().getId(),
+      !!this.B.getConnectedEndOf() && this.B.getConnectedEndOf().getId(),
       !!this.B.getJointTo() && this.B.getJointTo().getId()
     );
     console.log('/track');

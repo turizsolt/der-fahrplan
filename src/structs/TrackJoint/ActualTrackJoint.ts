@@ -101,7 +101,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   }
 
   setOneEnd(jointEndLetter: WhichEnd, trackEnd: TrackEnd) {
-    const track = trackEnd.getTrack();
+    const track = trackEnd.getEndOf();
     this.ends[jointEndLetter].setEnd(track, trackEnd);
     if (this.ends[otherEnd(jointEndLetter)].isSet()) {
       this.ends.A.end.connect(this.ends.B.end, this);

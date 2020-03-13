@@ -49,7 +49,7 @@ export class PositionOnTrack {
 
     if (this.position < 0) {
       const end = this.track.getA();
-      if (end.hasConnectedTrack()) {
+      if (end.hasConnectedEndOf()) {
         this.moveNextOnA(end);
       } else {
         this.stopOnA();
@@ -63,7 +63,7 @@ export class PositionOnTrack {
     const trackLength = this.track.getLength();
     if (this.position > trackLength) {
       const end = this.track.getB();
-      if (end.hasConnectedTrack()) {
+      if (end.hasConnectedEndOf()) {
         this.moveNextOnB(end, trackLength);
       } else {
         this.stopOnB();
@@ -91,7 +91,7 @@ export class PositionOnTrack {
 
   private moveToNextTrack(end: TrackEnd) {
     this.track.checkout(this.engine);
-    this.track = end.getConnectedTrack();
+    this.track = end.getConnectedEndOf();
     this.track.checkin(this.engine);
   }
 
