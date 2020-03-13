@@ -16,6 +16,9 @@ export class GridDrawer {
       this.scene
     );
     ground.position.y = 0;
+    const mat = new BABYLON.StandardMaterial('boxMat', null);
+    mat.diffuseColor = new BABYLON.Color3(0.5, 1, 0.5);
+    ground.material = mat;
 
     for (let i = -150; i <= 150; i += 10) {
       const gridVer = BABYLON.MeshBuilder.CreateLines(

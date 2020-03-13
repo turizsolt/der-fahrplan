@@ -27,6 +27,7 @@ import { PlatformBabylonRenderer } from './Platform/PlatformBabylonRenderer';
 import { Platform } from './Platform/Platform';
 import { ActualPlatform } from './Platform/ActualPlatform';
 import { TrackJointConnector } from './TrackJoint/TrackJointConnector';
+import { MeshProvider } from '../babylon/MeshProvider';
 
 export const babylonContainer = new Container();
 babylonContainer
@@ -55,6 +56,7 @@ babylonContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 babylonContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
 babylonContainer.bind<Platform>(TYPES.Platform).to(ActualPlatform);
 babylonContainer.bind<Store>(TYPES.Store).to(Store);
+babylonContainer.bind<MeshProvider>(TYPES.MeshProvider).to(MeshProvider);
 babylonContainer
   .bind<TrackJointConnector>(TYPES.TrackJointConnector)
   .to(TrackJointConnector);
@@ -84,6 +86,18 @@ babylonContainer
         store = context.container.get<Store>(TYPES.Store).init();
       }
       return store;
+    };
+  });
+
+let meshProvider: MeshProvider = null;
+babylonContainer
+  .bind<interfaces.Factory<MeshProvider>>(TYPES.FactoryOfMeshProvider)
+  .toFactory<MeshProvider>((context: interfaces.Context) => {
+    return () => {
+      if (!meshProvider) {
+        meshProvider = context.container.get<MeshProvider>(TYPES.MeshProvider);
+      }
+      return meshProvider;
     };
   });
 

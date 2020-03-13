@@ -11,7 +11,6 @@ import { babylonContainer } from '../structs/inversify.config';
 import { TYPES } from '../structs/TYPES';
 import { Side } from '../structs/Platform/Side';
 import { PassengerGenerator } from '../structs/Platform/PassengerGenerator';
-import { Color3 } from 'babylonjs';
 import { Color } from '../structs/Color';
 
 export class CreatePlatformInputHandler implements InputHandler {
@@ -65,7 +64,8 @@ export class CreatePlatformInputHandler implements InputHandler {
         new Coordinate(0, 0, 1),
         new Coordinate(0, 0, 2)
       ])
-        .getLinePoints()
+        .getLineSegmentChain()
+        .getPoints()
         .map(CoordinateToBabylonVector3),
       false
     );
@@ -159,7 +159,7 @@ export class CreatePlatformInputHandler implements InputHandler {
         pot.track,
         Math.min(pot.position, dpot.position),
         Math.max(pot.position, dpot.position),
-        5,
+        7.5,
         side > 0 ? Side.Left : Side.Right,
         randomColor(),
         this.passengerGenerator

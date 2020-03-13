@@ -2,34 +2,36 @@ import * as BABYLON from 'babylonjs';
 import { CoordinateToBabylonVector3 } from '../CoordinateToBabylonVector3';
 import { EngineRenderer } from './EngineRenderer';
 import { Engine } from './Engine';
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
 import { BaseBabylonRenderer } from '../Base/BaseBabylonRenderer';
+import { MeshProvider } from '../../babylon/MeshProvider';
+import { TYPES } from '../TYPES';
 
 @injectable()
 export class EngineBabylonRenderer extends BaseBabylonRenderer
   implements EngineRenderer {
-  private mesh: BABYLON.Mesh;
+  private mesh: BABYLON.AbstractMesh;
+  private selectedMesh: BABYLON.AbstractMesh;
   private engine: Engine;
   readonly scene: BABYLON.Scene;
 
-  private matNorm: BABYLON.StandardMaterial;
-  private matSel: BABYLON.StandardMaterial;
+  @inject(TYPES.FactoryOfMeshProvider)
+  private meshProviderFactory: () => MeshProvider;
+  private meshProvider: MeshProvider;
+
+  private lastSelected: boolean = false;
 
   init(engine: Engine) {
+    this.meshProvider = this.meshProviderFactory();
     this.engine = engine;
 
-    this.mesh = BABYLON.MeshBuilder.CreateBox(
-      'clickable-engine-' + this.engine.getId(),
-      { height: 3, width: 3, depth: 10 },
-      this.scene
+    this.mesh = this.meshProvider.createEngineMesh(
+      'clickable-engine-' + this.engine.getId()
     );
+    this.mesh.setEnabled(true);
 
-    this.matNorm = new BABYLON.StandardMaterial('boxMat', this.scene);
-    this.matNorm.diffuseColor = new BABYLON.Color3(1, 0, 0);
-
-    this.matSel = new BABYLON.StandardMaterial('boxMat', this.scene);
-    this.matSel.diffuseColor = new BABYLON.Color3(1, 0, 1);
-    this.mesh.material = this.matNorm;
+    this.selectedMesh = this.meshProvider.createSelectorMesh();
+    this.selectedMesh.setEnabled(false);
 
     this.update();
   }
@@ -37,13 +39,28 @@ export class EngineBabylonRenderer extends BaseBabylonRenderer
   update() {
     if (this.engine.isRemoved()) {
       this.mesh.setEnabled(false);
+      this.selectedMesh.setEnabled(false);
     } else {
       const ray = this.engine.getRay();
       this.mesh.position = CoordinateToBabylonVector3(ray.coord);
-      this.mesh.position.y = 1.5;
-      this.mesh.rotation.y = ray.dirXZ;
-      this.mesh.material = this.selected ? this.matSel : this.matNorm;
+      this.mesh.position.y = 4.2;
+      this.mesh.rotation.y = ray.dirXZ + Math.PI / 2;
+
+      if (this.selected) {
+        this.selectedMesh.position = CoordinateToBabylonVector3(ray.coord);
+        this.selectedMesh.position.y = 10;
+      }
     }
+
+    if (this.selected && !this.lastSelected) {
+      this.selectedMesh.setEnabled(true);
+    }
+
+    if (!this.selected && this.lastSelected) {
+      this.selectedMesh.setEnabled(false);
+    }
+
+    this.lastSelected = this.selected;
   }
 
   process(command: string) {

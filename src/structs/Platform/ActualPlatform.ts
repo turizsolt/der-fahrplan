@@ -92,7 +92,7 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
 
     var center = new Coordinate((b.x + a.x) / 2, 0, (b.z + a.z) / 2);
 
-    var dist = 1.6 + width / 2;
+    var dist = 1.8 + width / 2;
     var len = Math.sqrt(
       Math.pow(Math.abs(a.x - b.x), 2) + Math.pow(Math.abs(a.z - b.z), 2)
     );

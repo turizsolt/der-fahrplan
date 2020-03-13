@@ -1,17 +1,20 @@
 import { Coordinate } from '../Geometry/Coordinate';
 import { Bezier } from '../Geometry/Bezier/Bezier';
 import { BezierCreater } from '../Geometry/Bezier/BezierCreater';
+import { LineSegmentChain } from '../Geometry/LineSegmentChain';
 
 export class TrackSegment {
   readonly length: number;
   readonly isCurve: boolean;
   readonly curvePoints: Coordinate[];
   private bezier: Bezier;
+  private segmentChain: LineSegmentChain;
 
   constructor(coordinates: Coordinate[]) {
     this.bezier = BezierCreater.Create(coordinates);
-    this.curvePoints = this.bezier.getLinePoints();
-    this.length = this.bezier.getLength();
+    this.segmentChain = this.bezier.getLineSegmentChain();
+    this.curvePoints = this.segmentChain.getPoints();
+    this.length = this.segmentChain.getLength();
   }
 
   getCurvePoints(): Coordinate[] {
@@ -24,6 +27,10 @@ export class TrackSegment {
 
   getBezier(): Bezier {
     return this.bezier;
+  }
+
+  getLineSegmentChain(): LineSegmentChain {
+    return this.segmentChain;
   }
 
   getFirstPoint(): Coordinate {

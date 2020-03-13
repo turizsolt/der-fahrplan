@@ -11,4 +11,5 @@ export class PlatformDummyRenderer implements PlatformRenderer {
   process(command: string): void {}
   update() {}
   init(_: Platform) {}
+  remove(): void {}
 }

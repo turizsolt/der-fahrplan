@@ -11,4 +11,5 @@ export class EngineDummyRenderer implements EngineRenderer {
   process(command: string): void {}
   init(_: Engine) {}
   update() {}
+  remove(): void {}
 }

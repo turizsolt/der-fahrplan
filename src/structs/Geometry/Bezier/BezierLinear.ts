@@ -31,8 +31,4 @@ export class BezierLinear extends Bezier {
     const lineDerived = new Coordinate(end.x - start.x, 0, end.z - start.z);
     return Math.atan2(lineDerived.x, lineDerived.z);
   }
-
-  getLength(_: number): number {
-    return this.coordinates[0].distance2d(this.coordinates[1]);
-  }
 }

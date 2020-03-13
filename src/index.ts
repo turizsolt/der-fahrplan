@@ -5,6 +5,7 @@ import { Land } from './structs/Land/Land';
 import { TYPES } from './structs/TYPES';
 import { GridDrawer } from './controllers/GridDrawer';
 import { InputController } from './controllers/InputController';
+import { MeshProvider } from './babylon/MeshProvider';
 
 window.addEventListener('DOMContentLoaded', () => {
   const canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
@@ -14,28 +15,28 @@ window.addEventListener('DOMContentLoaded', () => {
   let camera: BABYLON.ArcRotateCamera;
   const createScene = () => {
     const scene = new BABYLON.Scene(renderEngine);
+
+    const meshProviderFactory = babylonContainer.get<() => MeshProvider>(
+      TYPES.FactoryOfMeshProvider
+    );
+    const meshProvider = meshProviderFactory().init(scene);
+
     scene.clearColor = new BABYLON.Color4(0, 1, 0, 1);
 
     camera = new BABYLON.ArcRotateCamera(
       'Camera',
       0,
-      0,
-      180, // 300,
-      new BABYLON.Vector3(0, 0, 0),
+      0.8,
+      70,
+      new BABYLON.Vector3(0, 0, 30),
       scene
     );
 
-    const light = new BABYLON.DirectionalLight(
-      'DirectionalLight',
-      new BABYLON.Vector3(0, -1, 0),
+    const light = new BABYLON.HemisphericLight(
+      'HemiLight',
+      new BABYLON.Vector3(0, 1, 0),
       scene
     );
-    light.intensity = 0.7;
-
-    const pol = new BABYLON.PointLight('pl', BABYLON.Vector3.Zero(), scene);
-    pol.diffuse = new BABYLON.Color3(1, 1, 1);
-    pol.specular = new BABYLON.Color3(1, 1, 1);
-    pol.intensity = 0.8;
 
     (window as any).switches = [];
     const land = babylonContainer.get<Land>(TYPES.Land);

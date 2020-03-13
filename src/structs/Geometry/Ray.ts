@@ -63,6 +63,30 @@ export class Ray {
     return this.dirXZ;
   }
 
+  fromHere(rad: number, dist: number): Ray {
+    const shift = new Coordinate(
+      Math.sin(this.dirXZ + rad) * dist,
+      0,
+      Math.cos(this.dirXZ + rad) * dist
+    );
+
+    return new Ray(this.coord.add(shift), this.dirXZ);
+  }
+
+  fromHereAbs(rad: number, dist: number): Ray {
+    const shift = new Coordinate(Math.sin(rad) * dist, 0, Math.cos(rad) * dist);
+
+    return new Ray(this.coord.add(shift), rad);
+  }
+
+  setY(y: number): Ray {
+    return new Ray(new Coordinate(this.coord.x, y, this.coord.z), this.dirXZ);
+  }
+
+  getArr(): number[] {
+    return [this.coord.x, this.coord.y, this.coord.z];
+  }
+
   whichEnd(comparePosition: Coordinate): WhichEnd {
     const direction = Math.atan2(
       comparePosition.x - this.getPosition().x,

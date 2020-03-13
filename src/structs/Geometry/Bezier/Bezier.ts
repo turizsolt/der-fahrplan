@@ -1,7 +1,9 @@
 import { Coordinate } from '../Coordinate';
 import { Ray } from '../Ray';
+import { LineSegmentChain } from '../LineSegmentChain';
 
-export const DEFAULT_PRECISION: number = 20;
+export const DEFAULT_PRECISION: number = 9;
+export const DEFAULT_DISTANCE: number = 2;
 
 export abstract class Bezier {
   protected coordinates: Coordinate[];
@@ -14,7 +16,6 @@ export abstract class Bezier {
   abstract getDegree(): number;
   abstract getPoint(percentage: number): Coordinate;
   abstract getDirection(percentage: number): number;
-  abstract getLength(count?: number): number;
 
   getCoordinates() {
     return this.coordinates;
@@ -24,13 +25,15 @@ export abstract class Bezier {
     return new Ray(this.getPoint(percentage), this.getDirection(percentage));
   }
 
-  getLinePoints(count: number = DEFAULT_PRECISION): Coordinate[] {
-    if (count < 2) throw new Error('Too few count to get points');
-
-    const points = [];
-    for (let i = 0; i < count; i++) {
-      points.push(this.getPoint(i / (count - 1)));
+  getLineSegmentChain(precision: number = DEFAULT_PRECISION): LineSegmentChain {
+    if (precision < 2) {
+      precision = 2;
     }
-    return points;
+
+    const rays = [];
+    for (let i = 0; i < precision; i++) {
+      rays.push(this.getRay(i / (precision - 1)));
+    }
+    return LineSegmentChain.fromRays(rays);
   }
 }

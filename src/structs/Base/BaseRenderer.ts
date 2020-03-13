@@ -3,4 +3,5 @@ export interface BaseRenderer {
   isSelected(): boolean;
   process(command: string): void;
   update();
+  remove();
 }

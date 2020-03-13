@@ -71,7 +71,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
         this.ends.B.unsetEnd();
       }
       this.removed = true;
-      this.renderer.update();
+      this.renderer.remove();
 
       this.store.unregister(this);
       return true;

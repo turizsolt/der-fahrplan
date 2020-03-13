@@ -125,6 +125,7 @@ export class ActualEngine extends ActualBaseBrick implements Engine {
     this.removed = true;
     this.store.unregister(this);
     this.renderer.update();
+    this.getTrackOn().checkout(this);
     return true;
   }
 

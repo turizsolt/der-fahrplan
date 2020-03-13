@@ -91,6 +91,9 @@ export class TrackJointConnector {
 
       oldTrack.remove();
 
+      // itt kéne valahol feldarabolni
+      // sw.splitNatural();
+
       peak.setOneEnd(peakLetter, sw.getA());
       second.setOneEnd(secondLetter, sw.getE());
       third.setOneEnd(thirdLetter, sw.getF());

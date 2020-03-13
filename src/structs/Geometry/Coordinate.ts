@@ -30,4 +30,8 @@ export class Coordinate {
       Math.pow(this.x - other.x, 2) + Math.pow(this.z - other.z, 2)
     );
   }
+
+  whichDir2d(other: Coordinate): number {
+    return Math.atan2(other.x - this.x, other.z - this.z);
+  }
 }
