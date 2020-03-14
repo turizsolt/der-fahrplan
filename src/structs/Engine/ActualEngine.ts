@@ -56,12 +56,14 @@ export class ActualEngine extends ActualBaseBrick implements Engine {
   }
 
   forward(): void {
-    this.positionOnTrack.move(1);
+    // to my B
+    this.positionOnTrack.hop(1);
     this.update();
   }
 
   backward(): void {
-    this.positionOnTrack.move(-1);
+    // to my A
+    this.positionOnTrack.hop(-1);
     this.update();
   }
 

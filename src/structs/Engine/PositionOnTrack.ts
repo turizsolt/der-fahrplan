@@ -3,26 +3,18 @@ import { Platform } from '../Platform/Platform';
 import { Engine } from './Engine';
 import { Ray } from '../Geometry/Ray';
 import { TrackEnd } from '../Track/TrackEnd';
+import { Circle } from '../Geometry/Circle';
 
 export class PositionOnTrack {
+  private percentage: number;
   constructor(
     private track: TrackBase,
     private engine: Engine,
     private position: number = 0,
     private direction: number = 1
   ) {
+    this.percentage = position;
     this.position = position * track.getSegment().getLength();
-  }
-
-  move(distance: number) {
-    const product = this.direction * distance;
-    if (product !== 0) {
-      if (product > 0) {
-        this.moveTowardsB();
-      } else {
-        this.moveTowardsA();
-      }
-    }
   }
 
   getTrack() {
@@ -36,12 +28,44 @@ export class PositionOnTrack {
       .getRay(this.getPercentage());
   }
 
+  getDirection(): number {
+    return this.direction;
+  }
+
   isBeside(platform: Platform): boolean {
     return platform.isBeside(this.position);
   }
 
   private getPercentage(): number {
-    return this.position / this.track.getLength();
+    return this.percentage;
+    //return this.position / this.track.getLength();
+  }
+
+  private setPercentage(percentage: number): void {
+    this.percentage = percentage;
+    //this.position = this.track.getLength() * percentage;
+  }
+
+  move(distance: number) {
+    const product = this.direction * distance;
+    if (product !== 0) {
+      if (product > 0) {
+        this.moveTowardsB();
+      } else {
+        this.moveTowardsA();
+      }
+    }
+  }
+
+  hop(distance: number) {
+    const product = this.direction * distance;
+    if (product !== 0) {
+      if (product > 0) {
+        this.hopTowardsB(Math.abs(distance));
+      } else {
+        this.hopTowardsA(Math.abs(distance));
+      }
+    }
   }
 
   private moveTowardsA(): void {
@@ -69,6 +93,59 @@ export class PositionOnTrack {
         this.stopOnB();
       }
     }
+  }
+
+  private hopTowardsB(distance): void {
+    const lastPoint = this.track.getSegment().getLastPoint();
+
+    let bezier = this.track.getSegment().getBezier();
+    const point = bezier.getPoint(this.getPercentage());
+    let fun = t => t > this.getPercentage();
+
+    if (lastPoint.distance2d(point) < distance) {
+      if (this.track.getB().hasConnectedEndOf()) {
+        if (!this.track.getB().isSwitchingEnds()) {
+          this.direction = -this.direction;
+        }
+        this.moveToNextTrack(this.track.getB());
+        bezier = this.track.getSegment().getBezier();
+        fun = t => true;
+      } else {
+        this.setPercentage(1);
+        return;
+      }
+    }
+
+    const circle = new Circle(point, distance);
+    const vals = bezier.intersectWithCircle(circle).filter(fun);
+    this.setPercentage(vals[0]);
+  }
+
+  private hopTowardsA(distance): void {
+    const firstPoint = this.track.getSegment().getFirstPoint();
+
+    let bezier = this.track.getSegment().getBezier();
+    const point = bezier.getPoint(this.getPercentage());
+    let fun = t => t < this.getPercentage();
+
+    if (firstPoint.distance2d(point) < distance) {
+      if (this.track.getA().hasConnectedEndOf()) {
+        if (!this.track.getA().isSwitchingEnds()) {
+          this.direction = -this.direction;
+        }
+        this.moveToNextTrack(this.track.getA());
+        bezier = this.track.getSegment().getBezier();
+        fun = t => true;
+      } else {
+        this.setPercentage(0);
+        return;
+      }
+    }
+
+    const circle = new Circle(point, distance);
+    const vals = bezier.intersectWithCircle(circle);
+    const vals2 = vals.filter(fun);
+    this.setPercentage(vals2[0]);
   }
 
   private moveNextOnA(end: TrackEnd) {
