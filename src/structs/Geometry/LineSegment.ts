@@ -26,6 +26,10 @@ export class LineSegment {
     ).fromHere(0, dist);
   }
 
+  getPointAtHalfway() {
+    return this.getPointAtDistance(this.getLength() / 2);
+  }
+
   isIntersectsWith(other: LineSegment) {
     const c1 = this.crossProduct(other.a);
     const c2 = this.crossProduct(other.b);

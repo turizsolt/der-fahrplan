@@ -12,4 +12,6 @@ export interface Wagon extends BaseBrick {
   remove(): boolean;
   isRemoved(): boolean;
   putOnTrack(track: Track, position?: number, direction?: number): void;
+  forward(distance: number): void;
+  backward(distance: number): void;
 }

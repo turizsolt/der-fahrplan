@@ -10,6 +10,7 @@ import { Ray } from '../Geometry/Ray';
 import { TYPES } from '../TYPES';
 import { WagonRenderer } from './WagonRenderer';
 import { TrackBase } from '../TrackBase/TrackBase';
+import { LineSegment } from '../Geometry/LineSegment';
 
 @injectable()
 export class ActualWagon extends ActualBaseBrick implements Wagon {
@@ -17,9 +18,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
-  getRay(): Ray {
-    return this.ends.A.positionOnTrack.getRay();
-  }
   remove(): boolean {
     this.removed = true;
     this.update();
@@ -73,9 +71,42 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       position,
       direction
     );
+
+    this.ends.B.positionOnTrack = new PositionOnTrack(
+      track,
+      null,
+      position,
+      direction
+    );
+
+    this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
+    this.ends.B.positionOnTrack.hop(14);
+
     track.checkin(null);
 
     this.renderer.init(this);
+    this.update();
+  }
+
+  getRay(): Ray {
+    const ls = LineSegment.fromTwoPoints(
+      this.ends.A.positionOnTrack.getRay().coord,
+      this.ends.B.positionOnTrack.getRay().coord
+    );
+    return ls.getPointAtHalfway();
+  }
+
+  forward(distance: number): void {
+    this.ends.B.positionOnTrack.hop(distance);
+    this.ends.A.positionOnTrack.copyFrom(this.ends.B.positionOnTrack);
+    this.ends.A.positionOnTrack.hop(-14);
+    this.update();
+  }
+
+  backward(distance: number): void {
+    this.ends.A.positionOnTrack.hop(-distance);
+    this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
+    this.ends.B.positionOnTrack.hop(14);
     this.update();
   }
 }
