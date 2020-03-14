@@ -28,6 +28,8 @@ import { Platform } from './Platform/Platform';
 import { ActualPlatform } from './Platform/ActualPlatform';
 import { TrackJointConnector } from './TrackJoint/TrackJointConnector';
 import { MeshProvider } from '../babylon/MeshProvider';
+import { ActualWagon } from './Engine/ActualWagon';
+import { Wagon } from './Engine/Wagon';
 
 export const babylonContainer = new Container();
 babylonContainer
@@ -51,6 +53,7 @@ babylonContainer
 
 babylonContainer.bind<Land>(TYPES.Land).to(ActualLand);
 babylonContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
+babylonContainer.bind<Wagon>(TYPES.Wagon).to(ActualWagon);
 babylonContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 babylonContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 babylonContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
@@ -106,6 +109,14 @@ babylonContainer
   .toFactory<Engine>((context: interfaces.Context) => {
     return () => {
       return context.container.get<Engine>(TYPES.Engine);
+    };
+  });
+
+babylonContainer
+  .bind<interfaces.Factory<Wagon>>(TYPES.FactoryOfWagon)
+  .toFactory<Wagon>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Wagon>(TYPES.Wagon);
     };
   });
 

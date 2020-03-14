@@ -25,6 +25,8 @@ import { PlatformDummyRenderer } from '../src/structs/Platform/PlatformDummyRend
 import { Platform } from '../src/structs/Platform/Platform';
 import { ActualPlatform } from '../src/structs/Platform/ActualPlatform';
 import { TrackJointConnector } from '../src/structs/TrackJoint/TrackJointConnector';
+import { Wagon } from '../src/structs/Engine/Wagon';
+import { ActualWagon } from '../src/structs/Engine/ActualWagon';
 
 export const testContainer = new Container();
 testContainer
@@ -45,6 +47,7 @@ testContainer
   .to(PlatformDummyRenderer);
 
 testContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
+testContainer.bind<Wagon>(TYPES.Wagon).to(ActualWagon);
 testContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 testContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 testContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
@@ -86,6 +89,14 @@ testContainer
   .toFactory<Engine>((context: interfaces.Context) => {
     return () => {
       return context.container.get<Engine>(TYPES.Engine);
+    };
+  });
+
+testContainer
+  .bind<interfaces.Factory<Wagon>>(TYPES.FactoryOfWagon)
+  .toFactory<Wagon>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Wagon>(TYPES.Wagon);
     };
   });
 

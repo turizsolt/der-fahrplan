@@ -11,7 +11,21 @@ import { Wagon } from './Wagon';
 export class ActualWagon extends ActualBaseBrick implements Wagon {
   init(): Wagon {
     super.initStore();
+
+    this.ends = {
+      [WhichEnd.A]: new WagonEnd(WhichEnd.A, this),
+      [WhichEnd.B]: new WagonEnd(WhichEnd.B, this)
+    };
+
     return this;
+  }
+
+  getA(): WagonEnd {
+    return this.ends.A;
+  }
+
+  getB(): WagonEnd {
+    return this.ends.B;
   }
 
   private ends: Record<WhichEnd, WagonEnd>;
