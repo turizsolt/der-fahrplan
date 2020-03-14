@@ -31,7 +31,7 @@ export class ActualLand implements Land {
     setTimeout(() => {
       const engine = this.engineFactory();
       engine.init().putOnTrack(track);
-    }, 500);
+    }, 1000);
 
     return null;
   }
