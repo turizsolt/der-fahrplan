@@ -12,11 +12,17 @@ import { WagonRenderer } from './WagonRenderer';
 import { TrackBase } from '../TrackBase/TrackBase';
 import { LineSegment } from '../Geometry/LineSegment';
 
+const WAGON_GAP: number = 1;
+
 @injectable()
 export class ActualWagon extends ActualBaseBrick implements Wagon {
   private removed: boolean = false;
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
+
+  getLength(): number {
+    return 14;
+  }
 
   remove(): boolean {
     this.removed = true;
@@ -80,7 +86,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     );
 
     this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
-    this.ends.B.positionOnTrack.hop(14);
+    this.ends.B.positionOnTrack.hop(this.getLength());
 
     track.checkin(null);
 
@@ -97,17 +103,57 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   forward(distance: number): void {
+    if (this.ends.B.hasConnectedEndOf()) return;
+
     this.ends.B.positionOnTrack.hop(distance);
     this.ends.A.positionOnTrack.copyFrom(this.ends.B.positionOnTrack);
-    this.ends.A.positionOnTrack.hop(-14);
+    this.ends.A.positionOnTrack.hop(-this.getLength());
     this.update();
+
+    if (this.ends.A.hasConnectedEndOf()) {
+      const next = this.ends.A.getConnectedEndOf();
+      next.pullForward(this.ends.A.positionOnTrack);
+    }
+  }
+
+  pullForward(pot: PositionOnTrack) {
+    this.getB().positionOnTrack.copyFrom(pot);
+    this.getB().positionOnTrack.hop(-WAGON_GAP);
+    this.getA().positionOnTrack.copyFrom(this.getB().positionOnTrack);
+    this.getA().positionOnTrack.hop(-this.getLength());
+    this.update();
+
+    if (this.ends.A.hasConnectedEndOf()) {
+      const next = this.ends.A.getConnectedEndOf();
+      next.pullForward(this.ends.A.positionOnTrack);
+    }
   }
 
   backward(distance: number): void {
+    if (this.ends.A.hasConnectedEndOf()) return;
+
     this.ends.A.positionOnTrack.hop(-distance);
     this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
-    this.ends.B.positionOnTrack.hop(14);
+    this.ends.B.positionOnTrack.hop(this.getLength());
     this.update();
+
+    if (this.ends.B.hasConnectedEndOf()) {
+      const next = this.ends.B.getConnectedEndOf();
+      next.pullBackward(this.ends.B.positionOnTrack);
+    }
+  }
+
+  pullBackward(pot: PositionOnTrack) {
+    this.getA().positionOnTrack.copyFrom(pot);
+    this.getA().positionOnTrack.hop(WAGON_GAP);
+    this.getB().positionOnTrack.copyFrom(this.getA().positionOnTrack);
+    this.getB().positionOnTrack.hop(this.getLength());
+    this.update();
+
+    if (this.ends.B.hasConnectedEndOf()) {
+      const next = this.ends.B.getConnectedEndOf();
+      next.pullBackward(this.ends.B.positionOnTrack);
+    }
   }
 }
 

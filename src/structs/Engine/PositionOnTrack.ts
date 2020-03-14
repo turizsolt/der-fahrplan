@@ -42,12 +42,12 @@ export class PositionOnTrack {
     return platform.isBeside(this.position);
   }
 
-  private getPercentage(): number {
+  getPercentage(): number {
     return this.percentage;
     //return this.position / this.track.getLength();
   }
 
-  private setPercentage(percentage: number): void {
+  setPercentage(percentage: number): void {
     this.percentage = percentage;
     //this.position = this.track.getLength() * percentage;
   }

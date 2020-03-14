@@ -8,6 +8,7 @@ import { TYPES } from '../structs/TYPES';
 import { Engine } from '../structs/Engine/Engine';
 import { Track } from '../structs/Track/Track';
 import { Wagon } from '../structs/Engine/Wagon';
+import { PositionOnTrack } from '../structs/Engine/PositionOnTrack';
 
 export class CreateEngineInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
@@ -67,6 +68,25 @@ export class CreateEngineInputHandler implements InputHandler {
       //engine.putOnTrack(dpot.track as Track, dpot.position);
       const wagon = this.wagonFactory().init();
       wagon.putOnTrack(dpot.track as Track, dpot.position);
+
+      const pot = new PositionOnTrack(dpot.track, null, dpot.position, 1);
+      pot.hop(14);
+      pot.hop(1);
+      const wagon2 = this.wagonFactory().init();
+      wagon2.putOnTrack(pot.getTrack() as Track, pot.getPercentage());
+      wagon.getB().connect(wagon2.getA());
+
+      pot.hop(14);
+      pot.hop(1);
+      const wagon3 = this.wagonFactory().init();
+      wagon3.putOnTrack(pot.getTrack() as Track, pot.getPercentage());
+      wagon2.getB().connect(wagon3.getA());
+
+      pot.hop(14);
+      pot.hop(1);
+      const wagon4 = this.wagonFactory().init();
+      wagon4.putOnTrack(pot.getTrack() as Track, pot.getPercentage());
+      wagon3.getB().connect(wagon4.getA());
     }
 
     this.fromMesh.setEnabled(false);
