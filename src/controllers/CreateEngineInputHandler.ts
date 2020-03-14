@@ -7,16 +7,19 @@ import { babylonContainer } from '../structs/inversify.config';
 import { TYPES } from '../structs/TYPES';
 import { Engine } from '../structs/Engine/Engine';
 import { Track } from '../structs/Track/Track';
+import { Wagon } from '../structs/Engine/Wagon';
 
 export class CreateEngineInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
 
   private engineFactory: () => Engine;
+  private wagonFactory: () => Wagon;
 
   constructor() {
     this.engineFactory = babylonContainer.get<() => Engine>(
       TYPES.FactoryOfEngine
     );
+    this.wagonFactory = babylonContainer.get<() => Wagon>(TYPES.FactoryOfWagon);
 
     const mat = new BABYLON.StandardMaterial('boxMat', null);
     mat.diffuseColor = new BABYLON.Color3(0, 1, 1);
@@ -60,8 +63,10 @@ export class CreateEngineInputHandler implements InputHandler {
     const dpot = downProps.snappedPositionOnTrack;
 
     if (dpot && dpot.track.constructor.name === ActualTrack.name) {
-      const engine = this.engineFactory().init();
-      engine.putOnTrack(dpot.track as Track, dpot.position);
+      //const engine = this.engineFactory().init();
+      //engine.putOnTrack(dpot.track as Track, dpot.position);
+      const wagon = this.wagonFactory().init();
+      wagon.putOnTrack(dpot.track as Track, dpot.position);
     }
 
     this.fromMesh.setEnabled(false);

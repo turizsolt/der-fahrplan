@@ -27,6 +27,8 @@ import { ActualPlatform } from '../src/structs/Platform/ActualPlatform';
 import { TrackJointConnector } from '../src/structs/TrackJoint/TrackJointConnector';
 import { Wagon } from '../src/structs/Engine/Wagon';
 import { ActualWagon } from '../src/structs/Engine/ActualWagon';
+import { WagonRenderer } from '../src/structs/Engine/WagonRenderer';
+import { WagonDummyRenderer } from '../src/structs/Engine/WagonDummyRenderer';
 
 export const testContainer = new Container();
 testContainer
@@ -35,6 +37,7 @@ testContainer
 testContainer
   .bind<EngineRenderer>(TYPES.EngineRenderer)
   .to(EngineDummyRenderer);
+testContainer.bind<WagonRenderer>(TYPES.WagonRenderer).to(WagonDummyRenderer);
 testContainer
   .bind<TrackJointRenderer>(TYPES.TrackJointRenderer)
   .to(TrackJointDummyRenderer);

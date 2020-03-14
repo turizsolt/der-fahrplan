@@ -30,6 +30,8 @@ import { TrackJointConnector } from './TrackJoint/TrackJointConnector';
 import { MeshProvider } from '../babylon/MeshProvider';
 import { ActualWagon } from './Engine/ActualWagon';
 import { Wagon } from './Engine/Wagon';
+import { WagonRenderer } from './Engine/WagonRenderer';
+import { WagonBabylonRenderer } from './Engine/WagonBabylonRenderer';
 
 export const babylonContainer = new Container();
 babylonContainer
@@ -38,6 +40,9 @@ babylonContainer
 babylonContainer
   .bind<EngineRenderer>(TYPES.EngineRenderer)
   .to(EngineBabylonRenderer);
+babylonContainer
+  .bind<WagonRenderer>(TYPES.WagonRenderer)
+  .to(WagonBabylonRenderer);
 babylonContainer
   .bind<TrackJointRenderer>(TYPES.TrackJointRenderer)
   .to(TrackJointBabylonRenderer);

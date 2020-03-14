@@ -10,6 +10,7 @@ import { MaterialName } from './MaterialName';
 @injectable()
 export class MeshProvider {
   private engine: BABYLON.AbstractMesh;
+  private wagon: BABYLON.AbstractMesh;
   private scene: BABYLON.Scene;
 
   private materials: Record<MaterialName, BABYLON.StandardMaterial>;
@@ -36,6 +37,20 @@ export class MeshProvider {
         newMeshes[0].setEnabled(false);
 
         this.engine = newMeshes[0];
+      }
+    );
+
+    BABYLON.SceneLoader.ImportMesh(
+      '', //['Engine'],
+      './assets/',
+      'wagon.glb',
+      scene,
+      newMeshes => {
+        //console.log('x', newMeshes.map(x => x.name));
+        newMeshes[0].rotationQuaternion = null;
+        newMeshes[0].setEnabled(false);
+
+        this.wagon = newMeshes[0];
       }
     );
 
@@ -77,6 +92,11 @@ export class MeshProvider {
 
   createEngineMesh(name: string): BABYLON.AbstractMesh {
     const clone = this.engine.clone(name, null);
+    return clone;
+  }
+
+  createWagonMesh(name: string): BABYLON.AbstractMesh {
+    const clone = this.wagon.clone(name, null);
     return clone;
   }
 
