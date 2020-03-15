@@ -221,10 +221,12 @@ export class InputController {
       }
       console.log(meshId);
       if (meshId.startsWith('clickable-')) {
-        const [_, type, id] = meshId.split('-');
+        const [_, type, id, command] = meshId.split('-');
         const storedObj = this.store.get(id);
         if (storedObj) {
-          if (event.button === 2) {
+          if(command) {
+            storedObj.getRenderer().process(command);
+          } else if (event.button === 2) {
             storedObj.getRenderer().process('switch');
           } else {
             let renderer = storedObj.getRenderer();

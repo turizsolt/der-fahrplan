@@ -115,6 +115,21 @@ export class MeshProvider {
     return mesh;
   }
 
+  createWagonEndMesh(name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateCylinder(
+      name,
+      {
+        diameterTop: 1.5,
+        diameterBottom: 0,
+        tessellation: 6,
+        height: 1.5
+      },
+      null
+    );
+    mesh.material = this.selectorRed;
+    return mesh;
+  }
+
   createSleeperMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
     const mesh = BABYLON.MeshBuilder.CreateBox(
       name,

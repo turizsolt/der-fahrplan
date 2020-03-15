@@ -7,6 +7,7 @@ import { MeshProvider } from '../../babylon/MeshProvider';
 import { TYPES } from '../TYPES';
 import { WagonRenderer } from './WagonRenderer';
 import { Wagon } from './Wagon';
+import { MaterialName } from '../../babylon/MaterialName';
 
 @injectable()
 export class WagonBabylonRenderer extends BaseBabylonRenderer
@@ -15,6 +16,9 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
   private selectedMesh: BABYLON.AbstractMesh;
   private wagon: Wagon;
   readonly scene: BABYLON.Scene;
+
+  private endAMesh: BABYLON.AbstractMesh;
+  private endBMesh: BABYLON.AbstractMesh;
 
   @inject(TYPES.FactoryOfMeshProvider)
   private meshProviderFactory: () => MeshProvider;
@@ -34,6 +38,13 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
     this.selectedMesh = this.meshProvider.createSelectorMesh();
     this.selectedMesh.setEnabled(false);
 
+    this.endAMesh = this.meshProvider.createWagonEndMesh(
+      'clickable-wagon-' + this.wagon.getId() + '-endA'
+    );
+    this.endBMesh = this.meshProvider.createWagonEndMesh(
+      'clickable-wagon-' + this.wagon.getId() + '-endB'
+    );
+
     this.update();
   }
 
@@ -41,6 +52,8 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
     if (this.wagon.isRemoved()) {
       this.mesh.setEnabled(false);
       this.selectedMesh.setEnabled(false);
+      this.endAMesh.setEnabled(false);
+      this.endBMesh.setEnabled(false);
     } else {
       const ray = this.wagon.getRay();
       this.mesh.position = CoordinateToBabylonVector3(ray.coord);
@@ -51,6 +64,22 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.selectedMesh.position = CoordinateToBabylonVector3(ray.coord);
         this.selectedMesh.position.y = 10;
       }
+
+      this.endAMesh.position = CoordinateToBabylonVector3(
+        this.wagon.getA().positionOnTrack.getRay().coord
+      );
+      this.endAMesh.position.y = 10;
+      this.endAMesh.material = this.wagon.getA().hasConnectedEndOf()
+        ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
+        : this.meshProvider.getMaterial(MaterialName.BedGray);
+
+      this.endBMesh.position = CoordinateToBabylonVector3(
+        this.wagon.getB().positionOnTrack.getRay().coord
+      );
+      this.endBMesh.position.y = 10;
+      this.endBMesh.material = this.wagon.getB().hasConnectedEndOf()
+        ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
+        : this.meshProvider.getMaterial(MaterialName.BedGray);
     }
 
     if (this.selected && !this.lastSelected) {
@@ -72,6 +101,14 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
 
       case 'backward':
         this.wagon.backward(1);
+        break;
+
+      case 'endA':
+        this.wagon.getA().disconnect();
+        break;
+
+      case 'endB':
+        this.wagon.getB().disconnect();
         break;
 
       //   case 'stop':
