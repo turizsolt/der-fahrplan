@@ -56,20 +56,33 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
   private lastSelected: boolean = false;
 
   update() {
-    if (this.selected && !this.lastSelected) {
+    if (!this.track.isEmpty()) {
       this.selectableMeshes.map(
-        x =>
-          (x.material = this.meshProvider.getMaterial(MaterialName.SelectorRed))
+        x => (x.material = this.meshProvider.getMaterial(MaterialName.BedGray))
       );
-    }
-
-    if (!this.selected && this.lastSelected) {
-      this.selectableMeshes.map(
-        x =>
-          (x.material = this.meshProvider.getMaterial(
-            MaterialName.SleeperBrown
-          ))
-      );
+    } else {
+      if (this.selected && !this.lastSelected) {
+        this.selectableMeshes.map(
+          x =>
+            (x.material = this.meshProvider.getMaterial(
+              MaterialName.SelectorRed
+            ))
+        );
+      } else if (!this.selected && this.lastSelected) {
+        this.selectableMeshes.map(
+          x =>
+            (x.material = this.meshProvider.getMaterial(
+              MaterialName.SleeperBrown
+            ))
+        );
+      } else {
+        this.selectableMeshes.map(
+          x =>
+            (x.material = this.meshProvider.getMaterial(
+              MaterialName.SleeperBrown
+            ))
+        );
+      }
     }
 
     this.lastSelected = this.selected;

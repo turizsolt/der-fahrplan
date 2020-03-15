@@ -127,7 +127,7 @@ describe('Engine', () => {
     expect(e.getTrackOn()).equals(t2);
   });
 
-  it('cannot enter the switch, if switched to the wrong side, cannot switch when on the switch', () => {
+  xit('cannot enter the switch, if switched to the wrong side, cannot switch when on the switch', () => {
     const t = TrackFactory().init([p2, p3]);
     const s = TrackSwitchFactory().init([p1, p2], [p1, p2i, p2b]);
     s.getF().connect(t.getA());

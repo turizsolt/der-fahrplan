@@ -1,4 +1,3 @@
-import { Engine } from '../Engine/Engine';
 import { Platform } from '../Platform/Platform';
 import { TrackEnd } from '../Track/TrackEnd';
 import { TrackSegment } from './TrackSegment';
@@ -7,6 +6,7 @@ import { TrackBase } from './TrackBase';
 import { injectable } from 'inversify';
 import { ActualBaseBrick } from '../Base/ActualBaseBrick';
 import { BaseRenderer } from '../Base/BaseRenderer';
+import { Wagon } from '../Engine/Wagon';
 
 @injectable()
 export abstract class ActualTrackBase extends ActualBaseBrick
@@ -15,7 +15,7 @@ export abstract class ActualTrackBase extends ActualBaseBrick
   protected B: TrackEnd;
   protected I: Coordinate;
   protected segment: TrackSegment;
-  protected checkedList: Engine[] = [];
+  protected checkedList: Wagon[] = [];
   protected _platformsBeside: Platform[] = [];
   protected removed: boolean = false;
 
@@ -25,12 +25,22 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     return this._platformsBeside;
   }
 
-  checkin(engine: Engine) {
+  checkin(engine: Wagon) {
     this.checkedList.push(engine);
+    this.update();
   }
 
-  checkout(engine: Engine) {
+  checkout(engine: Wagon) {
     this.checkedList = this.checkedList.filter(elem => elem !== engine);
+    this.update();
+  }
+
+  isEmpty(): boolean {
+    return this.checkedList.length === 0;
+  }
+
+  getCheckedList(): Wagon[] {
+    return this.checkedList;
   }
 
   addPlatform(platform: Platform) {
