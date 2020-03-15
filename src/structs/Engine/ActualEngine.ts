@@ -37,7 +37,7 @@ export class ActualEngine extends ActualBaseBrick implements Engine {
       position,
       direction
     );
-    track.checkin(this);
+    //track.checkin(this);
 
     this.renderer.init(this);
     this.update();
@@ -127,7 +127,7 @@ export class ActualEngine extends ActualBaseBrick implements Engine {
     this.removed = true;
     this.store.unregister(this);
     this.renderer.update();
-    this.getTrackOn().checkout(this);
+    //this.getTrackOn().checkout(this);
     return true;
   }
 
