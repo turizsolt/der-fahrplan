@@ -57,7 +57,7 @@ describe('Check-in on track', () => {
     expect(t1.getCheckedList()).deep.equals([w]);
     expect(t2.getCheckedList()).deep.equals([w]);
 
-    w.forward(20);
+    w.moveTowardsWagonB(20);
 
     expect(t1.getCheckedList()).deep.equals([]);
     expect(t2.getCheckedList()).deep.equals([w]);
@@ -80,7 +80,7 @@ describe('Check-in on track', () => {
     expect(t1.getCheckedList()).deep.equals([]);
     expect(t2.getCheckedList()).deep.equals([w]);
 
-    w.backward(20);
+    w.moveTowardsWagonA(20);
 
     expect(t1.getCheckedList()).deep.equals([w]);
     expect(t2.getCheckedList()).deep.equals([]);

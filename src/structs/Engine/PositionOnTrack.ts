@@ -17,6 +17,10 @@ export class PositionOnTrack {
     this.position = position * track.getSegment().getLength();
   }
 
+  swapDirection() {
+    this.direction = -this.direction;
+  }
+
   copyFrom(other: PositionOnTrack) {
     this.percentage = other.percentage;
     this.track = other.track;

@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack",
     "start": "webpack-dev-server --open",
+    "test:this": "ts-mocha --slow 5 test/PullingWagons.test.ts",
     "test:only": "ts-mocha --slow 5 test/**/*.{ts,tsx}",
     "test": "nyc ts-mocha test/**/*.{ts,tsx}",
     "posttest": "nyc report --reporter=json && nyc report --reporter=html"

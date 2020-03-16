@@ -14,12 +14,12 @@ export interface Wagon extends BaseBrick {
   remove(): boolean;
   isRemoved(): boolean;
   putOnTrack(track: Track, position?: number, direction?: number): void;
-  forward(distance: number): void;
-  backward(distance: number): void;
-  pullForward(pot: PositionOnTrack): void;
-  pullBackward(pot: PositionOnTrack): void;
+  moveTowardsWagonB(distance: number): void;
+  moveTowardsWagonA(distance: number): void;
   getLength(): number;
   getNearestWagon(end: WhichEnd): NearestWagon;
+  swapEnds(): void;
+  pullToPos(pot: PositionOnTrack, dir: number): void;
 }
 
 export interface NearestWagon {

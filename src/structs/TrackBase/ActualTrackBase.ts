@@ -98,8 +98,6 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     if (ttl === 0) return null;
 
     let sign = Math.sign(to - from); // 1 to B, -1 to A
-    console.log('============');
-    console.log('sign', from, to, ttl);
 
     let ret: NearestWagon = {
       distance: Infinity,
@@ -109,17 +107,14 @@ export abstract class ActualTrackBase extends ActualBaseBrick
 
     for (let wagon of this.checkedList) {
       if (wagon === excludeWagon) continue;
-      console.log('examining wagon', wagon.getId());
 
       ret = this.handleWagonEnd(ret, from, to, sign, wagon.getA());
       ret = this.handleWagonEnd(ret, from, to, sign, wagon.getB());
     }
 
     if (ret.distance === Infinity) {
-      console.log('going to next');
       if (sign === 1) {
         const nextTrack = this.getB().getConnectedEndOf();
-        console.log('next', nextTrack && nextTrack.getId());
         if (!nextTrack) return null;
         const [newFrom, newTo] = this.getB().isSwitchingEnds()
           ? [0, 1]
@@ -133,7 +128,6 @@ export abstract class ActualTrackBase extends ActualBaseBrick
         );
       } else {
         const nextTrack = this.getA().getConnectedEndOf();
-        console.log('next', nextTrack && nextTrack.getId());
         if (!nextTrack) return null;
         const [newFrom, newTo] = this.getA().isSwitchingEnds()
           ? [1, 0]
@@ -162,13 +156,6 @@ export abstract class ActualTrackBase extends ActualBaseBrick
   ) {
     const dist = end.positionOnTrack.getPercentage() - from;
     if (dist * sign < 0) {
-      console.log(
-        'nope nope',
-        end.positionOnTrack.getPercentage(),
-        from,
-        dist,
-        sign
-      );
       return ret;
     }
     if (Math.abs(dist) < ret.distance) {
@@ -177,15 +164,8 @@ export abstract class ActualTrackBase extends ActualBaseBrick
         wagon: end.getEndOf(),
         end: end
       };
-      console.log(
-        'yep',
-        ret2.distance,
-        ret2.wagon.getId(),
-        ret2.end.getWhichEnd()
-      );
       return ret2;
     } else {
-      console.log('nope');
       return ret;
     }
   }

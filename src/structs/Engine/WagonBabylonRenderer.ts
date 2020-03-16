@@ -96,11 +96,11 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
   process(command: string) {
     switch (command) {
       case 'forward':
-        this.wagon.forward(1);
+        this.wagon.moveTowardsWagonB(1);
         break;
 
       case 'backward':
-        this.wagon.backward(1);
+        this.wagon.moveTowardsWagonA(1);
         break;
 
       case 'endA':

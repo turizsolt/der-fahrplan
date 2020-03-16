@@ -29,6 +29,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   remove(): boolean {
     this.removed = true;
     this.worm.checkoutAll();
+    this.ends.A.disconnect();
+    this.ends.B.disconnect();
     this.update();
     return true;
   }
@@ -74,8 +76,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     position: number = 0,
     direction: number = 1
   ): void {
-    //if (!track.isEmpty()) return false;
-
     this.ends.A.positionOnTrack = new PositionOnTrack(
       track,
       null,
@@ -112,28 +112,49 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return ls.getPointAtHalfway();
   }
 
-  forward(distance: number): void {
+  moveTowardsWagonB(distance: number): void {
     if (this.ends.B.hasConnectedEndOf()) return;
 
+    const initDist = this.getB()
+      .getPositionOnTrack()
+      .getRay()
+      .coord.distance2d(
+        this.getA()
+          .getPositionOnTrack()
+          .getRay().coord
+      );
+
     this.ends.B.positionOnTrack.hop(distance);
+
+    const newDist = this.getB()
+      .getPositionOnTrack()
+      .getRay()
+      .coord.distance2d(
+        this.getA()
+          .getPositionOnTrack()
+          .getRay().coord
+      );
+
+    let inv = 1;
+    if (newDist < initDist) {
+      this.ends.B.positionOnTrack.hop(-distance);
+      this.ends.B.positionOnTrack.hop(-distance);
+      inv = -1;
+    }
+
     this.ends.A.positionOnTrack.copyFrom(this.ends.B.positionOnTrack);
     const newWorm = this.ends.A.positionOnTrack
-      .hop(-this.getLength())
+      .hop(-1 * inv * this.getLength())
       .reverse();
     this.worm.moveForward(newWorm);
     this.update();
 
     if (this.ends.A.hasConnectedEndOf()) {
       const next = this.ends.A.getConnectedEndOf();
-      if (this.ends.A.isSwitchingEnds()) {
-        next.pullForward(this.ends.A.positionOnTrack);
-      } else {
-        next.pullBackward(this.ends.A.positionOnTrack);
-      }
+      next.pullToPos(this.ends.A.positionOnTrack, -1 * inv);
     }
 
     const nearest = this.getNearestWagon(WhichEnd.B);
-    console.log(nearest && nearest.distance);
     if (nearest) {
       const dist = nearest.end
         .getPositionOnTrack()
@@ -146,46 +167,74 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     }
   }
 
-  pullForward(pot: PositionOnTrack) {
-    this.getB().positionOnTrack.copyFrom(pot);
-    this.getB().positionOnTrack.hop(-WAGON_GAP);
-    this.getA().positionOnTrack.copyFrom(this.getB().positionOnTrack);
-    const newWorm = this.getA()
-      .positionOnTrack.hop(-this.getLength())
-      .reverse();
-    this.worm.moveForward(newWorm);
-    this.update();
+  pullToPos(pot: PositionOnTrack, dir: number) {
+    const isACloser =
+      this.getA()
+        .getPositionOnTrack()
+        .getRay()
+        .coord.distance2d(pot.getRay().coord) <
+      this.getB()
+        .getPositionOnTrack()
+        .getRay()
+        .coord.distance2d(pot.getRay().coord);
+    const closer = isACloser ? this.getA() : this.getB();
+    const further = isACloser ? this.getB() : this.getA();
 
-    if (this.ends.A.hasConnectedEndOf()) {
-      const next = this.ends.A.getConnectedEndOf();
-      if (this.ends.A.isSwitchingEnds()) {
-        next.pullForward(this.ends.A.positionOnTrack);
-      } else {
-        next.pullBackward(this.ends.A.positionOnTrack);
-      }
-    }
-  }
-
-  backward(distance: number): void {
-    if (this.ends.A.hasConnectedEndOf()) return;
-
-    this.ends.A.positionOnTrack.hop(-distance);
-    this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
-    const newWorm = this.ends.B.positionOnTrack.hop(this.getLength());
+    closer.positionOnTrack.copyFrom(pot);
+    closer.positionOnTrack.hop(dir * WAGON_GAP);
+    further.positionOnTrack.copyFrom(closer.positionOnTrack);
+    const newWorm = further.positionOnTrack.hop(dir * this.getLength());
     this.worm.moveBackward(newWorm);
     this.update();
 
+    if (further.hasConnectedEndOf()) {
+      const next = further.getConnectedEndOf();
+      next.pullToPos(further.positionOnTrack, dir); // or -dir
+    }
+  }
+
+  moveTowardsWagonA(distance: number): void {
+    if (this.ends.A.hasConnectedEndOf()) return;
+
+    const initDist = this.getB()
+      .getPositionOnTrack()
+      .getRay()
+      .coord.distance2d(
+        this.getA()
+          .getPositionOnTrack()
+          .getRay().coord
+      );
+
+    this.ends.A.positionOnTrack.hop(-distance);
+
+    const newDist = this.getB()
+      .getPositionOnTrack()
+      .getRay()
+      .coord.distance2d(
+        this.getA()
+          .getPositionOnTrack()
+          .getRay().coord
+      );
+
+    let inv = 1;
+    if (newDist < initDist) {
+      this.ends.A.positionOnTrack.hop(distance);
+      this.ends.A.positionOnTrack.hop(distance);
+      inv = -1;
+    }
+
+    this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
+    const newWorm = this.ends.B.positionOnTrack.hop(inv * this.getLength());
+    this.worm.moveBackward(newWorm);
+    this.update();
+
+    // move some wagons behind be (on B end)
     if (this.ends.B.hasConnectedEndOf()) {
       const next = this.ends.B.getConnectedEndOf();
-      if (this.ends.B.isSwitchingEnds()) {
-        next.pullBackward(this.ends.B.positionOnTrack);
-      } else {
-        next.pullForward(this.ends.B.positionOnTrack);
-      }
+      next.pullToPos(this.ends.B.positionOnTrack, 1 * inv);
     }
 
     const nearest = this.getNearestWagon(WhichEnd.A);
-    console.log(nearest && nearest.distance);
     if (nearest) {
       const dist = nearest.end
         .getPositionOnTrack()
@@ -198,43 +247,11 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     }
   }
 
-  pullBackward(pot: PositionOnTrack) {
-    this.getA().positionOnTrack.copyFrom(pot);
-    this.getA().positionOnTrack.hop(WAGON_GAP);
-    this.getB().positionOnTrack.copyFrom(this.getA().positionOnTrack);
-    const newWorm = this.getB().positionOnTrack.hop(this.getLength());
-    this.worm.moveBackward(newWorm);
-    this.update();
-
-    if (this.ends.B.hasConnectedEndOf()) {
-      const next = this.ends.B.getConnectedEndOf();
-      if (this.ends.B.isSwitchingEnds()) {
-        next.pullBackward(this.ends.B.positionOnTrack);
-      } else {
-        next.pullForward(this.ends.B.positionOnTrack);
-      }
-    }
-  }
-
   getNearestWagon(whichEnd: WhichEnd): NearestWagon {
     const end = whichEnd === WhichEnd.A ? this.getA() : this.getB();
 
-    console.log('============');
-
     const track = end.positionOnTrack.getTrack();
 
-    // let to = 0;
-    // const worm = this.worm.getAll();
-    // if (worm.length === 1) {
-    //   if (
-    //     this.getA().positionOnTrack.getPercentage() <
-    //     this.getB().positionOnTrack.getPercentage()
-    //   ) {
-    //     to = whichEnd === WhichEnd.A ? 0 : 1;
-    //   } else {
-    //     to = whichEnd === WhichEnd.A ? 1 : 0;
-    //   }
-    // }
     let to = 0;
     if (end.positionOnTrack.getDirection() === 1) {
       to = whichEnd === WhichEnd.A ? 0 : 1;
@@ -249,6 +266,16 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       2
     );
   }
+
+  swapEnds(): void {
+    if (this.getA().hasConnectedEndOf() || this.getB().hasConnectedEndOf())
+      return;
+
+    const [tmpA, tmpB] = [this.getA(), this.getB()];
+    this.ends = { A: tmpB, B: tmpA };
+    this.getA().swapDirection();
+    this.getB().swapDirection();
+  }
 }
 
 export class WagonEnd extends End<Wagon> {
@@ -256,5 +283,24 @@ export class WagonEnd extends End<Wagon> {
 
   getPositionOnTrack() {
     return this.positionOnTrack;
+  }
+
+  getConnectedEnd(): WagonEnd {
+    return this.connectedEnd as WagonEnd;
+  }
+
+  isSwitchingDirections(): boolean {
+    if (!this.getConnectedEnd()) return null;
+    return (
+      this.getPositionOnTrack().getDirection() !==
+      this.getConnectedEnd()
+        .getPositionOnTrack()
+        .getDirection()
+    );
+  }
+
+  swapDirection() {
+    this.positionOnTrack.swapDirection();
+    this.whichEnd = this.whichEnd === WhichEnd.A ? WhichEnd.B : WhichEnd.A;
   }
 }
