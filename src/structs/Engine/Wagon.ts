@@ -3,6 +3,7 @@ import { WagonEnd } from './ActualWagon';
 import { Ray } from '../Geometry/Ray';
 import { Track } from '../Track/Track';
 import { PositionOnTrack } from './PositionOnTrack';
+import { WhichEnd } from '../Track/WhichEnd';
 
 export interface Wagon extends BaseBrick {
   init(): Wagon;
@@ -18,4 +19,11 @@ export interface Wagon extends BaseBrick {
   pullForward(pot: PositionOnTrack): void;
   pullBackward(pot: PositionOnTrack): void;
   getLength(): number;
+  getNearestWagon(end: WhichEnd): NearestWagon;
+}
+
+export interface NearestWagon {
+  distance: number;
+  wagon: Wagon;
+  end: WagonEnd;
 }

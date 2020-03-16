@@ -2,13 +2,20 @@ import { Platform } from '../Platform/Platform';
 import { TrackSegment } from './TrackSegment';
 import { TrackEnd } from '../Track/TrackEnd';
 import { BaseBrick } from '../Base/BaseBrick';
-import { Wagon } from '../Engine/Wagon';
+import { Wagon, NearestWagon } from '../Engine/Wagon';
 
 export interface TrackBase extends BaseBrick {
   checkin(wagon: Wagon);
   checkout(wagon: Wagon);
   isEmpty(): boolean;
   getCheckedList(): Wagon[];
+  getWagonClosest(
+    from: number,
+    to: number,
+    excludeWagon: Wagon,
+    ttl: number,
+    initDist?: number
+  ): NearestWagon;
 
   addPlatform(platform: Platform);
   getSegment(): TrackSegment;

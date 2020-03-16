@@ -6,6 +6,10 @@ export class TrackWorm {
     this.list.map(x => x.checkin(wagon));
   }
 
+  getAll(): TrackBase[] {
+    return this.list;
+  }
+
   checkoutAll(): void {
     this.list.map(x => x.checkout(this.wagon));
     this.list = [];

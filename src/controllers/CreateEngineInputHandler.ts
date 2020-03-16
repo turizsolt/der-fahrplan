@@ -69,24 +69,24 @@ export class CreateEngineInputHandler implements InputHandler {
       const wagon = this.wagonFactory().init();
       wagon.putOnTrack(dpot.track as Track, dpot.position);
 
-      const pot = new PositionOnTrack(dpot.track, null, dpot.position, 1);
-      pot.hop(14);
-      pot.hop(1);
-      const wagon2 = this.wagonFactory().init();
-      wagon2.putOnTrack(pot.getTrack() as Track, pot.getPercentage());
-      wagon.getB().connect(wagon2.getA());
+      //   const pot = new PositionOnTrack(dpot.track, null, dpot.position, 1);
+      //   pot.hop(14);
+      //   pot.hop(1);
+      //   const wagon2 = this.wagonFactory().init();
+      //   wagon2.putOnTrack(pot.getTrack() as Track, pot.getPercentage());
+      //   wagon.getB().connect(wagon2.getA());
 
-      pot.hop(14);
-      pot.hop(1);
-      const wagon3 = this.wagonFactory().init();
-      wagon3.putOnTrack(pot.getTrack() as Track, pot.getPercentage());
-      wagon2.getB().connect(wagon3.getA());
+      //   pot.hop(14);
+      //   pot.hop(1);
+      //   const wagon3 = this.wagonFactory().init();
+      //   wagon3.putOnTrack(pot.getTrack() as Track, pot.getPercentage());
+      //   wagon2.getB().connect(wagon3.getA());
 
-      pot.hop(14);
-      pot.hop(1);
-      const wagon4 = this.wagonFactory().init();
-      wagon4.putOnTrack(pot.getTrack() as Track, pot.getPercentage());
-      wagon3.getB().connect(wagon4.getA());
+      //   pot.hop(14);
+      //   pot.hop(1);
+      //   const wagon4 = this.wagonFactory().init();
+      //   wagon4.putOnTrack(pot.getTrack() as Track, pot.getPercentage());
+      //   wagon3.getB().connect(wagon4.getA());
     }
 
     this.fromMesh.setEnabled(false);

@@ -5,7 +5,7 @@ import { BaseRenderer } from '../Base/BaseRenderer';
 import { Store } from '../Store/Store';
 import { WhichEnd } from '../Track/WhichEnd';
 import { End } from '../Track/End';
-import { Wagon } from './Wagon';
+import { Wagon, NearestWagon } from './Wagon';
 import { Ray } from '../Geometry/Ray';
 import { TYPES } from '../TYPES';
 import { WagonRenderer } from './WagonRenderer';
@@ -125,7 +125,24 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
     if (this.ends.A.hasConnectedEndOf()) {
       const next = this.ends.A.getConnectedEndOf();
-      next.pullForward(this.ends.A.positionOnTrack);
+      if (this.ends.A.isSwitchingEnds()) {
+        next.pullForward(this.ends.A.positionOnTrack);
+      } else {
+        next.pullBackward(this.ends.A.positionOnTrack);
+      }
+    }
+
+    const nearest = this.getNearestWagon(WhichEnd.B);
+    console.log(nearest && nearest.distance);
+    if (nearest) {
+      const dist = nearest.end
+        .getPositionOnTrack()
+        .getRay()
+        .coord.distance2d(this.ends.B.getPositionOnTrack().getRay().coord);
+
+      if (dist <= 1) {
+        this.ends.B.connect(nearest.end);
+      }
     }
   }
 
@@ -141,7 +158,11 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
     if (this.ends.A.hasConnectedEndOf()) {
       const next = this.ends.A.getConnectedEndOf();
-      next.pullForward(this.ends.A.positionOnTrack);
+      if (this.ends.A.isSwitchingEnds()) {
+        next.pullForward(this.ends.A.positionOnTrack);
+      } else {
+        next.pullBackward(this.ends.A.positionOnTrack);
+      }
     }
   }
 
@@ -156,7 +177,24 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
     if (this.ends.B.hasConnectedEndOf()) {
       const next = this.ends.B.getConnectedEndOf();
-      next.pullBackward(this.ends.B.positionOnTrack);
+      if (this.ends.B.isSwitchingEnds()) {
+        next.pullBackward(this.ends.B.positionOnTrack);
+      } else {
+        next.pullForward(this.ends.B.positionOnTrack);
+      }
+    }
+
+    const nearest = this.getNearestWagon(WhichEnd.A);
+    console.log(nearest && nearest.distance);
+    if (nearest) {
+      const dist = nearest.end
+        .getPositionOnTrack()
+        .getRay()
+        .coord.distance2d(this.ends.A.getPositionOnTrack().getRay().coord);
+
+      if (dist <= 1) {
+        this.ends.A.connect(nearest.end);
+      }
     }
   }
 
@@ -170,8 +208,46 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
     if (this.ends.B.hasConnectedEndOf()) {
       const next = this.ends.B.getConnectedEndOf();
-      next.pullBackward(this.ends.B.positionOnTrack);
+      if (this.ends.B.isSwitchingEnds()) {
+        next.pullBackward(this.ends.B.positionOnTrack);
+      } else {
+        next.pullForward(this.ends.B.positionOnTrack);
+      }
     }
+  }
+
+  getNearestWagon(whichEnd: WhichEnd): NearestWagon {
+    const end = whichEnd === WhichEnd.A ? this.getA() : this.getB();
+
+    console.log('============');
+
+    const track = end.positionOnTrack.getTrack();
+
+    // let to = 0;
+    // const worm = this.worm.getAll();
+    // if (worm.length === 1) {
+    //   if (
+    //     this.getA().positionOnTrack.getPercentage() <
+    //     this.getB().positionOnTrack.getPercentage()
+    //   ) {
+    //     to = whichEnd === WhichEnd.A ? 0 : 1;
+    //   } else {
+    //     to = whichEnd === WhichEnd.A ? 1 : 0;
+    //   }
+    // }
+    let to = 0;
+    if (end.positionOnTrack.getDirection() === 1) {
+      to = whichEnd === WhichEnd.A ? 0 : 1;
+    } else {
+      to = whichEnd === WhichEnd.A ? 1 : 0;
+    }
+
+    return track.getWagonClosest(
+      end.positionOnTrack.getPercentage(),
+      to,
+      this,
+      2
+    );
   }
 }
 

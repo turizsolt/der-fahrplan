@@ -6,7 +6,8 @@ import { TrackBase } from './TrackBase';
 import { injectable } from 'inversify';
 import { ActualBaseBrick } from '../Base/ActualBaseBrick';
 import { BaseRenderer } from '../Base/BaseRenderer';
-import { Wagon } from '../Engine/Wagon';
+import { Wagon, NearestWagon } from '../Engine/Wagon';
+import { WagonEnd } from '../Engine/ActualWagon';
 
 @injectable()
 export abstract class ActualTrackBase extends ActualBaseBrick
@@ -85,5 +86,107 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     if (e === 'A') return this.getA();
     if (e === 'B') return this.getB();
     return null;
+  }
+
+  getWagonClosest(
+    from: number,
+    to: number,
+    excludeWagon: Wagon,
+    ttl: number,
+    initDist: number = 0
+  ): NearestWagon {
+    if (ttl === 0) return null;
+
+    let sign = Math.sign(to - from); // 1 to B, -1 to A
+    console.log('============');
+    console.log('sign', from, to, ttl);
+
+    let ret: NearestWagon = {
+      distance: Infinity,
+      wagon: null,
+      end: null
+    };
+
+    for (let wagon of this.checkedList) {
+      if (wagon === excludeWagon) continue;
+      console.log('examining wagon', wagon.getId());
+
+      ret = this.handleWagonEnd(ret, from, to, sign, wagon.getA());
+      ret = this.handleWagonEnd(ret, from, to, sign, wagon.getB());
+    }
+
+    if (ret.distance === Infinity) {
+      console.log('going to next');
+      if (sign === 1) {
+        const nextTrack = this.getB().getConnectedEndOf();
+        console.log('next', nextTrack && nextTrack.getId());
+        if (!nextTrack) return null;
+        const [newFrom, newTo] = this.getB().isSwitchingEnds()
+          ? [0, 1]
+          : [1, 0];
+        return nextTrack.getWagonClosest(
+          newFrom,
+          newTo,
+          excludeWagon,
+          ttl - 1,
+          initDist + Math.abs(to - from)
+        );
+      } else {
+        const nextTrack = this.getA().getConnectedEndOf();
+        console.log('next', nextTrack && nextTrack.getId());
+        if (!nextTrack) return null;
+        const [newFrom, newTo] = this.getA().isSwitchingEnds()
+          ? [1, 0]
+          : [0, 1];
+        return nextTrack.getWagonClosest(
+          newFrom,
+          newTo,
+          excludeWagon,
+          ttl - 1,
+          initDist + Math.abs(from - to)
+        );
+      }
+      return null;
+    } else {
+      ret.distance += initDist;
+      return ret;
+    }
+  }
+
+  private handleWagonEnd(
+    ret: NearestWagon,
+    from: number,
+    to: number,
+    sign: number,
+    end: WagonEnd
+  ) {
+    const dist = end.positionOnTrack.getPercentage() - from;
+    if (dist * sign < 0) {
+      console.log(
+        'nope nope',
+        end.positionOnTrack.getPercentage(),
+        from,
+        dist,
+        sign
+      );
+      return ret;
+    }
+    if (Math.abs(dist) < ret.distance) {
+      const ret2 = {
+        distance: Math.abs(dist),
+        wagon: end.getEndOf(),
+        end: end
+      };
+      console.log(
+        'yep',
+        ret2.distance,
+        ret2.wagon.getId(),
+        ret2.end.getWhichEnd()
+      );
+      return ret2;
+    } else {
+      console.log('nope');
+      return ret;
+    }
   }
 }
