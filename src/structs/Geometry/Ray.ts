@@ -1,6 +1,6 @@
 import { Coordinate } from './Coordinate';
 import { almost, almostDirection } from './Almost';
-import { WhichEnd } from '../Track/WhichEnd';
+import { WhichEnd } from '../Interfaces/WhichEnd';
 
 export class Ray {
   constructor(public coord: Coordinate, public dirXZ: number) {}

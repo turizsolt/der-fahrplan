@@ -1,11 +1,11 @@
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 import { babylonContainer } from './structs/inversify.config';
-import { Land } from './structs/Land/Land';
+import { Land } from './structs/Interfaces/Land';
 import { TYPES } from './structs/TYPES';
-import { GridDrawer } from './controllers/GridDrawer';
-import { InputController } from './controllers/InputController';
-import { MeshProvider } from './babylon/MeshProvider';
+import { GridDrawer } from './ui/controllers/GridDrawer';
+import { InputController } from './ui/controllers/InputController';
+import { MeshProvider } from './ui/babylon/MeshProvider';
 
 window.addEventListener('DOMContentLoaded', () => {
   const canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
