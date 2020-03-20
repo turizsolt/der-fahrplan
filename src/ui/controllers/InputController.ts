@@ -1,4 +1,5 @@
 import * as BABYLON from 'babylonjs';
+import Vue from 'vue/dist/vue.js';
 import { InputHandler } from './InputHandler';
 import { CreateTrackInputHandler } from './CreateTrackInputHandler';
 import { BabylonVector3ToCoordinate } from '../../ui/babylon/converters/BabylonVector3ToCoordinate';
@@ -22,6 +23,7 @@ import { CameraInputHandler } from './CameraInputHandler';
 import { SelectInputHandler } from './SelectInputHandler';
 import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
 import { CreateEngineInputHandler } from './CreateEngineInputHandler';
+import { VertexBuffer } from 'babylonjs';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -44,43 +46,24 @@ export class InputController {
 
   private mouseButtons: boolean[] = [];
 
+  private vm: Vue;
+
   constructor(
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera
   ) {
-    document.getElementById('input-cam').addEventListener('click', () => {
-      this.inputHandler.cancel();
-      this.mode = InputMode.CAMERA;
-      this.inputHandler = this.inputHandlers[this.mode];
-      updBoxes(this.mode);
-    });
-
-    document.getElementById('input-sel').addEventListener('click', () => {
-      this.inputHandler.cancel();
-      this.mode = InputMode.SELECT;
-      this.inputHandler = this.inputHandlers[this.mode];
-      updBoxes(this.mode);
-    });
-
-    document.getElementById('input-nt').addEventListener('click', () => {
-      this.inputHandler.cancel();
-      this.mode = InputMode.CREATE_TRACK;
-      this.inputHandler = this.inputHandlers[this.mode];
-      updBoxes(this.mode);
-    });
-
-    document.getElementById('input-np').addEventListener('click', () => {
-      this.inputHandler.cancel();
-      this.mode = InputMode.CREATE_PLATFORM;
-      this.inputHandler = this.inputHandlers[this.mode];
-      updBoxes(this.mode);
-    });
-
-    document.getElementById('input-ne').addEventListener('click', () => {
-      this.inputHandler.cancel();
-      this.mode = InputMode.CREATE_ENGINE;
-      this.inputHandler = this.inputHandlers[this.mode];
-      updBoxes(this.mode);
+    const _this = this;
+    this.vm = new Vue({
+      el: '#button-holder',
+      data: {
+        selected: '',
+        buttons: []
+      },
+      methods: {
+        handleClick: function(event) {
+          _this.selectMode(event.target.id);
+        }
+      }
     });
 
     this.inputHandlers = {
@@ -91,8 +74,20 @@ export class InputController {
       [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler()
     };
 
+    const modeNames = {
+      [InputMode.CAMERA]: 'Cam',
+      [InputMode.SELECT]: 'Sel',
+      [InputMode.CREATE_TRACK]: '+Trac',
+      [InputMode.CREATE_PLATFORM]: '+Plat',
+      [InputMode.CREATE_ENGINE]: '+Eng'
+    };
+
+    for (let mode of Object.keys(this.inputHandlers)) {
+      this.vm.buttons.push({ id: mode, text: modeNames[mode] });
+    }
+    this.vm.selected = this.mode;
+
     this.inputHandler = this.inputHandlers[this.mode];
-    updBoxes(this.mode);
 
     this.downProps = null;
     this.store = babylonContainer.get<() => Store>(TYPES.FactoryOfStore)();
@@ -264,43 +259,35 @@ export class InputController {
     }
   }
 
+  selectMode(mode: InputMode) {
+    this.inputHandler.cancel();
+    this.mode = mode;
+    this.inputHandler = this.inputHandlers[this.mode];
+    this.vm.selected = mode;
+  }
+
   keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {}
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     switch (key) {
       case 'U':
-        this.inputHandler.cancel();
-        this.mode = InputMode.CAMERA;
-        this.inputHandler = this.inputHandlers[this.mode];
-        updBoxes(this.mode);
+        this.selectMode(InputMode.CAMERA);
         break;
 
       case 'I':
-        this.inputHandler.cancel();
-        this.mode = InputMode.SELECT;
-        this.inputHandler = this.inputHandlers[this.mode];
-        updBoxes(this.mode);
+        this.selectMode(InputMode.SELECT);
         break;
 
       case 'O':
-        this.inputHandler.cancel();
-        this.mode = InputMode.CREATE_TRACK;
-        this.inputHandler = this.inputHandlers[this.mode];
-        updBoxes(this.mode);
+        this.selectMode(InputMode.CREATE_TRACK);
         break;
 
       case 'P':
-        this.inputHandler.cancel();
-        this.mode = InputMode.CREATE_PLATFORM;
-        this.inputHandler = this.inputHandlers[this.mode];
-        updBoxes(this.mode);
+        this.selectMode(InputMode.CREATE_PLATFORM);
         break;
 
       case '9':
-        this.inputHandler.cancel();
-        this.mode = InputMode.CREATE_ENGINE;
-        this.inputHandler = this.inputHandlers[this.mode];
-        updBoxes(this.mode);
+        this.selectMode(InputMode.CREATE_ENGINE);
         break;
 
       case 'K':
@@ -360,22 +347,4 @@ export class InputController {
   load(data: any) {
     this.store.loadAll(data);
   }
-}
-
-const choices = {
-  [InputMode.CAMERA]: 'input-cam',
-  [InputMode.SELECT]: 'input-sel',
-  [InputMode.CREATE_TRACK]: 'input-nt',
-  [InputMode.CREATE_PLATFORM]: 'input-np',
-  [InputMode.CREATE_ENGINE]: 'input-ne'
-};
-
-function updBoxes(chosen: InputMode) {
-  document.getElementById('input-cam').classList.remove('selected');
-  document.getElementById('input-sel').classList.remove('selected');
-  document.getElementById('input-nt').classList.remove('selected');
-  document.getElementById('input-np').classList.remove('selected');
-  document.getElementById('input-ne').classList.remove('selected');
-
-  document.getElementById(choices[chosen]).classList.add('selected');
 }

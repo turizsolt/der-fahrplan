@@ -1,5 +1,4 @@
 import * as BABYLON from 'babylonjs';
-import Vue from 'vue/dist/vue.js';
 import 'babylonjs-loaders';
 import { babylonContainer } from './structs/inversify.config';
 import { Land } from './structs/Interfaces/Land';
@@ -9,25 +8,6 @@ import { InputController } from './ui/controllers/InputController';
 import { MeshProvider } from './ui/babylon/MeshProvider';
 
 window.addEventListener('DOMContentLoaded', () => {
-  const vm = new Vue({
-    el: '#button-holder',
-    data: {
-      selected: 'input-cam',
-      buttons: [
-        { id: 'input-cam', text: 'Cam' },
-        { id: 'input-sel', text: 'Sel' },
-        { id: 'input-nt', text: '+Trac' },
-        { id: 'input-np', text: '+Plat' },
-        { id: 'input-ne', text: '+Eng' }
-      ]
-    },
-    methods: {
-      handleClick: function(event) {
-        this.selected = event.target.id;
-      }
-    }
-  });
-
   const canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
     'renderCanvas'
   ) as HTMLCanvasElement;
