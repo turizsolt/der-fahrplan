@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <title>Der Fahrplan</title>
     <style>
         html, body {
@@ -38,13 +39,13 @@
 </head>
 <body>
     <div id="button-holder">
-            <button id='input-cam'>Cam</button>
-            <button id='input-sel'>Sel</button>
-            <button id='input-nt'>+Trac</button>
-            <button id='input-np'>+Platf</button>
-            <button id='input-ne'>+Eng</button>
+            <button 
+                v-for="button in buttons"
+                v-bind:id="button.id"
+                v-on:click="handleClick"
+                v-bind:class="{ selected: selected === button.id }"
+            >{{button.text}}</button>
     </div>
-
 <canvas id="renderCanvas">
 </canvas>
 </body>
