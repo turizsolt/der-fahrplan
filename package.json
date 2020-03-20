@@ -6,8 +6,9 @@
   "scripts": {
     "build": "webpack",
     "start": "webpack-dev-server --open",
-    "test:only": "mocha -r ts-node/register test/**/*.{ts,tsx}",
-    "test": "nyc mocha -r ts-node/register test/**/*.{ts,tsx}",
+    "test:this": "ts-mocha --slow 5 test/PullingWagons.test.ts",
+    "test:only": "ts-mocha --slow 5 test/**/*.test.{ts,tsx}",
+    "test": "nyc ts-mocha test/**/*.test.{ts,tsx}",
     "posttest": "nyc report --reporter=json && nyc report --reporter=html"
   },
   "keywords": [],
@@ -26,10 +27,11 @@
     "css-loader": "^3.0.0",
     "html-webpack-plugin": "^3.2.0",
     "imports-loader": "^0.8.0",
-    "mocha": "^7.0.1",
+    "mocha": "^7.1.0",
     "nyc": "^15.0.0",
     "style-loader": "^0.23.1",
     "ts-loader": "^6.0.4",
+    "ts-mocha": "^6.0.0",
     "ts-node": "^8.6.2",
     "typescript": "^3.5.2",
     "webpack": "^4.35.2",
@@ -37,6 +39,7 @@
     "webpack-dev-server": "^3.7.2"
   },
   "dependencies": {
+    "@skymaker/quartic": "^0.1.5",
     "babylonjs": "^4.0.3",
     "babylonjs-gui": "^4.0.3",
     "babylonjs-loaders": "^4.0.3",

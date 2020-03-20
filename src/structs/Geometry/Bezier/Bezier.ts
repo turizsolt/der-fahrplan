@@ -1,6 +1,7 @@
 import { Coordinate } from '../Coordinate';
 import { Ray } from '../Ray';
 import { LineSegmentChain } from '../LineSegmentChain';
+import { Circle } from '../Circle';
 
 export const DEFAULT_PRECISION: number = 9;
 export const DEFAULT_DISTANCE: number = 2;
@@ -16,6 +17,7 @@ export abstract class Bezier {
   abstract getDegree(): number;
   abstract getPoint(percentage: number): Coordinate;
   abstract getDirection(percentage: number): number;
+  abstract intersectWithCircle(circle: Circle);
 
   getCoordinates() {
     return this.coordinates;

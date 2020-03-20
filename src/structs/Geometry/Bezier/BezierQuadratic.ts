@@ -1,5 +1,7 @@
 import { Coordinate } from '../Coordinate';
 import { Bezier, DEFAULT_PRECISION } from './Bezier';
+import { Circle } from '../Circle';
+import * as quartic from '@skymaker/quartic';
 
 export class BezierQuadratic extends Bezier {
   constructor(coordinates: Coordinate[]) {
@@ -41,5 +43,29 @@ export class BezierQuadratic extends Bezier {
     );
 
     return Math.atan2(curveDerived.x, curveDerived.z);
+  }
+
+  intersectWithCircle(circle: Circle) {
+    const [p0, p1, p2] = this.coordinates;
+    const ce = circle.getEquation();
+
+    const dx = p0.x - 2 * p1.x + p2.x;
+    const ex = 2 * p1.x - 2 * p0.x;
+    const fx = p0.x - ce.a;
+
+    const dz = p0.z - 2 * p1.z + p2.z;
+    const ez = 2 * p1.z - 2 * p0.z;
+    const fz = p0.z - ce.b;
+
+    const a = dx * dx + dz * dz;
+    const b = 2 * dx * ex + 2 * dz * ez;
+    const c = ex * ex + 2 * dx * fx + ez * ez + 2 * dz * fz;
+    const d = 2 * ex * fx + 2 * ez * fz;
+    const e = fx * fx + fz * fz - ce.r * ce.r;
+
+    return quartic
+      .solve(a, b, c, d, e)
+      .filter(t => t.im == 0 && 0 <= t.re && t.re <= 1)
+      .map(t => t.re);
   }
 }

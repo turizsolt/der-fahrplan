@@ -1,30 +1,34 @@
 import 'reflect-metadata';
 import { Container, interfaces } from 'inversify';
-import { PassengerRenderer } from '../src/structs/Passenger/PassengerRenderer';
+import { PassengerRenderer } from '../src/structs/Renderers/PassengerRenderer';
 import { TYPES } from '../src/structs/TYPES';
-import { PassengerDummyRenderer } from '../src/structs/Passenger/PassengerDummyRenderer';
-import { EngineRenderer } from '../src/structs/Engine/EngineRenderer';
-import { EngineDummyRenderer } from '../src/structs/Engine/EngineDummyRenderer';
-import { TrackJointRenderer } from '../src/structs/TrackJoint/TrackJointRenderer';
-import { TrackJointDummyRenderer } from '../src/structs/TrackJoint/TrackJointDummyRenderer';
-import { TrackRenderer } from '../src/structs/Track/TrackRenderer';
-import { TrackDummyRenderer } from '../src/structs/Track/TrackDummyRenderer';
-import { TrackSwitchRenderer } from '../src/structs/TrackSwitch/TrackSwitchRenderer';
-import { TrackSwitchDummyRenderer } from '../src/structs/TrackSwitch/TrackSwitchDummyRenderer';
-import { ActualEngine } from '../src/structs/Engine/ActualEngine';
-import { Engine } from '../src/structs/Engine/Engine';
-import { Track } from '../src/structs/Track/Track';
-import { ActualTrack } from '../src/structs/Track/ActualTrack';
-import { TrackSwitch } from '../src/structs/TrackSwitch/TrackSwitch';
-import { ActualTrackSwitch } from '../src/structs/TrackSwitch/ActualTrackSwitch';
-import { TrackJoint } from '../src/structs/TrackJoint/TrackJoint';
-import { ActualTrackJoint } from '../src/structs/TrackJoint/ActualTrackJoint';
-import { Store } from '../src/structs/Store/Store';
-import { PlatformRenderer } from '../src/structs/Platform/PlatformRenderer';
-import { PlatformDummyRenderer } from '../src/structs/Platform/PlatformDummyRenderer';
-import { Platform } from '../src/structs/Platform/Platform';
-import { ActualPlatform } from '../src/structs/Platform/ActualPlatform';
-import { TrackJointConnector } from '../src/structs/TrackJoint/TrackJointConnector';
+import { PassengerDummyRenderer } from './dummies/PassengerDummyRenderer';
+import { EngineRenderer } from '../src/structs/Renderers/EngineRenderer';
+import { EngineDummyRenderer } from './dummies/EngineDummyRenderer';
+import { TrackJointRenderer } from '../src/structs/Renderers/TrackJointRenderer';
+import { TrackJointDummyRenderer } from './dummies/TrackJointDummyRenderer';
+import { TrackRenderer } from '../src/structs/Renderers/TrackRenderer';
+import { TrackDummyRenderer } from './dummies/TrackDummyRenderer';
+import { TrackSwitchRenderer } from '../src/structs/Renderers/TrackSwitchRenderer';
+import { TrackSwitchDummyRenderer } from './dummies/TrackSwitchDummyRenderer';
+import { ActualEngine } from '../src/structs/Actuals/Wagon/ActualEngine';
+import { Engine } from '../src/structs/Interfaces/Engine';
+import { Track } from '../src/structs/Interfaces/Track';
+import { ActualTrack } from '../src/structs/Actuals/Track/ActualTrack';
+import { TrackSwitch } from '../src/structs/Interfaces/TrackSwitch';
+import { ActualTrackSwitch } from '../src/structs/Actuals/Track/ActualTrackSwitch';
+import { TrackJoint } from '../src/structs/Interfaces/TrackJoint';
+import { ActualTrackJoint } from '../src/structs/Actuals/TrackJoint/ActualTrackJoint';
+import { Store } from '../src/structs/Actuals/Store/Store';
+import { PlatformRenderer } from '../src/structs/Renderers/PlatformRenderer';
+import { PlatformDummyRenderer } from './dummies/PlatformDummyRenderer';
+import { Platform } from '../src/structs/Interfaces/Platform';
+import { ActualPlatform } from '../src/structs/Actuals/ActualPlatform';
+import { TrackJointConnector } from '../src/structs/Actuals/TrackJoint/TrackJointConnector';
+import { Wagon } from '../src/structs/Interfaces/Wagon';
+import { ActualWagon } from '../src/structs/Actuals/Wagon/ActualWagon';
+import { WagonRenderer } from '../src/structs/Renderers/WagonRenderer';
+import { WagonDummyRenderer } from './dummies/WagonDummyRenderer';
 
 export const testContainer = new Container();
 testContainer
@@ -33,6 +37,7 @@ testContainer
 testContainer
   .bind<EngineRenderer>(TYPES.EngineRenderer)
   .to(EngineDummyRenderer);
+testContainer.bind<WagonRenderer>(TYPES.WagonRenderer).to(WagonDummyRenderer);
 testContainer
   .bind<TrackJointRenderer>(TYPES.TrackJointRenderer)
   .to(TrackJointDummyRenderer);
@@ -45,6 +50,7 @@ testContainer
   .to(PlatformDummyRenderer);
 
 testContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
+testContainer.bind<Wagon>(TYPES.Wagon).to(ActualWagon);
 testContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 testContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 testContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
@@ -86,6 +92,14 @@ testContainer
   .toFactory<Engine>((context: interfaces.Context) => {
     return () => {
       return context.container.get<Engine>(TYPES.Engine);
+    };
+  });
+
+testContainer
+  .bind<interfaces.Factory<Wagon>>(TYPES.FactoryOfWagon)
+  .toFactory<Wagon>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Wagon>(TYPES.Wagon);
     };
   });
 
