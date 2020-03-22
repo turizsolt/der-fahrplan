@@ -35,6 +35,15 @@
             background-color: rebeccapurple;
         }
 
+        #info-box {
+            position: fixed;
+            left: 20px;
+            top: 80px;
+            width: 200px;
+            height: 100px;
+            background-color: aliceblue;
+        }
+
     </style>
 </head>
 <body>
@@ -45,6 +54,9 @@
                 v-on:click="handleClick"
                 v-bind:class="{ selected: selected === button.id }"
             >{{button.text}}</button>
+    </div>
+    <div id="info-box">
+        {{selectedId}}
     </div>
 <canvas id="renderCanvas">
 </canvas>

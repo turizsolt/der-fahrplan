@@ -47,6 +47,7 @@ export class InputController {
   private mouseButtons: boolean[] = [];
 
   private vm: Vue;
+  private vmInfoBox: Vue;
 
   constructor(
     private scene: BABYLON.Scene,
@@ -64,6 +65,10 @@ export class InputController {
           _this.selectMode(event.target.id);
         }
       }
+    });
+    this.vmInfoBox = new Vue({
+      el: '#info-box',
+      data: { selectedId: null }
     });
 
     this.inputHandlers = {
@@ -229,6 +234,7 @@ export class InputController {
               renderer.setSelected(false);
               this.selected = null;
               this.selectedMesh = null;
+              this.vmInfoBox.selectedId = null;
             } else {
               if (this.selected) {
                 this.selected.getRenderer().setSelected(false);
@@ -236,6 +242,7 @@ export class InputController {
               renderer.setSelected(true);
               this.selected = storedObj;
               this.selectedMesh = this.downProps.mesh;
+              this.vmInfoBox.selectedId = id;
             }
           }
           ready = true;
