@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import * as shortid from 'shortid';
-import { BaseBrick } from '../../Interfaces/BaseBrick';
+import { BaseStorable } from '../../Interfaces/BaseStorable';
 import { babylonContainer } from '../../inversify.config';
 import { Platform } from '../../Interfaces/Platform';
 import { TYPES } from '../../TYPES';
@@ -11,12 +11,7 @@ import { Engine } from '../../Interfaces/Engine';
 
 @injectable()
 export class Store {
-  private elements: Record<string, BaseBrick>;
-  private counter: any = {
-    ActualTrackJoint: { counter: 0, abbr: 'j' },
-    ActualTrack: { counter: 0, abbr: 't' },
-    ActualTrackSwitch: { counter: 0, abbr: 's' }
-  };
+  private elements: Record<string, BaseStorable>;
 
   init() {
     this.elements = {};
@@ -26,23 +21,38 @@ export class Store {
     return this;
   }
 
-  register(object: BaseBrick, presetId: string = null): string {
+  clear() {
+    this.elements = {};
+  }
+
+  register(object: BaseStorable, presetId: string = null): string {
     let id = presetId || shortid.generate();
     this.elements[id] = object;
     return id;
   }
 
-  unregister(object: BaseBrick): void {
+  unregister(object: BaseStorable): void {
     let id = object.getId();
     delete this.elements[id];
   }
 
-  get(id: string): BaseBrick {
+  get(id: string): BaseStorable {
     return this.elements[id];
   }
 
-  getAll(): Record<string, BaseBrick> {
+  getAll(): Record<string, BaseStorable> {
     return this.elements;
+  }
+
+  getFiltered(filter: (b: BaseStorable) => boolean): BaseStorable[] {
+    const ret = [];
+    for (let key of Object.keys(this.elements)) {
+      const elem = this.elements[key];
+      if (filter(elem)) {
+        ret.push(elem);
+      }
+    }
+    return ret;
   }
 
   persistAll(): Object {
@@ -76,7 +86,7 @@ export class Store {
     });
 
     arr.map(elem => {
-      let brick: BaseBrick;
+      let brick: BaseStorable;
       switch (elem.type) {
         case 'Platform':
           brick = babylonContainer.get<Platform>(TYPES.Platform);

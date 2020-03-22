@@ -222,7 +222,7 @@ export class InputController {
       console.log(meshId);
       if (meshId.startsWith('clickable-')) {
         const [_, type, id, command] = meshId.split('-');
-        const storedObj = this.store.get(id);
+        const storedObj = this.store.get(id) as BaseBrick;
         if (storedObj) {
           if (command) {
             storedObj.getRenderer().process(command);

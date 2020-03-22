@@ -34,5 +34,15 @@ export const TYPES = {
   FactoryOfTrackJointConnector: Symbol.for('Factory<TrackJointConnector>'),
 
   MeshProvider: Symbol.for('MeshProvider'),
-  FactoryOfMeshProvider: Symbol.for('Factory<MeshProvider>')
+  FactoryOfMeshProvider: Symbol.for('Factory<MeshProvider>'),
+
+  Route: Symbol.for('Route'),
+  FactoryOfRoute: Symbol.for('Factory<Route>'),
+
+  RouteStop: Symbol.for('RouteStop'),
+  FactoryOfRouteStop: Symbol.for('Factory<RouteStop>'),
+
+  Station: Symbol.for('Station'),
+  StationRenderer: Symbol.for('StationRenderer'),
+  FactoryOfStation: Symbol.for('Factory<Station>')
 };

@@ -29,6 +29,14 @@ import { Wagon } from '../src/structs/Interfaces/Wagon';
 import { ActualWagon } from '../src/structs/Actuals/Wagon/ActualWagon';
 import { WagonRenderer } from '../src/structs/Renderers/WagonRenderer';
 import { WagonDummyRenderer } from './dummies/WagonDummyRenderer';
+import { Station } from '../src/structs/Scheduling/Station';
+import { ActualStation } from '../src/structs/Scheduling/ActualStation';
+import { StationRenderer } from '../src/structs/Renderers/StationRenderer';
+import { StationDummyRenderer } from './dummies/StationDummyRenderer';
+import { Route } from '../src/structs/Scheduling/Route';
+import { ActualRoute } from '../src/structs/Scheduling/ActualRoute';
+import { RouteStop } from '../src/structs/Scheduling/RouteStop';
+import { ActualRouteStop } from '../src/structs/Scheduling/ActualRouteStop';
 
 export const testContainer = new Container();
 testContainer
@@ -132,5 +140,35 @@ testContainer
   .toFactory<Platform>((context: interfaces.Context) => {
     return () => {
       return context.container.get<Platform>(TYPES.Platform);
+    };
+  });
+
+testContainer.bind<Station>(TYPES.Station).to(ActualStation);
+testContainer
+  .bind<StationRenderer>(TYPES.StationRenderer)
+  .to(StationDummyRenderer);
+testContainer
+  .bind<interfaces.Factory<Station>>(TYPES.FactoryOfStation)
+  .toFactory<Station>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Station>(TYPES.Station);
+    };
+  });
+
+testContainer.bind<Route>(TYPES.Route).to(ActualRoute);
+testContainer
+  .bind<interfaces.Factory<Route>>(TYPES.FactoryOfRoute)
+  .toFactory<Route>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Route>(TYPES.Route);
+    };
+  });
+
+testContainer.bind<RouteStop>(TYPES.RouteStop).to(ActualRouteStop);
+testContainer
+  .bind<interfaces.Factory<RouteStop>>(TYPES.FactoryOfRouteStop)
+  .toFactory<RouteStop>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<RouteStop>(TYPES.RouteStop);
     };
   });
