@@ -1,17 +1,24 @@
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
 import * as shortid from 'shortid';
 import { BaseStorable } from '../../Interfaces/BaseStorable';
-import { babylonContainer } from '../../inversify.config';
 import { Platform } from '../../Interfaces/Platform';
 import { TYPES } from '../../TYPES';
 import { Track } from '../../Interfaces/Track';
 import { TrackSwitch } from '../../Interfaces/TrackSwitch';
 import { TrackJoint } from '../../Interfaces/TrackJoint';
 import { Engine } from '../../Interfaces/Engine';
+import { Station } from '../../Scheduling/Station';
+import { RouteStop } from '../../Scheduling/RouteStop';
+import { Route } from '../../Scheduling/Route';
+import { Store } from '../../Interfaces/Store';
 
 @injectable()
-export class Store {
+export class ActualStore implements Store {
   private elements: Record<string, BaseStorable>;
+
+  @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
+  @inject(TYPES.FactoryOfRouteStop) private RouteStopFactory: () => RouteStop;
+  @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
 
   init() {
     this.elements = {};
@@ -76,6 +83,12 @@ export class Store {
           return 3;
         case 'Track':
           return 4;
+        case 'Route':
+          return 10;
+        case 'RouteStop':
+          return 11;
+        case 'Station':
+          return 12;
         default:
           return 999;
       }
@@ -88,21 +101,30 @@ export class Store {
     arr.map(elem => {
       let brick: BaseStorable;
       switch (elem.type) {
-        case 'Platform':
-          brick = babylonContainer.get<Platform>(TYPES.Platform);
+        case 'Station':
+          brick = this.StationFactory();
           break;
-        case 'Track':
-          brick = babylonContainer.get<Track>(TYPES.Track);
+        case 'RouteStop':
+          brick = this.RouteStopFactory();
           break;
-        case 'TrackSwitch':
-          brick = babylonContainer.get<TrackSwitch>(TYPES.TrackSwitch);
+        case 'Route':
+          brick = this.RouteFactory();
           break;
-        case 'TrackJoint':
-          brick = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
-          break;
-        case 'Engine':
-          brick = babylonContainer.get<Engine>(TYPES.Engine);
-          break;
+        // case 'Platform':
+        //   brick = babylonContainer.get<Platform>(TYPES.Platform);
+        //   break;
+        // case 'Track':
+        //   brick = babylonContainer.get<Track>(TYPES.Track);
+        //   break;
+        // case 'TrackSwitch':
+        //   brick = babylonContainer.get<TrackSwitch>(TYPES.TrackSwitch);
+        //   break;
+        // case 'TrackJoint':
+        //   brick = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+        //   break;
+        // case 'Engine':
+        //   brick = babylonContainer.get<Engine>(TYPES.Engine);
+        //   break;
       }
 
       if (brick) {

@@ -1,4 +1,4 @@
-import { Store } from '../Actuals/Store/Store';
+import { Store } from './Store';
 
 export interface BaseStorable {
   getId(): string;

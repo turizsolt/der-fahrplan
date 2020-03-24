@@ -9,9 +9,9 @@ import { ActualTrackBase } from './ActualTrackBase';
 import { injectable, inject } from 'inversify';
 import { WhichEnd } from '../../Interfaces/WhichEnd';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { Store } from '../Store/Store';
 import { Ray } from '../../Geometry/Ray';
 import { Left, Right } from '../../Geometry/Directions';
+import { Store } from '../../Interfaces/Store';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {

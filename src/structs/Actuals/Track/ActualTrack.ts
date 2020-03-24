@@ -8,7 +8,7 @@ import { ActualTrackBase } from './ActualTrackBase';
 import { injectable, inject } from 'inversify';
 import { WhichEnd } from '../../Interfaces/WhichEnd';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { Store } from '../Store/Store';
+import { Store } from '../../Interfaces/Store';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {

@@ -21,7 +21,7 @@ import { ActualTrack } from './Actuals/Track/ActualTrack';
 import { ActualTrackSwitch } from './Actuals/Track/ActualTrackSwitch';
 import { TrackJoint } from './Interfaces/TrackJoint';
 import { ActualTrackJoint } from './Actuals/TrackJoint/ActualTrackJoint';
-import { Store } from './Actuals/Store/Store';
+import { ActualStore } from './Actuals/Store/ActualStore';
 import { PlatformRenderer } from './Renderers/PlatformRenderer';
 import { PlatformBabylonRenderer } from '../ui/babylon/PlatformBabylonRenderer';
 import { Platform } from './Interfaces/Platform';
@@ -32,6 +32,15 @@ import { ActualWagon } from './Actuals/Wagon/ActualWagon';
 import { Wagon } from './Interfaces/Wagon';
 import { WagonRenderer } from './Renderers/WagonRenderer';
 import { WagonBabylonRenderer } from '../ui/babylon/WagonBabylonRenderer';
+import { RouteStop } from './Scheduling/RouteStop';
+import { ActualRouteStop } from './Scheduling/ActualRouteStop';
+import { Route } from './Scheduling/Route';
+import { ActualRoute } from './Scheduling/ActualRoute';
+import { Station } from './Scheduling/Station';
+import { StationRenderer } from './Renderers/StationRenderer';
+import { ActualStation } from './Scheduling/ActualStation';
+import { StationDummyRenderer } from '../../test/dummies/StationDummyRenderer';
+import { Store } from './Interfaces/Store';
 
 export const babylonContainer = new Container();
 babylonContainer
@@ -63,7 +72,7 @@ babylonContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 babylonContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 babylonContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
 babylonContainer.bind<Platform>(TYPES.Platform).to(ActualPlatform);
-babylonContainer.bind<Store>(TYPES.Store).to(Store);
+babylonContainer.bind<Store>(TYPES.Store).to(ActualStore);
 babylonContainer.bind<MeshProvider>(TYPES.MeshProvider).to(MeshProvider);
 babylonContainer
   .bind<TrackJointConnector>(TYPES.TrackJointConnector)
@@ -146,5 +155,35 @@ babylonContainer
   .toFactory<Platform>((context: interfaces.Context) => {
     return () => {
       return context.container.get<Platform>(TYPES.Platform);
+    };
+  });
+
+babylonContainer.bind<Station>(TYPES.Station).to(ActualStation);
+babylonContainer
+  .bind<StationRenderer>(TYPES.StationRenderer)
+  .to(StationDummyRenderer);
+babylonContainer
+  .bind<interfaces.Factory<Station>>(TYPES.FactoryOfStation)
+  .toFactory<Station>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Station>(TYPES.Station);
+    };
+  });
+
+babylonContainer.bind<Route>(TYPES.Route).to(ActualRoute);
+babylonContainer
+  .bind<interfaces.Factory<Route>>(TYPES.FactoryOfRoute)
+  .toFactory<Route>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Route>(TYPES.Route);
+    };
+  });
+
+babylonContainer.bind<RouteStop>(TYPES.RouteStop).to(ActualRouteStop);
+babylonContainer
+  .bind<interfaces.Factory<RouteStop>>(TYPES.FactoryOfRouteStop)
+  .toFactory<RouteStop>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<RouteStop>(TYPES.RouteStop);
     };
   });

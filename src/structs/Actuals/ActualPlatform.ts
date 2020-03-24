@@ -11,7 +11,7 @@ import { PlatformRenderer } from '../Renderers/PlatformRenderer';
 import { ActualBaseBrick } from './ActualBaseBrick';
 import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { PassengerGenerator } from './PassengerGenerator';
-import { Store } from '../Actuals/Store/Store';
+import { Store } from '../Interfaces/Store';
 
 @injectable()
 export class ActualPlatform extends ActualBaseBrick implements Platform {

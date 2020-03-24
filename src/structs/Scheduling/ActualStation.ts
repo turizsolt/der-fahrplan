@@ -1,7 +1,7 @@
-import { Store } from '../Actuals/Store/Store';
 import { ActualBaseBrick } from '../Actuals/ActualBaseBrick';
 import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { Station } from './Station';
+import { Store } from '../Interfaces/Store';
 
 export class ActualStation extends ActualBaseBrick implements Station {
   private name: string;
@@ -25,10 +25,16 @@ export class ActualStation extends ActualBaseBrick implements Station {
   }
 
   persist(): Object {
-    throw new Error('Method not implemented.');
+    return {
+      id: this.id,
+      type: 'Station',
+      name: this.name
+    };
   }
 
-  load(obj: Object, store: Store): void {
-    throw new Error('Method not implemented.');
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init();
+    this.setName(obj.name);
   }
 }

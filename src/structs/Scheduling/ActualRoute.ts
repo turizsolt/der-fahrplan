@@ -1,7 +1,7 @@
 import { ActualBaseStorable } from '../Actuals/ActualStorable';
-import { Store } from '../Actuals/Store/Store';
 import { Route } from './Route';
 import { RouteStop } from './RouteStop';
+import { Store } from '../Interfaces/Store';
 
 export class ActualRoute extends ActualBaseStorable implements Route {
   private name: string;
@@ -45,10 +45,21 @@ export class ActualRoute extends ActualBaseStorable implements Route {
   }
 
   persist(): Object {
-    throw new Error('Method not implemented.');
+    return {
+      id: this.id,
+      type: 'Route',
+      name: this.name,
+      stops: this.stops.map(x => x.getId())
+    };
   }
 
-  load(obj: Object, store: Store): void {
-    throw new Error('Method not implemented.');
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init();
+    this.setName(obj.name);
+    for (let stopId of obj.stops) {
+      const x = store.get(stopId) as RouteStop;
+      this.addStop(x);
+    }
   }
 }

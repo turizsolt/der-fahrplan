@@ -5,7 +5,7 @@ import { TYPES } from '../../src/structs/TYPES';
 import { Route } from '../../src/structs/Scheduling/Route';
 import { RouteStop } from '../../src/structs/Scheduling/RouteStop';
 import { Station } from '../../src/structs/Scheduling/Station';
-import { Store } from '../../src/structs/Actuals/Store/Store';
+import { Store } from '../../src/structs/Interfaces/Store';
 chai.use(chaiAlmost());
 
 const RouteFactory = testContainer.get<() => Route>(TYPES.FactoryOfRoute);
@@ -32,10 +32,13 @@ describe('Routes', () => {
 
   it('adds a stop', () => {
     const route = RouteFactory().init();
+    const stationName = 'Stadium';
     const station = StationFactory().init();
+    station.setName(stationName);
     const stop = RouteStopFactory().init(station);
     route.addStop(stop);
     expect(route.getStops()).deep.equals([stop]);
+    expect(route.getStops()[0].getStationName()).equals(stationName);
   });
 
   it('adds and removes a stop', () => {

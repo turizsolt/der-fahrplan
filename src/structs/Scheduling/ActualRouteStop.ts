@@ -1,7 +1,7 @@
 import { ActualBaseStorable } from '../Actuals/ActualStorable';
-import { Store } from '../Actuals/Store/Store';
 import { Station } from './Station';
 import { RouteStop } from './RouteStop';
+import { Store } from '../Interfaces/Store';
 
 export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
   private station: Station;
@@ -17,10 +17,15 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
   }
 
   persist(): Object {
-    throw new Error('Method not implemented.');
+    return {
+      id: this.id,
+      type: 'RouteStop',
+      station: this.station.getId()
+    };
   }
 
-  load(obj: Object, store: Store): void {
-    throw new Error('Method not implemented.');
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(store.get(obj.station) as Station);
   }
 }

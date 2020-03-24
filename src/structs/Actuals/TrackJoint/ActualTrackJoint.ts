@@ -11,7 +11,7 @@ import { Ray } from '../../Geometry/Ray';
 import { TrackJointConnector } from './TrackJointConnector';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { Store } from '../Store/Store';
+import { Store } from '../../Interfaces/Store';
 
 @injectable()
 export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {

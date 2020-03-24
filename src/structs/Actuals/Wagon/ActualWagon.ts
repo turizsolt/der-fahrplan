@@ -2,9 +2,7 @@ import { inject, injectable } from 'inversify';
 import { PositionOnTrack } from '../Track/PositionOnTrack';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { Store } from '../Store/Store';
 import { WhichEnd } from '../../Interfaces/WhichEnd';
-import { End } from '../End';
 import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
 import { Ray } from '../../Geometry/Ray';
 import { TYPES } from '../../TYPES';
@@ -13,6 +11,7 @@ import { TrackBase } from '../../Interfaces/TrackBase';
 import { LineSegment } from '../../Geometry/LineSegment';
 import { TrackWorm } from '../Track/TrackWorm';
 import { WagonEnd } from './WagonEnd';
+import { Store } from '../../Interfaces/Store';
 
 const WAGON_GAP: number = 1;
 

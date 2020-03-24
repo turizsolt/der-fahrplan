@@ -1,9 +1,7 @@
-import { BaseBrick } from '../Interfaces/BaseBrick';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../TYPES';
-import { Store } from './Store/Store';
-import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { BaseStorable } from '../Interfaces/BaseStorable';
+import { Store } from '../Interfaces/Store';
 
 @injectable()
 export abstract class ActualBaseStorable implements BaseStorable {

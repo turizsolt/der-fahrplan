@@ -1,6 +1,5 @@
 import { TYPES } from '../../TYPES';
 import { inject, injectable } from 'inversify';
-import { Store } from '../Store/Store';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { Engine } from '../../Interfaces/Engine';
 import { PositionOnTrack } from '../Track/PositionOnTrack';
@@ -11,6 +10,7 @@ import { Coordinate } from '../../Geometry/Coordinate';
 import { Ray } from '../../Geometry/Ray';
 import { Platform } from '../../Interfaces/Platform';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
+import { Store } from '../../Interfaces/Store';
 
 @injectable()
 export class ActualEngine extends ActualBaseBrick implements Engine {

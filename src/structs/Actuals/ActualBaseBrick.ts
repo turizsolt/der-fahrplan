@@ -1,7 +1,5 @@
 import { BaseBrick } from '../Interfaces/BaseBrick';
-import { injectable, inject } from 'inversify';
-import { TYPES } from '../TYPES';
-import { Store } from '../Actuals/Store/Store';
+import { injectable } from 'inversify';
 import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { ActualBaseStorable } from './ActualStorable';
 

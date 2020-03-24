@@ -10,7 +10,6 @@ import {
   snapJoint
 } from '../../structs/Geometry/Snap';
 import { babylonContainer } from '../../structs/inversify.config';
-import { Store } from '../../structs/Actuals/Store/Store';
 import { TYPES } from '../../structs/TYPES';
 import { ActualTrack } from '../../structs/Actuals/Track/ActualTrack';
 import { TrackBase } from '../../structs/Interfaces/TrackBase';
@@ -23,7 +22,7 @@ import { CameraInputHandler } from './CameraInputHandler';
 import { SelectInputHandler } from './SelectInputHandler';
 import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
 import { CreateEngineInputHandler } from './CreateEngineInputHandler';
-import { VertexBuffer } from 'babylonjs';
+import { Store } from '../../structs/Interfaces/Store';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
