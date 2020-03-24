@@ -115,11 +115,12 @@ export class LineSegmentChain {
         this.rays[i - 1].coord,
         this.rays[i].coord
       );
+      if (put) rays.push(this.rays[i - 1]);
       if (seg.contains(p)) {
         put = false;
-        rays.push(new Ray(p, seg.getDir()));
+        if (!this.rays[i - 1].coord.equalsTo(p))
+          rays.push(new Ray(p, seg.getDir()));
       }
-      if (put) rays.push(this.rays[i]);
     }
     return LineSegmentChain.fromRays(rays);
   }
@@ -213,6 +214,15 @@ export class LineSegmentChain {
       if (ray) return ray;
     }
     return null;
+  }
+
+  getIntersectionsWithCirlce(circle: Circle) {
+    const points = [];
+    for (let segment of this.getLineSegments()) {
+      const ps = segment.getIntersectionsWithCirlce(circle);
+      points.push(...ps);
+    }
+    return points;
   }
 
   isIntersectsWithChain(other: LineSegmentChain): boolean {

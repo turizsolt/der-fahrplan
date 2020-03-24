@@ -6,6 +6,8 @@ import { Route } from '../../src/structs/Scheduling/Route';
 import { RouteStop } from '../../src/structs/Scheduling/RouteStop';
 import { Station } from '../../src/structs/Scheduling/Station';
 import { Store } from '../../src/structs/Interfaces/Store';
+import { Circle } from '../../src/structs/Geometry/Circle';
+import { Coordinate } from '../../src/structs/Geometry/Coordinate';
 chai.use(chaiAlmost());
 
 const RouteFactory = testContainer.get<() => Route>(TYPES.FactoryOfRoute);
@@ -14,6 +16,8 @@ const RouteStopFactory = testContainer.get<() => RouteStop>(
 );
 const StationFactory = testContainer.get<() => Station>(TYPES.FactoryOfStation);
 const StoreFactory = testContainer.get<() => Store>(TYPES.FactoryOfStore);
+
+const circle = new Circle(new Coordinate(0, 0, 0), 20);
 
 describe('Routes', () => {
   it('creates a new route', () => {
@@ -33,7 +37,7 @@ describe('Routes', () => {
   it('adds a stop', () => {
     const route = RouteFactory().init();
     const stationName = 'Stadium';
-    const station = StationFactory().init();
+    const station = StationFactory().init(circle);
     station.setName(stationName);
     const stop = RouteStopFactory().init(station);
     route.addStop(stop);
@@ -43,7 +47,7 @@ describe('Routes', () => {
 
   it('adds and removes a stop', () => {
     const route = RouteFactory().init();
-    const station = StationFactory().init();
+    const station = StationFactory().init(circle);
     const stop = RouteStopFactory().init(station);
     route.addStop(stop);
     route.removeStop(stop);
@@ -52,7 +56,7 @@ describe('Routes', () => {
 
   it('adds two stops and then swaps them', () => {
     const route = RouteFactory().init();
-    const station = StationFactory().init();
+    const station = StationFactory().init(circle);
     const stop1 = RouteStopFactory().init(station);
     const stop2 = RouteStopFactory().init(station);
     route.addStop(stop1);
@@ -63,7 +67,7 @@ describe('Routes', () => {
 
   it('adds two stops and then swaps noting, but wrong', () => {
     const route = RouteFactory().init();
-    const station = StationFactory().init();
+    const station = StationFactory().init(circle);
     const stop1 = RouteStopFactory().init(station);
     const stop2 = RouteStopFactory().init(station);
     route.addStop(stop1);

@@ -6,6 +6,7 @@ import { Side } from './Side';
 import { TrackBase } from './TrackBase';
 import { BaseBrick } from './BaseBrick';
 import { PassengerGenerator } from '../Actuals/PassengerGenerator';
+import { LineSegmentChain } from '../Geometry/LineSegmentChain';
 
 export interface Platform extends BaseBrick {
   checkin(engine: Engine): void;
@@ -15,6 +16,8 @@ export interface Platform extends BaseBrick {
   removePassenger(passenger: Passenger): void;
   callForDepartingPassengers(engine: Engine): void;
   isBeside(position: number): boolean;
+
+  getLineSegmentChain(): LineSegmentChain;
 
   getWidth(): number;
   getLength(): number;

@@ -12,6 +12,7 @@ import { ActualBaseBrick } from './ActualBaseBrick';
 import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { PassengerGenerator } from './PassengerGenerator';
 import { Store } from '../Interfaces/Store';
+import { LineSegmentChain } from '../Geometry/LineSegmentChain';
 
 @injectable()
 export class ActualPlatform extends ActualBaseBrick implements Platform {
@@ -23,6 +24,8 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
   private track: TrackBase;
   private start: number;
   private end: number;
+  private startPerc: number;
+  private endPerc: number;
   private width: number;
   private side: Side;
   private color: Color;
@@ -53,6 +56,31 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     return this.color;
   }
 
+  getLineSegmentChain(): LineSegmentChain {
+    const p1 = this.track
+      .getSegment()
+      .getBezier()
+      .getPoint(this.startPerc);
+
+    const p2 = this.track
+      .getSegment()
+      .getBezier()
+      .getPoint(this.endPerc);
+
+    //console.log('p1', p1);
+    //console.log('p2', p2);
+
+    const chain = this.track.getSegment().getLineSegmentChain();
+
+    const chain2 = chain.getChainFromPoint(chain.project(p1).coord);
+    const chain3 = chain2.getChainToPoint(chain2.project(p2).coord);
+
+    // console.log('pch1', chain.getRays().map(x => x.coord));
+    // console.log('pch2', chain2.getRays().map(x => x.coord));
+    // console.log('pch3', chain3.getRays().map(x => x.coord));
+    return chain3;
+  }
+
   init(
     track: TrackBase,
     start: number,
@@ -68,6 +96,10 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     const a = segment.getFirstPoint();
     const b = segment.getLastPoint();
     const segLen = segment.getLength();
+
+    this.startPerc = start;
+    this.endPerc = end;
+
     start = start * segLen;
     end = end * segLen;
 
