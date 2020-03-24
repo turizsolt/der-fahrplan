@@ -39,9 +39,23 @@
             position: fixed;
             left: 20px;
             top: 80px;
+            bottom: 20px;
             width: 200px;
-            height: 100px;
             background-color: aliceblue;
+        }
+
+        #big-screen {
+            position: fixed;
+            left: 240px;
+            top: 20px;
+            bottom: 20px;
+            right: 20px;
+            background-color: aliceblue;
+            display: flex;
+        }
+
+        .column {
+            flex-grow: 1;
         }
 
     </style>
@@ -58,7 +72,105 @@
     <div id="info-box">
         {{selectedId}}
     </div>
+    <div id="big-screen" v-if="false">
+        <div class="column" id="route-list">
+            <div>Route list</div>
+            <div v-for="route in routes" v-bind:class="{selected: selectedRoute === route}">
+                <span v-on:click="selectRoute(route)">{{route.name}} {{fromTo(route)}}</span>
+                <span v-on:click="removeRoute(route)">x</span>
+            </div>
+            <div>
+                <span v-on:click="createRoute()">Create route</span>
+            </div>
+        </div>
+        <div class="column" id="route-details">
+            <div>Edit route</div>
+            <div v-if="selectedRoute">
+                Id: <input type="text" v-model="selectedRoute.id" /><br />
+                Name: <input type="text" v-model="selectedRoute.name" /><br />
+                Stops:<br />
+                <div v-for="(stop, index) in selectedRoute.stops">
+                    {{stop.name}}
+                    <button v-on:click="deleteStop(stop)">Del</button>
+                    <button v-on:click="swapStop(stop)" v-if="index !== 0">Swup</button>
+                </div>
+                <button v-on:click="createReverseRoute(selectedRoute)">Create reverse route</button>
+            </div>
+        </div>
+        <div class="column" id="route-station-options">
+            <div>Add stops</div>
+            <div  v-if="selectedRoute">
+                <div v-for="station in stations">
+                    <button v-on:click="addStop(station)">Add</button> {{station.name}}
+                </div>
+            </div>
+        </div>
+    </div>
 <canvas id="renderCanvas">
 </canvas>
+<script>
+    const app = new Vue({
+      el: '#big-screen',
+      data: {
+          routes: [
+              {id: 'dfse34fgsf', name: 'B12', stops: []},
+              {id: 'assddferj', name: 'B12', stops: []},
+          ],
+          selectedRoute: null,
+          stations: [
+            {id: 'sewtew', name: 'Algarra'},
+            {id: 'fdsfds', name: 'Burito'},
+            {id: 'rt3trw', name: 'Cheddar'},
+            {id: '65443e', name: 'Dorito'},
+          ]
+      },
+      methods: {
+        fromTo: function(route) {
+              if(route.stops.length === 0) {
+                  return "Unknown terminus";
+              } else if(route.stops.length === 1) {
+                  return route.stops[0].name;
+              } else {
+                last = route.stops[route.stops.length-1];
+                return route.stops[0].name + ">>" +last.name;
+              }
+          },
+          removeRoute: function(route) {
+              this.routes = this.routes.filter(x => x !== route);
+              if(this.selectedRoute === route) {
+                  this.selectedRoute = null;
+              }
+          },
+          createRoute: function() {
+              this.routes.push({id: 'assddferj', name: '???', stops: []});
+          },
+          createReverseRoute: function(route) {
+              this.routes.push({id: route.id+'1', name: route.name, stops: [...route.stops].reverse()});
+          },
+          selectRoute: function(route) {
+              this.selectedRoute = route;
+          },
+          deleteStop: function(stop) {
+              this.selectedRoute.stops = this.selectedRoute.stops.filter(x => x !== stop);
+          },
+          swapStop: function(stop) {
+              const index = this.selectedRoute.stops.findIndex(x => x === stop);
+              if(index > 0) {
+                const newStops = [
+                    ...this.selectedRoute.stops
+              ];
+                    newStops[index-1] = this.selectedRoute.stops[index];
+                    newStops[index] = this.selectedRoute.stops[index-1];
+                    this.selectedRoute.stops = newStops;
+              }
+          },
+          addStop: function(station) {
+              if(this.selectedRoute) {
+                  this.selectedRoute.stops.push(station);
+              }
+          }
+      }
+    });
+    </script>
 </body>
 </html>
