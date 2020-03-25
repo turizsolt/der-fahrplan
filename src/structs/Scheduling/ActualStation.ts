@@ -28,11 +28,9 @@ export class ActualStation extends ActualBaseBrick implements Station {
       .getFiltered(x => x.constructor.name === 'ActualPlatform')
       .forEach(pl => {
         const platform = pl as Platform;
-        if (
-          platform.getLineSegmentChain().getIntersectionsWithCirlce(this.circle)
-            .length > 0
-        ) {
+        if (platform.isPartOfStation(this)) {
           this.platforms.push(platform);
+          platform.setStation(this);
         }
       });
 

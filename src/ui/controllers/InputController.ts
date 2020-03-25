@@ -249,6 +249,22 @@ export class InputController {
               const sel = this.selected as any;
               if (sel.getName) {
                 this.vmInfoBox.selectedId = sel.getName();
+                if (sel.getPlatforms) {
+                  this.vmInfoBox.selectedId =
+                    sel.getName() +
+                    ' / ' +
+                    sel
+                      .getPlatforms()
+                      .map(p => p.getId())
+                      .join(', ');
+                }
+              } else if (sel.getStation) {
+                this.vmInfoBox.selectedId =
+                  id +
+                  ':' +
+                  (!sel.getStation()
+                    ? 'No station'
+                    : sel.getStation().getName());
               } else {
                 this.vmInfoBox.selectedId = id;
               }

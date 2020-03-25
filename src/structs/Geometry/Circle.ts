@@ -37,4 +37,8 @@ export class Circle {
       return sols.map(x => new Coordinate(x, 0, le.m * (x - le.a) + le.b));
     }
   }
+
+  isPointInside(point: Coordinate) {
+    return point.distance2d(this.a) <= this.r;
+  }
 }

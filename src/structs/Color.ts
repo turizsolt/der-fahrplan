@@ -4,4 +4,8 @@ export class Color {
   static CreateRandom(): Color {
     return new Color(Math.random(), Math.random(), Math.random());
   }
+
+  static White(): Color {
+    return new Color(1, 1, 1);
+  }
 }

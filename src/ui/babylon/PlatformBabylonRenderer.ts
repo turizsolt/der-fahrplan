@@ -5,6 +5,7 @@ import { ColorToBabylonColor3 } from './converters/ColorToBabylonColor3';
 import { PlatformRenderer } from '../../structs/Renderers/PlatformRenderer';
 import { injectable } from 'inversify';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
+import { Color } from '../../structs/Color';
 
 @injectable()
 export class PlatformBabylonRenderer extends BaseBabylonRenderer
@@ -15,6 +16,8 @@ export class PlatformBabylonRenderer extends BaseBabylonRenderer
   private matSel: BABYLON.StandardMaterial;
   private platform: Platform;
   private scene: BABYLON.Scene;
+
+  private lastColor: Color;
 
   init(platform: Platform) {
     this.platform = platform;
@@ -33,8 +36,9 @@ export class PlatformBabylonRenderer extends BaseBabylonRenderer
     );
     this.mesh.rotation.y = this.platform.getRotation();
 
+    this.lastColor = this.platform.getColor();
     this.matNorm = new BABYLON.StandardMaterial('blue', this.scene);
-    this.matNorm.diffuseColor = ColorToBabylonColor3(this.platform.getColor());
+    this.matNorm.diffuseColor = ColorToBabylonColor3(this.lastColor);
     this.matSel = new BABYLON.StandardMaterial('blue', this.scene);
     this.matSel.diffuseColor = BABYLON.Color3.White();
 
@@ -47,6 +51,11 @@ export class PlatformBabylonRenderer extends BaseBabylonRenderer
       this.mesh.setEnabled(false);
     } else {
       this.mesh.setEnabled(true);
+      if (this.lastColor !== this.platform.getColor()) {
+        this.lastColor = this.platform.getColor();
+        this.matNorm = new BABYLON.StandardMaterial('blue', this.scene);
+        this.matNorm.diffuseColor = ColorToBabylonColor3(this.lastColor);
+      }
       this.mesh.material = this.selected ? this.matSel : this.matNorm;
     }
   }

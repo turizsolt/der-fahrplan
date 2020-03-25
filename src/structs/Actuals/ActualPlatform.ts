@@ -13,6 +13,7 @@ import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { PassengerGenerator } from './PassengerGenerator';
 import { Store } from '../Interfaces/Store';
 import { LineSegmentChain } from '../Geometry/LineSegmentChain';
+import { Station } from '../Scheduling/Station';
 
 @injectable()
 export class ActualPlatform extends ActualBaseBrick implements Platform {
@@ -28,7 +29,7 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
   private endPerc: number;
   private width: number;
   private side: Side;
-  private color: Color;
+  private station: Station;
   private removed: boolean = false;
   private pg: PassengerGenerator;
 
@@ -53,7 +54,7 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     return this.rotation;
   }
   getColor(): Color {
-    return this.color;
+    return this.station ? this.station.getColor() : Color.White();
   }
 
   getLineSegmentChain(): LineSegmentChain {
@@ -79,6 +80,27 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     // console.log('pch2', chain2.getRays().map(x => x.coord));
     // console.log('pch3', chain3.getRays().map(x => x.coord));
     return chain3;
+  }
+
+  isPartOfStation(station: Station): boolean {
+    for (let point of this.getLineSegmentChain().getPoints()) {
+      if (station.getCircle().isPointInside(point)) {
+        return true;
+      }
+    }
+    return (
+      this.getLineSegmentChain().getIntersectionsWithCirlce(station.getCircle())
+        .length > 0
+    );
+  }
+
+  setStation(station: Station): void {
+    this.station = station;
+    this.renderer.update();
+  }
+
+  getStation(): Station {
+    return this.station;
   }
 
   init(
@@ -108,7 +130,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     this.end = end;
     this.width = width;
     this.side = side;
-    this.color = color;
     this.pg = pg;
 
     track.addPlatform(this);
@@ -149,6 +170,17 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     this.carList = [];
 
     this.renderer.init(this);
+
+    this.store
+      .getFiltered(x => x.constructor.name === 'ActualStation')
+      .forEach(st => {
+        const station = st as Station;
+        if (this.isPartOfStation(station)) {
+          station.getPlatforms().push(this); // todo antipattern
+          this.setStation(station);
+        }
+      });
+
     return this;
   }
 
@@ -201,11 +233,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
       start: this.start,
       end: this.end,
       side: this.side,
-      color: {
-        red: this.color.red,
-        green: this.color.green,
-        blue: this.color.blue
-      },
       width: this.width
     };
   }
@@ -218,7 +245,7 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
       obj.end,
       obj.width,
       obj.side,
-      obj.color,
+      null,
       null
     );
   }
