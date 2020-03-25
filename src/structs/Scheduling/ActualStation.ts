@@ -16,6 +16,8 @@ export class ActualStation extends ActualBaseBrick implements Station {
   private circle: Circle;
   private platforms: Platform[];
   private color: Color;
+
+  private removed: boolean = false;
   @inject(TYPES.StationRenderer) private renderer: StationRenderer;
 
   init(circle: Circle): Station {
@@ -29,8 +31,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
       .forEach(pl => {
         const platform = pl as Platform;
         if (platform.isPartOfStation(this)) {
-          this.platforms.push(platform);
-          platform.setStation(this);
+          this.addPlatform(platform);
         }
       });
 
@@ -41,6 +42,18 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
   getPlatforms(): Platform[] {
     return this.platforms;
+  }
+
+  addPlatform(platform: Platform): void {
+    if (!platform.getStation()) {
+      this.platforms.push(platform);
+      platform.setStation(this);
+    }
+  }
+
+  removePlatform(platform: Platform): void {
+    platform.setStation(null);
+    this.platforms = this.platforms.filter(p => p !== platform);
   }
 
   getCircle(): Circle {
@@ -61,6 +74,18 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
   getRenderer(): BaseRenderer {
     return this.renderer;
+  }
+
+  remove(): boolean {
+    this.store.unregister(this);
+    this.removed = true;
+    this.platforms.map(platform => this.removePlatform(platform));
+    this.renderer.update();
+    return true;
+  }
+
+  isRemoved(): boolean {
+    return this.removed;
   }
 
   persist(): Object {

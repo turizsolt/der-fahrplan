@@ -176,8 +176,7 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
       .forEach(st => {
         const station = st as Station;
         if (this.isPartOfStation(station)) {
-          station.getPlatforms().push(this); // todo antipattern
-          this.setStation(station);
+          station.addPlatform(this);
         }
       });
 
@@ -214,8 +213,12 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
 
   remove(): boolean {
     this.store.unregister(this);
-    this.pg.removeFromList(this);
+    if (this.pg) this.pg.removeFromList(this);
     this.removed = true;
+    if (this.station) {
+      this.station.removePlatform(this);
+      this.station = null;
+    }
     this.renderer.update();
     return true;
   }

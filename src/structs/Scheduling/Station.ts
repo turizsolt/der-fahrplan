@@ -10,4 +10,8 @@ export interface Station extends BaseBrick {
   getPlatforms(): Platform[];
   getCircle(): Circle;
   getColor(): Color;
+  addPlatform(platform: Platform): void;
+  removePlatform(platform: Platform): void;
+  remove(): boolean;
+  isRemoved(): boolean;
 }

@@ -46,27 +46,33 @@ export class StationBabylonRenderer extends BaseBabylonRenderer
   private lastSelected: boolean = false;
 
   update() {
-    this.meshes[0].position = CoordinateToBabylonVector3(
-      this.station.getCircle().a
-    );
-    this.meshes[0].position.y = 0.05;
-
-    if (this.selected && !this.lastSelected) {
-      this.selectableMeshes.map(
-        x =>
-          (x.material = this.meshProvider.getMaterial(MaterialName.SelectorRed))
+    if (this.station.isRemoved()) {
+      this.meshes.map(mesh => mesh.setEnabled(false));
+    } else {
+      this.meshes[0].position = CoordinateToBabylonVector3(
+        this.station.getCircle().a
       );
-    } else if (!this.selected && this.lastSelected) {
-      this.selectableMeshes.map(x => (x.material = this.myMat));
-    }
+      this.meshes[0].position.y = 0.05;
 
-    this.lastSelected = this.selected;
+      if (this.selected && !this.lastSelected) {
+        this.selectableMeshes.map(
+          x =>
+            (x.material = this.meshProvider.getMaterial(
+              MaterialName.SelectorRed
+            ))
+        );
+      } else if (!this.selected && this.lastSelected) {
+        this.selectableMeshes.map(x => (x.material = this.myMat));
+      }
+
+      this.lastSelected = this.selected;
+    }
   }
 
   process(command: string) {
     switch (command) {
       case 'delete':
-        //this.station.remove();
+        this.station.remove();
         break;
     }
   }
