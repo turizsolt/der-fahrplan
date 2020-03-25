@@ -245,7 +245,13 @@ export class InputController {
               renderer.setSelected(true);
               this.selected = storedObj;
               this.selectedMesh = this.downProps.mesh;
-              this.vmInfoBox.selectedId = id;
+
+              const sel = this.selected as any;
+              if (sel.getName) {
+                this.vmInfoBox.selectedId = sel.getName();
+              } else {
+                this.vmInfoBox.selectedId = id;
+              }
             }
           }
           ready = true;

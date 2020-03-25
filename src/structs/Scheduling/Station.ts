@@ -1,6 +1,7 @@
 import { BaseBrick } from '../Interfaces/BaseBrick';
 import { Circle } from '../Geometry/Circle';
 import { Platform } from '../Interfaces/Platform';
+import { Color } from '../Color';
 
 export interface Station extends BaseBrick {
   init(circle: Circle): Station;
@@ -8,4 +9,5 @@ export interface Station extends BaseBrick {
   setName(name: string);
   getPlatforms(): Platform[];
   getCircle(): Circle;
+  getColor(): Color;
 }
