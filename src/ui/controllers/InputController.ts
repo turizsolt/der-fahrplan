@@ -23,13 +23,15 @@ import { SelectInputHandler } from './SelectInputHandler';
 import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
 import { CreateEngineInputHandler } from './CreateEngineInputHandler';
 import { Store } from '../../structs/Interfaces/Store';
+import { CreateStationInputHandler } from './CreateStationInputHandler';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
   SELECT = 'SELECT',
   CREATE_TRACK = 'CREATE_TRACK',
   CREATE_PLATFORM = 'CREATE_PLATFORM',
-  CREATE_ENGINE = 'CREATE_ENGINE'
+  CREATE_ENGINE = 'CREATE_ENGINE',
+  CREATE_STATION = 'CREATE_STATION'
 }
 
 export class InputController {
@@ -75,7 +77,8 @@ export class InputController {
       [InputMode.SELECT]: new SelectInputHandler(),
       [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(),
       [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(),
-      [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler()
+      [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(),
+      [InputMode.CREATE_STATION]: new CreateStationInputHandler()
     };
 
     const modeNames = {
@@ -83,7 +86,8 @@ export class InputController {
       [InputMode.SELECT]: 'Sel',
       [InputMode.CREATE_TRACK]: '+Trac',
       [InputMode.CREATE_PLATFORM]: '+Plat',
-      [InputMode.CREATE_ENGINE]: '+Eng'
+      [InputMode.CREATE_ENGINE]: '+Eng',
+      [InputMode.CREATE_STATION]: '+Stat'
     };
 
     for (let mode of Object.keys(this.inputHandlers)) {
@@ -292,8 +296,12 @@ export class InputController {
         this.selectMode(InputMode.CREATE_PLATFORM);
         break;
 
-      case '9':
+      case '8':
         this.selectMode(InputMode.CREATE_ENGINE);
+        break;
+
+      case '9':
+        this.selectMode(InputMode.CREATE_STATION);
         break;
 
       case 'K':

@@ -5,11 +5,15 @@ import { Store } from '../Interfaces/Store';
 import { Circle } from '../Geometry/Circle';
 import { Coordinate } from '../Geometry/Coordinate';
 import { Platform } from '../Interfaces/Platform';
+import { StationRenderer } from '../Renderers/StationRenderer';
+import { TYPES } from '../TYPES';
+import { inject } from 'inversify';
 
 export class ActualStation extends ActualBaseBrick implements Station {
   private name: string;
   private circle: Circle;
   private platforms: Platform[];
+  @inject(TYPES.StationRenderer) private renderer: StationRenderer;
 
   init(circle: Circle): Station {
     super.initStore();
@@ -27,11 +31,18 @@ export class ActualStation extends ActualBaseBrick implements Station {
           this.platforms.push(platform);
         }
       });
+
+    this.renderer.init(this);
+
     return this;
   }
 
   getPlatforms(): Platform[] {
     return this.platforms;
+  }
+
+  getCircle(): Circle {
+    return this.circle;
   }
 
   getName(): string {
@@ -43,7 +54,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
   }
 
   getRenderer(): BaseRenderer {
-    throw new Error('Method not implemented.');
+    return this.renderer;
   }
 
   persist(): Object {

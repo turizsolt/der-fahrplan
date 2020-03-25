@@ -39,8 +39,8 @@ import { ActualRoute } from './Scheduling/ActualRoute';
 import { Station } from './Scheduling/Station';
 import { StationRenderer } from './Renderers/StationRenderer';
 import { ActualStation } from './Scheduling/ActualStation';
-import { StationDummyRenderer } from '../../test/dummies/StationDummyRenderer';
 import { Store } from './Interfaces/Store';
+import { StationBabylonRenderer } from '../ui/babylon/StationBabylonRenderer';
 
 export const babylonContainer = new Container();
 babylonContainer
@@ -161,7 +161,7 @@ babylonContainer
 babylonContainer.bind<Station>(TYPES.Station).to(ActualStation);
 babylonContainer
   .bind<StationRenderer>(TYPES.StationRenderer)
-  .to(StationDummyRenderer);
+  .to(StationBabylonRenderer);
 babylonContainer
   .bind<interfaces.Factory<Station>>(TYPES.FactoryOfStation)
   .toFactory<Station>((context: interfaces.Context) => {

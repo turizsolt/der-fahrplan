@@ -7,4 +7,5 @@ export interface Station extends BaseBrick {
   getName(): string;
   setName(name: string);
   getPlatforms(): Platform[];
+  getCircle(): Circle;
 }
