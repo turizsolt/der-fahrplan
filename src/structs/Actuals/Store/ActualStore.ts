@@ -11,21 +11,62 @@ import { Station } from '../../Scheduling/Station';
 import { RouteStop } from '../../Scheduling/RouteStop';
 import { Route } from '../../Scheduling/Route';
 import { Store } from '../../Interfaces/Store';
+import { Wagon } from '../../Interfaces/Wagon';
 
 @injectable()
 export class ActualStore implements Store {
   private elements: Record<string, BaseStorable>;
+  private typedElements: Record<symbol, BaseStorable[]>;
+  private factoryMethods: Record<symbol, () => any>;
+  private typeOrder: Record<symbol, number>;
 
   @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
   @inject(TYPES.FactoryOfRouteStop) private RouteStopFactory: () => RouteStop;
   @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
 
+  @inject(TYPES.FactoryOfTrack) private TrackFactory: () => Track;
+  @inject(TYPES.FactoryOfTrackSwitch)
+  private TrackSwitchFactory: () => TrackSwitch;
+  @inject(TYPES.FactoryOfTrackJoint)
+  private TrackJointFactory: () => TrackJoint;
+  @inject(TYPES.FactoryOfPlatform) private PlatformFactory: () => Platform;
+  @inject(TYPES.FactoryOfEngine) private EngineFactory: () => Engine;
+  @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
+
   init() {
     this.elements = {};
+    this.typedElements = {};
+    this.factoryMethods = {
+      [TYPES.Route]: this.RouteFactory,
+      [TYPES.RouteStop]: this.RouteStopFactory,
+      [TYPES.Station]: this.StationFactory,
+      [TYPES.Track]: this.TrackFactory,
+      [TYPES.TrackSwitch]: this.TrackSwitchFactory,
+      [TYPES.TrackJoint]: this.TrackJointFactory,
+      [TYPES.Platform]: this.PlatformFactory,
+      [TYPES.Engine]: this.EngineFactory,
+      [TYPES.Wagon]: this.WagonFactory
+    };
+    this.typeOrder = {
+      [TYPES.Station]: 12,
+      [TYPES.RouteStop]: 11,
+      [TYPES.Route]: 10,
+      [TYPES.Track]: 4,
+      [TYPES.TrackSwitch]: 3,
+      [TYPES.TrackJoint]: 2,
+      [TYPES.Platform]: 1,
+      [TYPES.Engine]: 0,
+      [TYPES.Wagon]: 0
+    };
     shortid.characters(
       '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_*'
     );
     return this;
+  }
+
+  create<T>(type: symbol): T {
+    if (!this.factoryMethods[type]) return null;
+    return this.factoryMethods[type]() as T;
   }
 
   clear() {
@@ -35,11 +76,19 @@ export class ActualStore implements Store {
   register(object: BaseStorable, presetId: string = null): string {
     let id = presetId || shortid.generate();
     this.elements[id] = object;
+
+    if (!this.typedElements[object.getType()]) {
+      this.typedElements[object.getType()] = [];
+    }
+    this.typedElements[object.getType()].push(object);
     return id;
   }
 
   unregister(object: BaseStorable): void {
     let id = object.getId();
+    this.typedElements[object.getType()] = this.typedElements[
+      object.getType()
+    ].filter(x => x.id !== id);
     delete this.elements[id];
   }
 
@@ -49,6 +98,10 @@ export class ActualStore implements Store {
 
   getAll(): Record<string, BaseStorable> {
     return this.elements;
+  }
+
+  getAllOf(type: symbol): BaseStorable[] {
+    return this.typedElements[type] || [];
   }
 
   getFiltered(filter: (b: BaseStorable) => boolean): BaseStorable[] {
@@ -71,61 +124,16 @@ export class ActualStore implements Store {
   }
 
   loadAll(arr: any[]) {
-    const fx = a => {
-      switch (a) {
-        case 'Engine':
-          return 0;
-        case 'Platform':
-          return 1;
-        case 'TrackJoint':
-          return 2;
-        case 'TrackSwitch':
-          return 3;
-        case 'Track':
-          return 4;
-        case 'Route':
-          return 10;
-        case 'RouteStop':
-          return 11;
-        case 'Station':
-          return 12;
-        default:
-          return 999;
-      }
-    };
+    const fx = a => this.typeOrder[Symbol.for(a)] || 999;
 
     arr.sort((a, b) => {
       return fx(b.type) - fx(a.type);
     });
 
     arr.map(elem => {
-      let brick: BaseStorable;
-      switch (elem.type) {
-        case 'Station':
-          brick = this.StationFactory();
-          break;
-        case 'RouteStop':
-          brick = this.RouteStopFactory();
-          break;
-        case 'Route':
-          brick = this.RouteFactory();
-          break;
-        // case 'Platform':
-        //   brick = babylonContainer.get<Platform>(TYPES.Platform);
-        //   break;
-        // case 'Track':
-        //   brick = babylonContainer.get<Track>(TYPES.Track);
-        //   break;
-        // case 'TrackSwitch':
-        //   brick = babylonContainer.get<TrackSwitch>(TYPES.TrackSwitch);
-        //   break;
-        // case 'TrackJoint':
-        //   brick = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
-        //   break;
-        // case 'Engine':
-        //   brick = babylonContainer.get<Engine>(TYPES.Engine);
-        //   break;
-      }
+      const brick: BaseStorable = this.create<BaseStorable>(
+        Symbol.for(elem.type)
+      );
 
       if (brick) {
         brick.load(elem, this);

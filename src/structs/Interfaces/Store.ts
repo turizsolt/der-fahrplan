@@ -7,7 +7,9 @@ export interface Store {
   unregister(object: BaseStorable): void;
   get(id: string): BaseStorable;
   getAll(): Record<string, BaseStorable>;
+  getAllOf(type: symbol): BaseStorable[];
   getFiltered(filter: (b: BaseStorable) => boolean): BaseStorable[];
   persistAll(): Object;
   loadAll(arr: any[]);
+  create<T>(type: symbol): T;
 }

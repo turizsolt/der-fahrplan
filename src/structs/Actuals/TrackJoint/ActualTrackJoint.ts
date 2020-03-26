@@ -26,7 +26,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   private connector: TrackJointConnector;
 
   init(x: number, z: number, rot: number): TrackJoint {
-    super.initStore();
+    super.initStore(TYPES.TrackJoint);
 
     this.connector = this.TrackJointConnectorFactory();
 

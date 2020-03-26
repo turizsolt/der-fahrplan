@@ -2,12 +2,13 @@ import { ActualBaseStorable } from '../Actuals/ActualStorable';
 import { Station } from './Station';
 import { RouteStop } from './RouteStop';
 import { Store } from '../Interfaces/Store';
+import { TYPES } from '../TYPES';
 
 export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
   private station: Station;
 
   init(station: Station): RouteStop {
-    super.initStore();
+    super.initStore(TYPES.RouteStop);
     this.station = station;
     return this;
   }

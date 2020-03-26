@@ -21,7 +21,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
   @inject(TYPES.StationRenderer) private renderer: StationRenderer;
 
   init(circle: Circle): Station {
-    super.initStore();
+    super.initStore(TYPES.Station);
     this.circle = circle;
     this.name = NameGenerator.next();
     this.platforms = [];

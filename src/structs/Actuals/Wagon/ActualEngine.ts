@@ -21,7 +21,7 @@ export class ActualEngine extends ActualBaseBrick implements Engine {
   @inject(TYPES.EngineRenderer) private renderer: EngineRenderer;
 
   init(): Engine {
-    super.initStore();
+    super.initStore(TYPES.Engine);
     return this;
   }
 

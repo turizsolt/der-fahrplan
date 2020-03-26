@@ -112,7 +112,7 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     color: Color,
     pg: PassengerGenerator
   ): Platform {
-    super.initStore();
+    super.initStore(TYPES.Platform);
 
     const segment = track.getSegment();
     const a = segment.getFirstPoint();

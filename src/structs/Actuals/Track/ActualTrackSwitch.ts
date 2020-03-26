@@ -36,7 +36,7 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   @inject(TYPES.TrackSwitchRenderer) private renderer: TrackSwitchRenderer;
 
   init(coordinates1: Coordinate[], coordinates2: Coordinate[]): TrackSwitch {
-    super.initStore();
+    super.initStore(TYPES.TrackSwitch);
 
     this.D = new TrackEnd(WhichEnd.A, this);
     this.E = new TrackSwitchEnd(WhichEnd.B, this);

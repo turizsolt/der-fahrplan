@@ -38,7 +38,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.removed;
   }
   init(): Wagon {
-    super.initStore();
+    super.initStore(TYPES.Wagon);
 
     this.ends = {
       [WhichEnd.A]: new WagonEnd(WhichEnd.A, this),

@@ -18,7 +18,7 @@ export class ActualTrack extends ActualTrackBase implements Track {
   @inject(TYPES.TrackRenderer) private renderer: TrackRenderer;
 
   init(coordinates: Coordinate[]): Track {
-    super.initStore();
+    super.initStore(TYPES.Track);
 
     this.A = new TrackEnd(WhichEnd.A, this);
     this.B = new TrackEnd(WhichEnd.B, this);
