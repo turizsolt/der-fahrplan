@@ -40,15 +40,7 @@ describe('Station', () => {
       new Coordinate(-100, 0, 0),
       new Coordinate(100, 0, 0)
     ]);
-    const platform = PlatformFactory().init(
-      track,
-      0,
-      1,
-      5,
-      Side.Left,
-      null,
-      null
-    );
+    const platform = PlatformFactory().init(track, 0, 1, Side.Left);
 
     const station = StationFactory().init(
       new Circle(new Coordinate(0, 0, 0), 20)
@@ -67,15 +59,7 @@ describe('Station', () => {
       new Coordinate(-100, 0, 0),
       new Coordinate(100, 0, 0)
     ]);
-    const platform = PlatformFactory().init(
-      track,
-      0,
-      1,
-      5,
-      Side.Left,
-      null,
-      null
-    );
+    const platform = PlatformFactory().init(track, 0, 1, Side.Left);
 
     expect(station.getPlatforms()).deep.equals([platform]);
     expect(platform.getStation()).equals(station);
@@ -86,15 +70,7 @@ describe('Station', () => {
       new Coordinate(-100, 0, 0),
       new Coordinate(100, 0, 0)
     ]);
-    const platform = PlatformFactory().init(
-      track,
-      0,
-      0.5,
-      5,
-      Side.Left,
-      null,
-      null
-    );
+    const platform = PlatformFactory().init(track, 0, 0.5, Side.Left);
 
     const station = StationFactory().init(
       new Circle(new Coordinate(50, 0, 0), 20)
@@ -108,15 +84,7 @@ describe('Station', () => {
       new Coordinate(-100, 0, 0),
       new Coordinate(100, 0, 0)
     ]);
-    const platform = PlatformFactory().init(
-      track,
-      0,
-      1,
-      5,
-      Side.Left,
-      null,
-      null
-    );
+    const platform = PlatformFactory().init(track, 0, 1, Side.Left);
 
     const station = StationFactory().init(
       new Circle(new Coordinate(0, 0, 0), 20)
@@ -136,15 +104,7 @@ describe('Station', () => {
       new Coordinate(-100, 0, 0),
       new Coordinate(100, 0, 0)
     ]);
-    const platform = PlatformFactory().init(
-      track,
-      0,
-      1,
-      5,
-      Side.Left,
-      null,
-      null
-    );
+    const platform = PlatformFactory().init(track, 0, 1, Side.Left);
 
     const station = StationFactory().init(
       new Circle(new Coordinate(0, 0, 0), 20)
@@ -165,15 +125,7 @@ describe('Station', () => {
       new Coordinate(-100, 0, 0),
       new Coordinate(100, 0, 0)
     ]);
-    const platform = PlatformFactory().init(
-      track,
-      0,
-      1,
-      5,
-      Side.Left,
-      null,
-      null
-    );
+    const platform = PlatformFactory().init(track, 0, 1, Side.Left);
 
     const station = StationFactory().init(
       new Circle(new Coordinate(0, 0, 0), 20)

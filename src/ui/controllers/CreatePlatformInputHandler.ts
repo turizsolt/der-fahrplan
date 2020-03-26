@@ -156,10 +156,8 @@ export class CreatePlatformInputHandler implements InputHandler {
         pot.track,
         Math.min(pot.position, dpot.position),
         Math.max(pot.position, dpot.position),
-        7.5,
         side > 0 ? Side.Left : Side.Right,
-        randomColor(),
-        null
+        7.5
       );
     }
 
@@ -173,8 +171,4 @@ export class CreatePlatformInputHandler implements InputHandler {
     this.toMesh.setEnabled(false);
     this.pathMesh.setEnabled(false);
   }
-}
-
-function randomColor() {
-  return new Color(Math.random(), Math.random(), Math.random());
 }

@@ -35,9 +35,7 @@ export interface Platform extends BaseBrick {
     track: TrackBase,
     start: number,
     end: number,
-    width: number,
     side: Side,
-    color: Color,
-    pg: PassengerGenerator
+    width?: number
   ): Platform;
 }

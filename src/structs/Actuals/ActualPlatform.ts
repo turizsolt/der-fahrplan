@@ -106,10 +106,8 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     track: TrackBase,
     start: number,
     end: number,
-    width: number,
     side: Side,
-    color: Color,
-    pg: PassengerGenerator
+    width: number = 5
   ): Platform {
     super.initStore(TYPES.Platform);
 
@@ -243,10 +241,8 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
       store.get(obj.track) as TrackBase,
       obj.start,
       obj.end,
-      obj.width,
       obj.side,
-      null,
-      null
+      obj.width
     );
   }
 }
