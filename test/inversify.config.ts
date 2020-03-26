@@ -38,11 +38,19 @@ import { ActualRoute } from '../src/structs/Scheduling/ActualRoute';
 import { RouteStop } from '../src/structs/Scheduling/RouteStop';
 import { ActualRouteStop } from '../src/structs/Scheduling/ActualRouteStop';
 import { Store } from '../src/structs/Interfaces/Store';
+import { Passenger } from '../src/structs/Interfaces/Passenger';
+import { ActualPassenger } from '../src/structs/Actuals/ActualPassenger';
+import { PassengerGenerator } from '../src/structs/Actuals/PassengerGenerator';
+import { ActualPassengerGenerator } from '../src/structs/Actuals/ActualPassengerGenerator';
 
 export const testContainer = new Container();
 testContainer
   .bind<PassengerRenderer>(TYPES.PassengerRenderer)
   .to(PassengerDummyRenderer);
+testContainer
+  .bind<PassengerGenerator>(TYPES.PassengerGenerator)
+  .to(ActualPassengerGenerator);
+testContainer.bind<Passenger>(TYPES.Passenger).to(ActualPassenger);
 testContainer
   .bind<EngineRenderer>(TYPES.EngineRenderer)
   .to(EngineDummyRenderer);
@@ -171,5 +179,13 @@ testContainer
   .toFactory<RouteStop>((context: interfaces.Context) => {
     return () => {
       return context.container.get<RouteStop>(TYPES.RouteStop);
+    };
+  });
+
+testContainer
+  .bind<interfaces.Factory<Passenger>>(TYPES.FactoryOfPassenger)
+  .toFactory<Passenger>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Passenger>(TYPES.Passenger);
     };
   });

@@ -41,11 +41,19 @@ import { StationRenderer } from './Renderers/StationRenderer';
 import { ActualStation } from './Scheduling/ActualStation';
 import { Store } from './Interfaces/Store';
 import { StationBabylonRenderer } from '../ui/babylon/StationBabylonRenderer';
+import { Passenger } from './Interfaces/Passenger';
+import { ActualPassenger } from './Actuals/ActualPassenger';
+import { PassengerGenerator } from './Actuals/PassengerGenerator';
+import { ActualPassengerGenerator } from './Actuals/ActualPassengerGenerator';
 
 export const babylonContainer = new Container();
 babylonContainer
   .bind<PassengerRenderer>(TYPES.PassengerRenderer)
   .to(PassengerBabylonRenderer);
+babylonContainer
+  .bind<PassengerGenerator>(TYPES.PassengerGenerator)
+  .to(ActualPassengerGenerator);
+babylonContainer.bind<Passenger>(TYPES.Passenger).to(ActualPassenger);
 babylonContainer
   .bind<EngineRenderer>(TYPES.EngineRenderer)
   .to(EngineBabylonRenderer);
@@ -185,5 +193,20 @@ babylonContainer
   .toFactory<RouteStop>((context: interfaces.Context) => {
     return () => {
       return context.container.get<RouteStop>(TYPES.RouteStop);
+    };
+  });
+babylonContainer
+  .bind<interfaces.Factory<TrackJoint>>(TYPES.FactoryOfTrackJoint)
+  .toFactory<TrackJoint>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<TrackJoint>(TYPES.TrackJoint);
+    };
+  });
+
+babylonContainer
+  .bind<interfaces.Factory<Passenger>>(TYPES.FactoryOfPassenger)
+  .toFactory<Passenger>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Passenger>(TYPES.Passenger);
     };
   });

@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { Engine } from '../../Interfaces/Engine';
 import { PositionOnTrack } from '../Track/PositionOnTrack';
-import { Passenger } from '../Passenger';
+import { Passenger } from '../../Interfaces/Passenger';
 import { EngineRenderer } from '../../Renderers/EngineRenderer';
 import { TrackBase } from '../../Interfaces/TrackBase';
 import { Coordinate } from '../../Geometry/Coordinate';

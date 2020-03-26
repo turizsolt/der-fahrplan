@@ -1,5 +1,5 @@
 import { Engine } from './Engine';
-import { Passenger } from '../Actuals/Passenger';
+import { Passenger } from './Passenger';
 import { Coordinate } from '../Geometry/Coordinate';
 import { Color } from '../Color';
 import { Side } from './Side';

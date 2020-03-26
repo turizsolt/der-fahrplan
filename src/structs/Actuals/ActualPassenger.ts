@@ -3,18 +3,35 @@ import { Platform } from '../Interfaces/Platform';
 import { PassengerRenderer } from '../Renderers/PassengerRenderer';
 import { Coordinate } from '../Geometry/Coordinate';
 import { TYPES } from '../TYPES';
-import { babylonContainer } from '../inversify.config';
+import { Passenger } from '../Interfaces/Passenger';
+import { ActualBaseBrick } from './ActualBaseBrick';
+import { BaseRenderer } from '../Renderers/BaseRenderer';
+import { injectable, inject } from 'inversify';
 
-export class Passenger {
-  readonly id: number;
+@injectable()
+export class ActualPassenger extends ActualBaseBrick implements Passenger {
+  getRenderer(): BaseRenderer {
+    return this.renderer;
+  }
+  persist(): Object {
+    throw new Error('Method not implemented.');
+  }
+  load(obj: Object, store: import('../Interfaces/Store').Store): void {
+    throw new Error('Method not implemented.');
+  }
   public onPlatform: Platform = null;
   public onEngine: Engine = null;
   public position: Coordinate;
   public offset: Coordinate;
-  private renderer: PassengerRenderer;
+  @inject(TYPES.PassengerRenderer) private renderer: PassengerRenderer;
+  private to: Platform;
+  private from: Platform;
 
-  constructor(readonly to: Platform, readonly from: Platform) {
-    this.id = (Math.random() * 1000000) | 0;
+  init(to: Platform, from: Platform) {
+    super.initStore(TYPES.Passenger);
+    this.to = to;
+    this.from = from;
+
     this.onPlatform = from;
 
     const dist = Math.random() * 2;
@@ -27,10 +44,8 @@ export class Passenger {
 
     this.position = from.getPosition().add(this.offset);
 
-    this.renderer = babylonContainer.get<PassengerRenderer>(
-      TYPES.PassengerRenderer
-    );
     this.renderer.init(this);
+    return this;
   }
 
   updatePosition() {
@@ -67,5 +82,17 @@ export class Passenger {
     this.onEngine = null;
 
     this.updatePosition();
+  }
+
+  getPosition(): Coordinate {
+    return this.position;
+  }
+
+  getTo(): Platform {
+    return this.to;
+  }
+
+  isOnPlatformOrEngine(): boolean {
+    return !!this.onEngine || !!this.onPlatform;
   }
 }

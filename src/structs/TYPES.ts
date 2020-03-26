@@ -20,7 +20,11 @@ export const TYPES = {
   TrackSwitchRenderer: Symbol.for('TrackSwitchRenderer'),
   FactoryOfTrackSwitch: Symbol.for('Factory<TrackSwitch>'),
 
+  Passenger: Symbol.for('Passenger'),
   PassengerRenderer: Symbol.for('PassengerRenderer'),
+  FactoryOfPassenger: Symbol.for('Factory<Passenger>'),
+
+  PassengerGenerator: Symbol.for('PassengerGenerator'),
 
   Platform: Symbol.for('Platform'),
   PlatformRenderer: Symbol.for('PlatformRenderer'),

@@ -12,6 +12,7 @@ import { RouteStop } from '../../Scheduling/RouteStop';
 import { Route } from '../../Scheduling/Route';
 import { Store } from '../../Interfaces/Store';
 import { Wagon } from '../../Interfaces/Wagon';
+import { Passenger } from '../../Interfaces/Passenger';
 
 @injectable()
 export class ActualStore implements Store {
@@ -23,6 +24,7 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
   @inject(TYPES.FactoryOfRouteStop) private RouteStopFactory: () => RouteStop;
   @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
+  @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
 
   @inject(TYPES.FactoryOfTrack) private TrackFactory: () => Track;
   @inject(TYPES.FactoryOfTrackSwitch)
@@ -40,6 +42,7 @@ export class ActualStore implements Store {
       [TYPES.Route]: this.RouteFactory,
       [TYPES.RouteStop]: this.RouteStopFactory,
       [TYPES.Station]: this.StationFactory,
+      [TYPES.Passenger]: this.PassengerFactory,
       [TYPES.Track]: this.TrackFactory,
       [TYPES.TrackSwitch]: this.TrackSwitchFactory,
       [TYPES.TrackJoint]: this.TrackJointFactory,
@@ -56,7 +59,8 @@ export class ActualStore implements Store {
       [TYPES.TrackJoint]: 2,
       [TYPES.Platform]: 1,
       [TYPES.Engine]: 0,
-      [TYPES.Wagon]: 0
+      [TYPES.Wagon]: 0,
+      [TYPES.Passenger]: -1
     };
     shortid.characters(
       '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_*'
@@ -100,7 +104,7 @@ export class ActualStore implements Store {
     return this.elements;
   }
 
-  getAllOf(type: symbol): BaseStorable[] {
+  getAllOf<T extends BaseStorable>(type: symbol): T[] {
     return this.typedElements[type] || [];
   }
 

@@ -1,5 +1,5 @@
 import { Engine } from '../Interfaces/Engine';
-import { Passenger } from './Passenger';
+import { Passenger } from '../Interfaces/Passenger';
 import { Side } from '../Interfaces/Side';
 import { TrackBase } from '../Interfaces/TrackBase';
 import { Coordinate } from '../Geometry/Coordinate';
@@ -31,7 +31,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
   private side: Side;
   private station: Station;
   private removed: boolean = false;
-  private pg: PassengerGenerator;
 
   @inject(TYPES.PlatformRenderer) private renderer: PlatformRenderer;
 
@@ -130,7 +129,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     this.end = end;
     this.width = width;
     this.side = side;
-    this.pg = pg;
 
     track.addPlatform(this);
 
@@ -213,7 +211,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
 
   remove(): boolean {
     this.store.unregister(this);
-    if (this.pg) this.pg.removeFromList(this);
     this.removed = true;
     if (this.station) {
       this.station.removePlatform(this);

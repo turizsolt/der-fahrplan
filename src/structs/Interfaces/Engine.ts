@@ -1,4 +1,4 @@
-import { Passenger } from '../Actuals/Passenger';
+import { Passenger } from './Passenger';
 import { Track } from './Track';
 import { TrackBase } from './TrackBase';
 import { Ray } from '../Geometry/Ray';
