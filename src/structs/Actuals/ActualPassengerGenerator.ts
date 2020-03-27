@@ -4,6 +4,7 @@ import { PassengerGenerator } from './PassengerGenerator';
 import { injectable, inject } from 'inversify';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../TYPES';
+import { Station } from '../Scheduling/Station';
 
 @injectable()
 export class ActualPassengerGenerator implements PassengerGenerator {
@@ -19,19 +20,18 @@ export class ActualPassengerGenerator implements PassengerGenerator {
   }
 
   tick() {
-    const platformList = this.store.getAllOf<Platform>(TYPES.Platform);
-    if (platformList.length === 0) return;
+    const stationList = this.store.getAllOf<Station>(TYPES.Station);
+    if (stationList.length === 0) return;
 
     if (Math.random() < 0.8) {
-      const length = platformList.length;
+      const length = stationList.length;
       const fromIdx = (Math.random() * length) | 0;
       const toIdx = (Math.random() * length) | 0;
       if (toIdx !== fromIdx) {
         const passenger = this.PassengerFactory().init(
-          platformList[toIdx],
-          platformList[fromIdx]
+          stationList[toIdx],
+          stationList[fromIdx]
         );
-        platformList[fromIdx].addPassenger(passenger);
       }
     }
   }
