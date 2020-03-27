@@ -4,6 +4,8 @@ import { Ray } from '../Geometry/Ray';
 import { Track } from './Track';
 import { PositionOnTrack } from '../Actuals/Track/PositionOnTrack';
 import { WhichEnd } from '../Interfaces/WhichEnd';
+import { Route } from '../Scheduling/Route';
+import { Platform } from './Platform';
 
 export interface Wagon extends BaseBrick {
   init(): Wagon;
@@ -20,6 +22,9 @@ export interface Wagon extends BaseBrick {
   getNearestWagon(end: WhichEnd): NearestWagon;
   swapEnds(): void;
   pullToPos(pot: PositionOnTrack, dir: number): void;
+
+  assignTrip(route: Route): void;
+  stoppedAt(platform: Platform): void;
 }
 
 export interface NearestWagon {

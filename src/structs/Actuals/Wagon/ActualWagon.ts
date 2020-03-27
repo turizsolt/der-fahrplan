@@ -12,6 +12,9 @@ import { LineSegment } from '../../Geometry/LineSegment';
 import { TrackWorm } from '../Track/TrackWorm';
 import { WagonEnd } from './WagonEnd';
 import { Store } from '../../Interfaces/Store';
+import { Route } from '../../Scheduling/Route';
+import { Platform } from '../../Interfaces/Platform';
+import { Passenger } from '../../Interfaces/Passenger';
 
 const WAGON_GAP: number = 1;
 
@@ -19,8 +22,33 @@ const WAGON_GAP: number = 1;
 export class ActualWagon extends ActualBaseBrick implements Wagon {
   private removed: boolean = false;
   protected worm: TrackWorm;
+  protected trip: Route;
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
+
+  assignTrip(route: Route): void {
+    this.trip = route;
+    for (let stop of this.trip.getStops()) {
+      stop.getStation().announce(this.trip);
+    }
+  }
+
+  stoppedAt(platform: Platform): void {
+    if (platform.getStation()) {
+      platform.getStation().announceArrived(this, platform, this.trip);
+    }
+    this.announceStoppedAt(platform);
+  }
+
+  announceStoppedAt(platform: Platform): void {
+    const station = platform.getStation();
+    this.store
+      .getAllOf<Passenger>(TYPES.Passenger)
+      .filter(p => p.getPlace() === this)
+      .map(p => {
+        p.listenWagonStoppedAtAnnouncement(station, platform, this, this.trip);
+      });
+  }
 
   getLength(): number {
     return 14;

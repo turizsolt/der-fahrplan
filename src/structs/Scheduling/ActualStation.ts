@@ -10,6 +10,9 @@ import { TYPES } from '../TYPES';
 import { inject } from 'inversify';
 import { Color } from '../Color';
 import { NameGenerator } from '../NameGenerator';
+import { Route } from './Route';
+import { Passenger } from '../Interfaces/Passenger';
+import { Wagon } from '../Interfaces/Wagon';
 
 export class ActualStation extends ActualBaseBrick implements Station {
   private name: string;
@@ -19,6 +22,29 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
   private removed: boolean = false;
   @inject(TYPES.StationRenderer) private renderer: StationRenderer;
+
+  private announcedTrips: Route[] = [];
+
+  announce(trip: Route) {
+    this.announcedTrips.push(trip);
+    this.store
+      .getAllOf<Passenger>(TYPES.Passenger)
+      .filter(p => p.getPlace() === this)
+      .map(p => {
+        p.listenStationAnnouncement(this, trip);
+      });
+  }
+
+  announceArrived(wagon: Wagon, platform: Platform, trip: Route) {
+    this.store
+      .getAllOf<Passenger>(TYPES.Passenger)
+      .filter(p => p.getPlace() === platform)
+      .map(p => {
+        p.listenStationArrivingAnnouncement(this, platform, wagon, trip);
+      });
+
+    this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
+  }
 
   init(circle: Circle): Station {
     super.initStore(TYPES.Station);

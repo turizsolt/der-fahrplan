@@ -7,9 +7,75 @@ import { Passenger } from '../Interfaces/Passenger';
 import { ActualBaseBrick } from './ActualBaseBrick';
 import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { injectable, inject } from 'inversify';
+import { Station } from '../Scheduling/Station';
+import { BaseBrick } from '../Interfaces/BaseBrick';
+import { Route } from '../Scheduling/Route';
+import { Wagon } from '../Interfaces/Wagon';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
+  private to: Station;
+  private from: Station;
+  private place: BaseBrick;
+
+  init(from: Station, to: Station) {
+    super.initStore(TYPES.Passenger);
+    this.to = to;
+    this.from = from;
+    this.place = from;
+
+    this.renderer.init(this);
+    return this;
+  }
+
+  listenStationAnnouncement(station: Station, trip: Route): void {
+    if (this.place !== station) return;
+
+    const fromIndex = trip
+      .getStops()
+      .findIndex(st => st.getStation() === station);
+    if (fromIndex === -1) return;
+
+    const fromStop = trip.getStops()[fromIndex];
+    const toStop = trip
+      .getStops()
+      .slice(fromIndex + 1)
+      .find(st => st.getStation() === this.to);
+    if (!toStop) return;
+
+    if (fromStop.getPlatform()) {
+      this.place = fromStop.getPlatform();
+    }
+  }
+
+  listenStationArrivingAnnouncement(
+    station: Station,
+    platform: Platform,
+    wagon: Wagon,
+    trip: Route
+  ) {
+    if (this.place === platform) {
+      this.place = wagon;
+    }
+  }
+
+  listenWagonStoppedAtAnnouncement(
+    station: Station,
+    platform: Platform,
+    wagon: Wagon,
+    trip: Route
+  ) {
+    if (this.to === station) {
+      this.place = null;
+    }
+  }
+
+  getPlace(): BaseBrick {
+    return this.place;
+  }
+
+  /************/
+
   getRenderer(): BaseRenderer {
     return this.renderer;
   }
@@ -24,29 +90,6 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   public position: Coordinate;
   public offset: Coordinate;
   @inject(TYPES.PassengerRenderer) private renderer: PassengerRenderer;
-  private to: Platform;
-  private from: Platform;
-
-  init(to: Platform, from: Platform) {
-    super.initStore(TYPES.Passenger);
-    this.to = to;
-    this.from = from;
-
-    this.onPlatform = from;
-
-    const dist = Math.random() * 2;
-    const rad = Math.random() * Math.PI * 2;
-    this.offset = new Coordinate(
-      Math.sin(rad) * dist,
-      2.5,
-      Math.cos(rad) * dist
-    );
-
-    this.position = from.getPosition().add(this.offset);
-
-    this.renderer.init(this);
-    return this;
-  }
 
   updatePosition() {
     if (this.onPlatform) {
@@ -68,7 +111,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   }
 
   isArrivedAt(platform: Platform) {
-    return platform === this.to;
+    return false; //platform === this.to;
   }
 
   checkShouldGetOffAt(platform: Platform) {
@@ -89,7 +132,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   }
 
   getTo(): Platform {
-    return this.to;
+    return null; //this.to;
   }
 
   isOnPlatformOrEngine(): boolean {
