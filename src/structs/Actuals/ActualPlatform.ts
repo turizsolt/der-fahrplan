@@ -1,4 +1,3 @@
-import { Engine } from '../Interfaces/Engine';
 import { Passenger } from '../Interfaces/Passenger';
 import { Side } from '../Interfaces/Side';
 import { TrackBase } from '../Interfaces/TrackBase';
@@ -19,7 +18,6 @@ import { Station } from '../Scheduling/Station';
 export class ActualPlatform extends ActualBaseBrick implements Platform {
   private position: Coordinate;
   private rotation: number;
-  private carList: Engine[];
   private passengerList: Passenger[] = [];
 
   private track: TrackBase;
@@ -163,8 +161,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     const rot1 = Math.atan2(rot.x, rot.z);
     this.rotation = rot1;
 
-    this.carList = [];
-
     this.renderer.init(this);
 
     this.store
@@ -179,28 +175,12 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     return this;
   }
 
-  checkin(engine: Engine) {
-    this.carList.push(engine);
-  }
-
-  checkout(engine: Engine) {
-    this.carList = this.carList.filter(elem => elem !== engine);
-  }
-
-  isChecked(engine: Engine) {
-    return this.carList.filter(elem => elem === engine).length > 0;
-  }
-
   addPassenger(passenger: Passenger) {
     this.passengerList.push(passenger);
   }
 
   removePassenger(passenger: Passenger) {
     this.passengerList = this.passengerList.filter(x => x !== passenger);
-  }
-
-  callForDepartingPassengers(engine: Engine) {
-    this.passengerList.map(x => x.checkTrain(engine));
   }
 
   isBeside(position: number): boolean {

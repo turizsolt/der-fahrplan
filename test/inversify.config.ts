@@ -3,16 +3,12 @@ import { Container, interfaces } from 'inversify';
 import { PassengerRenderer } from '../src/structs/Renderers/PassengerRenderer';
 import { TYPES } from '../src/structs/TYPES';
 import { PassengerDummyRenderer } from './dummies/PassengerDummyRenderer';
-import { EngineRenderer } from '../src/structs/Renderers/EngineRenderer';
-import { EngineDummyRenderer } from './dummies/EngineDummyRenderer';
 import { TrackJointRenderer } from '../src/structs/Renderers/TrackJointRenderer';
 import { TrackJointDummyRenderer } from './dummies/TrackJointDummyRenderer';
 import { TrackRenderer } from '../src/structs/Renderers/TrackRenderer';
 import { TrackDummyRenderer } from './dummies/TrackDummyRenderer';
 import { TrackSwitchRenderer } from '../src/structs/Renderers/TrackSwitchRenderer';
 import { TrackSwitchDummyRenderer } from './dummies/TrackSwitchDummyRenderer';
-import { ActualEngine } from '../src/structs/Actuals/Wagon/ActualEngine';
-import { Engine } from '../src/structs/Interfaces/Engine';
 import { Track } from '../src/structs/Interfaces/Track';
 import { ActualTrack } from '../src/structs/Actuals/Track/ActualTrack';
 import { TrackSwitch } from '../src/structs/Interfaces/TrackSwitch';
@@ -51,9 +47,6 @@ testContainer
   .bind<PassengerGenerator>(TYPES.PassengerGenerator)
   .to(ActualPassengerGenerator);
 testContainer.bind<Passenger>(TYPES.Passenger).to(ActualPassenger);
-testContainer
-  .bind<EngineRenderer>(TYPES.EngineRenderer)
-  .to(EngineDummyRenderer);
 testContainer.bind<WagonRenderer>(TYPES.WagonRenderer).to(WagonDummyRenderer);
 testContainer
   .bind<TrackJointRenderer>(TYPES.TrackJointRenderer)
@@ -66,7 +59,6 @@ testContainer
   .bind<PlatformRenderer>(TYPES.PlatformRenderer)
   .to(PlatformDummyRenderer);
 
-testContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
 testContainer.bind<Wagon>(TYPES.Wagon).to(ActualWagon);
 testContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 testContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
@@ -101,14 +93,6 @@ testContainer
         store = context.container.get<Store>(TYPES.Store).init();
       }
       return store;
-    };
-  });
-
-testContainer
-  .bind<interfaces.Factory<Engine>>(TYPES.FactoryOfEngine)
-  .toFactory<Engine>((context: interfaces.Context) => {
-    return () => {
-      return context.container.get<Engine>(TYPES.Engine);
     };
   });
 

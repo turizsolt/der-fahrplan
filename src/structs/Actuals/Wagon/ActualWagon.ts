@@ -106,14 +106,12 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   ): void {
     this.ends.A.positionOnTrack = new PositionOnTrack(
       track,
-      null,
       position,
       direction
     );
 
     this.ends.B.positionOnTrack = new PositionOnTrack(
       track,
-      null,
       position,
       direction
     );

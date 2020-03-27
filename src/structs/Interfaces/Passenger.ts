@@ -1,4 +1,3 @@
-import { Engine } from './Engine';
 import { Platform } from './Platform';
 import { BaseBrick } from './BaseBrick';
 import { Coordinate } from '../Geometry/Coordinate';
@@ -23,12 +22,13 @@ export interface Passenger extends BaseBrick {
     trip: Route
   );
 
-  updatePosition();
-  checkTrain(engine: Engine);
-  isArrivedAt(platform: Platform);
-  checkShouldGetOffAt(platform: Platform);
-  getOff();
+  //updatePosition();
+  //checkTrain(engine: Engine);
+  //isArrivedAt(platform: Platform);
+  //checkShouldGetOffAt(platform: Platform);
+  //getOff();
 
+  // renderer
   getPosition(): Coordinate;
   getTo(): Platform;
   isOnPlatformOrEngine(): boolean;

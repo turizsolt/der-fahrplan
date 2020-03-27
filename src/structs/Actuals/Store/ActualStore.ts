@@ -6,7 +6,6 @@ import { TYPES } from '../../TYPES';
 import { Track } from '../../Interfaces/Track';
 import { TrackSwitch } from '../../Interfaces/TrackSwitch';
 import { TrackJoint } from '../../Interfaces/TrackJoint';
-import { Engine } from '../../Interfaces/Engine';
 import { Station } from '../../Scheduling/Station';
 import { RouteStop } from '../../Scheduling/RouteStop';
 import { Route } from '../../Scheduling/Route';
@@ -32,7 +31,6 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfTrackJoint)
   private TrackJointFactory: () => TrackJoint;
   @inject(TYPES.FactoryOfPlatform) private PlatformFactory: () => Platform;
-  @inject(TYPES.FactoryOfEngine) private EngineFactory: () => Engine;
   @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
 
   init() {
@@ -47,7 +45,6 @@ export class ActualStore implements Store {
       [TYPES.TrackSwitch]: this.TrackSwitchFactory,
       [TYPES.TrackJoint]: this.TrackJointFactory,
       [TYPES.Platform]: this.PlatformFactory,
-      [TYPES.Engine]: this.EngineFactory,
       [TYPES.Wagon]: this.WagonFactory
     };
     this.typeOrder = {
@@ -58,7 +55,6 @@ export class ActualStore implements Store {
       [TYPES.TrackSwitch]: 3,
       [TYPES.TrackJoint]: 2,
       [TYPES.Platform]: 1,
-      [TYPES.Engine]: 0,
       [TYPES.Wagon]: 0,
       [TYPES.Passenger]: -1
     };

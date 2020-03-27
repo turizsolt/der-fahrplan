@@ -1,4 +1,3 @@
-import { Engine } from '../Interfaces/Engine';
 import { Platform } from '../Interfaces/Platform';
 import { PassengerRenderer } from '../Renderers/PassengerRenderer';
 import { Coordinate } from '../Geometry/Coordinate';
@@ -85,47 +84,10 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   load(obj: Object, store: import('../Interfaces/Store').Store): void {
     throw new Error('Method not implemented.');
   }
-  public onPlatform: Platform = null;
-  public onEngine: Engine = null;
+
   public position: Coordinate;
   public offset: Coordinate;
   @inject(TYPES.PassengerRenderer) private renderer: PassengerRenderer;
-
-  updatePosition() {
-    if (this.onPlatform) {
-      this.position = this.onPlatform.getPosition().add(this.offset);
-    } else if (this.onEngine) {
-      this.position = this.onEngine.getPosition().add(this.offset);
-    }
-    this.renderer.update();
-  }
-
-  checkTrain(engine: Engine) {
-    engine.getOn(this);
-    this.onEngine = engine;
-
-    this.onPlatform.removePassenger(this);
-    this.onPlatform = null;
-
-    this.updatePosition();
-  }
-
-  isArrivedAt(platform: Platform) {
-    return false; //platform === this.to;
-  }
-
-  checkShouldGetOffAt(platform: Platform) {
-    if (this.isArrivedAt(platform)) {
-      this.getOff();
-    }
-  }
-
-  getOff() {
-    this.onEngine.getOff(this);
-    this.onEngine = null;
-
-    this.updatePosition();
-  }
 
   getPosition(): Coordinate {
     return this.position;
@@ -136,6 +98,6 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   }
 
   isOnPlatformOrEngine(): boolean {
-    return !!this.onEngine || !!this.onPlatform;
+    return true;
   }
 }

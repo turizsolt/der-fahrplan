@@ -18,7 +18,7 @@ describe('Position on track', () => {
       new Coordinate(0, 0, 0),
       new Coordinate(100, 0, 0)
     ]);
-    const p1 = new PositionOnTrack(t, null, 0, 1);
+    const p1 = new PositionOnTrack(t, 0, 1);
     p1.move(1);
 
     expect(p1.getRay()).deep.equals(new Ray(new Coordinate(1, 0, 0), Right));
@@ -29,7 +29,7 @@ describe('Position on track', () => {
       new Coordinate(0, 0, 0),
       new Coordinate(100, 0, 0)
     ]);
-    const p1 = new PositionOnTrack(t, null, 0, 1);
+    const p1 = new PositionOnTrack(t, 0, 1);
     p1.hop(10);
 
     expect(p1.getRay()).deep.equals(new Ray(new Coordinate(10, 0, 0), Right));
@@ -41,7 +41,7 @@ describe('Position on track', () => {
       new Coordinate(10, 0, 0),
       new Coordinate(20, 0, 10)
     ]);
-    const p1 = new PositionOnTrack(t, null, 0, 1);
+    const p1 = new PositionOnTrack(t, 0, 1);
     p1.hop(10);
 
     expect(p1.getRay()).deep.almost(
@@ -60,7 +60,7 @@ describe('Position on track', () => {
     ]);
     t1.getB().connect(t2.getA());
 
-    const p1 = new PositionOnTrack(t1, null, 0, 1);
+    const p1 = new PositionOnTrack(t1, 0, 1);
     p1.hop(15);
 
     expect(p1.getRay()).deep.equals(new Ray(new Coordinate(15, 0, 0), Right));
@@ -79,7 +79,7 @@ describe('Position on track', () => {
     ]);
     t1.getB().connect(t2.getA());
 
-    const p1 = new PositionOnTrack(t1, null, 0, 1);
+    const p1 = new PositionOnTrack(t1, 0, 1);
     p1.hop(25);
 
     expect(p1.getRay()).deep.almost(
@@ -103,7 +103,7 @@ describe('Position on track', () => {
     );
     t1.getB().connect(t2.getB());
 
-    const p1 = new PositionOnTrack(t1, null, 0, 1);
+    const p1 = new PositionOnTrack(t1, 0, 1);
     p1.hop(25);
 
     expect(p1.getRay()).deep.almost(
@@ -119,7 +119,7 @@ describe('Position on track', () => {
       new Coordinate(20, 0, 10)
     ]);
 
-    const p1 = new PositionOnTrack(t1, null, 0, 1);
+    const p1 = new PositionOnTrack(t1, 0, 1);
     p1.hop(25);
 
     expect(p1.getRay()).deep.almost(
@@ -141,7 +141,7 @@ describe('Position on track', () => {
     ]);
     t1.getB().connect(t2.getA());
 
-    const p1 = new PositionOnTrack(t2, null, 1, -1);
+    const p1 = new PositionOnTrack(t2, 1, -1);
     p1.hop(25);
 
     expect(p1.getRay()).deep.almost(
@@ -165,7 +165,7 @@ describe('Position on track', () => {
     ]);
     t1.getA().connect(t2.getA());
 
-    const p1 = new PositionOnTrack(t2, null, 1, -1);
+    const p1 = new PositionOnTrack(t2, 1, -1);
     p1.hop(25);
 
     expect(p1.getRay()).deep.almost(
@@ -184,7 +184,7 @@ describe('Position on track', () => {
       new Coordinate(20, 0, 10)
     ]);
 
-    const p1 = new PositionOnTrack(t1, null, 1, -1);
+    const p1 = new PositionOnTrack(t1, 1, -1);
     p1.hop(25);
 
     expect(p1.getRay()).deep.almost(new Ray(new Coordinate(0, 0, 0), Right));

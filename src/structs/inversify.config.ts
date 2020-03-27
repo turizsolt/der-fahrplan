@@ -3,8 +3,6 @@ import { Container, interfaces } from 'inversify';
 import { PassengerRenderer } from './Renderers/PassengerRenderer';
 import { TYPES } from './TYPES';
 import { PassengerBabylonRenderer } from '../ui/babylon/PassengerBabylonRenderer';
-import { EngineBabylonRenderer } from '../ui/babylon/EngineBabylonRenderer';
-import { EngineRenderer } from './Renderers/EngineRenderer';
 import { TrackJointRenderer } from './Renderers/TrackJointRenderer';
 import { TrackJointBabylonRenderer } from '../ui/babylon/TrackJointBabylonRenderer';
 import { TrackRenderer } from './Renderers/TrackRenderer';
@@ -13,8 +11,6 @@ import { TrackSwitchRenderer } from './Renderers/TrackSwitchRenderer';
 import { TrackSwitchBabylonRenderer } from '../ui/babylon/TrackSwitchBabylonRenderer';
 import { Land } from './Interfaces/Land';
 import { ActualLand } from './Actuals/ActualLand';
-import { Engine } from './Interfaces/Engine';
-import { ActualEngine } from './Actuals/Wagon/ActualEngine';
 import { Track } from './Interfaces/Track';
 import { TrackSwitch } from './Interfaces/TrackSwitch';
 import { ActualTrack } from './Actuals/Track/ActualTrack';
@@ -55,9 +51,6 @@ babylonContainer
   .to(ActualPassengerGenerator);
 babylonContainer.bind<Passenger>(TYPES.Passenger).to(ActualPassenger);
 babylonContainer
-  .bind<EngineRenderer>(TYPES.EngineRenderer)
-  .to(EngineBabylonRenderer);
-babylonContainer
   .bind<WagonRenderer>(TYPES.WagonRenderer)
   .to(WagonBabylonRenderer);
 babylonContainer
@@ -74,7 +67,6 @@ babylonContainer
   .to(PlatformBabylonRenderer);
 
 babylonContainer.bind<Land>(TYPES.Land).to(ActualLand);
-babylonContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
 babylonContainer.bind<Wagon>(TYPES.Wagon).to(ActualWagon);
 babylonContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 babylonContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
@@ -123,14 +115,6 @@ babylonContainer
         meshProvider = context.container.get<MeshProvider>(TYPES.MeshProvider);
       }
       return meshProvider;
-    };
-  });
-
-babylonContainer
-  .bind<interfaces.Factory<Engine>>(TYPES.FactoryOfEngine)
-  .toFactory<Engine>((context: interfaces.Context) => {
-    return () => {
-      return context.container.get<Engine>(TYPES.Engine);
     };
   });
 
