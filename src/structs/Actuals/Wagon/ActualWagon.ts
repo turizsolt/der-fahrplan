@@ -33,7 +33,32 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     }
   }
 
+  stop(): void {
+    // todo use the worm
+    const platformsInvolved: Platform[] = [];
+    const trackA = this.ends.A.positionOnTrack.getTrack();
+    platformsInvolved.push(
+      ...trackA
+        .getPlatformsBeside()
+        .filter(p => this.ends.A.positionOnTrack.isBeside(p))
+    );
+    const trackB = this.ends.B.positionOnTrack.getTrack();
+    trackB
+      .getPlatformsBeside()
+      .filter(p => this.ends.B.positionOnTrack.isBeside(p))
+      .map((p: Platform) => {
+        if (!platformsInvolved.find(x => x === p)) {
+          platformsInvolved.push(p);
+        }
+      });
+
+    platformsInvolved.map(p => this.stoppedAt(p));
+  }
+
   stoppedAt(platform: Platform): void {
+    console.log(
+      `stopped at ${platform.getId()} of ${platform.getStation()!.getName()}`
+    );
     if (platform.getStation()) {
       platform.getStation().announceArrived(this, platform, this.trip);
     }

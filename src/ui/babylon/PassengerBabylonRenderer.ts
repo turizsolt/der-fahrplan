@@ -16,29 +16,29 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
   init(passenger: Passenger): void {
     this.passenger = passenger;
 
-    this.mesh = BABYLON.MeshBuilder.CreateBox(
-      'box',
-      { height: 1, width: 1, depth: 1 },
-      this.scene
-    );
-    this.mesh.position = CoordinateToBabylonVector3(
-      this.passenger.getPosition()
-    );
+    // this.mesh = BABYLON.MeshBuilder.CreateBox(
+    //   'box',
+    //   { height: 1, width: 1, depth: 1 },
+    //   this.scene
+    // );
+    // this.mesh.position = CoordinateToBabylonVector3(
+    //   this.passenger.getPosition()
+    // );
 
-    var boxMaterial = new BABYLON.StandardMaterial('boxMat', this.scene);
-    boxMaterial.diffuseColor = ColorToBabylonColor3(
-      this.passenger.getTo().getColor()
-    );
-    this.mesh.material = boxMaterial;
+    // var boxMaterial = new BABYLON.StandardMaterial('boxMat', this.scene);
+    // boxMaterial.diffuseColor = ColorToBabylonColor3(
+    //   this.passenger.getTo().getColor()
+    // );
+    // this.mesh.material = boxMaterial;
+    this.update();
   }
 
   update() {
-    if (this.passenger.isOnPlatformOrEngine()) {
-      this.mesh.position = CoordinateToBabylonVector3(
-        this.passenger.getPosition()
-      );
-    } else {
-      this.mesh.setEnabled(false);
-    }
+    console.log(
+      `pass #${this.passenger.getId()} on ${this.passenger
+        .getPlace()!
+        .getType()
+        .toString()} #${this.passenger.getPlace()!.getId()}`
+    );
   }
 }

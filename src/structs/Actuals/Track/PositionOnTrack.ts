@@ -51,7 +51,7 @@ export class PositionOnTrack {
 
   setPercentage(percentage: number): void {
     this.percentage = percentage;
-    //this.position = this.track.getLength() * percentage;
+    this.position = this.track.getLength() * percentage;
   }
 
   move(distance: number) {

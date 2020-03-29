@@ -44,6 +44,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
 
     if (fromStop.getPlatform()) {
       this.place = fromStop.getPlatform();
+      this.renderer.update();
     }
   }
 
@@ -55,6 +56,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   ) {
     if (this.place === platform) {
       this.place = wagon;
+      this.renderer.update();
     }
   }
 
@@ -66,6 +68,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   ) {
     if (this.to === station) {
       this.place = null;
+      this.renderer.update();
     }
   }
 
@@ -89,15 +92,15 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   public offset: Coordinate;
   @inject(TYPES.PassengerRenderer) private renderer: PassengerRenderer;
 
-  getPosition(): Coordinate {
-    return this.position;
-  }
+  //   getPosition(): Coordinate {
+  //     return this.position;
+  //   }
 
-  getTo(): Platform {
-    return null; //this.to;
-  }
+  //   getTo(): Platform {
+  //     return null; //this.to;
+  //   }
 
-  isOnPlatformOrEngine(): boolean {
-    return true;
-  }
+  //   isOnPlatformOrEngine(): boolean {
+  //     return true;
+  //   }
 }

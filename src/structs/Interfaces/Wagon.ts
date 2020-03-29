@@ -15,9 +15,12 @@ export interface Wagon extends BaseBrick {
   getRay(): Ray;
   remove(): boolean;
   isRemoved(): boolean;
+
   putOnTrack(track: Track, position?: number, direction?: number): void;
   moveTowardsWagonB(distance: number): void;
   moveTowardsWagonA(distance: number): void;
+  stop(): void;
+
   getLength(): number;
   getNearestWagon(end: WhichEnd): NearestWagon;
   swapEnds(): void;

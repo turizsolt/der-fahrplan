@@ -102,6 +102,10 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.wagon.moveTowardsWagonA(1);
         break;
 
+      case 'stop':
+        this.wagon.stop();
+        break;
+
       case 'endA':
         this.wagon.getA().disconnect();
         break;
