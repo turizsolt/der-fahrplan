@@ -70,7 +70,7 @@
             >{{button.text}}</button>
     </div>
     <div id="info-box">
-        <component v-if="selected" :is="type" :idt="selected.getId()" :obj="selected" :opts="opts"></component>
+        <component v-if="selected" :is="type" :idt="selected.id" :obj="selected" :opts="opts"></component>
     </div>
     <div id="big-screen" v-if="show">
         <div class="column" id="route-list">

@@ -14,6 +14,10 @@ export abstract class ActualBaseStorable implements BaseStorable {
   abstract persist(): Object;
   abstract load(obj: Object, store: Store): void;
 
+  public persistDeep(): Object {
+    return this.persist();
+  }
+
   protected initStore(type: symbol) {
     this.type = type;
     this.store = this.StoreFactory();

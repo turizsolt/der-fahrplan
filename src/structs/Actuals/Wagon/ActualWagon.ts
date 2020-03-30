@@ -119,8 +119,25 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.renderer;
   }
   persist(): Object {
-    throw new Error('Method not implemented.');
+    return {
+      id: this.id,
+      type: 'Wagon',
+
+      // todo A, B ends
+      trip: this.trip && this.trip.getId()
+    };
   }
+
+  persistDeep(): Object {
+    return {
+      id: this.id,
+      type: 'Wagon',
+
+      // todo A, B ends
+      trip: this.trip && this.trip.persistDeep()
+    };
+  }
+
   load(obj: Object, store: Store): void {
     throw new Error('Method not implemented.');
   }

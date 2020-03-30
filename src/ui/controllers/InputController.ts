@@ -88,13 +88,13 @@ export class InputController {
       template: `
       <div>
         <div>Wagon #{{idt}}</div>
-        <div v-if="obj.getTrip()">
-          <div>Trip: {{obj.getTrip().getName()}} </div>
-          <div v-for="stop in obj.getTrip().getStops()">{{stop.getStationName()}} </div>
+        <div v-if="obj.trip">
+          <div>Trip: {{obj.trip.name}} </div>
+          <div v-for="stop in obj.trip.stops">{{stop.stationName}} </div>
         </div>
         <div v-else>
         <div>Select a trip:</div>
-        <div v-for="route in opts" @click="assignRoute(obj, route)">{{route.getDetailedName()}} </div>
+        <div v-for="route in opts" @click="assignRoute(obj, route)">{{route.detailedName}} </div>
         <div v-if="!opts || opts.length === 0">No trip available...</div>
         
         </div>
@@ -349,15 +349,18 @@ export class InputController {
               renderer.setSelected(true);
               this.selected = storedObj;
               this.selectedMesh = this.downProps.mesh;
-              //  this.vmInfoBox.selected = storedObj;
-              //   this.vmInfoBox.type =
-              //     storedObj.getType() === Symbol.for('Wagon')
-              //       ? 'wagon'
-              //       : 'idtext';
-              //   console.log('gt', storedObj.getType(), this.vmInfoBox.type);
-              //   if (storedObj.getType() === Symbol.for('Wagon')) {
-              //     this.vmInfoBox.opts = this.store.getAllOf<Route>(TYPES.Route);
-              //   }
+
+              this.vmInfoBox.selected = storedObj.persistDeep();
+              this.vmInfoBox.type =
+                storedObj.getType() === Symbol.for('Wagon')
+                  ? 'wagon'
+                  : 'idtext';
+              console.log('gt', storedObj.getType(), this.vmInfoBox.type);
+              if (storedObj.getType() === Symbol.for('Wagon')) {
+                this.vmInfoBox.opts = this.store
+                  .getAllOf<Route>(TYPES.Route)
+                  .map(x => x.persistDeep());
+              }
 
               //   const sel = this.selected as any;
               //   if (sel.getName) {

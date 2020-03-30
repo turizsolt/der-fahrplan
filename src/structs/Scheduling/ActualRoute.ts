@@ -71,6 +71,16 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     };
   }
 
+  persistDeep(): Object {
+    return {
+      id: this.id,
+      type: 'Route',
+      name: this.name,
+      detailedName: this.getDetailedName(),
+      stops: this.stops.map(x => x.persistDeep())
+    };
+  }
+
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init();

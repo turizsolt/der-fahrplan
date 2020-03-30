@@ -37,6 +37,16 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     };
   }
 
+  persistDeep(): Object {
+    return {
+      id: this.id,
+      type: 'RouteStop',
+      station: this.station.persistDeep(),
+      stationName: this.getStationName(),
+      platform: this.platform && this.platform.getId()
+    };
+  }
+
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(
