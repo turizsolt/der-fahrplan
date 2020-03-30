@@ -3,13 +3,11 @@ import { Coordinate } from '../Geometry/Coordinate';
 import { Color } from '../Color';
 import { Side } from './Side';
 import { TrackBase } from './TrackBase';
-import { BaseBrick } from './BaseBrick';
 import { LineSegmentChain } from '../Geometry/LineSegmentChain';
 import { Station } from '../Scheduling/Station';
+import { BaseBoardable } from './BaseBoardable';
 
-export interface Platform extends BaseBrick {
-  addPassenger(passenger: Passenger): void;
-  removePassenger(passenger: Passenger): void;
+export interface Platform extends BaseBoardable {
   isBeside(position: number): boolean;
 
   getLineSegmentChain(): LineSegmentChain;

@@ -7,18 +7,16 @@ import { Color } from '../Color';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../TYPES';
 import { PlatformRenderer } from '../Renderers/PlatformRenderer';
-import { ActualBaseBrick } from './ActualBaseBrick';
 import { BaseRenderer } from '../Renderers/BaseRenderer';
-import { PassengerGenerator } from './PassengerGenerator';
 import { Store } from '../Interfaces/Store';
 import { LineSegmentChain } from '../Geometry/LineSegmentChain';
 import { Station } from '../Scheduling/Station';
+import { ActualBaseBoardable } from './ActualBaseBoardable';
 
 @injectable()
-export class ActualPlatform extends ActualBaseBrick implements Platform {
+export class ActualPlatform extends ActualBaseBoardable implements Platform {
   private position: Coordinate;
   private rotation: number;
-  private passengerList: Passenger[] = [];
 
   private track: TrackBase;
   private start: number;
@@ -173,14 +171,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
       });
 
     return this;
-  }
-
-  addPassenger(passenger: Passenger) {
-    this.passengerList.push(passenger);
-  }
-
-  removePassenger(passenger: Passenger) {
-    this.passengerList = this.passengerList.filter(x => x !== passenger);
   }
 
   isBeside(position: number): boolean {

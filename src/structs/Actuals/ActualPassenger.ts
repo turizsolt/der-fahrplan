@@ -10,18 +10,19 @@ import { Station } from '../Scheduling/Station';
 import { BaseBrick } from '../Interfaces/BaseBrick';
 import { Route } from '../Scheduling/Route';
 import { Wagon } from '../Interfaces/Wagon';
+import { BaseBoardable } from '../Interfaces/BaseBoardable';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
   private to: Station;
   private from: Station;
-  private place: BaseBrick;
+  private place: BaseBoardable;
 
   init(from: Station, to: Station) {
     super.initStore(TYPES.Passenger);
     this.to = to;
     this.from = from;
-    this.place = from;
+    this.setPlace(from);
 
     this.renderer.init(this);
     return this;
@@ -43,7 +44,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     if (!toStop) return;
 
     if (fromStop.getPlatform()) {
-      this.place = fromStop.getPlatform();
+      this.setPlace(fromStop.getPlatform());
       this.renderer.update();
     }
   }
@@ -55,7 +56,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     trip: Route
   ) {
     if (this.place === platform) {
-      this.place = wagon;
+      this.setPlace(wagon);
       this.renderer.update();
     }
   }
@@ -67,13 +68,23 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     trip: Route
   ) {
     if (this.to === station) {
-      this.place = null;
+      this.setPlace(null);
       this.renderer.update();
     }
   }
 
-  getPlace(): BaseBrick {
+  getPlace(): BaseBoardable {
     return this.place;
+  }
+
+  private setPlace(place: BaseBoardable) {
+    if (this.place) {
+      this.place.unboard(this);
+    }
+    this.place = place;
+    if (this.place) {
+      this.place.board(this);
+    }
   }
 
   /************/

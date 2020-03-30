@@ -13,8 +13,9 @@ import { NameGenerator } from '../NameGenerator';
 import { Route } from './Route';
 import { Passenger } from '../Interfaces/Passenger';
 import { Wagon } from '../Interfaces/Wagon';
+import { ActualBaseBoardable } from '../Actuals/ActualBaseBoardable';
 
-export class ActualStation extends ActualBaseBrick implements Station {
+export class ActualStation extends ActualBaseBoardable implements Station {
   private name: string;
   private circle: Circle;
   private platforms: Platform[];
@@ -27,21 +28,15 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
   announce(trip: Route) {
     this.announcedTrips.push(trip);
-    this.store
-      .getAllOf<Passenger>(TYPES.Passenger)
-      .filter(p => p.getPlace() === this)
-      .map(p => {
-        p.listenStationAnnouncement(this, trip);
-      });
+    this.boardedPassengers.map(p => {
+      p.listenStationAnnouncement(this, trip);
+    });
   }
 
   announceArrived(wagon: Wagon, platform: Platform, trip: Route) {
-    this.store
-      .getAllOf<Passenger>(TYPES.Passenger)
-      .filter(p => p.getPlace() === platform)
-      .map(p => {
-        p.listenStationArrivingAnnouncement(this, platform, wagon, trip);
-      });
+    platform.getBoardedPassengers().map(p => {
+      p.listenStationArrivingAnnouncement(this, platform, wagon, trip);
+    });
 
     this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
   }

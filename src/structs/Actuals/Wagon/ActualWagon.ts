@@ -15,11 +15,12 @@ import { Store } from '../../Interfaces/Store';
 import { Route } from '../../Scheduling/Route';
 import { Platform } from '../../Interfaces/Platform';
 import { Passenger } from '../../Interfaces/Passenger';
+import { ActualBaseBoardable } from '../ActualBaseBoardable';
 
 const WAGON_GAP: number = 1;
 
 @injectable()
-export class ActualWagon extends ActualBaseBrick implements Wagon {
+export class ActualWagon extends ActualBaseBoardable implements Wagon {
   private removed: boolean = false;
   protected worm: TrackWorm;
   protected trip: Route;
@@ -71,12 +72,9 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   announceStoppedAt(platform: Platform): void {
     const station = platform.getStation();
-    this.store
-      .getAllOf<Passenger>(TYPES.Passenger)
-      .filter(p => p.getPlace() === this)
-      .map(p => {
-        p.listenWagonStoppedAtAnnouncement(station, platform, this, this.trip);
-      });
+    this.boardedPassengers.map(p => {
+      p.listenWagonStoppedAtAnnouncement(station, platform, this, this.trip);
+    });
   }
 
   getLength(): number {

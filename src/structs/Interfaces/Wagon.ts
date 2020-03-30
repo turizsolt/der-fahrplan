@@ -1,4 +1,3 @@
-import { BaseBrick } from './BaseBrick';
 import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
 import { Ray } from '../Geometry/Ray';
 import { Track } from './Track';
@@ -6,8 +5,9 @@ import { PositionOnTrack } from '../Actuals/Track/PositionOnTrack';
 import { WhichEnd } from '../Interfaces/WhichEnd';
 import { Route } from '../Scheduling/Route';
 import { Platform } from './Platform';
+import { BaseBoardable } from './BaseBoardable';
 
-export interface Wagon extends BaseBrick {
+export interface Wagon extends BaseBoardable {
   init(): Wagon;
   update(): void;
   getA(): WagonEnd;

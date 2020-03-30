@@ -1,11 +1,11 @@
-import { BaseBrick } from '../Interfaces/BaseBrick';
 import { Circle } from '../Geometry/Circle';
 import { Platform } from '../Interfaces/Platform';
 import { Color } from '../Color';
 import { Route } from './Route';
 import { Wagon } from '../Interfaces/Wagon';
+import { BaseBoardable } from '../Interfaces/BaseBoardable';
 
-export interface Station extends BaseBrick {
+export interface Station extends BaseBoardable {
   init(circle: Circle): Station;
   getName(): string;
   setName(name: string);
