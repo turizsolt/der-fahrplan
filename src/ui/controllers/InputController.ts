@@ -101,9 +101,10 @@ export class InputController {
       </div>
       `,
       methods: {
-        assignRoute: function(wagon: Wagon, route: Route) {
+        assignRoute: function(vWagon, vRoute) {
+          const wagon = _this.store.get(vWagon.id) as Wagon;
+          const route = _this.store.get(vRoute.id) as Route;
           wagon.assignTrip(route);
-          this.obj = wagon;
         }
       }
     });
@@ -112,28 +113,28 @@ export class InputController {
       el: '#big-screen',
       data: {
         show: false,
-        routes: [
-          // { id: 'dfse34fgsf', name: 'B12', stops: [] },
-          // { id: 'assddferj', name: 'B12', stops: [] }
-        ],
+        routes: [],
         selectedRoute: null,
-        stations: [
-          //   { id: 'sewtew', name: 'Algarra' },
-          //   { id: 'fdsfds', name: 'Burito' },
-          //   { id: 'rt3trw', name: 'Cheddar' },
-          //   { id: '65443e', name: 'Dorito' }
-        ]
+        stations: []
       },
       methods: {
         load: function() {
-          //this.routes = _this.store.getAllOf<Route>(TYPES.Route);
-          //this.stations = _this.store.getAllOf<Station>(TYPES.Station);
+          this.routes = _this.store
+            .getAllOf<Route>(TYPES.Route)
+            .map(x => x.persistDeep());
+          this.stations = _this.store
+            .getAllOf<Station>(TYPES.Station)
+            .map(x => x.persistDeep());
+          if (this.selectedRoute) {
+            this.selectedRoute = (_this.store.get(
+              this.selectedRoute.id
+            ) as Route).persistDeep();
+          }
         },
-        fromTo: function(route) {
-          return route.getDetailedName();
-        },
-        removeRoute: function(route) {
+        removeRoute: function(vRoute) {
+          const route = _this.store.get(vRoute.id) as Route;
           route.remove();
+          this.selectedRoute = null;
           this.load();
         },
         createRoute: function() {
@@ -141,35 +142,50 @@ export class InputController {
           route.init();
           this.load();
         },
-        createReverseRoute: function(route) {
-          //   this.routes.push({
-          //     id: route.id + '1',
-          //     name: route.name,
-          //     stops: [...route.stops].reverse()
-          //   });
+        createReverseRoute: function(vRouteFrom) {
+          const routeFrom = _this.store.get(vRouteFrom.id) as Route;
+          const route = _this.store.create<Route>(TYPES.Route);
+          route.init();
+          route.setName(routeFrom.getName());
+          for (let stopFrom of [...routeFrom.getStops()].reverse()) {
+            const stop = _this.store.create<RouteStop>(TYPES.RouteStop);
+            stop.init(stopFrom.getStation(), stopFrom.getPlatform());
+            route.addStop(stop);
+          }
+          this.load();
         },
         selectRoute: function(route) {
           this.selectedRoute = route;
           this.load();
         },
         deleteStop: function(stop) {
-          this.selectedRoute.removeStop(stop);
+          const route = _this.store.get(this.selectedRoute.id) as Route;
+          route.removeStop(stop);
           this.load();
         },
-        swapStop: function(stop) {
-          this.selectedRoute.swapStopWithPrev(stop);
+        swapStop: function(vStop) {
+          const stop = _this.store.get(vStop.id) as RouteStop;
+          const route = _this.store.get(this.selectedRoute.id) as Route;
+          route.swapStopWithPrev(stop);
           this.load();
         },
-        addStop: function(station) {
+        addStop: function(vStation) {
           if (this.selectedRoute) {
+            const route = _this.store.get(this.selectedRoute.id) as Route;
+            const station = _this.store.get(vStation.id) as Station;
             const stop = _this.store.create<RouteStop>(TYPES.RouteStop);
             stop.init(
               station,
               station.getPlatforms().length > 0 && station.getPlatforms()[0]
             );
-            this.selectedRoute.addStop(stop);
+            route.addStop(stop);
             this.load();
           }
+        },
+        nameChange: function(event) {
+          const route = _this.store.get(this.selectedRoute.id) as Route;
+          route.setName(event.target.value);
+          this.load();
         }
       }
     });

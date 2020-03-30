@@ -15,6 +15,10 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     return this;
   }
 
+  remove(): void {
+    this.store.unregister(this);
+  }
+
   getName(): string {
     return this.name;
   }

@@ -75,8 +75,8 @@
     <div id="big-screen" v-if="show">
         <div class="column" id="route-list">
             <div>Route list</div>
-            <div v-for="route in routes" v-bind:class="{selected: selectedRoute === route}">
-                <span v-on:click="selectRoute(route)">{{route.name}} {{fromTo(route)}}</span>
+            <div v-for="route in routes" v-bind:class="{selected: selectedRoute && selectedRoute.id === route.id}">
+                <span v-on:click="selectRoute(route)">{{route.detailedName}}</span>
                 <span v-on:click="removeRoute(route)">x</span>
             </div>
             <div>
@@ -86,11 +86,11 @@
         <div class="column" id="route-details">
             <div>Edit route</div>
             <div v-if="selectedRoute">
-                Id: <input type="text" v-model="selectedRoute.id" /><br />
-                Name: <input type="text" v-model="selectedRoute.name" /><br />
+                Id: {{selectedRoute.id}}<br />
+                Name: <input type="text" v-model="selectedRoute.name" @change="nameChange" /><br />
                 Stops:<br />
                 <div v-for="(stop, index) in selectedRoute.stops">
-                    {{stop.getStationName()}}
+                    {{stop.stationName}}
                     <button v-on:click="deleteStop(stop)">Del</button>
                     <button v-on:click="swapStop(stop)" v-if="index !== 0">Swup</button>
                 </div>
