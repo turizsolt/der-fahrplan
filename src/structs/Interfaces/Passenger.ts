@@ -4,10 +4,12 @@ import { Coordinate } from '../Geometry/Coordinate';
 import { Station } from '../Scheduling/Station';
 import { Route } from '../Scheduling/Route';
 import { Wagon } from './Wagon';
+import { BaseBoardable } from './BaseBoardable';
 
 export interface Passenger extends BaseBrick {
   init(from: Station, to: Station);
-  getPlace(): BaseBrick;
+  getPlace(): BaseBoardable;
+  getPosition(): Coordinate;
   listenStationAnnouncement(station: Station, trip: Route);
   listenStationArrivingAnnouncement(
     station: Station,

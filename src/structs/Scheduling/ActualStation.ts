@@ -41,6 +41,11 @@ export class ActualStation extends ActualBaseBoardable implements Station {
     this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
   }
 
+  board(passenger: Passenger): Coordinate {
+    super.board(passenger);
+    return this.circle.a;
+  }
+
   init(circle: Circle): Station {
     super.initStore(TYPES.Station);
     this.circle = circle;

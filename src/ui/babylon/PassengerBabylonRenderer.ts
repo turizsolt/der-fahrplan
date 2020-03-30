@@ -5,6 +5,7 @@ import { CoordinateToBabylonVector3 } from './converters/CoordinateToBabylonVect
 import { injectable } from 'inversify';
 import { ColorToBabylonColor3 } from './converters/ColorToBabylonColor3';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
+import { Color } from '../../structs/Color';
 
 @injectable()
 export class PassengerBabylonRenderer extends BaseBabylonRenderer
@@ -16,24 +17,26 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
   init(passenger: Passenger): void {
     this.passenger = passenger;
 
-    // this.mesh = BABYLON.MeshBuilder.CreateBox(
-    //   'box',
-    //   { height: 1, width: 1, depth: 1 },
-    //   this.scene
-    // );
-    // this.mesh.position = CoordinateToBabylonVector3(
-    //   this.passenger.getPosition()
-    // );
+    this.mesh = BABYLON.MeshBuilder.CreateBox(
+      'box',
+      { height: 1, width: 1, depth: 1 },
+      this.scene
+    );
 
-    // var boxMaterial = new BABYLON.StandardMaterial('boxMat', this.scene);
-    // boxMaterial.diffuseColor = ColorToBabylonColor3(
-    //   this.passenger.getTo().getColor()
-    // );
-    // this.mesh.material = boxMaterial;
+    var boxMaterial = new BABYLON.StandardMaterial('boxMat', this.scene);
+    boxMaterial.diffuseColor = ColorToBabylonColor3(
+      // this.passenger.getTo().getColor()
+      Color.White()
+    );
+    this.mesh.material = boxMaterial;
     this.update();
   }
 
   update() {
+    this.mesh.position = CoordinateToBabylonVector3(
+      this.passenger.getPosition()
+    );
+    this.mesh.position.y = 5;
     console.log(
       `pass #${this.passenger.getId()} on ${this.passenger.getPlace() &&
         this.passenger

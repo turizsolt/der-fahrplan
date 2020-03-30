@@ -30,6 +30,11 @@ export class ActualPlatform extends ActualBaseBoardable implements Platform {
 
   @inject(TYPES.PlatformRenderer) private renderer: PlatformRenderer;
 
+  board(passenger: Passenger): Coordinate {
+    super.board(passenger);
+    return this.position;
+  }
+
   getRenderer(): BaseRenderer {
     return this.renderer;
   }

@@ -7,7 +7,6 @@ import { ActualBaseBrick } from './ActualBaseBrick';
 import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { injectable, inject } from 'inversify';
 import { Station } from '../Scheduling/Station';
-import { BaseBrick } from '../Interfaces/BaseBrick';
 import { Route } from '../Scheduling/Route';
 import { Wagon } from '../Interfaces/Wagon';
 import { BaseBoardable } from '../Interfaces/BaseBoardable';
@@ -17,14 +16,15 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   private to: Station;
   private from: Station;
   private place: BaseBoardable;
+  private pos: Coordinate = Coordinate.Origo();
 
   init(from: Station, to: Station) {
     super.initStore(TYPES.Passenger);
     this.to = to;
     this.from = from;
-    this.setPlace(from);
 
     this.renderer.init(this);
+    this.setPlace(from);
     return this;
   }
 
@@ -77,13 +77,18 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     return this.place;
   }
 
+  getPosition(): Coordinate {
+    return this.pos;
+  }
+
   private setPlace(place: BaseBoardable) {
     if (this.place) {
       this.place.unboard(this);
     }
     this.place = place;
     if (this.place) {
-      this.place.board(this);
+      this.pos = this.place.board(this);
+      this.renderer.update();
     }
   }
 

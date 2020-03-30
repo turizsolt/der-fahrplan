@@ -16,6 +16,7 @@ import { Route } from '../../Scheduling/Route';
 import { Platform } from '../../Interfaces/Platform';
 import { Passenger } from '../../Interfaces/Passenger';
 import { ActualBaseBoardable } from '../ActualBaseBoardable';
+import { Coordinate } from '../../Geometry/Coordinate';
 
 const WAGON_GAP: number = 1;
 
@@ -75,6 +76,13 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
     this.boardedPassengers.map(p => {
       p.listenWagonStoppedAtAnnouncement(station, platform, this, this.trip);
     });
+  }
+
+  board(passenger: Passenger): Coordinate {
+    super.board(passenger);
+    return this.ends.A.positionOnTrack
+      .getRay()
+      .coord.midpoint(this.ends.B.positionOnTrack.getRay().coord);
   }
 
   getLength(): number {
