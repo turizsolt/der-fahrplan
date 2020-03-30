@@ -70,9 +70,9 @@
             >{{button.text}}</button>
     </div>
     <div id="info-box">
-        {{selectedId}}
+        <component v-if="selected" :is="type" :idt="selected.getId()" :obj="selected" :opts="opts"></component>
     </div>
-    <div id="big-screen" v-if="false">
+    <div id="big-screen" v-if="show">
         <div class="column" id="route-list">
             <div>Route list</div>
             <div v-for="route in routes" v-bind:class="{selected: selectedRoute === route}">
@@ -90,7 +90,7 @@
                 Name: <input type="text" v-model="selectedRoute.name" /><br />
                 Stops:<br />
                 <div v-for="(stop, index) in selectedRoute.stops">
-                    {{stop.name}}
+                    {{stop.getStationName()}}
                     <button v-on:click="deleteStop(stop)">Del</button>
                     <button v-on:click="swapStop(stop)" v-if="index !== 0">Swup</button>
                 </div>
@@ -109,68 +109,7 @@
 <canvas id="renderCanvas">
 </canvas>
 <script>
-    const app = new Vue({
-      el: '#big-screen',
-      data: {
-          routes: [
-              {id: 'dfse34fgsf', name: 'B12', stops: []},
-              {id: 'assddferj', name: 'B12', stops: []},
-          ],
-          selectedRoute: null,
-          stations: [
-            {id: 'sewtew', name: 'Algarra'},
-            {id: 'fdsfds', name: 'Burito'},
-            {id: 'rt3trw', name: 'Cheddar'},
-            {id: '65443e', name: 'Dorito'},
-          ]
-      },
-      methods: {
-        fromTo: function(route) {
-              if(route.stops.length === 0) {
-                  return "Unknown terminus";
-              } else if(route.stops.length === 1) {
-                  return route.stops[0].name;
-              } else {
-                last = route.stops[route.stops.length-1];
-                return route.stops[0].name + ">>" +last.name;
-              }
-          },
-          removeRoute: function(route) {
-              this.routes = this.routes.filter(x => x !== route);
-              if(this.selectedRoute === route) {
-                  this.selectedRoute = null;
-              }
-          },
-          createRoute: function() {
-              this.routes.push({id: 'assddferj', name: '???', stops: []});
-          },
-          createReverseRoute: function(route) {
-              this.routes.push({id: route.id+'1', name: route.name, stops: [...route.stops].reverse()});
-          },
-          selectRoute: function(route) {
-              this.selectedRoute = route;
-          },
-          deleteStop: function(stop) {
-              this.selectedRoute.stops = this.selectedRoute.stops.filter(x => x !== stop);
-          },
-          swapStop: function(stop) {
-              const index = this.selectedRoute.stops.findIndex(x => x === stop);
-              if(index > 0) {
-                const newStops = [
-                    ...this.selectedRoute.stops
-              ];
-                    newStops[index-1] = this.selectedRoute.stops[index];
-                    newStops[index] = this.selectedRoute.stops[index-1];
-                    this.selectedRoute.stops = newStops;
-              }
-          },
-          addStop: function(station) {
-              if(this.selectedRoute) {
-                  this.selectedRoute.stops.push(station);
-              }
-          }
-      }
-    });
+    
     </script>
 </body>
 </html>

@@ -4,6 +4,7 @@ import { RouteStop } from './RouteStop';
 export interface Route extends BaseStorable {
   init(): Route;
   getName(): string;
+  getDetailedName(): string;
   setName(name: string): void;
   getStops(): any[];
   addStop(stop: RouteStop): void;

@@ -33,6 +33,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     }
   }
 
+  getTrip(): Route {
+    return this.trip;
+  }
+
   stop(): void {
     // todo use the worm
     const platformsInvolved: Platform[] = [];

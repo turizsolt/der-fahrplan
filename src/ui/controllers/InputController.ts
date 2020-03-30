@@ -24,6 +24,11 @@ import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
 import { CreateEngineInputHandler } from './CreateEngineInputHandler';
 import { Store } from '../../structs/Interfaces/Store';
 import { CreateStationInputHandler } from './CreateStationInputHandler';
+import { Route } from '../../structs/Scheduling/Route';
+import { Station } from '../../structs/Scheduling/Station';
+import { ActualRouteStop } from '../../structs/Scheduling/ActualRouteStop';
+import { RouteStop } from '../../structs/Scheduling/RouteStop';
+import { Wagon } from '../../structs/Interfaces/Wagon';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -49,6 +54,7 @@ export class InputController {
 
   private vm: Vue;
   private vmInfoBox: Vue;
+  private vmBigScreen: Vue;
 
   constructor(
     private scene: BABYLON.Scene,
@@ -69,7 +75,103 @@ export class InputController {
     });
     this.vmInfoBox = new Vue({
       el: '#info-box',
-      data: { selectedId: null }
+      data: { selected: null, type: null, opts: [] }
+    });
+
+    Vue.component('idtext', {
+      props: ['idt', 'obj'],
+      template: '<div>{{idt}}</div>'
+    });
+
+    Vue.component('wagon', {
+      props: ['idt', 'obj', 'opts'],
+      template: `
+      <div>
+        <div>Wagon #{{idt}}</div>
+        <div v-if="obj.getTrip()">
+          <div>Trip: {{obj.getTrip().getName()}} </div>
+          <div v-for="stop in obj.getTrip().getStops()">{{stop.getStationName()}} </div>
+        </div>
+        <div v-else>
+        <div>Select a trip:</div>
+        <div v-for="route in opts" @click="assignRoute(obj, route)">{{route.getDetailedName()}} </div>
+        <div v-if="!opts || opts.length === 0">No trip available...</div>
+        
+        </div>
+      </div>
+      `,
+      methods: {
+        assignRoute: function(wagon: Wagon, route: Route) {
+          wagon.assignTrip(route);
+          this.obj = wagon;
+        }
+      }
+    });
+
+    this.vmBigScreen = new Vue({
+      el: '#big-screen',
+      data: {
+        show: false,
+        routes: [
+          // { id: 'dfse34fgsf', name: 'B12', stops: [] },
+          // { id: 'assddferj', name: 'B12', stops: [] }
+        ],
+        selectedRoute: null,
+        stations: [
+          //   { id: 'sewtew', name: 'Algarra' },
+          //   { id: 'fdsfds', name: 'Burito' },
+          //   { id: 'rt3trw', name: 'Cheddar' },
+          //   { id: '65443e', name: 'Dorito' }
+        ]
+      },
+      methods: {
+        load: function() {
+          //this.routes = _this.store.getAllOf<Route>(TYPES.Route);
+          //this.stations = _this.store.getAllOf<Station>(TYPES.Station);
+        },
+        fromTo: function(route) {
+          return route.getDetailedName();
+        },
+        removeRoute: function(route) {
+          route.remove();
+          this.load();
+        },
+        createRoute: function() {
+          const route = _this.store.create<Route>(TYPES.Route);
+          route.init();
+          this.load();
+        },
+        createReverseRoute: function(route) {
+          //   this.routes.push({
+          //     id: route.id + '1',
+          //     name: route.name,
+          //     stops: [...route.stops].reverse()
+          //   });
+        },
+        selectRoute: function(route) {
+          this.selectedRoute = route;
+          this.load();
+        },
+        deleteStop: function(stop) {
+          this.selectedRoute.removeStop(stop);
+          this.load();
+        },
+        swapStop: function(stop) {
+          this.selectedRoute.swapStopWithPrev(stop);
+          this.load();
+        },
+        addStop: function(station) {
+          if (this.selectedRoute) {
+            const stop = _this.store.create<RouteStop>(TYPES.RouteStop);
+            stop.init(
+              station,
+              station.getPlatforms().length > 0 && station.getPlatforms()[0]
+            );
+            this.selectedRoute.addStop(stop);
+            this.load();
+          }
+        }
+      }
     });
 
     this.inputHandlers = {
@@ -237,7 +339,9 @@ export class InputController {
               renderer.setSelected(false);
               this.selected = null;
               this.selectedMesh = null;
-              this.vmInfoBox.selectedId = null;
+              this.vmInfoBox.selected = null;
+              this.vmInfoBox.type = null;
+              this.vmInfoBox.opts = [];
             } else {
               if (this.selected) {
                 this.selected.getRenderer().setSelected(false);
@@ -245,29 +349,38 @@ export class InputController {
               renderer.setSelected(true);
               this.selected = storedObj;
               this.selectedMesh = this.downProps.mesh;
+              //  this.vmInfoBox.selected = storedObj;
+              //   this.vmInfoBox.type =
+              //     storedObj.getType() === Symbol.for('Wagon')
+              //       ? 'wagon'
+              //       : 'idtext';
+              //   console.log('gt', storedObj.getType(), this.vmInfoBox.type);
+              //   if (storedObj.getType() === Symbol.for('Wagon')) {
+              //     this.vmInfoBox.opts = this.store.getAllOf<Route>(TYPES.Route);
+              //   }
 
-              const sel = this.selected as any;
-              if (sel.getName) {
-                this.vmInfoBox.selectedId = sel.getName();
-                if (sel.getPlatforms) {
-                  this.vmInfoBox.selectedId =
-                    sel.getName() +
-                    ' / ' +
-                    sel
-                      .getPlatforms()
-                      .map(p => p.getId())
-                      .join(', ');
-                }
-              } else if (sel.getStation) {
-                this.vmInfoBox.selectedId =
-                  id +
-                  ':' +
-                  (!sel.getStation()
-                    ? 'No station'
-                    : sel.getStation().getName());
-              } else {
-                this.vmInfoBox.selectedId = id;
-              }
+              //   const sel = this.selected as any;
+              //   if (sel.getName) {
+              //     this.vmInfoBox.selectedId = sel.getName();
+              //     if (sel.getPlatforms) {
+              //       this.vmInfoBox.selectedId =
+              //         sel.getName() +
+              //         ' / ' +
+              //         sel
+              //           .getPlatforms()
+              //           .map(p => p.getId())
+              //           .join(', ');
+              //     }
+              //   } else if (sel.getStation) {
+              //     this.vmInfoBox.selectedId =
+              //       id +
+              //       ':' +
+              //       (!sel.getStation()
+              //         ? 'No station'
+              //         : sel.getStation().getName());
+              //   } else {
+              //     this.vmInfoBox.selectedId = id;
+              //   }
             }
           }
           ready = true;
@@ -316,6 +429,13 @@ export class InputController {
 
       case 'P':
         this.selectMode(InputMode.CREATE_PLATFORM);
+        break;
+
+      case '7':
+        this.vmBigScreen.show = !this.vmBigScreen.show;
+        if (this.vmBigScreen.show) {
+          this.vmBigScreen.load();
+        }
         break;
 
       case '8':

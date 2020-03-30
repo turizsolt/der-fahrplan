@@ -27,6 +27,8 @@ export interface Wagon extends BaseBrick {
   pullToPos(pot: PositionOnTrack, dir: number): void;
 
   assignTrip(route: Route): void;
+  getTrip(): Route;
+
   stoppedAt(platform: Platform): void;
 }
 

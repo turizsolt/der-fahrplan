@@ -19,6 +19,23 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     return this.name;
   }
 
+  getDetailedName(): string {
+    if (this.stops.length === 0) {
+      return this.getName() + ' ' + 'Unknown terminus';
+    } else if (this.stops.length === 1) {
+      return this.getName() + ' ' + this.stops[0].getStationName();
+    } else {
+      const last = this.stops[this.stops.length - 1];
+      return (
+        this.getName() +
+        ' ' +
+        this.stops[0].getStationName() +
+        '>>' +
+        last.getStationName()
+      );
+    }
+  }
+
   setName(name: string) {
     this.name = name;
   }

@@ -35,10 +35,12 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
 
   update() {
     console.log(
-      `pass #${this.passenger.getId()} on ${this.passenger
-        .getPlace()!
-        .getType()
-        .toString()} #${this.passenger.getPlace()!.getId()}`
+      `pass #${this.passenger.getId()} on ${this.passenger.getPlace() &&
+        this.passenger
+          .getPlace()
+          .getType()
+          .toString()} #${this.passenger.getPlace() &&
+        this.passenger.getPlace().getId()}`
     );
   }
 }
