@@ -12,6 +12,7 @@ import { Store } from '../Interfaces/Store';
 import { LineSegmentChain } from '../Geometry/LineSegmentChain';
 import { Station } from '../Scheduling/Station';
 import { ActualBaseBoardable } from './ActualBaseBoardable';
+import { Left, Right } from '../Geometry/Directions';
 
 @injectable()
 export class ActualPlatform extends ActualBaseBoardable implements Platform {
@@ -32,7 +33,13 @@ export class ActualPlatform extends ActualBaseBoardable implements Platform {
 
   board(passenger: Passenger): Coordinate {
     super.board(passenger);
-    return this.position;
+    const chain = this.getLineSegmentChain();
+    const length = chain.getLength();
+    const at = Math.random() * length;
+    const ray = chain.getRayByDistance(at);
+    const w = 2.8 + Math.random() * (this.width - 1);
+    const x = ray.fromHere(this.side === Side.Left ? Left : Right, w);
+    return x.coord;
   }
 
   getRenderer(): BaseRenderer {

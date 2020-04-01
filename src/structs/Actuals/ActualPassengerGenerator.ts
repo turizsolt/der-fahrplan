@@ -15,7 +15,7 @@ export class ActualPassengerGenerator implements PassengerGenerator {
 
   init() {
     this.store = this.StoreFactory();
-    this.interval = (setInterval(() => this.tick(), 5000) as unknown) as number;
+    this.interval = (setInterval(() => this.tick(), 100) as unknown) as number;
     this.tick();
   }
 

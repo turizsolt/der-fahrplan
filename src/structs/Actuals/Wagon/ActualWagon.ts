@@ -70,7 +70,8 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
 
   stoppedAt(platform: Platform): void {
     console.log(
-      `stopped at ${platform.getId()} of ${platform.getStation()!.getName()}`
+      `stopped at ${platform.getId()} of ${platform.getStation() &&
+        platform.getStation().getName()}`
     );
     if (platform.getStation()) {
       platform.getStation().announceArrived(this, platform, this.trip);

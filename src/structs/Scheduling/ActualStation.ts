@@ -51,7 +51,14 @@ export class ActualStation extends ActualBaseBoardable implements Station {
 
   board(passenger: Passenger): Coordinate {
     super.board(passenger);
-    return this.circle.a;
+    const rand = Math.random() * Math.PI * 2 - Math.PI;
+    const dist = Math.random() * 5;
+    const offset = new Coordinate(
+      Math.sin(rand) * dist,
+      0,
+      Math.cos(rand) * dist
+    );
+    return this.circle.a.add(offset);
   }
 
   init(circle: Circle): Station {

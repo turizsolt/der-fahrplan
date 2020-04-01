@@ -41,7 +41,8 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
       this.mesh.position = CoordinateToBabylonVector3(
         this.passenger.getPosition()
       );
-      this.mesh.position.y = 12;
+      this.mesh.position.y =
+        this.passenger.getPlace().getType() !== Symbol.for('Platform') ? 12 : 2;
       console.log(
         `pass #${this.passenger.getId()} on ${this.passenger.getPlace() &&
           this.passenger
