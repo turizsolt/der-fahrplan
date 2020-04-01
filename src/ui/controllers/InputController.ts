@@ -338,6 +338,8 @@ export class InputController {
 
   private wheelRotation = 0;
 
+  private selectCallback: (ob: Object) => void = null;
+
   private selectIfPossible(event: PointerEvent) {
     let ready = false;
     if (this.downProps.mesh) {
@@ -357,6 +359,15 @@ export class InputController {
           } else {
             let renderer = storedObj.getRenderer();
             if (renderer.isSelected()) {
+              if (
+                this.selectCallback &&
+                this.selected.getType() === Symbol.for('Wagon')
+              ) {
+                (this.selected as Wagon).unsubscribeToUpdates(
+                  this.selectCallback
+                );
+              }
+
               renderer.setSelected(false);
               this.selected = null;
               this.selectedMesh = null;
@@ -365,12 +376,31 @@ export class InputController {
               this.vmInfoBox.opts = [];
             } else {
               if (this.selected) {
+                if (
+                  this.selectCallback &&
+                  this.selected.getType() === Symbol.for('Wagon')
+                ) {
+                  (this.selected as Wagon).unsubscribeToUpdates(
+                    this.selectCallback
+                  );
+                }
                 this.selected.getRenderer().setSelected(false);
               }
+
               renderer.setSelected(true);
               this.selected = storedObj;
               this.selectedMesh = this.downProps.mesh;
 
+              if (storedObj.getType() === Symbol.for('Wagon')) {
+                console.log('select');
+                this.selectCallback = (obj: Object): void => {
+                  console.log('update');
+                  this.vmInfoBox.selected = obj;
+                };
+                (this.selected as Wagon).subscribeToUpdates(
+                  this.selectCallback
+                );
+              }
               this.vmInfoBox.selected = storedObj.persistDeep();
               this.vmInfoBox.type =
                 storedObj.getType() === Symbol.for('Wagon')

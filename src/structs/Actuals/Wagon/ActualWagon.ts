@@ -41,6 +41,7 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
         stop.getStation().announce(this.trip);
       }
     }
+    this.update();
   }
 
   getTrip(): Route {
@@ -210,8 +211,22 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
   load(obj: Object, store: Store): void {
     throw new Error('Method not implemented.');
   }
+
   update() {
     this.renderer.update();
+
+    const deep = this.persistDeep();
+    this.updateCallbacks.map(cb => cb(deep));
+  }
+
+  private updateCallbacks: Function[] = [];
+
+  subscribeToUpdates(callback: (wagon: Object) => void): void {
+    this.updateCallbacks.push(callback);
+  }
+
+  unsubscribeToUpdates(callback: (wagon: Object) => void): void {
+    this.updateCallbacks = this.updateCallbacks.filter(c => c !== callback);
   }
 
   putOnTrack(

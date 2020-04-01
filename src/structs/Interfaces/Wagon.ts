@@ -30,6 +30,9 @@ export interface Wagon extends BaseBoardable {
   getTrip(): Route;
 
   stoppedAt(platform: Platform): void;
+
+  subscribeToUpdates(callback: (wagon: Object) => void): void;
+  unsubscribeToUpdates(callback: (wagon: Object) => void): void;
 }
 
 export interface NearestWagon {
