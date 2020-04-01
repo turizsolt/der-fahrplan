@@ -33,17 +33,23 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
   }
 
   update() {
-    this.mesh.position = CoordinateToBabylonVector3(
-      this.passenger.getPosition()
-    );
-    this.mesh.position.y = 5;
-    console.log(
-      `pass #${this.passenger.getId()} on ${this.passenger.getPlace() &&
-        this.passenger
-          .getPlace()
-          .getType()
-          .toString()} #${this.passenger.getPlace() &&
-        this.passenger.getPlace().getId()}`
-    );
+    if (!this.passenger.getPlace()) {
+      this.mesh.setEnabled(false);
+    } else {
+      this.mesh.setEnabled(true);
+
+      this.mesh.position = CoordinateToBabylonVector3(
+        this.passenger.getPosition()
+      );
+      this.mesh.position.y = 12;
+      console.log(
+        `pass #${this.passenger.getId()} on ${this.passenger.getPlace() &&
+          this.passenger
+            .getPlace()
+            .getType()
+            .toString()} #${this.passenger.getPlace() &&
+          this.passenger.getPlace().getId()}`
+      );
+    }
   }
 }

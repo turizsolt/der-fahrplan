@@ -29,9 +29,16 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
   assignTrip(route: Route): void {
+    if (this.trip) {
+      for (let stop of this.trip.getStops()) {
+        stop.getStation().deannounce(this.trip);
+      }
+    }
     this.trip = route;
-    for (let stop of this.trip.getStops()) {
-      stop.getStation().announce(this.trip);
+    if (this.trip) {
+      for (let stop of this.trip.getStops()) {
+        stop.getStation().announce(this.trip);
+      }
     }
   }
 
@@ -80,6 +87,10 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
 
   board(passenger: Passenger): Coordinate {
     super.board(passenger);
+    return this.getCenterPos();
+  }
+
+  getCenterPos(): Coordinate {
     return this.ends.A.positionOnTrack
       .getRay()
       .coord.midpoint(this.ends.B.positionOnTrack.getRay().coord);
@@ -243,6 +254,8 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
         this.ends.B.connect(nearest.end);
       }
     }
+
+    this.moveBoardedPassengers();
   }
 
   pullToPos(pot: PositionOnTrack, dir: number) {
@@ -323,6 +336,12 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
         this.ends.A.connect(nearest.end);
       }
     }
+
+    this.moveBoardedPassengers();
+  }
+
+  moveBoardedPassengers() {
+    this.boardedPassengers.map(pass => pass.updatePos(this.getCenterPos()));
   }
 
   getNearestWagon(whichEnd: WhichEnd): NearestWagon {

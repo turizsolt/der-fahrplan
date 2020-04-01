@@ -33,6 +33,14 @@ export class ActualStation extends ActualBaseBoardable implements Station {
     });
   }
 
+  deannounce(trip: Route) {
+    this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
+    // todo
+    // this.boardedPassengers.map(p => {
+    //   p.listenStationAnnouncement(this, trip);
+    // });
+  }
+
   announceArrived(wagon: Wagon, platform: Platform, trip: Route) {
     platform.getBoardedPassengers().map(p => {
       p.listenStationArrivingAnnouncement(this, platform, wagon, trip);

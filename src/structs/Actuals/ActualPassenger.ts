@@ -92,6 +92,11 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     }
   }
 
+  updatePos(pos: Coordinate): void {
+    this.pos = pos;
+    this.renderer.update();
+  }
+
   /************/
 
   getRenderer(): BaseRenderer {

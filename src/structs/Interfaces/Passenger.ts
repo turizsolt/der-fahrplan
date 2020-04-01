@@ -23,15 +23,5 @@ export interface Passenger extends BaseBrick {
     wagon: Wagon,
     trip: Route
   );
-
-  // updatePosition();
-  // checkTrain(engine: Engine);
-  // isArrivedAt(platform: Platform);
-  // checkShouldGetOffAt(platform: Platform);
-  // getOff();
-
-  // renderer
-  // getPosition(): Coordinate;
-  // getTo(): Platform;
-  // isOnPlatformOrEngine(): boolean;
+  updatePos(pos: Coordinate): void;
 }

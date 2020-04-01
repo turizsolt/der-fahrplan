@@ -19,4 +19,5 @@ export interface Station extends BaseBoardable {
 
   announceArrived(wagon: Wagon, platform: Platform, trip: Route);
   announce(trip: Route);
+  deannounce(trip: Route);
 }

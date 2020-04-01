@@ -91,6 +91,7 @@ export class InputController {
         <div v-if="obj.trip">
           <div>Trip: {{obj.trip.name}} </div>
           <div v-for="stop in obj.trip.stops">{{stop.stationName}} </div>
+          <div @click="removeRoute(obj)">Remove route</div>
         </div>
         <div v-else>
         <div>Select a trip:</div>
@@ -105,6 +106,10 @@ export class InputController {
           const wagon = _this.store.get(vWagon.id) as Wagon;
           const route = _this.store.get(vRoute.id) as Route;
           wagon.assignTrip(route);
+        },
+        removeRoute: function(vWagon) {
+          const wagon = _this.store.get(vWagon.id) as Wagon;
+          wagon.assignTrip(null);
         }
       }
     });
