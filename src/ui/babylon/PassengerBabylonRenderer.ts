@@ -24,10 +24,7 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
     );
 
     var boxMaterial = new BABYLON.StandardMaterial('boxMat', this.scene);
-    boxMaterial.diffuseColor = ColorToBabylonColor3(
-      // this.passenger.getTo().getColor()
-      Color.White()
-    );
+    boxMaterial.diffuseColor = ColorToBabylonColor3(this.passenger.getColor());
     this.mesh.material = boxMaterial;
     this.update();
   }
@@ -42,7 +39,11 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
         this.passenger.getPosition()
       );
       this.mesh.position.y =
-        this.passenger.getPlace().getType() !== Symbol.for('Platform') ? 12 : 2;
+        this.passenger.getPlace().getType() === Symbol.for('Platform')
+          ? 2
+          : this.passenger.getPlace().getType() === Symbol.for('Wagon')
+          ? 6
+          : 12;
       console.log(
         `pass #${this.passenger.getId()} on ${this.passenger.getPlace() &&
           this.passenger

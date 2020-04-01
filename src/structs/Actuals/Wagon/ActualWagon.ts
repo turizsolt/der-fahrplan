@@ -17,6 +17,7 @@ import { Platform } from '../../Interfaces/Platform';
 import { Passenger } from '../../Interfaces/Passenger';
 import { ActualBaseBoardable } from '../ActualBaseBoardable';
 import { Coordinate } from '../../Geometry/Coordinate';
+import { Left } from '../../Geometry/Directions';
 
 const WAGON_GAP: number = 1;
 
@@ -86,15 +87,65 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
     });
   }
 
+  private seatCount: number = 21;
+  private passengerCount: number = 0;
+  private seats: Passenger[] = [];
+
   board(passenger: Passenger): Coordinate {
-    super.board(passenger);
-    return this.getCenterPos();
+    //super.board(passenger);
+    if (this.passengerCount >= this.seatCount) {
+      return Coordinate.Origo(); // todo
+    }
+
+    this.passengerCount += 1;
+    let seatNo: number;
+    do {
+      seatNo = (Math.random() * this.seatCount) | 0;
+    } while (this.seats[seatNo]);
+    this.seats[seatNo] = passenger;
+    return this.seatOffset(seatNo).coord;
+  }
+
+  moveBoardedPassengers() {
+    this.seats.map((pass, seatNo) => {
+      if (pass) {
+        pass.updatePos(this.seatOffset(seatNo).coord);
+      }
+    });
+  }
+
+  private seatOffset(seatNo) {
+    const colSize = 1.2;
+    const rowSize = 1.2;
+    const colCount = 3 - 1;
+    const rowCount = Math.ceil(this.seatCount / (colCount + 1)) - 1;
+
+    const col = seatNo % 3;
+    const row = (seatNo - col) / 3;
+    return this.getCenterRay()
+      .fromHere(Left, -((colCount / 2) * colSize) + col * colSize)
+      .fromHere(0, (rowCount / 2) * rowSize - row * rowSize);
+  }
+
+  unboard(passenger: Passenger): void {
+    const seatNo = this.seats.findIndex(x => x === passenger);
+    if (seatNo !== -1) {
+      this.seats[seatNo] = undefined;
+      this.passengerCount -= 1;
+    }
   }
 
   getCenterPos(): Coordinate {
     return this.ends.A.positionOnTrack
       .getRay()
       .coord.midpoint(this.ends.B.positionOnTrack.getRay().coord);
+  }
+
+  getCenterRay(): Ray {
+    return new Ray(
+      this.getCenterPos(),
+      this.ends.A.positionOnTrack.getRay().dirXZ
+    );
   }
 
   getLength(): number {
@@ -339,10 +390,6 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
     }
 
     this.moveBoardedPassengers();
-  }
-
-  moveBoardedPassengers() {
-    this.boardedPassengers.map(pass => pass.updatePos(this.getCenterPos()));
   }
 
   getNearestWagon(whichEnd: WhichEnd): NearestWagon {

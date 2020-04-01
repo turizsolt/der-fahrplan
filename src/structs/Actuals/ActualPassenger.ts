@@ -10,6 +10,7 @@ import { Station } from '../Scheduling/Station';
 import { Route } from '../Scheduling/Route';
 import { Wagon } from '../Interfaces/Wagon';
 import { BaseBoardable } from '../Interfaces/BaseBoardable';
+import { Color } from '../Color';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
@@ -79,6 +80,10 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
 
   getPosition(): Coordinate {
     return this.pos;
+  }
+
+  getColor(): Color {
+    return this.to.getColor();
   }
 
   private setPlace(place: BaseBoardable) {
