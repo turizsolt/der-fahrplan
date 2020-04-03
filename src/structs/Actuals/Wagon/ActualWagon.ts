@@ -71,10 +71,6 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
   }
 
   stoppedAt(platform: Platform): void {
-    console.log(
-      `stopped at ${platform.getId()} of ${platform.getStation() &&
-        platform.getStation().getName()}`
-    );
     if (platform.getStation()) {
       platform.getStation().announceArrived(this, platform, this.trip);
     }
@@ -83,8 +79,10 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
 
   announceStoppedAt(platform: Platform): void {
     const station = platform.getStation();
-    this.boardedPassengers.map(p => {
-      p.listenWagonStoppedAtAnnouncement(station, platform, this, this.trip);
+    this.seats.map(p => {
+      if (p) {
+        p.listenWagonStoppedAtAnnouncement(station, platform, this, this.trip);
+      }
     });
   }
 
