@@ -12,7 +12,6 @@ window.addEventListener('DOMContentLoaded', () => {
     'renderCanvas'
   ) as HTMLCanvasElement;
   const renderEngine = new BABYLON.Engine(canvas, true);
-  let camera: BABYLON.ArcRotateCamera;
   const createScene = () => {
     const scene = new BABYLON.Scene(renderEngine);
 
@@ -23,7 +22,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     scene.clearColor = new BABYLON.Color4(0, 1, 0, 1);
 
-    camera = new BABYLON.ArcRotateCamera(
+    const camera = new BABYLON.ArcRotateCamera(
       'Camera',
       0,
       0.8,
@@ -46,9 +45,8 @@ window.addEventListener('DOMContentLoaded', () => {
     gridDrawer.setScene(scene);
     gridDrawer.drawGrid();
 
-    this.scene = scene;
-    this.map = {};
-    this.scene.actionManager = new BABYLON.ActionManager(this.scene);
+    const map = {};
+    scene.actionManager = new BABYLON.ActionManager(scene);
 
     const modifier = key => {
       const list = ['Shift', 'Control', 'Alt'];
@@ -59,55 +57,55 @@ window.addEventListener('DOMContentLoaded', () => {
       return key[0].toUpperCase() + key.slice(1);
     };
 
-    this.scene.actionManager.registerAction(
+    scene.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnKeyDownTrigger,
         evt => {
           const key = upper(evt.sourceEvent.key);
-          if (!this.map[key]) {
+          if (!map[key]) {
             if (!modifier(key)) {
               inputController.keyDown(key, {
-                shift: this.map['Shift'],
-                ctrl: this.map['Control']
+                shift: map['Shift'],
+                ctrl: map['Control']
               });
             }
           }
-          this.map[key] = evt.sourceEvent.type == 'keydown';
+          map[key] = evt.sourceEvent.type == 'keydown';
         }
       )
     );
 
-    this.scene.actionManager.registerAction(
+    scene.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnKeyUpTrigger,
         evt => {
           const key = upper(evt.sourceEvent.key);
           if (!modifier(key)) {
             inputController.keyUp(key, {
-              shift: this.map['Shift'],
-              ctrl: this.map['Control']
+              shift: map['Shift'],
+              ctrl: map['Control']
             });
           }
 
-          this.map[key] = evt.sourceEvent.type == 'keydown';
+          map[key] = evt.sourceEvent.type == 'keydown';
         }
       )
     );
 
-    this.scene.registerAfterRender(() => {
-      for (let key of Object.keys(this.map)) {
-        if (this.map[key] && !modifier(key)) {
+    scene.registerAfterRender(() => {
+      for (let key of Object.keys(map)) {
+        if (map[key] && !modifier(key)) {
           inputController.keyHold(key, {
-            shift: this.map['Shift'],
-            ctrl: this.map['Control']
+            shift: map['Shift'],
+            ctrl: map['Control']
           });
         }
       }
     });
 
-    return scene;
+    return { scene, camera };
   };
-  const scene = createScene();
+  const { scene, camera } = createScene();
 
   const inputController = new InputController(scene, camera);
 
@@ -166,8 +164,8 @@ window.addEventListener('DOMContentLoaded', () => {
       event.preventDefault();
 
       var i = 0,
-        files = event.dataTransfer.files,
-        len = files.length;
+        files = event && event.dataTransfer && event.dataTransfer.files,
+        len = (files && files.length) || 0;
 
       for (; i < len; i++) {
         var reader = new FileReader();
@@ -191,7 +189,7 @@ window.addEventListener('DOMContentLoaded', () => {
           );
         };
 
-        reader.readAsText(files[i]);
+        if (files) reader.readAsText(files[i]);
       }
     },
     false

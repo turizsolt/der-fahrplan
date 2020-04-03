@@ -106,12 +106,12 @@ export const curveToTube = (curve, normal = true, prevMesh = null, id = '') => {
     8,
     null,
     0,
-    this.scene,
+    null,
     true,
     BABYLON.Mesh.FRONTSIDE,
     prevMesh
   );
-  var boxMaterial = new BABYLON.StandardMaterial('boxMat', this.scene);
+  var boxMaterial = new BABYLON.StandardMaterial('boxMat', null);
   boxMaterial.diffuseColor = normal
     ? new BABYLON.Color3(0, 0, 0)
     : new BABYLON.Color3(0.5, 0.5, 1);

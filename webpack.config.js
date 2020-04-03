@@ -16,7 +16,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: 'src/index.ejs'
+      template: 'src/index.html'
     }),
     new CopyWebpackPlugin([{ from: 'src/assets', to: 'assets' }])
   ],
