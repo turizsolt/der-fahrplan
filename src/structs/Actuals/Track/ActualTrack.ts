@@ -1,7 +1,7 @@
 import { TrackEnd } from './TrackEnd';
 import { TrackSegment } from './TrackSegment';
 import { TrackRenderer } from '../../Renderers/TrackRenderer';
-import { TYPES } from '../../TYPES';
+import { TYPES } from '../../../di/TYPES';
 import { Coordinate } from '../../Geometry/Coordinate';
 import { Track } from '../../Interfaces/Track';
 import { ActualTrackBase } from './ActualTrackBase';

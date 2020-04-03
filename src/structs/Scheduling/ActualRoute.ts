@@ -2,7 +2,7 @@ import { ActualBaseStorable } from '../Actuals/ActualStorable';
 import { Route } from './Route';
 import { RouteStop } from './RouteStop';
 import { Store } from '../Interfaces/Store';
-import { TYPES } from '../TYPES';
+import { TYPES } from '../../di/TYPES';
 
 export class ActualRoute extends ActualBaseStorable implements Route {
   private name: string;

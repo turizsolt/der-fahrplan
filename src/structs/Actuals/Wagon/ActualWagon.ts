@@ -5,7 +5,7 @@ import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { WhichEnd } from '../../Interfaces/WhichEnd';
 import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
 import { Ray } from '../../Geometry/Ray';
-import { TYPES } from '../../TYPES';
+import { TYPES } from '../../../di/TYPES';
 import { WagonRenderer } from '../../Renderers/WagonRenderer';
 import { TrackBase } from '../../Interfaces/TrackBase';
 import { LineSegment } from '../../Geometry/LineSegment';

@@ -1,6 +1,6 @@
 import { TrackJointRenderer } from '../../Renderers/TrackJointRenderer';
 import { Coordinate } from '../../Geometry/Coordinate';
-import { TYPES } from '../../TYPES';
+import { TYPES } from '../../../di/TYPES';
 import { TrackJointEnd } from './TrackJointEnd';
 import { inject, injectable } from 'inversify';
 import { TrackJoint } from '../../Interfaces/TrackJoint';

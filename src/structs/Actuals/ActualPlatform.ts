@@ -5,7 +5,7 @@ import { Coordinate } from '../Geometry/Coordinate';
 import { Platform } from '../Interfaces/Platform';
 import { Color } from '../Color';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../TYPES';
+import { TYPES } from '../../di/TYPES';
 import { PlatformRenderer } from '../Renderers/PlatformRenderer';
 import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { Store } from '../Interfaces/Store';

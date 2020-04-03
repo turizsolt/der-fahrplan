@@ -3,7 +3,7 @@ import { TrackEnd } from './TrackEnd';
 import { TrackSegment } from './TrackSegment';
 import { Coordinate } from '../../Geometry/Coordinate';
 import { TrackSwitchRenderer } from '../../Renderers/TrackSwitchRenderer';
-import { TYPES } from '../../TYPES';
+import { TYPES } from '../../../di/TYPES';
 import { TrackSwitch } from '../../Interfaces/TrackSwitch';
 import { ActualTrackBase } from './ActualTrackBase';
 import { injectable, inject } from 'inversify';

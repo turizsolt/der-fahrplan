@@ -9,8 +9,8 @@ import {
   snapPositionOnTrack,
   snapJoint
 } from '../../structs/Geometry/Snap';
-import { babylonContainer } from '../../structs/inversify.config';
-import { TYPES } from '../../structs/TYPES';
+import { productionContainer } from '../../di/production.config';
+import { TYPES } from '../../di/TYPES';
 import { ActualTrack } from '../../structs/Actuals/Track/ActualTrack';
 import { TrackBase } from '../../structs/Interfaces/TrackBase';
 import { TrackJoint } from '../../structs/Interfaces/TrackJoint';
@@ -221,7 +221,7 @@ export class InputController {
     this.inputHandler = this.inputHandlers[this.mode];
 
     this.downProps = null;
-    this.store = babylonContainer.get<() => Store>(TYPES.FactoryOfStore)();
+    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
   }
 
   convert(event: PointerEvent): InputProps {

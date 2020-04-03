@@ -2,7 +2,7 @@ import { ActualBaseStorable } from '../Actuals/ActualStorable';
 import { Station } from './Station';
 import { RouteStop } from './RouteStop';
 import { Store } from '../Interfaces/Store';
-import { TYPES } from '../TYPES';
+import { TYPES } from '../../di/TYPES';
 import { Platform } from '../Interfaces/Platform';
 
 export class ActualRouteStop extends ActualBaseStorable implements RouteStop {

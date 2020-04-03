@@ -4,7 +4,7 @@ import { injectable, inject } from 'inversify';
 import { Track } from '../../structs/Interfaces/Track';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
 import { Left, Right } from '../../structs/Geometry/Directions';
-import { TYPES } from '../../structs/TYPES';
+import { TYPES } from '../../di/TYPES';
 import { MeshProvider } from './MeshProvider';
 import { MaterialName } from './MaterialName';
 

@@ -6,7 +6,7 @@ import { Circle } from '../Geometry/Circle';
 import { Coordinate } from '../Geometry/Coordinate';
 import { Platform } from '../Interfaces/Platform';
 import { StationRenderer } from '../Renderers/StationRenderer';
-import { TYPES } from '../TYPES';
+import { TYPES } from '../../di/TYPES';
 import { inject } from 'inversify';
 import { Color } from '../Color';
 import { NameGenerator } from '../NameGenerator';

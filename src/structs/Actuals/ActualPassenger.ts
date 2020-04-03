@@ -1,7 +1,7 @@
 import { Platform } from '../Interfaces/Platform';
 import { PassengerRenderer } from '../Renderers/PassengerRenderer';
 import { Coordinate } from '../Geometry/Coordinate';
-import { TYPES } from '../TYPES';
+import { TYPES } from '../../di/TYPES';
 import { Passenger } from '../Interfaces/Passenger';
 import { ActualBaseBrick } from './ActualBaseBrick';
 import { BaseRenderer } from '../Renderers/BaseRenderer';

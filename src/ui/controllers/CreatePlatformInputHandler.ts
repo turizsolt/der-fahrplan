@@ -7,8 +7,8 @@ import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/CoordinateToBabylonVector3';
 import { ActualTrack } from '../../structs/Actuals/Track/ActualTrack';
 import { Platform } from '../../structs/Interfaces/Platform';
-import { babylonContainer } from '../../structs/inversify.config';
-import { TYPES } from '../../structs/TYPES';
+import { productionContainer } from '../../di/production.config';
+import { TYPES } from '../../di/TYPES';
 import { Side } from '../../structs/Interfaces/Side';
 import { Color } from '../../structs/Color';
 
@@ -20,7 +20,7 @@ export class CreatePlatformInputHandler implements InputHandler {
   private platformFactory: () => Platform;
 
   constructor() {
-    this.platformFactory = babylonContainer.get<() => Platform>(
+    this.platformFactory = productionContainer.get<() => Platform>(
       TYPES.FactoryOfPlatform
     );
 
