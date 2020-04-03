@@ -1,5 +1,4 @@
-import { Engine } from '../Interfaces/Engine';
-import { Passenger } from './Passenger';
+import { Passenger } from '../Interfaces/Passenger';
 import { Side } from '../Interfaces/Side';
 import { TrackBase } from '../Interfaces/TrackBase';
 import { Coordinate } from '../Geometry/Coordinate';
@@ -8,28 +7,40 @@ import { Color } from '../Color';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../TYPES';
 import { PlatformRenderer } from '../Renderers/PlatformRenderer';
-import { ActualBaseBrick } from './ActualBaseBrick';
 import { BaseRenderer } from '../Renderers/BaseRenderer';
-import { PassengerGenerator } from './PassengerGenerator';
-import { Store } from '../Actuals/Store/Store';
+import { Store } from '../Interfaces/Store';
+import { LineSegmentChain } from '../Geometry/LineSegmentChain';
+import { Station } from '../Scheduling/Station';
+import { ActualBaseBoardable } from './ActualBaseBoardable';
+import { Left, Right } from '../Geometry/Directions';
 
 @injectable()
-export class ActualPlatform extends ActualBaseBrick implements Platform {
+export class ActualPlatform extends ActualBaseBoardable implements Platform {
   private position: Coordinate;
   private rotation: number;
-  private carList: Engine[];
-  private passengerList: Passenger[] = [];
 
   private track: TrackBase;
   private start: number;
   private end: number;
+  private startPerc: number;
+  private endPerc: number;
   private width: number;
   private side: Side;
-  private color: Color;
+  private station: Station;
   private removed: boolean = false;
-  private pg: PassengerGenerator;
 
   @inject(TYPES.PlatformRenderer) private renderer: PlatformRenderer;
+
+  board(passenger: Passenger): Coordinate {
+    super.board(passenger);
+    const chain = this.getLineSegmentChain();
+    const length = chain.getLength();
+    const at = Math.random() * length;
+    const ray = chain.getRayByDistance(at);
+    const w = 2.8 + Math.random() * (this.width - 1);
+    const x = ray.fromHere(this.side === Side.Left ? Left : Right, w);
+    return x.coord;
+  }
 
   getRenderer(): BaseRenderer {
     return this.renderer;
@@ -50,24 +61,72 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     return this.rotation;
   }
   getColor(): Color {
-    return this.color;
+    return this.station ? this.station.getColor() : Color.White();
+  }
+
+  getLineSegmentChain(): LineSegmentChain {
+    const p1 = this.track
+      .getSegment()
+      .getBezier()
+      .getPoint(this.startPerc);
+
+    const p2 = this.track
+      .getSegment()
+      .getBezier()
+      .getPoint(this.endPerc);
+
+    //console.log('p1', p1);
+    //console.log('p2', p2);
+
+    const chain = this.track.getSegment().getLineSegmentChain();
+
+    const chain2 = chain.getChainFromPoint(chain.project(p1).coord);
+    const chain3 = chain2.getChainToPoint(chain2.project(p2).coord);
+
+    // console.log('pch1', chain.getRays().map(x => x.coord));
+    // console.log('pch2', chain2.getRays().map(x => x.coord));
+    // console.log('pch3', chain3.getRays().map(x => x.coord));
+    return chain3;
+  }
+
+  isPartOfStation(station: Station): boolean {
+    for (let point of this.getLineSegmentChain().getPoints()) {
+      if (station.getCircle().isPointInside(point)) {
+        return true;
+      }
+    }
+    return (
+      this.getLineSegmentChain().getIntersectionsWithCirlce(station.getCircle())
+        .length > 0
+    );
+  }
+
+  setStation(station: Station): void {
+    this.station = station;
+    this.renderer.update();
+  }
+
+  getStation(): Station {
+    return this.station;
   }
 
   init(
     track: TrackBase,
     start: number,
     end: number,
-    width: number,
     side: Side,
-    color: Color,
-    pg: PassengerGenerator
+    width: number = 5
   ): Platform {
-    super.initStore();
+    super.initStore(TYPES.Platform);
 
     const segment = track.getSegment();
     const a = segment.getFirstPoint();
     const b = segment.getLastPoint();
     const segLen = segment.getLength();
+
+    this.startPerc = start;
+    this.endPerc = end;
+
     start = start * segLen;
     end = end * segLen;
 
@@ -76,8 +135,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     this.end = end;
     this.width = width;
     this.side = side;
-    this.color = color;
-    this.pg = pg;
 
     track.addPlatform(this);
 
@@ -114,34 +171,18 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     const rot1 = Math.atan2(rot.x, rot.z);
     this.rotation = rot1;
 
-    this.carList = [];
-
     this.renderer.init(this);
+
+    this.store
+      .getFiltered(x => x.constructor.name === 'ActualStation')
+      .forEach(st => {
+        const station = st as Station;
+        if (this.isPartOfStation(station)) {
+          station.addPlatform(this);
+        }
+      });
+
     return this;
-  }
-
-  checkin(engine: Engine) {
-    this.carList.push(engine);
-  }
-
-  checkout(engine: Engine) {
-    this.carList = this.carList.filter(elem => elem !== engine);
-  }
-
-  isChecked(engine: Engine) {
-    return this.carList.filter(elem => elem === engine).length > 0;
-  }
-
-  addPassenger(passenger: Passenger) {
-    this.passengerList.push(passenger);
-  }
-
-  removePassenger(passenger: Passenger) {
-    this.passengerList = this.passengerList.filter(x => x !== passenger);
-  }
-
-  callForDepartingPassengers(engine: Engine) {
-    this.passengerList.map(x => x.checkTrain(engine));
   }
 
   isBeside(position: number): boolean {
@@ -150,8 +191,11 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
 
   remove(): boolean {
     this.store.unregister(this);
-    this.pg.removeFromList(this);
     this.removed = true;
+    if (this.station) {
+      this.station.removePlatform(this);
+      this.station = null;
+    }
     this.renderer.update();
     return true;
   }
@@ -169,11 +213,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
       start: this.start,
       end: this.end,
       side: this.side,
-      color: {
-        red: this.color.red,
-        green: this.color.green,
-        blue: this.color.blue
-      },
       width: this.width
     };
   }
@@ -184,10 +223,8 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
       store.get(obj.track) as TrackBase,
       obj.start,
       obj.end,
-      obj.width,
       obj.side,
-      obj.color,
-      null
+      obj.width
     );
   }
 }

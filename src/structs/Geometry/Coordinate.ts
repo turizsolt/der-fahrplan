@@ -34,4 +34,8 @@ export class Coordinate {
   whichDir2d(other: Coordinate): number {
     return Math.atan2(other.x - this.x, other.z - this.z);
   }
+
+  static Origo(): Coordinate {
+    return new Coordinate(0, 0, 0);
+  }
 }

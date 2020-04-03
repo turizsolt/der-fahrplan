@@ -5,20 +5,15 @@ import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/Coordina
 import { ActualTrack } from '../../structs/Actuals/Track/ActualTrack';
 import { babylonContainer } from '../../structs/inversify.config';
 import { TYPES } from '../../structs/TYPES';
-import { Engine } from '../../structs/Interfaces/Engine';
 import { Track } from '../../structs/Interfaces/Track';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 
 export class CreateEngineInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
 
-  private engineFactory: () => Engine;
   private wagonFactory: () => Wagon;
 
   constructor() {
-    this.engineFactory = babylonContainer.get<() => Engine>(
-      TYPES.FactoryOfEngine
-    );
     this.wagonFactory = babylonContainer.get<() => Wagon>(TYPES.FactoryOfWagon);
 
     const mat = new BABYLON.StandardMaterial('boxMat', null);

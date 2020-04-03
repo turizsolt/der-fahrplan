@@ -115,6 +115,19 @@ export class MeshProvider {
     return mesh;
   }
 
+  createStationMesh(name: string, radius): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateTorus(
+      name,
+      {
+        diameter: 2 * radius,
+        thickness: 1,
+        tessellation: 24
+      },
+      null
+    );
+    return mesh;
+  }
+
   createWagonEndMesh(name: string): BABYLON.AbstractMesh {
     const mesh = BABYLON.MeshBuilder.CreateCylinder(
       name,

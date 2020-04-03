@@ -10,7 +10,6 @@ import { Platform } from '../../structs/Interfaces/Platform';
 import { babylonContainer } from '../../structs/inversify.config';
 import { TYPES } from '../../structs/TYPES';
 import { Side } from '../../structs/Interfaces/Side';
-import { PassengerGenerator } from '../../structs/Actuals/PassengerGenerator';
 import { Color } from '../../structs/Color';
 
 export class CreatePlatformInputHandler implements InputHandler {
@@ -18,14 +17,12 @@ export class CreatePlatformInputHandler implements InputHandler {
   private toMesh: BABYLON.Mesh;
   private pathMesh: BABYLON.Mesh;
 
-  private passengerGenerator: PassengerGenerator;
   private platformFactory: () => Platform;
 
   constructor() {
     this.platformFactory = babylonContainer.get<() => Platform>(
       TYPES.FactoryOfPlatform
     );
-    this.passengerGenerator = new PassengerGenerator([], null);
 
     const mat = new BABYLON.StandardMaterial('boxMat', null);
     mat.diffuseColor = new BABYLON.Color3(0, 1, 0);
@@ -159,12 +156,9 @@ export class CreatePlatformInputHandler implements InputHandler {
         pot.track,
         Math.min(pot.position, dpot.position),
         Math.max(pot.position, dpot.position),
-        7.5,
         side > 0 ? Side.Left : Side.Right,
-        randomColor(),
-        this.passengerGenerator
+        7.5
       );
-      this.passengerGenerator.addToList(pl);
     }
 
     this.fromMesh.setEnabled(false);
@@ -177,8 +171,4 @@ export class CreatePlatformInputHandler implements InputHandler {
     this.toMesh.setEnabled(false);
     this.pathMesh.setEnabled(false);
   }
-}
-
-function randomColor() {
-  return new Color(Math.random(), Math.random(), Math.random());
 }

@@ -1,15 +1,15 @@
 import { Land } from '../Interfaces/Land';
-import { Engine } from '../Interfaces/Engine';
 import { TrackJoint } from '../Interfaces/TrackJoint';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../TYPES';
 import { babylonContainer } from '../inversify.config';
+import { PassengerGenerator } from './PassengerGenerator';
 
 @injectable()
 export class ActualLand implements Land {
-  @inject(TYPES.FactoryOfEngine) engineFactory: () => Engine;
+  @inject(TYPES.PassengerGenerator) passengerGenerator: PassengerGenerator;
 
-  init(): Engine {
+  init(): void {
     const j0 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
     j0.init(-10, 0, Math.PI / 4);
     const jk = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
@@ -26,13 +26,8 @@ export class ActualLand implements Land {
     j2.connect(j0);
     j3.connect(jk);
     j3.connect(j2);
-    const { track } = j4.connect(j3);
+    j4.connect(j3);
 
-    setTimeout(() => {
-      const engine = this.engineFactory();
-      engine.init().putOnTrack(track);
-    }, 1000);
-
-    return null;
+    this.passengerGenerator.init();
   }
 }

@@ -3,6 +3,7 @@ import { Coordinate } from './Coordinate';
 import { Line } from './Line';
 import { almost } from './Almost';
 import { Left } from './Directions';
+import { Circle } from './Circle';
 
 export class LineSegment {
   private constructor(public a: Coordinate, public b: Coordinate) {}
@@ -57,6 +58,12 @@ export class LineSegment {
     const p = r2.computeMidpoint(r1);
     if (p) return [p];
     return [];
+  }
+
+  getIntersectionsWithCirlce(circle: Circle) {
+    const line = this.toLine();
+    const candidates = circle.getIntersectionsWithLine(line);
+    return candidates.filter(candidate => this.contains(candidate));
   }
 
   // returns 1 if point is on the left, -1 if on the right, 0 if on the line (not the segment)

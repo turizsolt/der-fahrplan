@@ -1,6 +1,5 @@
 import * as BABYLON from 'babylonjs';
 import { CoordinateToBabylonVector3 } from './converters/CoordinateToBabylonVector3';
-import { Engine } from '../../structs/Interfaces/Engine';
 import { injectable, inject } from 'inversify';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
 import { MeshProvider } from './MeshProvider';
@@ -101,6 +100,10 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
 
       case 'backward':
         this.wagon.moveTowardsWagonA(1);
+        break;
+
+      case 'stop':
+        this.wagon.stop();
         break;
 
       case 'endA':

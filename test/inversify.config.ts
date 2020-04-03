@@ -3,23 +3,19 @@ import { Container, interfaces } from 'inversify';
 import { PassengerRenderer } from '../src/structs/Renderers/PassengerRenderer';
 import { TYPES } from '../src/structs/TYPES';
 import { PassengerDummyRenderer } from './dummies/PassengerDummyRenderer';
-import { EngineRenderer } from '../src/structs/Renderers/EngineRenderer';
-import { EngineDummyRenderer } from './dummies/EngineDummyRenderer';
 import { TrackJointRenderer } from '../src/structs/Renderers/TrackJointRenderer';
 import { TrackJointDummyRenderer } from './dummies/TrackJointDummyRenderer';
 import { TrackRenderer } from '../src/structs/Renderers/TrackRenderer';
 import { TrackDummyRenderer } from './dummies/TrackDummyRenderer';
 import { TrackSwitchRenderer } from '../src/structs/Renderers/TrackSwitchRenderer';
 import { TrackSwitchDummyRenderer } from './dummies/TrackSwitchDummyRenderer';
-import { ActualEngine } from '../src/structs/Actuals/Wagon/ActualEngine';
-import { Engine } from '../src/structs/Interfaces/Engine';
 import { Track } from '../src/structs/Interfaces/Track';
 import { ActualTrack } from '../src/structs/Actuals/Track/ActualTrack';
 import { TrackSwitch } from '../src/structs/Interfaces/TrackSwitch';
 import { ActualTrackSwitch } from '../src/structs/Actuals/Track/ActualTrackSwitch';
 import { TrackJoint } from '../src/structs/Interfaces/TrackJoint';
 import { ActualTrackJoint } from '../src/structs/Actuals/TrackJoint/ActualTrackJoint';
-import { Store } from '../src/structs/Actuals/Store/Store';
+import { ActualStore } from '../src/structs/Actuals/Store/ActualStore';
 import { PlatformRenderer } from '../src/structs/Renderers/PlatformRenderer';
 import { PlatformDummyRenderer } from './dummies/PlatformDummyRenderer';
 import { Platform } from '../src/structs/Interfaces/Platform';
@@ -29,14 +25,28 @@ import { Wagon } from '../src/structs/Interfaces/Wagon';
 import { ActualWagon } from '../src/structs/Actuals/Wagon/ActualWagon';
 import { WagonRenderer } from '../src/structs/Renderers/WagonRenderer';
 import { WagonDummyRenderer } from './dummies/WagonDummyRenderer';
+import { Station } from '../src/structs/Scheduling/Station';
+import { ActualStation } from '../src/structs/Scheduling/ActualStation';
+import { StationRenderer } from '../src/structs/Renderers/StationRenderer';
+import { StationDummyRenderer } from './dummies/StationDummyRenderer';
+import { Route } from '../src/structs/Scheduling/Route';
+import { ActualRoute } from '../src/structs/Scheduling/ActualRoute';
+import { RouteStop } from '../src/structs/Scheduling/RouteStop';
+import { ActualRouteStop } from '../src/structs/Scheduling/ActualRouteStop';
+import { Store } from '../src/structs/Interfaces/Store';
+import { Passenger } from '../src/structs/Interfaces/Passenger';
+import { ActualPassenger } from '../src/structs/Actuals/ActualPassenger';
+import { PassengerGenerator } from '../src/structs/Actuals/PassengerGenerator';
+import { ActualPassengerGenerator } from '../src/structs/Actuals/ActualPassengerGenerator';
 
 export const testContainer = new Container();
 testContainer
   .bind<PassengerRenderer>(TYPES.PassengerRenderer)
   .to(PassengerDummyRenderer);
 testContainer
-  .bind<EngineRenderer>(TYPES.EngineRenderer)
-  .to(EngineDummyRenderer);
+  .bind<PassengerGenerator>(TYPES.PassengerGenerator)
+  .to(ActualPassengerGenerator);
+testContainer.bind<Passenger>(TYPES.Passenger).to(ActualPassenger);
 testContainer.bind<WagonRenderer>(TYPES.WagonRenderer).to(WagonDummyRenderer);
 testContainer
   .bind<TrackJointRenderer>(TYPES.TrackJointRenderer)
@@ -49,13 +59,12 @@ testContainer
   .bind<PlatformRenderer>(TYPES.PlatformRenderer)
   .to(PlatformDummyRenderer);
 
-testContainer.bind<Engine>(TYPES.Engine).to(ActualEngine);
 testContainer.bind<Wagon>(TYPES.Wagon).to(ActualWagon);
 testContainer.bind<Track>(TYPES.Track).to(ActualTrack);
 testContainer.bind<TrackJoint>(TYPES.TrackJoint).to(ActualTrackJoint);
 testContainer.bind<TrackSwitch>(TYPES.TrackSwitch).to(ActualTrackSwitch);
 testContainer.bind<Platform>(TYPES.Platform).to(ActualPlatform);
-testContainer.bind<Store>(TYPES.Store).to(Store);
+testContainer.bind<Store>(TYPES.Store).to(ActualStore);
 testContainer
   .bind<TrackJointConnector>(TYPES.TrackJointConnector)
   .to(TrackJointConnector);
@@ -84,14 +93,6 @@ testContainer
         store = context.container.get<Store>(TYPES.Store).init();
       }
       return store;
-    };
-  });
-
-testContainer
-  .bind<interfaces.Factory<Engine>>(TYPES.FactoryOfEngine)
-  .toFactory<Engine>((context: interfaces.Context) => {
-    return () => {
-      return context.container.get<Engine>(TYPES.Engine);
     };
   });
 
@@ -132,5 +133,43 @@ testContainer
   .toFactory<Platform>((context: interfaces.Context) => {
     return () => {
       return context.container.get<Platform>(TYPES.Platform);
+    };
+  });
+
+testContainer.bind<Station>(TYPES.Station).to(ActualStation);
+testContainer
+  .bind<StationRenderer>(TYPES.StationRenderer)
+  .to(StationDummyRenderer);
+testContainer
+  .bind<interfaces.Factory<Station>>(TYPES.FactoryOfStation)
+  .toFactory<Station>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Station>(TYPES.Station);
+    };
+  });
+
+testContainer.bind<Route>(TYPES.Route).to(ActualRoute);
+testContainer
+  .bind<interfaces.Factory<Route>>(TYPES.FactoryOfRoute)
+  .toFactory<Route>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Route>(TYPES.Route);
+    };
+  });
+
+testContainer.bind<RouteStop>(TYPES.RouteStop).to(ActualRouteStop);
+testContainer
+  .bind<interfaces.Factory<RouteStop>>(TYPES.FactoryOfRouteStop)
+  .toFactory<RouteStop>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<RouteStop>(TYPES.RouteStop);
+    };
+  });
+
+testContainer
+  .bind<interfaces.Factory<Passenger>>(TYPES.FactoryOfPassenger)
+  .toFactory<Passenger>((context: interfaces.Context) => {
+    return () => {
+      return context.container.get<Passenger>(TYPES.Passenger);
     };
   });

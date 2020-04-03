@@ -2,9 +2,7 @@ import { inject, injectable } from 'inversify';
 import { PositionOnTrack } from '../Track/PositionOnTrack';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { Store } from '../Store/Store';
 import { WhichEnd } from '../../Interfaces/WhichEnd';
-import { End } from '../End';
 import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
 import { Ray } from '../../Geometry/Ray';
 import { TYPES } from '../../TYPES';
@@ -13,15 +11,141 @@ import { TrackBase } from '../../Interfaces/TrackBase';
 import { LineSegment } from '../../Geometry/LineSegment';
 import { TrackWorm } from '../Track/TrackWorm';
 import { WagonEnd } from './WagonEnd';
+import { Store } from '../../Interfaces/Store';
+import { Route } from '../../Scheduling/Route';
+import { Platform } from '../../Interfaces/Platform';
+import { Passenger } from '../../Interfaces/Passenger';
+import { ActualBaseBoardable } from '../ActualBaseBoardable';
+import { Coordinate } from '../../Geometry/Coordinate';
+import { Left } from '../../Geometry/Directions';
 
 const WAGON_GAP: number = 1;
 
 @injectable()
-export class ActualWagon extends ActualBaseBrick implements Wagon {
+export class ActualWagon extends ActualBaseBoardable implements Wagon {
   private removed: boolean = false;
   protected worm: TrackWorm;
+  protected trip: Route;
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
+
+  assignTrip(route: Route): void {
+    if (this.trip) {
+      for (let stop of this.trip.getStops()) {
+        stop.getStation().deannounce(this.trip);
+      }
+    }
+    this.trip = route;
+    if (this.trip) {
+      for (let stop of this.trip.getStops()) {
+        stop.getStation().announce(this.trip);
+      }
+    }
+    this.update();
+  }
+
+  getTrip(): Route {
+    return this.trip;
+  }
+
+  stop(): void {
+    // todo use the worm
+    const platformsInvolved: Platform[] = [];
+    const trackA = this.ends.A.positionOnTrack.getTrack();
+    platformsInvolved.push(
+      ...trackA
+        .getPlatformsBeside()
+        .filter(p => this.ends.A.positionOnTrack.isBeside(p))
+    );
+    const trackB = this.ends.B.positionOnTrack.getTrack();
+    trackB
+      .getPlatformsBeside()
+      .filter(p => this.ends.B.positionOnTrack.isBeside(p))
+      .map((p: Platform) => {
+        if (!platformsInvolved.find(x => x === p)) {
+          platformsInvolved.push(p);
+        }
+      });
+
+    platformsInvolved.map(p => this.stoppedAt(p));
+  }
+
+  stoppedAt(platform: Platform): void {
+    if (platform.getStation()) {
+      platform.getStation().announceArrived(this, platform, this.trip);
+    }
+    this.announceStoppedAt(platform);
+  }
+
+  announceStoppedAt(platform: Platform): void {
+    const station = platform.getStation();
+    this.seats.map(p => {
+      if (p) {
+        p.listenWagonStoppedAtAnnouncement(station, platform, this, this.trip);
+      }
+    });
+  }
+
+  private seatCount: number = 21;
+  private passengerCount: number = 0;
+  private seats: Passenger[] = [];
+
+  board(passenger: Passenger): Coordinate {
+    //super.board(passenger);
+    if (this.passengerCount >= this.seatCount) {
+      return Coordinate.Origo(); // todo
+    }
+
+    this.passengerCount += 1;
+    let seatNo: number;
+    do {
+      seatNo = (Math.random() * this.seatCount) | 0;
+    } while (this.seats[seatNo]);
+    this.seats[seatNo] = passenger;
+    return this.seatOffset(seatNo).coord;
+  }
+
+  moveBoardedPassengers() {
+    this.seats.map((pass, seatNo) => {
+      if (pass) {
+        pass.updatePos(this.seatOffset(seatNo).coord);
+      }
+    });
+  }
+
+  private seatOffset(seatNo) {
+    const colSize = 1.2;
+    const rowSize = 1.2;
+    const colCount = 3 - 1;
+    const rowCount = Math.ceil(this.seatCount / (colCount + 1)) - 1;
+
+    const col = seatNo % 3;
+    const row = (seatNo - col) / 3;
+    return this.getCenterRay()
+      .fromHere(Left, -((colCount / 2) * colSize) + col * colSize)
+      .fromHere(0, (rowCount / 2) * rowSize - row * rowSize);
+  }
+
+  unboard(passenger: Passenger): void {
+    const seatNo = this.seats.findIndex(x => x === passenger);
+    if (seatNo !== -1) {
+      this.seats[seatNo] = undefined;
+      this.passengerCount -= 1;
+    }
+  }
+
+  getCenterPos(): Coordinate {
+    return this.ends.A.positionOnTrack
+      .getRay()
+      .coord.midpoint(this.ends.B.positionOnTrack.getRay().coord);
+  }
+
+  getCenterRay(): Ray {
+    return new Ray(
+      this.getCenterPos(),
+      this.ends.A.positionOnTrack.getRay().dirXZ
+    );
+  }
 
   getLength(): number {
     return 14;
@@ -39,7 +163,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.removed;
   }
   init(): Wagon {
-    super.initStore();
+    super.initStore(TYPES.Wagon);
 
     this.ends = {
       [WhichEnd.A]: new WagonEnd(WhichEnd.A, this),
@@ -63,13 +187,44 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.renderer;
   }
   persist(): Object {
-    throw new Error('Method not implemented.');
+    return {
+      id: this.id,
+      type: 'Wagon',
+
+      // todo A, B ends
+      trip: this.trip && this.trip.getId()
+    };
   }
+
+  persistDeep(): Object {
+    return {
+      id: this.id,
+      type: 'Wagon',
+
+      // todo A, B ends
+      trip: this.trip && this.trip.persistDeep()
+    };
+  }
+
   load(obj: Object, store: Store): void {
     throw new Error('Method not implemented.');
   }
+
   update() {
     this.renderer.update();
+
+    const deep = this.persistDeep();
+    this.updateCallbacks.map(cb => cb(deep));
+  }
+
+  private updateCallbacks: Function[] = [];
+
+  subscribeToUpdates(callback: (wagon: Object) => void): void {
+    this.updateCallbacks.push(callback);
+  }
+
+  unsubscribeToUpdates(callback: (wagon: Object) => void): void {
+    this.updateCallbacks = this.updateCallbacks.filter(c => c !== callback);
   }
 
   putOnTrack(
@@ -79,14 +234,12 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   ): void {
     this.ends.A.positionOnTrack = new PositionOnTrack(
       track,
-      null,
       position,
       direction
     );
 
     this.ends.B.positionOnTrack = new PositionOnTrack(
       track,
-      null,
       position,
       direction
     );
@@ -166,6 +319,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
         this.ends.B.connect(nearest.end);
       }
     }
+
+    this.moveBoardedPassengers();
   }
 
   pullToPos(pot: PositionOnTrack, dir: number) {
@@ -246,6 +401,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
         this.ends.A.connect(nearest.end);
       }
     }
+
+    this.moveBoardedPassengers();
   }
 
   getNearestWagon(whichEnd: WhichEnd): NearestWagon {

@@ -1,6 +1,5 @@
 import { TrackBase } from '../../Interfaces/TrackBase';
 import { Platform } from '../../Interfaces/Platform';
-import { Engine } from '../../Interfaces/Engine';
 import { Ray } from '../../Geometry/Ray';
 import { TrackEnd } from './TrackEnd';
 import { Circle } from '../../Geometry/Circle';
@@ -9,7 +8,6 @@ export class PositionOnTrack {
   private percentage: number;
   constructor(
     private track: TrackBase,
-    private engine: Engine,
     private position: number = 0,
     private direction: number = 1
   ) {
@@ -53,7 +51,7 @@ export class PositionOnTrack {
 
   setPercentage(percentage: number): void {
     this.percentage = percentage;
-    //this.position = this.track.getLength() * percentage;
+    this.position = this.track.getLength() * percentage;
   }
 
   move(distance: number) {

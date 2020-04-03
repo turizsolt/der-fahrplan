@@ -1,0 +1,110 @@
+import * as BABYLON from 'babylonjs';
+import { InputHandler } from './InputHandler';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { InputProps } from './InputProps';
+import { babylonContainer } from '../../structs/inversify.config';
+import { TrackJoint } from '../../structs/Interfaces/TrackJoint';
+import { TYPES } from '../../structs/TYPES';
+import { curveToTube } from '../babylon/TrackBabylonRenderer';
+import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
+import { CoordinateToBabylonVector3 } from '../babylon/converters/CoordinateToBabylonVector3';
+import { Station } from '../../structs/Scheduling/Station';
+import { Circle } from '../../structs/Geometry/Circle';
+
+export class CreateStationInputHandler implements InputHandler {
+  private fromMesh: BABYLON.Mesh;
+  private toMesh: BABYLON.Mesh;
+
+  constructor() {
+    this.fromMesh = BABYLON.MeshBuilder.CreateBox(
+      name,
+      { height: 1, width: 1, depth: 1 },
+      null
+    );
+    this.fromMesh.setEnabled(false);
+    this.fromMesh.isPickable = false;
+
+    this.toMesh = BABYLON.MeshBuilder.CreateBox(
+      name,
+      { height: 1, width: 1, depth: 1 },
+      null
+    );
+    this.toMesh.setEnabled(false);
+    this.toMesh.isPickable = false;
+  }
+
+  down(props: InputProps, event: PointerEvent): void {
+    if (!props.snappedJoint) {
+      this.fromMesh.setEnabled(
+        !props.snappedJoint && !props.snappedPositionOnTrack
+      );
+      this.fromMesh.position = CoordinateToBabylonVector3(
+        props.snappedPoint.coord
+      );
+      this.fromMesh.position.y = 0.75;
+    }
+
+    this.toMesh.setEnabled(
+      !props.snappedJoint && !props.snappedPositionOnTrack
+    );
+    this.toMesh.position = CoordinateToBabylonVector3(props.snappedPoint.coord);
+    this.toMesh.position.y = 0.75;
+  }
+
+  roam(props: InputProps, event: PointerEvent): void {
+    if (props.snappedPoint) {
+      this.fromMesh.position = CoordinateToBabylonVector3(
+        props.snappedPoint.coord
+      );
+      this.fromMesh.position.y = 0.75;
+    }
+    this.fromMesh.setEnabled(
+      !props.snappedJoint && !props.snappedPositionOnTrack
+    );
+  }
+
+  move(downProps: InputProps, props: InputProps, event: PointerEvent): void {
+    this.toMesh.position = CoordinateToBabylonVector3(props.snappedPoint.coord);
+    this.toMesh.position.y = 0.75;
+    this.toMesh.setEnabled(!props.snappedJoint);
+
+    if (props.snappedJoint) {
+      props.snappedPoint.dirXZ = props.snappedJoint.getRotation();
+    }
+
+    if (downProps.snappedJoint) {
+      downProps.snappedPoint.dirXZ = downProps.snappedJoint.getRotation();
+    }
+  }
+
+  click(downProps: InputProps, event: PointerEvent): void {}
+
+  up(downProps: InputProps, props: InputProps, event: PointerEvent): void {
+    if (
+      !downProps.snappedPoint.coord.equalsTo(props.snappedPoint.coord) &&
+      (!props.snappedJointOnTrack ||
+        props.snappedJointOnTrack.position === 0 ||
+        props.snappedJointOnTrack.position === 1) &&
+      (!downProps.snappedJointOnTrack ||
+        downProps.snappedJointOnTrack.position === 0 ||
+        downProps.snappedJointOnTrack.position === 1)
+    ) {
+      const station = babylonContainer.get<Station>(TYPES.Station);
+      const diam = downProps.snappedPoint.coord.distance2d(
+        props.snappedPoint.coord
+      );
+      const pt = downProps.snappedPoint.coord.midpoint(
+        props.snappedPoint.coord
+      );
+      station.init(new Circle(pt, diam / 2));
+      console.log('station', station);
+    }
+    this.fromMesh.setEnabled(false);
+    this.toMesh.setEnabled(false);
+  }
+
+  cancel(): void {
+    this.fromMesh.setEnabled(false);
+    this.toMesh.setEnabled(false);
+  }
+}
