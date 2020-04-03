@@ -1,6 +1,4 @@
 import { TYPES as T } from './TYPES';
-import { Land } from '../structs/Interfaces/Land';
-import { ActualLand } from '../structs/Actuals/ActualLand';
 import { Track } from '../structs/Interfaces/Track';
 import { TrackSwitch } from '../structs/Interfaces/TrackSwitch';
 import { ActualTrack } from '../structs/Actuals/Track/ActualTrack';
@@ -36,7 +34,6 @@ export const addCommonMaps = (ioc: DependencyContainer): void => {
     TrackJointConnector
   );
 
-  ioc.map<Land>(T.Land, ActualLand);
   ioc.map<PassengerGenerator>(T.PassengerGenerator, ActualPassengerGenerator);
 
   ioc.fm<Wagon>(T.FactoryOfWagon, T.Wagon, ActualWagon);

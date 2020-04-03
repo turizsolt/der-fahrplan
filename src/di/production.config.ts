@@ -17,10 +17,13 @@ import { StationRenderer } from '../structs/Renderers/StationRenderer';
 import { StationBabylonRenderer } from '../ui/babylon/StationBabylonRenderer';
 import { DependencyContainer } from './DependencyContainer';
 import { addCommonMaps } from './common';
+import { ActualLand } from '../structs/Actuals/ActualLand';
+import { Land } from '../structs/Interfaces/Land';
 
 export const productionContainer = new Container();
 const ioc = new DependencyContainer(productionContainer);
 addCommonMaps(ioc);
+ioc.map<Land>(T.Land, ActualLand);
 ioc.map<WagonRenderer>(T.WagonRenderer, WagonBabylonRenderer);
 ioc.map<TrackRenderer>(T.TrackRenderer, TrackBabylonRenderer);
 ioc.map<TrackSwitchRenderer>(T.TrackSwitchRenderer, TrackSwitchBabylonRenderer);
