@@ -1,6 +1,5 @@
 import { inject, injectable } from 'inversify';
 import { PositionOnTrack } from '../Track/PositionOnTrack';
-import { ActualBaseBrick } from '../ActualBaseBrick';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { WhichEnd } from '../../Interfaces/WhichEnd';
 import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
@@ -18,9 +17,13 @@ import { Passenger } from '../../Interfaces/Passenger';
 import { ActualBaseBoardable } from '../ActualBaseBoardable';
 import { Coordinate } from '../../Geometry/Coordinate';
 import { Left } from '../../Geometry/Directions';
+import { Updatable } from '../../../mixins/Updatable';
+import { applyMixins } from '../../../mixins/ApplyMixins';
 
 const WAGON_GAP: number = 1;
 
+export interface ActualWagon extends Updatable {}
+const doApply = () => applyMixins(ActualWagon, [Updatable]);
 @injectable()
 export class ActualWagon extends ActualBaseBoardable implements Wagon {
   private removed: boolean = false;
@@ -214,17 +217,7 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
     this.renderer.update();
 
     const deep = this.persistDeep();
-    this.updateCallbacks.map(cb => cb(deep));
-  }
-
-  private updateCallbacks: Function[] = [];
-
-  subscribeToUpdates(callback: (wagon: Object) => void): void {
-    this.updateCallbacks.push(callback);
-  }
-
-  unsubscribeToUpdates(callback: (wagon: Object) => void): void {
-    this.updateCallbacks = this.updateCallbacks.filter(c => c !== callback);
+    this.notify(deep);
   }
 
   putOnTrack(
@@ -435,3 +428,5 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
     this.getB().swapDirection();
   }
 }
+
+doApply();
