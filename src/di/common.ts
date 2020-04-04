@@ -9,7 +9,6 @@ import { ActualStore } from '../structs/Actuals/Store/ActualStore';
 import { Platform } from '../structs/Interfaces/Platform';
 import { ActualPlatform } from '../structs/Actuals/ActualPlatform';
 import { TrackJointConnector } from '../structs/Actuals/TrackJoint/TrackJointConnector';
-import { MeshProvider } from '../ui/babylon/MeshProvider';
 import { ActualWagon } from '../structs/Actuals/Wagon/ActualWagon';
 import { Wagon } from '../structs/Interfaces/Wagon';
 import { RouteStop } from '../structs/Scheduling/RouteStop';
@@ -27,7 +26,6 @@ import { DependencyContainer } from './DependencyContainer';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
-  ioc.sng<MeshProvider>(T.FactoryOfMeshProvider, T.MeshProvider, MeshProvider);
   ioc.sng<TrackJointConnector>(
     T.FactoryOfTrackJointConnector,
     T.TrackJointConnector,

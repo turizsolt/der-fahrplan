@@ -19,11 +19,13 @@ import { DependencyContainer } from './DependencyContainer';
 import { addCommonMaps } from './common';
 import { ActualLand } from '../structs/Actuals/ActualLand';
 import { Land } from '../structs/Interfaces/Land';
+import { MeshProvider } from '../ui/babylon/MeshProvider';
 
 export const productionContainer = new Container();
 const ioc = new DependencyContainer(productionContainer);
 addCommonMaps(ioc);
 ioc.map<Land>(T.Land, ActualLand);
+ioc.sng<MeshProvider>(T.FactoryOfMeshProvider, T.MeshProvider, MeshProvider);
 ioc.map<WagonRenderer>(T.WagonRenderer, WagonBabylonRenderer);
 ioc.map<TrackRenderer>(T.TrackRenderer, TrackBabylonRenderer);
 ioc.map<TrackSwitchRenderer>(T.TrackSwitchRenderer, TrackSwitchBabylonRenderer);
