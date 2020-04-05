@@ -14,18 +14,19 @@ import { Store } from '../../Interfaces/Store';
 import { Route } from '../../Scheduling/Route';
 import { Platform } from '../../Interfaces/Platform';
 import { Passenger } from '../../Interfaces/Passenger';
-import { ActualBaseBoardable } from '../ActualBaseBoardable';
 import { Coordinate } from '../../Geometry/Coordinate';
 import { Left } from '../../Geometry/Directions';
 import { Updatable } from '../../../mixins/Updatable';
 import { applyMixins } from '../../../mixins/ApplyMixins';
+import { Boardable } from '../../../mixins/Boardable';
+import { ActualBaseBrick } from '../ActualBaseBrick';
 
 const WAGON_GAP: number = 1;
 
-export interface ActualWagon extends Updatable {}
-const doApply = () => applyMixins(ActualWagon, [Updatable]);
+export interface ActualWagon extends Updatable, Boardable {}
+const doApply = () => applyMixins(ActualWagon, [Updatable, Boardable]);
 @injectable()
-export class ActualWagon extends ActualBaseBoardable implements Wagon {
+export class ActualWagon extends ActualBaseBrick implements Wagon {
   private removed: boolean = false;
   protected worm: TrackWorm;
   protected trip: Route;
@@ -94,7 +95,6 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
   private seats: Passenger[] = [];
 
   board(passenger: Passenger): Coordinate {
-    //super.board(passenger);
     if (this.passengerCount >= this.seatCount) {
       return Coordinate.Origo(); // todo
     }
@@ -135,6 +135,10 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
       this.seats[seatNo] = undefined;
       this.passengerCount -= 1;
     }
+  }
+
+  getBoardedPassengers(): Passenger[] {
+    return this.seats.filter(x => x);
   }
 
   getCenterPos(): Coordinate {

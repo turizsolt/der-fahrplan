@@ -1,13 +1,13 @@
-import { Passenger } from './Passenger';
 import { Coordinate } from '../Geometry/Coordinate';
 import { Color } from '../Color';
 import { Side } from './Side';
 import { TrackBase } from './TrackBase';
 import { LineSegmentChain } from '../Geometry/LineSegmentChain';
 import { Station } from '../Scheduling/Station';
-import { BaseBoardable } from './BaseBoardable';
+import { BaseBrick } from './BaseBrick';
+import { Boardable } from '../../mixins/Boardable';
 
-export interface Platform extends BaseBoardable {
+export interface Platform extends BaseBrick, Boardable {
   isBeside(position: number): boolean;
 
   getLineSegmentChain(): LineSegmentChain;

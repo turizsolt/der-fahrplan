@@ -5,10 +5,11 @@ import { PositionOnTrack } from '../Actuals/Track/PositionOnTrack';
 import { WhichEnd } from '../Interfaces/WhichEnd';
 import { Route } from '../Scheduling/Route';
 import { Platform } from './Platform';
-import { BaseBoardable } from './BaseBoardable';
 import { Updatable } from '../../mixins/Updatable';
+import { BaseBrick } from './BaseBrick';
+import { Boardable } from '../../mixins/Boardable';
 
-export interface Wagon extends BaseBoardable, Updatable {
+export interface Wagon extends BaseBrick, Boardable, Updatable {
   init(): Wagon;
   update(): void;
   getA(): WagonEnd;

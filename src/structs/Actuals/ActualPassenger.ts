@@ -2,21 +2,20 @@ import { Platform } from '../Interfaces/Platform';
 import { PassengerRenderer } from '../Renderers/PassengerRenderer';
 import { Coordinate } from '../Geometry/Coordinate';
 import { TYPES } from '../../di/TYPES';
-import { Passenger } from '../Interfaces/Passenger';
+import { Passenger, Place } from '../Interfaces/Passenger';
 import { ActualBaseBrick } from './ActualBaseBrick';
 import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { injectable, inject } from 'inversify';
 import { Station } from '../Scheduling/Station';
 import { Route } from '../Scheduling/Route';
 import { Wagon } from '../Interfaces/Wagon';
-import { BaseBoardable } from '../Interfaces/BaseBoardable';
 import { Color } from '../Color';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
   private to: Station;
   private from: Station;
-  private place: BaseBoardable;
+  private place: Place;
   private pos: Coordinate = Coordinate.Origo();
 
   init(from: Station, to: Station) {
@@ -74,7 +73,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     }
   }
 
-  getPlace(): BaseBoardable {
+  getPlace(): Place {
     return this.place;
   }
 
@@ -86,7 +85,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     return this.to.getColor();
   }
 
-  private setPlace(place: BaseBoardable) {
+  private setPlace(place: Place) {
     if (this.place) {
       this.place.unboard(this);
     }

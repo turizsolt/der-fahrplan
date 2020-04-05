@@ -4,12 +4,14 @@ import { Coordinate } from '../Geometry/Coordinate';
 import { Station } from '../Scheduling/Station';
 import { Route } from '../Scheduling/Route';
 import { Wagon } from './Wagon';
-import { BaseBoardable } from './BaseBoardable';
 import { Color } from '../Color';
+import { Boardable } from '../../mixins/Boardable';
+
+export type Place = Boardable & BaseBrick;
 
 export interface Passenger extends BaseBrick {
   init(from: Station, to: Station);
-  getPlace(): BaseBoardable;
+  getPlace(): Place;
   getColor(): Color;
   getPosition(): Coordinate;
   listenStationAnnouncement(station: Station, trip: Route);
