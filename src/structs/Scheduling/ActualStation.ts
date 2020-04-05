@@ -13,9 +13,12 @@ import { NameGenerator } from '../NameGenerator';
 import { Route } from './Route';
 import { Passenger } from '../Interfaces/Passenger';
 import { Wagon } from '../Interfaces/Wagon';
-import { ActualBaseBoardable } from '../Actuals/ActualBaseBoardable';
+import { Boardable } from '../../mixins/Boardable';
+import { applyMixins } from '../../mixins/ApplyMixins';
 
-export class ActualStation extends ActualBaseBoardable implements Station {
+export interface ActualStation extends Boardable {}
+const doApply = () => applyMixins(ActualStation, [], [Boardable]);
+export class ActualStation extends ActualBaseBrick implements Station {
   private name: string;
   private circle: Circle;
   private platforms: Platform[];
@@ -26,9 +29,11 @@ export class ActualStation extends ActualBaseBoardable implements Station {
 
   private announcedTrips: Route[] = [];
 
+  private boardable: Boardable = new Boardable();
+
   announce(trip: Route) {
     this.announcedTrips.push(trip);
-    this.boardedPassengers.map(p => {
+    this.getBoardedPassengers().map(p => {
       p.listenStationAnnouncement(this, trip);
     });
   }
@@ -50,7 +55,9 @@ export class ActualStation extends ActualBaseBoardable implements Station {
   }
 
   board(passenger: Passenger): Coordinate {
-    super.board(passenger);
+    //super.board(passenger);
+    this.boardable.board(passenger);
+
     const rand = Math.random() * Math.PI * 2 - Math.PI;
     const dist = Math.random() * 5;
     const offset = new Coordinate(
@@ -154,3 +161,4 @@ export class ActualStation extends ActualBaseBoardable implements Station {
     this.setName(obj.name);
   }
 }
+doApply();
