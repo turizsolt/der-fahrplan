@@ -15,6 +15,7 @@ export interface Wagon extends BaseBrick, Boardable, Updatable {
   update(): void;
   getA(): WagonEnd;
   getB(): WagonEnd;
+  getEnd(whichEnd: WhichEnd): WagonEnd;
   getRay(): Ray;
   remove(): boolean;
   isRemoved(): boolean;

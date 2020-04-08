@@ -1,5 +1,5 @@
 import { PositionOnTrack } from '../Track/PositionOnTrack';
-import { WhichEnd } from '../../Interfaces/WhichEnd';
+import { WhichEnd, otherEnd } from '../../Interfaces/WhichEnd';
 import { End } from '../End';
 import { Wagon } from '../../Interfaces/Wagon';
 
@@ -10,8 +10,10 @@ export class WagonEnd extends End<Wagon> {
     const successful: boolean = super.connect(otherEnd);
     if (successful) {
       const train = this.endOf.getTrain();
-      otherEnd.getEndOf().getTrain();
-      otherEnd.getEndOf().setTrain(train);
+      const otherTrain = otherEnd.getEndOf().getTrain();
+      if (train !== otherTrain) {
+        train.mergeWith(otherTrain);
+      }
     }
     return successful;
   }
@@ -19,9 +21,20 @@ export class WagonEnd extends End<Wagon> {
   disconnect(): boolean {
     const successful: boolean = super.disconnect();
     if (successful) {
-      this.endOf.setTrain(undefined);
+      const train = this.endOf.getTrain();
+      const wagonsToSeparate = [];
+      let end: WagonEnd = this;
+      while (end) {
+        wagonsToSeparate.push(end.endOf);
+        end = end.getOppositeEnd().getConnectedEnd();
+      }
+      train.separateThese(wagonsToSeparate);
     }
     return successful;
+  }
+
+  getOppositeEnd(): WagonEnd {
+    return this.endOf.getEnd(otherEnd(this.whichEnd));
   }
 
   getPositionOnTrack() {

@@ -58,7 +58,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     if (train) {
       this.train = train;
     } else {
-      this.train = this.store.create<Train>(TYPES.Train).init();
+      this.train = this.store.create<Train>(TYPES.Train).init(this);
     }
   }
 
@@ -191,7 +191,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       [WhichEnd.B]: new WagonEnd(WhichEnd.B, this)
     };
 
-    this.train = this.store.create<Train>(TYPES.Train).init();
+    this.train = this.store.create<Train>(TYPES.Train).init(this);
 
     return this;
   }
@@ -202,6 +202,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   getB(): WagonEnd {
     return this.ends.B;
+  }
+
+  getEnd(whichEnd: WhichEnd): WagonEnd {
+    return this.ends[whichEnd];
   }
 
   private ends: Record<WhichEnd, WagonEnd>;

@@ -6,8 +6,8 @@ export class TrackEnd extends End<TrackBase> {
   protected jointTo: TrackJoint;
   protected connectedEnd: TrackEnd;
 
-  connect(otherEnd: TrackEnd, joint?: TrackJoint) {
-    if (this.connectedEnd) return;
+  connect(otherEnd: TrackEnd, joint?: TrackJoint): boolean {
+    if (this.connectedEnd) return false;
 
     this.connectedEnd = otherEnd;
     if (joint) this.jointTo = joint;
@@ -17,6 +17,7 @@ export class TrackEnd extends End<TrackBase> {
     }
 
     this.endOf.update();
+    return true;
   }
 
   hasConnectedEndOf(): boolean {
