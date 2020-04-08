@@ -36,15 +36,20 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
   assignTrip(route: Route): void {
-    if (this.trip) {
-      for (let stop of this.trip.getStops()) {
-        stop.getStation().deannounce(this.trip);
+    const oldTrip = this.getTrip();
+    if (oldTrip) {
+      for (let stop of oldTrip.getStops()) {
+        stop.getStation().deannounce(oldTrip);
       }
     }
     this.trip = route;
-    if (this.trip) {
-      for (let stop of this.trip.getStops()) {
-        stop.getStation().announce(this.trip);
+    if (route) {
+      this.train.setSchedulingWagon(this);
+    }
+    const newTrip = this.getTrip();
+    if (newTrip) {
+      for (let stop of newTrip.getStops()) {
+        stop.getStation().announce(newTrip);
       }
     }
     this.update();
@@ -63,7 +68,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   getTrip(): Route {
-    return this.trip;
+    if (this.trip) return this.trip;
+    if (this.getTrain().getSchedulingWagon() !== this)
+      return this.getTrain().getTrip();
+    return null;
   }
 
   stop(): void {
