@@ -23,6 +23,8 @@ import { ActualPassenger } from '../structs/Actuals/ActualPassenger';
 import { PassengerGenerator } from '../structs/Actuals/PassengerGenerator';
 import { ActualPassengerGenerator } from '../structs/Actuals/ActualPassengerGenerator';
 import { DependencyContainer } from './DependencyContainer';
+import { Train } from '../structs/Scheduling/Train';
+import { ActualTrain } from '../structs/Scheduling/ActualTrain';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
@@ -34,6 +36,7 @@ export const addCommonMaps = (ioc: DependencyContainer): void => {
 
   ioc.map<PassengerGenerator>(T.PassengerGenerator, ActualPassengerGenerator);
 
+  ioc.fm<Train>(T.FactoryOfTrain, T.Train, ActualTrain);
   ioc.fm<Wagon>(T.FactoryOfWagon, T.Wagon, ActualWagon);
   ioc.fm<Track>(T.FactoryOfTrack, T.Track, ActualTrack);
   ioc.fm<TrackSwitch>(T.FactoryOfTrackSwitch, T.TrackSwitch, ActualTrackSwitch);

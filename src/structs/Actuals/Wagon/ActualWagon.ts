@@ -20,6 +20,7 @@ import { Updatable } from '../../../mixins/Updatable';
 import { applyMixins } from '../../../mixins/ApplyMixins';
 import { Boardable } from '../../../mixins/Boardable';
 import { ActualBaseBrick } from '../ActualBaseBrick';
+import { Train } from '../../Scheduling/Train';
 
 const WAGON_GAP: number = 1;
 
@@ -30,6 +31,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   private removed: boolean = false;
   protected worm: TrackWorm;
   protected trip: Route;
+  protected train: Train;
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
@@ -46,6 +48,18 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       }
     }
     this.update();
+  }
+
+  getTrain(): Train {
+    return this.train;
+  }
+
+  setTrain(train: Train): void {
+    if (train) {
+      this.train = train;
+    } else {
+      this.train = this.store.create<Train>(TYPES.Train).init();
+    }
   }
 
   getTrip(): Route {
@@ -176,6 +190,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       [WhichEnd.A]: new WagonEnd(WhichEnd.A, this),
       [WhichEnd.B]: new WagonEnd(WhichEnd.B, this)
     };
+
+    this.train = this.store.create<Train>(TYPES.Train).init();
 
     return this;
   }

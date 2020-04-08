@@ -12,6 +12,7 @@ import { Route } from '../../Scheduling/Route';
 import { Store } from '../../Interfaces/Store';
 import { Wagon } from '../../Interfaces/Wagon';
 import { Passenger } from '../../Interfaces/Passenger';
+import { Train } from '../../Scheduling/Train';
 
 @injectable()
 export class ActualStore implements Store {
@@ -25,6 +26,7 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
   @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
 
+  @inject(TYPES.FactoryOfTrain) private TrainFactory: () => Train;
   @inject(TYPES.FactoryOfTrack) private TrackFactory: () => Track;
   @inject(TYPES.FactoryOfTrackSwitch)
   private TrackSwitchFactory: () => TrackSwitch;
@@ -45,6 +47,7 @@ export class ActualStore implements Store {
       [TYPES.TrackSwitch]: this.TrackSwitchFactory,
       [TYPES.TrackJoint]: this.TrackJointFactory,
       [TYPES.Platform]: this.PlatformFactory,
+      [TYPES.Train]: this.TrainFactory,
       [TYPES.Wagon]: this.WagonFactory
     };
     this.typeOrder = {
@@ -56,7 +59,8 @@ export class ActualStore implements Store {
       [TYPES.TrackJoint]: 2,
       [TYPES.Platform]: 1,
       [TYPES.Wagon]: 0,
-      [TYPES.Passenger]: -1
+      [TYPES.Train]: -1,
+      [TYPES.Passenger]: -2
     };
     shortid.characters(
       '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_*'

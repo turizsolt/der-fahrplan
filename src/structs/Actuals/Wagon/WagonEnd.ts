@@ -6,6 +6,24 @@ import { Wagon } from '../../Interfaces/Wagon';
 export class WagonEnd extends End<Wagon> {
   public positionOnTrack: PositionOnTrack;
 
+  connect(otherEnd: WagonEnd): boolean {
+    const successful: boolean = super.connect(otherEnd);
+    if (successful) {
+      const train = this.endOf.getTrain();
+      otherEnd.getEndOf().getTrain();
+      otherEnd.getEndOf().setTrain(train);
+    }
+    return successful;
+  }
+
+  disconnect(): boolean {
+    const successful: boolean = super.disconnect();
+    if (successful) {
+      this.endOf.setTrain(undefined);
+    }
+    return successful;
+  }
+
   getPositionOnTrack() {
     return this.positionOnTrack;
   }

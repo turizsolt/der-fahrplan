@@ -15,8 +15,10 @@ export class End<EndOf extends BasicEndOf> {
     this.endOf = endOf;
   }
 
-  connect(otherEnd: End<EndOf>) {
-    if (this.connectedEnd) return;
+  connect(otherEnd: End<EndOf>): boolean {
+    if (this.connectedEnd) {
+      return false;
+    }
 
     this.connectedEnd = otherEnd;
 
@@ -25,14 +27,15 @@ export class End<EndOf extends BasicEndOf> {
     }
 
     this.endOf.update();
+    return true;
   }
 
   isConnectedTo(otherEnd: End<EndOf>) {
     return this.connectedEnd === otherEnd;
   }
 
-  disconnect() {
-    if (!this.connectedEnd) return;
+  disconnect(): boolean {
+    if (!this.connectedEnd) return false;
 
     const temp = this.connectedEnd;
     this.connectedEnd = null;
@@ -41,6 +44,7 @@ export class End<EndOf extends BasicEndOf> {
     }
 
     this.endOf.update();
+    return true;
   }
 
   remove() {
