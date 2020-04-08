@@ -2,9 +2,9 @@ import * as BABYLON from 'babylonjs';
 import { InputHandler } from './InputHandler';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { InputProps } from './InputProps';
-import { babylonContainer } from '../../structs/inversify.config';
+import { productionContainer } from '../../di/production.config';
 import { TrackJoint } from '../../structs/Interfaces/TrackJoint';
-import { TYPES } from '../../structs/TYPES';
+import { TYPES } from '../../di/TYPES';
 import { curveToTube } from '../../ui/babylon/TrackBabylonRenderer';
 import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/CoordinateToBabylonVector3';
@@ -122,7 +122,7 @@ export class CreateTrackInputHandler implements InputHandler {
 
   click(downProps: InputProps, event: PointerEvent): void {
     if (!downProps.snappedJoint && !downProps.snappedPositionOnTrack) {
-      const tj = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+      const tj = productionContainer.get<TrackJoint>(TYPES.TrackJoint);
       tj.init(
         downProps.snappedPoint.coord.x,
         downProps.snappedPoint.coord.z,
@@ -146,7 +146,7 @@ export class CreateTrackInputHandler implements InputHandler {
       if (downProps.snappedJoint) {
         j1 = downProps.snappedJoint;
       } else {
-        j1 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+        j1 = productionContainer.get<TrackJoint>(TYPES.TrackJoint);
         j1.init(
           downProps.snappedPoint.coord.x,
           downProps.snappedPoint.coord.z,
@@ -158,7 +158,7 @@ export class CreateTrackInputHandler implements InputHandler {
       if (props.snappedJoint) {
         j2 = props.snappedJoint;
       } else {
-        j2 = babylonContainer.get<TrackJoint>(TYPES.TrackJoint);
+        j2 = productionContainer.get<TrackJoint>(TYPES.TrackJoint);
         j2.init(
           props.snappedPoint.coord.x,
           props.snappedPoint.coord.z,

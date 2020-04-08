@@ -2,7 +2,7 @@ import { injectable, inject } from 'inversify';
 import * as shortid from 'shortid';
 import { BaseStorable } from '../../Interfaces/BaseStorable';
 import { Platform } from '../../Interfaces/Platform';
-import { TYPES } from '../../TYPES';
+import { TYPES } from '../../../di/TYPES';
 import { Track } from '../../Interfaces/Track';
 import { TrackSwitch } from '../../Interfaces/TrackSwitch';
 import { TrackJoint } from '../../Interfaces/TrackJoint';

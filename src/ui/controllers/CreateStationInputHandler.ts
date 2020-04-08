@@ -2,9 +2,9 @@ import * as BABYLON from 'babylonjs';
 import { InputHandler } from './InputHandler';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { InputProps } from './InputProps';
-import { babylonContainer } from '../../structs/inversify.config';
+import { productionContainer } from '../../di/production.config';
 import { TrackJoint } from '../../structs/Interfaces/TrackJoint';
-import { TYPES } from '../../structs/TYPES';
+import { TYPES } from '../../di/TYPES';
 import { curveToTube } from '../babylon/TrackBabylonRenderer';
 import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../babylon/converters/CoordinateToBabylonVector3';
@@ -89,7 +89,7 @@ export class CreateStationInputHandler implements InputHandler {
         downProps.snappedJointOnTrack.position === 0 ||
         downProps.snappedJointOnTrack.position === 1)
     ) {
-      const station = babylonContainer.get<Station>(TYPES.Station);
+      const station = productionContainer.get<Station>(TYPES.Station);
       const diam = downProps.snappedPoint.coord.distance2d(
         props.snappedPoint.coord
       );

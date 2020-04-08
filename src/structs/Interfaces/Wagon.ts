@@ -5,9 +5,11 @@ import { PositionOnTrack } from '../Actuals/Track/PositionOnTrack';
 import { WhichEnd } from '../Interfaces/WhichEnd';
 import { Route } from '../Scheduling/Route';
 import { Platform } from './Platform';
-import { BaseBoardable } from './BaseBoardable';
+import { Updatable } from '../../mixins/Updatable';
+import { BaseBrick } from './BaseBrick';
+import { Boardable } from '../../mixins/Boardable';
 
-export interface Wagon extends BaseBoardable {
+export interface Wagon extends BaseBrick, Boardable, Updatable {
   init(): Wagon;
   update(): void;
   getA(): WagonEnd;
@@ -30,9 +32,6 @@ export interface Wagon extends BaseBoardable {
   getTrip(): Route;
 
   stoppedAt(platform: Platform): void;
-
-  subscribeToUpdates(callback: (wagon: Object) => void): void;
-  unsubscribeToUpdates(callback: (wagon: Object) => void): void;
 }
 
 export interface NearestWagon {

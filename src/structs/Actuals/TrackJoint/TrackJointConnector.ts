@@ -1,7 +1,7 @@
 import { TrackJoint } from '../../Interfaces/TrackJoint';
 import { TrackBase } from '../../Interfaces/TrackBase';
 import { inject, injectable } from 'inversify';
-import { TYPES } from '../../TYPES';
+import { TYPES } from '../../../di/TYPES';
 import { Track } from '../../Interfaces/Track';
 import { TrackSwitch } from '../../Interfaces/TrackSwitch';
 import { ActualTrackSwitch } from '../Track/ActualTrackSwitch';
@@ -10,6 +10,10 @@ import { ActualTrackSwitch } from '../Track/ActualTrackSwitch';
 export class TrackJointConnector {
   @inject(TYPES.FactoryOfTrack) TrackFactory: () => Track;
   @inject(TYPES.FactoryOfTrackSwitch) TrackSwitchFactory: () => TrackSwitch;
+
+  init(): TrackJointConnector {
+    return this;
+  }
 
   connect(one: TrackJoint, other: TrackJoint) {
     const midpoint = one.getRay().computeMidpoint(other.getRay());

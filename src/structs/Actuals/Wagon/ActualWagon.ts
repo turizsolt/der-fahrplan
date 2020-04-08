@@ -1,11 +1,10 @@
 import { inject, injectable } from 'inversify';
 import { PositionOnTrack } from '../Track/PositionOnTrack';
-import { ActualBaseBrick } from '../ActualBaseBrick';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { WhichEnd } from '../../Interfaces/WhichEnd';
 import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
 import { Ray } from '../../Geometry/Ray';
-import { TYPES } from '../../TYPES';
+import { TYPES } from '../../../di/TYPES';
 import { WagonRenderer } from '../../Renderers/WagonRenderer';
 import { TrackBase } from '../../Interfaces/TrackBase';
 import { LineSegment } from '../../Geometry/LineSegment';
@@ -15,14 +14,19 @@ import { Store } from '../../Interfaces/Store';
 import { Route } from '../../Scheduling/Route';
 import { Platform } from '../../Interfaces/Platform';
 import { Passenger } from '../../Interfaces/Passenger';
-import { ActualBaseBoardable } from '../ActualBaseBoardable';
 import { Coordinate } from '../../Geometry/Coordinate';
 import { Left } from '../../Geometry/Directions';
+import { Updatable } from '../../../mixins/Updatable';
+import { applyMixins } from '../../../mixins/ApplyMixins';
+import { Boardable } from '../../../mixins/Boardable';
+import { ActualBaseBrick } from '../ActualBaseBrick';
 
 const WAGON_GAP: number = 1;
 
+export interface ActualWagon extends Updatable, Boardable {}
+const doApply = () => applyMixins(ActualWagon, [Updatable, Boardable]);
 @injectable()
-export class ActualWagon extends ActualBaseBoardable implements Wagon {
+export class ActualWagon extends ActualBaseBrick implements Wagon {
   private removed: boolean = false;
   protected worm: TrackWorm;
   protected trip: Route;
@@ -91,7 +95,6 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
   private seats: Passenger[] = [];
 
   board(passenger: Passenger): Coordinate {
-    //super.board(passenger);
     if (this.passengerCount >= this.seatCount) {
       return Coordinate.Origo(); // todo
     }
@@ -132,6 +135,10 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
       this.seats[seatNo] = undefined;
       this.passengerCount -= 1;
     }
+  }
+
+  getBoardedPassengers(): Passenger[] {
+    return this.seats.filter(x => x);
   }
 
   getCenterPos(): Coordinate {
@@ -214,17 +221,7 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
     this.renderer.update();
 
     const deep = this.persistDeep();
-    this.updateCallbacks.map(cb => cb(deep));
-  }
-
-  private updateCallbacks: Function[] = [];
-
-  subscribeToUpdates(callback: (wagon: Object) => void): void {
-    this.updateCallbacks.push(callback);
-  }
-
-  unsubscribeToUpdates(callback: (wagon: Object) => void): void {
-    this.updateCallbacks = this.updateCallbacks.filter(c => c !== callback);
+    this.notify(deep);
   }
 
   putOnTrack(
@@ -435,3 +432,5 @@ export class ActualWagon extends ActualBaseBoardable implements Wagon {
     this.getB().swapDirection();
   }
 }
+
+doApply();

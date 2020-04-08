@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { testContainer } from '../inversify.config';
-import { TYPES } from '../../src/structs/TYPES';
+import { testContainer } from '../../src/di/test.config';
+import { TYPES } from '../../src/di/TYPES';
 import { Route } from '../../src/structs/Scheduling/Route';
 import { RouteStop } from '../../src/structs/Scheduling/RouteStop';
 import { Station } from '../../src/structs/Scheduling/Station';

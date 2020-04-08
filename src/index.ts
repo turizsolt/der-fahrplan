@@ -1,8 +1,8 @@
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
-import { babylonContainer } from './structs/inversify.config';
+import { productionContainer } from './di/production.config';
 import { Land } from './structs/Interfaces/Land';
-import { TYPES } from './structs/TYPES';
+import { TYPES } from './di/TYPES';
 import { GridDrawer } from './ui/controllers/GridDrawer';
 import { InputController } from './ui/controllers/InputController';
 import { MeshProvider } from './ui/babylon/MeshProvider';
@@ -15,10 +15,11 @@ window.addEventListener('DOMContentLoaded', () => {
   const createScene = () => {
     const scene = new BABYLON.Scene(renderEngine);
 
-    const meshProviderFactory = babylonContainer.get<() => MeshProvider>(
+    const meshProviderFactory = productionContainer.get<() => MeshProvider>(
       TYPES.FactoryOfMeshProvider
     );
-    const meshProvider = meshProviderFactory().init(scene);
+    const meshProvider = meshProviderFactory();
+    meshProvider.setScene(scene);
 
     scene.clearColor = new BABYLON.Color4(0, 1, 0, 1);
 
@@ -38,7 +39,7 @@ window.addEventListener('DOMContentLoaded', () => {
     );
 
     (window as any).switches = [];
-    const land = babylonContainer.get<Land>(TYPES.Land);
+    const land = productionContainer.get<Land>(TYPES.Land);
     land.init();
 
     const gridDrawer = new GridDrawer();

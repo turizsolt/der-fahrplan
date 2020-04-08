@@ -3,7 +3,7 @@ import { Platform } from '../Interfaces/Platform';
 import { PassengerGenerator } from './PassengerGenerator';
 import { injectable, inject } from 'inversify';
 import { Store } from '../Interfaces/Store';
-import { TYPES } from '../TYPES';
+import { TYPES } from '../../di/TYPES';
 import { Station } from '../Scheduling/Station';
 
 @injectable()

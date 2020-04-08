@@ -1,5 +1,5 @@
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../TYPES';
+import { TYPES } from '../../di/TYPES';
 import { BaseStorable } from '../Interfaces/BaseStorable';
 import { Store } from '../Interfaces/Store';
 

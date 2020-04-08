@@ -3,9 +3,10 @@ import { Platform } from '../Interfaces/Platform';
 import { Color } from '../Color';
 import { Route } from './Route';
 import { Wagon } from '../Interfaces/Wagon';
-import { BaseBoardable } from '../Interfaces/BaseBoardable';
+import { BaseBrick } from '../Interfaces/BaseBrick';
+import { Boardable } from '../../mixins/Boardable';
 
-export interface Station extends BaseBoardable {
+export interface Station extends BaseBrick, Boardable {
   init(circle: Circle): Station;
   getName(): string;
   setName(name: string);

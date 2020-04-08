@@ -5,17 +5,23 @@ import { Coordinate } from '../Geometry/Coordinate';
 import { Platform } from '../Interfaces/Platform';
 import { Color } from '../Color';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../TYPES';
+import { TYPES } from '../../di/TYPES';
 import { PlatformRenderer } from '../Renderers/PlatformRenderer';
 import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { Store } from '../Interfaces/Store';
 import { LineSegmentChain } from '../Geometry/LineSegmentChain';
 import { Station } from '../Scheduling/Station';
-import { ActualBaseBoardable } from './ActualBaseBoardable';
 import { Left, Right } from '../Geometry/Directions';
+import { Boardable } from '../../mixins/Boardable';
+import { ActualBaseBrick } from './ActualBaseBrick';
+import { applyMixins } from '../../mixins/ApplyMixins';
 
+export interface ActualPlatform extends Boardable {}
+const doApply = () => applyMixins(ActualPlatform, [], [Boardable]);
 @injectable()
-export class ActualPlatform extends ActualBaseBoardable implements Platform {
+export class ActualPlatform extends ActualBaseBrick implements Platform {
+  private boardable: Boardable = new Boardable();
+
   private position: Coordinate;
   private rotation: number;
 
@@ -32,7 +38,7 @@ export class ActualPlatform extends ActualBaseBoardable implements Platform {
   @inject(TYPES.PlatformRenderer) private renderer: PlatformRenderer;
 
   board(passenger: Passenger): Coordinate {
-    super.board(passenger);
+    this.boardable.board(passenger);
     const chain = this.getLineSegmentChain();
     const length = chain.getLength();
     const at = Math.random() * length;
@@ -228,3 +234,4 @@ export class ActualPlatform extends ActualBaseBoardable implements Platform {
     );
   }
 }
+doApply();

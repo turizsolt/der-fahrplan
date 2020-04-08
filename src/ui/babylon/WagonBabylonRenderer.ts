@@ -3,7 +3,7 @@ import { CoordinateToBabylonVector3 } from './converters/CoordinateToBabylonVect
 import { injectable, inject } from 'inversify';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
 import { MeshProvider } from './MeshProvider';
-import { TYPES } from '../../structs/TYPES';
+import { TYPES } from '../../di/TYPES';
 import { WagonRenderer } from '../../structs/Renderers/WagonRenderer';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 import { MaterialName } from './MaterialName';
