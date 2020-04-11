@@ -67,6 +67,17 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     if (this.to === station) {
       this.setPlace(null);
       this.renderer.update();
+    } else if (!trip) {
+      this.setPlace(station);
+      this.renderer.update();
+    } else if (
+      !trip
+        .getStops()
+        .map(x => x.getStation())
+        .includes(this.to)
+    ) {
+      this.setPlace(station);
+      this.renderer.update();
     }
   }
 

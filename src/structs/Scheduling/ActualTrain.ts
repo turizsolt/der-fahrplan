@@ -6,6 +6,7 @@ import { Wagon } from '../Interfaces/Wagon';
 import { Route } from './Route';
 import { Platform } from '../Interfaces/Platform';
 import { Station } from './Station';
+import { Passenger } from '../Interfaces/Passenger';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private wagons: Wagon[];
@@ -97,7 +98,20 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     if (station) {
       station.announceArrived(this, platform, this.getTrip());
     }
-    //this.announceStoppedAt(platform);
+    this.callOnPassengers((p: Passenger) => {
+      p.listenWagonStoppedAtAnnouncement(
+        station,
+        platform,
+        this,
+        this.getTrip()
+      );
+    });
+  }
+
+  private callOnPassengers(f: (p: Passenger) => void): void {
+    for (let wagon of this.wagons) {
+      wagon.getBoardedPassengers().map(p => f(p));
+    }
   }
 
   getFreeWagon(): Wagon {
