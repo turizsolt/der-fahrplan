@@ -97,17 +97,23 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   stoppedAt(platform: Platform): void {
-    if (platform.getStation()) {
-      platform.getStation().announceArrived(this, platform, this.trip);
-    }
-    this.announceStoppedAt(platform);
+    this.train.stoppedAt(platform.getStation(), platform);
+  }
+
+  hasFreeSeat(): boolean {
+    return this.seatCount > this.passengerCount;
   }
 
   announceStoppedAt(platform: Platform): void {
     const station = platform.getStation();
     this.seats.map(p => {
       if (p) {
-        p.listenWagonStoppedAtAnnouncement(station, platform, this, this.trip);
+        p.listenWagonStoppedAtAnnouncement(
+          station,
+          platform,
+          this.train,
+          this.trip
+        );
       }
     });
   }
@@ -127,7 +133,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       seatNo = (Math.random() * this.seatCount) | 0;
     } while (this.seats[seatNo]);
     this.seats[seatNo] = passenger;
-    return this.seatOffset(seatNo).coord;
+    const ray = this.seatOffset(seatNo);
+    return ray && ray.coord;
   }
 
   moveBoardedPassengers() {
@@ -139,6 +146,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   private seatOffset(seatNo) {
+    if (!this.worm || this.worm.getAll().length === 0) return null;
+
     const colSize = 1.2;
     const rowSize = 1.2;
     const colCount = 3 - 1;

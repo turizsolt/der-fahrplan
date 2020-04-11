@@ -4,6 +4,8 @@ import { TYPES } from '../../di/TYPES';
 import { Train } from './Train';
 import { Wagon } from '../Interfaces/Wagon';
 import { Route } from './Route';
+import { Platform } from '../Interfaces/Platform';
+import { Station } from './Station';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private wagons: Wagon[];
@@ -89,6 +91,22 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   setWagons(wagons: Wagon[]) {
     this.wagons = wagons;
+  }
+
+  stoppedAt(station: Station, platform: Platform) {
+    if (station) {
+      station.announceArrived(this, platform, this.getTrip());
+    }
+    //this.announceStoppedAt(platform);
+  }
+
+  getFreeWagon(): Wagon {
+    for (let wagon of this.wagons) {
+      if (wagon.hasFreeSeat()) {
+        return wagon;
+      }
+    }
+    return null;
   }
 
   persist(): Object {

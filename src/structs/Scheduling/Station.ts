@@ -2,10 +2,10 @@ import { Circle } from '../Geometry/Circle';
 import { Platform } from '../Interfaces/Platform';
 import { Color } from '../Color';
 import { Route } from './Route';
-import { Wagon } from '../Interfaces/Wagon';
 import { BaseBrick } from '../Interfaces/BaseBrick';
 import { Boardable } from '../../mixins/Boardable';
 import { Trip } from './Trip';
+import { Train } from './Train';
 
 export interface Station extends BaseBrick, Boardable {
   init(circle: Circle): Station;
@@ -22,7 +22,7 @@ export interface Station extends BaseBrick, Boardable {
   remove(): boolean;
   isRemoved(): boolean;
 
-  announceArrived(wagon: Wagon, platform: Platform, trip: Route);
+  announceArrived(train: Train, platform: Platform, trip: Route);
   announce(trip: Route);
   deannounce(trip: Route);
 }

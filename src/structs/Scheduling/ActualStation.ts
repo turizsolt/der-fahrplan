@@ -12,10 +12,10 @@ import { Color } from '../Color';
 import { NameGenerator } from '../NameGenerator';
 import { Route } from './Route';
 import { Passenger } from '../Interfaces/Passenger';
-import { Wagon } from '../Interfaces/Wagon';
 import { Boardable } from '../../mixins/Boardable';
 import { applyMixins } from '../../mixins/ApplyMixins';
 import { Trip } from './Trip';
+import { Train } from './Train';
 
 export interface ActualStation extends Boardable {}
 const doApply = () => applyMixins(ActualStation, [], [Boardable]);
@@ -57,12 +57,18 @@ export class ActualStation extends ActualBaseBrick implements Station {
       }
     }
 
+    this.callOnPassengers(p => {
+      p.listenStationAnnouncement(this);
+    });
+  }
+
+  private callOnPassengers(f: (p: Passenger) => void) {
     this.getBoardedPassengers().map(p => {
-      p.listenStationAnnouncement(this, null);
+      f(p);
     });
     for (let platform of this.platforms) {
       platform.getBoardedPassengers().map(p => {
-        p.listenStationAnnouncement(this, null);
+        f(p);
       });
     }
   }
@@ -77,12 +83,11 @@ export class ActualStation extends ActualBaseBrick implements Station {
     return this.platformTo[station.getId()];
   }
 
-  announceArrived(wagon: Wagon, platform: Platform, trip: Route) {
-    platform.getBoardedPassengers().map(p => {
-      p.listenStationArrivingAnnouncement(this, platform, wagon, trip);
+  announceArrived(train: Train, platform: Platform, trip: Route) {
+    this.callOnPassengers(p => {
+      p.listenStationArrivingAnnouncement(this, platform, train, trip);
     });
-
-    this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
+    //this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
   }
 
   board(passenger: Passenger): Coordinate {

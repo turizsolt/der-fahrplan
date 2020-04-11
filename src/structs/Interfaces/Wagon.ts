@@ -34,6 +34,7 @@ export interface Wagon extends BaseBrick, Boardable, Updatable {
   getTrip(): Route;
 
   stoppedAt(platform: Platform): void;
+  hasFreeSeat(): boolean;
 
   getTrain(): Train;
   setTrain(train: Train): void;

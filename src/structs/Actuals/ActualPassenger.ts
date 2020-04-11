@@ -8,8 +8,8 @@ import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { injectable, inject } from 'inversify';
 import { Station } from '../Scheduling/Station';
 import { Route } from '../Scheduling/Route';
-import { Wagon } from '../Interfaces/Wagon';
 import { Color } from '../Color';
+import { Train } from '../Scheduling/Train';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
@@ -28,7 +28,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     return this;
   }
 
-  listenStationAnnouncement(station: Station, trip: Route): void {
+  listenStationAnnouncement(station: Station): void {
     const nextPlace: Place = station.getPlatformTo(this.to) || station;
     if (nextPlace !== this.place) {
       this.setPlace(nextPlace);
@@ -39,19 +39,29 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   listenStationArrivingAnnouncement(
     station: Station,
     platform: Platform,
-    wagon: Wagon,
+    train: Train,
     trip: Route
   ) {
-    if (this.place === platform) {
-      this.setPlace(wagon);
-      this.renderer.update();
+    if (!trip) return;
+
+    if (
+      trip
+        .getStops()
+        .map(s => s.getStation())
+        .includes(this.to)
+    ) {
+      const wagon = train.getFreeWagon();
+      if (wagon) {
+        this.setPlace(wagon);
+        this.renderer.update();
+      }
     }
   }
 
   listenWagonStoppedAtAnnouncement(
     station: Station,
     platform: Platform,
-    wagon: Wagon,
+    train: Train,
     trip: Route
   ) {
     if (this.to === station) {
