@@ -16,7 +16,8 @@
       "babylonjs-gui",
       "babylonjs-materials",
       "reflect-metadata",
-      "mocha"
+      "mocha",
+      "mocha-steps"
     ],
     "lib": [
       "es2016",
