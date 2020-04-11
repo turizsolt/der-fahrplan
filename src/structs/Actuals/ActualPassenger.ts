@@ -29,22 +29,9 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   }
 
   listenStationAnnouncement(station: Station, trip: Route): void {
-    if (this.place !== station) return;
-
-    const fromIndex = trip
-      .getStops()
-      .findIndex(st => st.getStation() === station);
-    if (fromIndex === -1) return;
-
-    const fromStop = trip.getStops()[fromIndex];
-    const toStop = trip
-      .getStops()
-      .slice(fromIndex + 1)
-      .find(st => st.getStation() === this.to);
-    if (!toStop) return;
-
-    if (fromStop.getPlatform()) {
-      this.setPlace(fromStop.getPlatform());
+    const nextPlace: Place = station.getPlatformTo(this.to) || station;
+    if (nextPlace !== this.place) {
+      this.setPlace(nextPlace);
       this.renderer.update();
     }
   }

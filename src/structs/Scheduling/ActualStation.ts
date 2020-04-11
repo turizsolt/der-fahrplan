@@ -15,6 +15,7 @@ import { Passenger } from '../Interfaces/Passenger';
 import { Wagon } from '../Interfaces/Wagon';
 import { Boardable } from '../../mixins/Boardable';
 import { applyMixins } from '../../mixins/ApplyMixins';
+import { Trip } from './Trip';
 
 export interface ActualStation extends Boardable {}
 const doApply = () => applyMixins(ActualStation, [], [Boardable]);
@@ -33,17 +34,47 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
   announce(trip: Route) {
     this.announcedTrips.push(trip);
-    this.getBoardedPassengers().map(p => {
-      p.listenStationAnnouncement(this, trip);
-    });
+    this.updatePlatforms();
   }
 
   deannounce(trip: Route) {
     this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
-    // todo
-    // this.boardedPassengers.map(p => {
-    //   p.listenStationAnnouncement(this, trip);
-    // });
+    this.updatePlatforms();
+  }
+
+  private updatePlatforms() {
+    this.platformTo = {};
+    for (let trip of this.announcedTrips) {
+      let record = false;
+      let platformHere = null;
+      for (let stop of trip.getStops()) {
+        if (stop.getStation() === this) {
+          record = true;
+          platformHere = stop.getPlatform();
+        } else if (record) {
+          this.platformTo[stop.getStation().getId()] = platformHere;
+        }
+      }
+    }
+
+    this.getBoardedPassengers().map(p => {
+      p.listenStationAnnouncement(this, null);
+    });
+    for (let platform of this.platforms) {
+      platform.getBoardedPassengers().map(p => {
+        p.listenStationAnnouncement(this, null);
+      });
+    }
+  }
+
+  getAnnouncedTrips(): Trip[] {
+    return this.announcedTrips;
+  }
+
+  private platformTo: Record<string, Platform> = {};
+
+  getPlatformTo(station: Station): Platform {
+    return this.platformTo[station.getId()];
   }
 
   announceArrived(wagon: Wagon, platform: Platform, trip: Route) {
@@ -57,6 +88,8 @@ export class ActualStation extends ActualBaseBrick implements Station {
   board(passenger: Passenger): Coordinate {
     //super.board(passenger);
     this.boardable.board(passenger);
+
+    if (!this.circle) return null;
 
     const rand = Math.random() * Math.PI * 2 - Math.PI;
     const dist = Math.random() * 5;
@@ -85,6 +118,17 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
     this.renderer.init(this);
 
+    return this;
+  }
+
+  initX(): Station {
+    super.initStore(TYPES.Station);
+    this.boardable.init();
+    this.circle = null;
+    this.name = NameGenerator.next();
+    this.platforms = [];
+    this.color = Color.CreateRandom();
+    this.renderer.init(this);
     return this;
   }
 
@@ -139,7 +183,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
   persist(): Object {
     return {
       id: this.id,
-      circle: {
+      circle: this.circle && {
         x: this.circle.a.x,
         y: this.circle.a.y,
         z: this.circle.a.z,

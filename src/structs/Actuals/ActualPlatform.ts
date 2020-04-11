@@ -33,12 +33,16 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
   private width: number;
   private side: Side;
   private station: Station;
+  private no: string;
   private removed: boolean = false;
 
   @inject(TYPES.PlatformRenderer) private renderer: PlatformRenderer;
 
   board(passenger: Passenger): Coordinate {
     this.boardable.board(passenger);
+
+    if (!this.position) return null;
+
     const chain = this.getLineSegmentChain();
     const length = chain.getLength();
     const at = Math.random() * length;
@@ -187,8 +191,22 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
           station.addPlatform(this);
         }
       });
+    this.no = '';
 
     return this;
+  }
+
+  initX(station: Station, no: string): Platform {
+    super.initStore(TYPES.Platform);
+    this.boardable.init();
+    this.position = null;
+    this.no = no;
+    station.addPlatform(this);
+    return this;
+  }
+
+  getNo(): string {
+    return this.no;
   }
 
   isBeside(position: number): boolean {
