@@ -22,59 +22,36 @@ const RouteFactory = () => store.create<Route>(TYPES.Route);
 const RouteStopFactory = () => store.create<RouteStop>(TYPES.RouteStop);
 const PassengerFactory = () => store.create<Passenger>(TYPES.Passenger);
 
-describe('Announcing departing trains', () => {
+describe('Arrive then depart', () => {
   const stationA = StationFactory().initX();
   const platformA1 = PlatformFactory().initX(stationA, '1');
 
   const stationB = StationFactory().initX();
   const platformB2 = PlatformFactory().initX(stationB, '2');
 
+  const stationC = StationFactory().initX();
+  const platformC3 = PlatformFactory().initX(stationC, '3');
+
   const tripStopA1 = RouteStopFactory().init(stationA, platformA1);
-  const tripStopA = RouteStopFactory().init(stationA, null);
   const tripStopB2 = RouteStopFactory().init(stationB, platformB2);
+  const tripStopC3 = RouteStopFactory().init(stationC, platformC3);
 
-  const trip: Trip = RouteFactory().init();
-  trip.addStop(tripStopA1);
-  trip.addStop(tripStopB2);
+  const tripAC: Trip = RouteFactory().init();
+  tripAC.addStop(tripStopA1);
+  tripAC.addStop(tripStopB2);
+  tripAC.addStop(tripStopC3);
 
-  const trip2: Trip = RouteFactory().init();
-  trip2.addStop(tripStopA);
-  trip2.addStop(tripStopB2);
-
-  it('train stops with trip, on known platform', () => {
-    const passenger = PassengerFactory().init(stationA, stationB);
+  it('should unboard first, then board', () => {
     const wagon = WagonFactory().init();
-    wagon.assignTrip(trip);
-    wagon.stoppedAt(platformA1);
-
-    expect(passenger.getPlace()).equals(wagon);
-  });
-
-  it('train stops with trip, on unknown platform', () => {
-    const passenger = PassengerFactory().init(stationA, stationB);
-    const wagon = WagonFactory().init();
-    wagon.assignTrip(trip2);
-    wagon.stoppedAt(platformA1);
-
-    expect(passenger.getPlace()).equals(wagon);
-  });
-
-  it('train stops without trip (passenger not getting on)', () => {
-    const passenger = PassengerFactory().init(stationA, stationB);
-    const wagon = WagonFactory().init();
-    wagon.stoppedAt(platformA1);
-
-    expect(passenger.getPlace()).equals(stationA);
-  });
-
-  it('train stops with trip, on known platform, passenger created afterwards', () => {
-    const wagon = WagonFactory().init();
-    wagon.assignTrip(trip);
-    const passenger = PassengerFactory().init(stationA, stationB);
-    expect(passenger.getPlace()).equals(platformA1);
+    wagon.setSeatCount(1, 1);
+    wagon.assignTrip(tripAC);
+    const passenger1 = PassengerFactory().init(stationA, stationB);
+    const passenger2 = PassengerFactory().init(stationB, stationC);
 
     wagon.stoppedAt(platformA1);
+    wagon.stoppedAt(platformB2);
 
-    expect(passenger.getPlace()).equals(wagon);
+    expect(passenger1.getPlace()).equals(null);
+    expect(passenger2.getPlace().getId()).equals(wagon.getId());
   });
 });

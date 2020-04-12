@@ -119,12 +119,18 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   private seatCount: number = 21;
+  private seatColumns: number = 3;
   private passengerCount: number = 0;
   private seats: Passenger[] = [];
 
+  setSeatCount(count: number, columns: number = 3) {
+    this.seatCount = count;
+    this.seatColumns = columns;
+  }
+
   board(passenger: Passenger): Coordinate {
     if (this.passengerCount >= this.seatCount) {
-      return Coordinate.Origo(); // todo
+      return null;
     }
 
     this.passengerCount += 1;
@@ -150,7 +156,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
     const colSize = 1.2;
     const rowSize = 1.2;
-    const colCount = 3 - 1;
+    const colCount = this.seatColumns - 1;
     const rowCount = Math.ceil(this.seatCount / (colCount + 1)) - 1;
 
     const col = seatNo % 3;

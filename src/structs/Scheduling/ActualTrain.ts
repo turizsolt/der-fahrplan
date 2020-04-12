@@ -95,9 +95,6 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   stoppedAt(station: Station, platform: Platform) {
-    if (station) {
-      station.announceArrived(this, platform, this.getTrip());
-    }
     this.callOnPassengers((p: Passenger) => {
       p.listenWagonStoppedAtAnnouncement(
         station,
@@ -106,6 +103,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         this.getTrip()
       );
     });
+    if (station) {
+      station.announceArrived(this, platform, this.getTrip());
+    }
   }
 
   private callOnPassengers(f: (p: Passenger) => void): void {

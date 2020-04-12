@@ -24,7 +24,8 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     this.from = from;
 
     this.renderer.init(this);
-    this.setPlace(from);
+    this.listenStationAnnouncement(this.from);
+
     return this;
   }
 

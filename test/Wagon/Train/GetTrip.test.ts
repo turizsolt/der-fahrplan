@@ -145,7 +145,7 @@ describe('Train - getTrip', () => {
   });
 });
 
-function createConnectedWagons(n: number) {
+export function createConnectedWagons(n: number) {
   let lastWagon = WagonFactory().init();
   let wagons = [lastWagon];
   for (let i = 1; i < n; i++) {
