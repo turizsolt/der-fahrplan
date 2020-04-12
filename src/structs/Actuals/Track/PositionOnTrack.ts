@@ -40,6 +40,16 @@ export class PositionOnTrack {
     return this.direction;
   }
 
+  getConstantAngle(): number {
+    const dir = this.getRay().dirXZ;
+    if (this.direction === 1) {
+      return dir;
+    } else {
+      if (dir > 0) return dir - Math.PI;
+      return dir + Math.PI;
+    }
+  }
+
   isBeside(platform: Platform): boolean {
     return platform.isBeside(this.position);
   }

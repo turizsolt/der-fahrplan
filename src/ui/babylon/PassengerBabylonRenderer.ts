@@ -17,9 +17,9 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
   init(passenger: Passenger): void {
     this.passenger = passenger;
 
-    this.mesh = BABYLON.MeshBuilder.CreateBox(
+    this.mesh = BABYLON.MeshBuilder.CreateSphere(
       'box',
-      { height: 1, width: 1, depth: 1 },
+      { diameter: 1 }, //{ height: 1, width: 1, depth: 1 },
       this.scene
     );
 

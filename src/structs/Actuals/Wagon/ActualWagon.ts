@@ -187,7 +187,9 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   getCenterRay(): Ray {
     return new Ray(
       this.getCenterPos(),
-      this.ends.A.positionOnTrack.getRay().dirXZ
+      this.ends.A.positionOnTrack
+        .getRay()
+        .coord.whichDir2d(this.ends.B.positionOnTrack.getRay().coord)
     );
   }
 
