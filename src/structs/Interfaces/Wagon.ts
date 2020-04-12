@@ -36,6 +36,7 @@ export interface Wagon extends BaseBrick, Boardable, Updatable {
   stoppedAt(platform: Platform): void;
   hasFreeSeat(): boolean;
   setSeatCount(count: number, columns?: number);
+  moveBoardedPassengers(): void;
 
   getTrain(): Train;
   setTrain(train: Train): void;

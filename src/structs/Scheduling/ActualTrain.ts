@@ -108,6 +108,12 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }
   }
 
+  moveBoardedPassengers(): void {
+    for (let wagon of this.wagons) {
+      wagon.moveBoardedPassengers();
+    }
+  }
+
   private callOnPassengers(f: (p: Passenger) => void): void {
     for (let wagon of this.wagons) {
       wagon.getBoardedPassengers().map(p => f(p));

@@ -360,7 +360,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       }
     }
 
-    this.moveBoardedPassengers();
+    this.train.moveBoardedPassengers();
   }
 
   pullToPos(pot: PositionOnTrack, dir: number) {
@@ -442,7 +442,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       }
     }
 
-    this.moveBoardedPassengers();
+    this.train.moveBoardedPassengers();
   }
 
   getNearestWagon(whichEnd: WhichEnd): NearestWagon {
