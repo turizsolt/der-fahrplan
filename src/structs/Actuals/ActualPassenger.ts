@@ -45,12 +45,12 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   ) {
     if (!trip) return;
 
-    if (
-      trip
-        .getStops()
-        .map(s => s.getStation())
-        .includes(this.to)
-    ) {
+    const toIndex = trip.getStops().findIndex(s => s.getStation() === this.to);
+    const stationIndex = trip
+      .getStops()
+      .findIndex(s => s.getStation() === station);
+
+    if (toIndex !== -1 && stationIndex !== -1 && stationIndex < toIndex) {
       const wagon = train.getFreeWagon();
       if (wagon) {
         this.setPlace(wagon);
