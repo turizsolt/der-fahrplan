@@ -170,13 +170,13 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
       A: this.ends.A.isSet()
         ? {
             track: this.ends.A.track.getId(),
-            whichEnd: this.ends.A.end.getWhichEnd()
+            whichEnd: this.ends.A.end.getWhichTrackEnd()
           }
         : null,
       B: this.ends.B.isSet()
         ? {
             track: this.ends.B.track.getId(),
-            whichEnd: this.ends.B.end.getWhichEnd()
+            whichEnd: this.ends.B.end.getWhichTrackEnd()
           }
         : null
     };

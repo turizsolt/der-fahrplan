@@ -12,6 +12,7 @@ import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { Ray } from '../../Geometry/Ray';
 import { Left, Right } from '../../Geometry/Directions';
 import { Store } from '../../Interfaces/Store';
+import { WhichSwitchEnd } from '../../Interfaces/WhichTrackEnd';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
@@ -39,8 +40,8 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     super.initStore(TYPES.TrackSwitch);
 
     this.D = new TrackEnd(WhichEnd.A, this);
-    this.E = new TrackSwitchEnd(WhichEnd.B, this);
-    this.F = new TrackSwitchEnd(WhichEnd.B, this);
+    this.E = new TrackSwitchEnd(WhichEnd.B, WhichSwitchEnd.E, this);
+    this.F = new TrackSwitchEnd(WhichEnd.B, WhichSwitchEnd.F, this);
 
     const last1 = coordinates1.length - 1;
     const last2 = coordinates2.length - 1;
