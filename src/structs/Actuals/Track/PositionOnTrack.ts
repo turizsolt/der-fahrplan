@@ -3,6 +3,7 @@ import { Platform } from '../../Interfaces/Platform';
 import { Ray } from '../../Geometry/Ray';
 import { TrackEnd } from './TrackEnd';
 import { Circle } from '../../Geometry/Circle';
+import { Store } from '../../Interfaces/Store';
 
 export class PositionOnTrack {
   private percentage: number;
@@ -13,6 +14,22 @@ export class PositionOnTrack {
   ) {
     this.percentage = position;
     this.position = position * track.getSegment().getLength();
+  }
+
+  persist(): Object {
+    return {
+      track: this.track && this.track.getId(),
+      position: this.position,
+      percentage: this.percentage,
+      direction: this.direction
+    };
+  }
+
+  load(obj: any, store: Store): void {
+    this.track = store.get(obj.track) as TrackBase;
+    this.position = obj.position;
+    this.percentage = obj.percentage;
+    this.direction = obj.direction;
   }
 
   swapDirection() {

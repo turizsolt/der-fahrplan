@@ -58,9 +58,10 @@ export class ActualStore implements Store {
       [TYPES.TrackSwitch]: 3,
       [TYPES.TrackJoint]: 2,
       [TYPES.Platform]: 1,
-      [TYPES.Wagon]: 0,
-      [TYPES.Train]: -1,
-      [TYPES.Passenger]: -2
+      // skip zero, cos it is falsy
+      [TYPES.Wagon]: -1,
+      [TYPES.Train]: -2,
+      [TYPES.Passenger]: -3
     };
     shortid.characters(
       '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_*'

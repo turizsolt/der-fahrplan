@@ -10,6 +10,7 @@ import { Station } from '../Scheduling/Station';
 import { Route } from '../Scheduling/Route';
 import { Color } from '../Color';
 import { Train } from '../Scheduling/Train';
+import { Store } from '../Interfaces/Store';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
@@ -116,10 +117,20 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     return this.renderer;
   }
   persist(): Object {
-    throw new Error('Method not implemented.');
+    return {
+      id: this.getId(),
+      type: 'Passenger',
+
+      from: this.from.getId(),
+      to: this.to.getId(),
+
+      place: this.place.getId()
+    };
   }
-  load(obj: Object, store: import('../Interfaces/Store').Store): void {
-    throw new Error('Method not implemented.');
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(store.get(obj.from) as Station, store.get(obj.to) as Station);
+    this.setPlace(store.get(obj.place) as Place);
   }
 
   public position: Coordinate;

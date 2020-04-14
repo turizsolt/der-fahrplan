@@ -24,6 +24,7 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
   private meshProvider: MeshProvider;
 
   private lastSelected: boolean = false;
+  private inited: boolean = false;
 
   init(engine: Wagon) {
     this.meshProvider = this.meshProviderFactory();
@@ -44,10 +45,13 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
       'clickable-wagon-' + this.wagon.getId() + '-endB'
     );
 
+    this.inited = true;
     this.update();
   }
 
   update() {
+    if (!this.inited) return;
+
     if (this.wagon.isRemoved()) {
       this.mesh.setEnabled(false);
       this.selectedMesh.setEnabled(false);

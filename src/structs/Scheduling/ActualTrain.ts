@@ -142,5 +142,8 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.presetId(obj.id);
     this.init(store.get(obj.schedulingWagon) as Wagon);
     this.wagons = obj.wagons.map(x => store.get(x) as Wagon);
+    for (let wagon of this.wagons) {
+      wagon.setTrain(this);
+    }
   }
 }

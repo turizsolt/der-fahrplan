@@ -233,9 +233,9 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
       id: this.getId(),
       type: 'Platform',
 
-      track: this.track,
-      start: this.start,
-      end: this.end,
+      track: this.track.getId(),
+      start: this.startPerc,
+      end: this.endPerc,
       side: this.side,
       width: this.width
     };

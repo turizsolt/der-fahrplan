@@ -21,6 +21,7 @@ import { applyMixins } from '../../../mixins/ApplyMixins';
 import { Boardable } from '../../../mixins/Boardable';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { Train } from '../../Scheduling/Train';
+import { Trip } from '../../Scheduling/Trip';
 
 const WAGON_GAP: number = 1;
 
@@ -243,8 +244,15 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       id: this.id,
       type: 'Wagon',
 
-      // todo A, B ends
-      trip: this.trip && this.trip.getId()
+      seatCount: this.seatCount,
+      seatColumns: this.seatColumns,
+      seats: this.seats.map(p => p && p.getId()),
+
+      A: this.ends.A.persist(),
+      B: this.ends.B.persist(),
+
+      trip: this.trip && this.trip.getId(),
+      train: this.train.getId()
     };
   }
 
@@ -253,13 +261,31 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       id: this.id,
       type: 'Wagon',
 
-      // todo A, B ends
       trip: this.trip && this.trip.persistDeep()
     };
   }
 
-  load(obj: Object, store: Store): void {
-    throw new Error('Method not implemented.');
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init();
+
+    this.setSeatCount(obj.seatCount, obj.seatColumns);
+    this.seats = obj.seats.map(s => (s ? store.get(s.id) : undefined));
+
+    this.ends.A.load(obj.A, store);
+    this.ends.B.load(obj.B, store);
+
+    const track = this.ends.A.positionOnTrack.getTrack();
+    const bTrack = this.ends.B.positionOnTrack.getTrack();
+    if (track === bTrack) {
+      this.worm = new TrackWorm([track], this);
+    } else {
+      this.worm = new TrackWorm([track, bTrack], this);
+    }
+
+    if (obj.trip) this.assignTrip(store.get(obj.trip) as Trip);
+
+    this.renderer.init(this);
   }
 
   update() {
