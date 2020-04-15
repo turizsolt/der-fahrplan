@@ -322,6 +322,7 @@ export class InputController {
 
     if (
       this.downProps.point &&
+      props.point &&
       this.downProps.point.coord.equalsTo(props.point.coord)
     ) {
       let ready = this.selectIfPossible(event);

@@ -136,7 +136,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   canvas.addEventListener('pointerenter', () => {});
 
-  canvas.addEventListener('pointerleave', () => {});
+  canvas.addEventListener('pointerleave', e => {
+    inputController.up(e);
+  });
 
   canvas.addEventListener('focus', () => {});
 
