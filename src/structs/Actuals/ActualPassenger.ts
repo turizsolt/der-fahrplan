@@ -8,8 +8,9 @@ import { BaseRenderer } from '../Renderers/BaseRenderer';
 import { injectable, inject } from 'inversify';
 import { Station } from '../Scheduling/Station';
 import { Route } from '../Scheduling/Route';
-import { Wagon } from '../Interfaces/Wagon';
 import { Color } from '../Color';
+import { Train } from '../Scheduling/Train';
+import { Store } from '../Interfaces/Store';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
@@ -24,27 +25,15 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     this.from = from;
 
     this.renderer.init(this);
-    this.setPlace(from);
+    this.listenStationAnnouncement(this.from);
+
     return this;
   }
 
-  listenStationAnnouncement(station: Station, trip: Route): void {
-    if (this.place !== station) return;
-
-    const fromIndex = trip
-      .getStops()
-      .findIndex(st => st.getStation() === station);
-    if (fromIndex === -1) return;
-
-    const fromStop = trip.getStops()[fromIndex];
-    const toStop = trip
-      .getStops()
-      .slice(fromIndex + 1)
-      .find(st => st.getStation() === this.to);
-    if (!toStop) return;
-
-    if (fromStop.getPlatform()) {
-      this.setPlace(fromStop.getPlatform());
+  listenStationAnnouncement(station: Station): void {
+    const nextPlace: Place = station.getPlatformTo(this.to) || station;
+    if (nextPlace !== this.place) {
+      this.setPlace(nextPlace);
       this.renderer.update();
     }
   }
@@ -52,23 +41,44 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   listenStationArrivingAnnouncement(
     station: Station,
     platform: Platform,
-    wagon: Wagon,
+    train: Train,
     trip: Route
   ) {
-    if (this.place === platform) {
-      this.setPlace(wagon);
-      this.renderer.update();
+    if (!trip) return;
+
+    const toIndex = trip.getStops().findIndex(s => s.getStation() === this.to);
+    const stationIndex = trip
+      .getStops()
+      .findIndex(s => s.getStation() === station);
+
+    if (toIndex !== -1 && stationIndex !== -1 && stationIndex < toIndex) {
+      const wagon = train.getFreeWagon();
+      if (wagon) {
+        this.setPlace(wagon);
+        this.renderer.update();
+      }
     }
   }
 
   listenWagonStoppedAtAnnouncement(
     station: Station,
     platform: Platform,
-    wagon: Wagon,
+    train: Train,
     trip: Route
   ) {
     if (this.to === station) {
       this.setPlace(null);
+      this.renderer.update();
+    } else if (!trip) {
+      this.setPlace(station);
+      this.renderer.update();
+    } else if (
+      !trip
+        .getStops()
+        .map(x => x.getStation())
+        .includes(this.to)
+    ) {
+      this.setPlace(station);
       this.renderer.update();
     }
   }
@@ -107,10 +117,20 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     return this.renderer;
   }
   persist(): Object {
-    throw new Error('Method not implemented.');
+    return {
+      id: this.getId(),
+      type: 'Passenger',
+
+      from: this.from.getId(),
+      to: this.to.getId(),
+
+      place: this.place.getId()
+    };
   }
-  load(obj: Object, store: import('../Interfaces/Store').Store): void {
-    throw new Error('Method not implemented.');
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(store.get(obj.from) as Station, store.get(obj.to) as Station);
+    this.setPlace(store.get(obj.place) as Place);
   }
 
   public position: Coordinate;

@@ -8,6 +8,9 @@ export const TYPES = {
   WagonRenderer: Symbol.for('WagonRenderer'),
   FactoryOfWagon: Symbol.for('Factory<Wagon>'),
 
+  Train: Symbol.for('Train'),
+  FactoryOfTrain: Symbol.for('Factory<Train>'),
+
   Track: Symbol.for('Track'),
   TrackRenderer: Symbol.for('TrackRenderer'),
   FactoryOfTrack: Symbol.for('Factory<Track>'),

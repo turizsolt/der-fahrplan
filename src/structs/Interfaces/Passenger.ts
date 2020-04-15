@@ -3,9 +3,9 @@ import { BaseBrick } from './BaseBrick';
 import { Coordinate } from '../Geometry/Coordinate';
 import { Station } from '../Scheduling/Station';
 import { Route } from '../Scheduling/Route';
-import { Wagon } from './Wagon';
 import { Color } from '../Color';
 import { Boardable } from '../../mixins/Boardable';
+import { Train } from '../Scheduling/Train';
 
 export type Place = Boardable & BaseBrick;
 
@@ -14,17 +14,17 @@ export interface Passenger extends BaseBrick {
   getPlace(): Place;
   getColor(): Color;
   getPosition(): Coordinate;
-  listenStationAnnouncement(station: Station, trip: Route);
+  listenStationAnnouncement(station: Station);
   listenStationArrivingAnnouncement(
     station: Station,
     platform: Platform,
-    wagon: Wagon,
+    train: Train,
     trip: Route
   );
   listenWagonStoppedAtAnnouncement(
     station: Station,
     platform: Platform,
-    wagon: Wagon,
+    train: Train,
     trip: Route
   );
   updatePos(pos: Coordinate): void;

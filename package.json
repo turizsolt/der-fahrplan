@@ -6,9 +6,9 @@
   "scripts": {
     "build": "webpack",
     "start": "webpack-dev-server --open",
-    "test:this": "ts-mocha --slow 5 test/PullingWagons.test.ts",
-    "test:only": "ts-mocha --slow 5 test/**/*.test.{ts,tsx}",
-    "test": "nyc ts-mocha test/**/*.test.{ts,tsx}",
+    "test:this": "ts-mocha --require mocha-steps --slow 5 test/Wagon/Announcements/AssignTrip.test.ts",
+    "test:only": "ts-mocha --require mocha-steps --slow 5 test/**/*.test.{ts,tsx}",
+    "test": "nyc ts-mocha --require mocha-steps test/**/*.test.{ts,tsx}",
     "posttest": "nyc report --reporter=json && nyc report --reporter=html"
   },
   "keywords": [],
@@ -19,6 +19,7 @@
     "@types/chai-almost": "^1.0.1",
     "@types/es6-shim": "^0.31.39",
     "@types/mocha": "^7.0.1",
+    "@types/mocha-steps": "^1.3.0",
     "@types/shortid": "^0.0.29",
     "chai": "^4.2.0",
     "chai-almost": "^1.0.1",
@@ -28,6 +29,7 @@
     "html-webpack-plugin": "^3.2.0",
     "imports-loader": "^0.8.0",
     "mocha": "^7.1.0",
+    "mocha-steps": "^1.3.0",
     "nyc": "^15.0.0",
     "style-loader": "^0.23.1",
     "ts-loader": "^6.0.4",

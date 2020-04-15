@@ -12,18 +12,6 @@ chai.use(chaiAlmost());
 const TrackFactory = testContainer.get<() => Track>(TYPES.FactoryOfTrack);
 
 describe('Position on track', () => {
-  xit('simple move', () => {
-    // no need for "move" anymore
-    const t = TrackFactory().init([
-      new Coordinate(0, 0, 0),
-      new Coordinate(100, 0, 0)
-    ]);
-    const p1 = new PositionOnTrack(t, 0, 1);
-    p1.move(1);
-
-    expect(p1.getRay()).deep.equals(new Ray(new Coordinate(1, 0, 0), Right));
-  });
-
   it('simple hop', () => {
     const t = TrackFactory().init([
       new Coordinate(0, 0, 0),

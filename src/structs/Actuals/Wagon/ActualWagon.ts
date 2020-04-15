@@ -20,6 +20,8 @@ import { Updatable } from '../../../mixins/Updatable';
 import { applyMixins } from '../../../mixins/ApplyMixins';
 import { Boardable } from '../../../mixins/Boardable';
 import { ActualBaseBrick } from '../ActualBaseBrick';
+import { Train } from '../../Scheduling/Train';
+import { Trip } from '../../Scheduling/Trip';
 
 const WAGON_GAP: number = 1;
 
@@ -30,26 +32,47 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   private removed: boolean = false;
   protected worm: TrackWorm;
   protected trip: Route;
+  protected train: Train;
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
   assignTrip(route: Route): void {
-    if (this.trip) {
-      for (let stop of this.trip.getStops()) {
-        stop.getStation().deannounce(this.trip);
+    const oldTrip = this.getTrip();
+    if (oldTrip) {
+      for (let stop of oldTrip.getStops()) {
+        stop.getStation().deannounce(oldTrip);
       }
     }
     this.trip = route;
-    if (this.trip) {
-      for (let stop of this.trip.getStops()) {
-        stop.getStation().announce(this.trip);
+    if (route) {
+      this.train.setSchedulingWagon(this);
+    }
+    const newTrip = this.getTrip();
+    if (newTrip) {
+      for (let stop of newTrip.getStops()) {
+        stop.getStation().announce(newTrip);
       }
     }
     this.update();
   }
 
+  getTrain(): Train {
+    return this.train;
+  }
+
+  setTrain(train: Train): void {
+    if (train) {
+      this.train = train;
+    } else {
+      this.train = this.store.create<Train>(TYPES.Train).init(this);
+    }
+  }
+
   getTrip(): Route {
-    return this.trip;
+    if (this.trip) return this.trip;
+    if (this.getTrain().getSchedulingWagon() !== this)
+      return this.getTrain().getTrip();
+    return null;
   }
 
   stop(): void {
@@ -75,28 +98,40 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   stoppedAt(platform: Platform): void {
-    if (platform.getStation()) {
-      platform.getStation().announceArrived(this, platform, this.trip);
-    }
-    this.announceStoppedAt(platform);
+    this.train.stoppedAt(platform.getStation(), platform);
+  }
+
+  hasFreeSeat(): boolean {
+    return this.seatCount > this.passengerCount;
   }
 
   announceStoppedAt(platform: Platform): void {
     const station = platform.getStation();
     this.seats.map(p => {
       if (p) {
-        p.listenWagonStoppedAtAnnouncement(station, platform, this, this.trip);
+        p.listenWagonStoppedAtAnnouncement(
+          station,
+          platform,
+          this.train,
+          this.trip
+        );
       }
     });
   }
 
   private seatCount: number = 21;
+  private seatColumns: number = 3;
   private passengerCount: number = 0;
   private seats: Passenger[] = [];
 
+  setSeatCount(count: number, columns: number = 3) {
+    this.seatCount = count;
+    this.seatColumns = columns;
+  }
+
   board(passenger: Passenger): Coordinate {
     if (this.passengerCount >= this.seatCount) {
-      return Coordinate.Origo(); // todo
+      return null;
     }
 
     this.passengerCount += 1;
@@ -105,7 +140,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       seatNo = (Math.random() * this.seatCount) | 0;
     } while (this.seats[seatNo]);
     this.seats[seatNo] = passenger;
-    return this.seatOffset(seatNo).coord;
+    const ray = this.seatOffset(seatNo);
+    return ray && ray.coord;
   }
 
   moveBoardedPassengers() {
@@ -117,9 +153,11 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   private seatOffset(seatNo) {
+    if (!this.worm || this.worm.getAll().length === 0) return null;
+
     const colSize = 1.2;
     const rowSize = 1.2;
-    const colCount = 3 - 1;
+    const colCount = this.seatColumns - 1;
     const rowCount = Math.ceil(this.seatCount / (colCount + 1)) - 1;
 
     const col = seatNo % 3;
@@ -150,7 +188,9 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   getCenterRay(): Ray {
     return new Ray(
       this.getCenterPos(),
-      this.ends.A.positionOnTrack.getRay().dirXZ
+      this.ends.A.positionOnTrack
+        .getRay()
+        .coord.whichDir2d(this.ends.B.positionOnTrack.getRay().coord)
     );
   }
 
@@ -177,6 +217,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       [WhichEnd.B]: new WagonEnd(WhichEnd.B, this)
     };
 
+    this.train = this.store.create<Train>(TYPES.Train).init(this);
+
     return this;
   }
 
@@ -186,6 +228,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   getB(): WagonEnd {
     return this.ends.B;
+  }
+
+  getEnd(whichEnd: WhichEnd): WagonEnd {
+    return this.ends[whichEnd];
   }
 
   private ends: Record<WhichEnd, WagonEnd>;
@@ -198,8 +244,15 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       id: this.id,
       type: 'Wagon',
 
-      // todo A, B ends
-      trip: this.trip && this.trip.getId()
+      seatCount: this.seatCount,
+      seatColumns: this.seatColumns,
+      seats: this.seats.map(p => p && p.getId()),
+
+      A: this.ends.A.persist(),
+      B: this.ends.B.persist(),
+
+      trip: this.trip && this.trip.getId(),
+      train: this.train.getId()
     };
   }
 
@@ -208,13 +261,31 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       id: this.id,
       type: 'Wagon',
 
-      // todo A, B ends
       trip: this.trip && this.trip.persistDeep()
     };
   }
 
-  load(obj: Object, store: Store): void {
-    throw new Error('Method not implemented.');
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init();
+
+    this.setSeatCount(obj.seatCount, obj.seatColumns);
+    this.seats = obj.seats.map(s => (s ? store.get(s.id) : undefined));
+
+    this.ends.A.load(obj.A, store);
+    this.ends.B.load(obj.B, store);
+
+    const track = this.ends.A.positionOnTrack.getTrack();
+    const bTrack = this.ends.B.positionOnTrack.getTrack();
+    if (track === bTrack) {
+      this.worm = new TrackWorm([track], this);
+    } else {
+      this.worm = new TrackWorm([track, bTrack], this);
+    }
+
+    if (obj.trip) this.assignTrip(store.get(obj.trip) as Trip);
+
+    this.renderer.init(this);
   }
 
   update() {
@@ -317,7 +388,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       }
     }
 
-    this.moveBoardedPassengers();
+    this.train.moveBoardedPassengers();
   }
 
   pullToPos(pot: PositionOnTrack, dir: number) {
@@ -399,7 +470,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       }
     }
 
-    this.moveBoardedPassengers();
+    this.train.moveBoardedPassengers();
   }
 
   getNearestWagon(whichEnd: WhichEnd): NearestWagon {

@@ -19,6 +19,7 @@ export interface Platform extends BaseBrick, Boardable {
   getLength(): number;
   getPosition(): Coordinate;
   getRotation(): number;
+  getNo(): string;
   getColor(): Color;
   remove(): boolean;
   isRemoved(): boolean;
@@ -30,4 +31,6 @@ export interface Platform extends BaseBrick, Boardable {
     side: Side,
     width?: number
   ): Platform;
+
+  initX(station: Station, no: string): Platform;
 }
