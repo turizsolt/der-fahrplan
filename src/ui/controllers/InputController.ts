@@ -87,24 +87,49 @@ export class InputController {
       props: ['idt', 'obj', 'opts'],
       template: `
       <div>
-        <div>Wagon #{{idt}}</div>
+        <div class="item-type">🚂 Mozdony</div>
+        <div class="item-id">{{idt}}</div>
         <div v-if="obj.trip">
-          <div>Trip: {{obj.trip.name}} </div>
-          <div v-for="stop in obj.trip.stops">{{stop.stationName}} </div>
-          <div @click="removeRoute(obj)">Remove route</div>
+          <div class="trip">
+            <div class="trip-name">{{obj.trip.name}}</div> 
+            <div class="trip-destination">▶ {{obj.trip.destination}}</div> 
+          </div>
+          <div v-for="(stop, id) in obj.trip.stops">
+            <div class="stop">
+                <div class="stop-circle" :style="{backgroundColor: stop.rgbColor}"></div>
+                <div v-if="id !== obj.trip.stops.length-1" class="stop-after color"></div>
+                <div v-if="id === obj.trip.stops.length-1" class="stop-after nocolor"></div>
+                <div class="stop-name">{{stop.stationName}}</div>
+            </div>
+          </div>
+          <div class="trip-buttons">
+            <div class="xbutton trip-cancel" @click="removeRoute(obj)">❌ Útirány törlése</div>
+          </div>
         </div>
         <div v-else>
-        <div>Select a trip:</div>
-        <div v-for="route in opts" @click="assignRoute(obj, route)">{{route.detailedName}} </div>
-        <div v-if="!opts || opts.length === 0">No trip available...</div>
+        <div v-if="opts && opts.length > 0">
+          <select class="route-select" size="1" @change="assignRoute(obj, $event)">
+            <option>Útirány kiválasztása...</option>
+            <option v-for="route in opts" :value="route.id">
+              {{route.detailedName}}
+            </option>
+          </select>
+        </div>
+        <div v-if="!opts || opts.length === 0">
+        <select class="route-select" size="1" disabled>
+            <option>Nincs kiválsztható útirány</option>
+          </select>
+        </div>
         
         </div>
       </div>
       `,
       methods: {
-        assignRoute: function(vWagon, vRoute) {
+        assignRoute: function(vWagon, $event) {
+          const vRouteId = $event.target.value;
+          if (!vRouteId) return;
           const wagon = _this.store.get(vWagon.id) as Wagon;
-          const route = _this.store.get(vRoute.id) as Route;
+          const route = _this.store.get(vRouteId) as Route;
           wagon.assignTrip(route);
         },
         removeRoute: function(vWagon) {
