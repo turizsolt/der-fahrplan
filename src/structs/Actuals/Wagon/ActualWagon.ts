@@ -56,6 +56,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.update();
   }
 
+  cancelTrip(): void {
+      this.train.cancelTrip();
+  }
+
   getTrain(): Train {
     return this.train;
   }
@@ -261,7 +265,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       id: this.id,
       type: 'Wagon',
 
-      trip: this.trip && this.trip.persistDeep()
+      trip: this.getTrip() && this.getTrip().persistDeep()
     };
   }
 

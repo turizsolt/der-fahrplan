@@ -134,7 +134,7 @@ export class InputController {
         },
         removeRoute: function(vWagon) {
           const wagon = _this.store.get(vWagon.id) as Wagon;
-          wagon.assignTrip(null);
+          wagon.cancelTrip();
         }
       }
     });

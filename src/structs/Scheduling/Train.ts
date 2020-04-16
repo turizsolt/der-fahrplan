@@ -15,6 +15,7 @@ export interface Train extends BaseStorable {
   getFreeWagon(): Wagon;
   getSchedulingWagon(): Wagon;
   setSchedulingWagon(wagon: Wagon): void;
+  cancelTrip(): void;
   mergeWith(other: Train): void;
   separateThese(wagons: Wagon[]): void;
   moveBoardedPassengers(): void;

@@ -31,6 +31,7 @@ export interface Wagon extends BaseBrick, Boardable, Updatable {
   pullToPos(pot: PositionOnTrack, dir: number): void;
 
   assignTrip(route: Route): void;
+  cancelTrip(): void;
   getTrip(): Route;
 
   stoppedAt(platform: Platform): void;
