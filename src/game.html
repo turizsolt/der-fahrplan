@@ -65,6 +65,15 @@
     border-radius: 0.5em;
 
     padding: 10px;
+
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.to-menu {
+    height: 20px;
+    text-align: center;
 }
 
 .item-type {
@@ -163,6 +172,8 @@
     background-color: none;
 }
 
+[v-cloak] { display: none; }
+
     </style>
 </head>
 <body>
@@ -178,8 +189,12 @@
     -->
     <div id="info-box">
         <component v-if="selected" :is="type" :idt="selected.id" :obj="selected" :opts="opts"></component>
+        <div v-if="!selected"></div>
+        <div class="to-menu">
+            <a href="index.html">Vissza a menübe</a>
+        </div>
     </div>
-    <div id="big-screen" v-if="show">
+    <div v-cloak id="big-screen" v-if="show">
         <div class="column" id="route-list">
             <div>Route list</div>
             <div v-for="route in routes" v-bind:class="{selected: selectedRoute && selectedRoute.id === route.id}">
