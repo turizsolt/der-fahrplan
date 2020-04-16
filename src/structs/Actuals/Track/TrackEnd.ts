@@ -1,13 +1,14 @@
 import { TrackBase } from '../../Interfaces/TrackBase';
 import { TrackJoint } from '../../Interfaces/TrackJoint';
 import { End } from '../End';
+import { WhichTrackEnd } from '../../Interfaces/WhichTrackEnd';
 
 export class TrackEnd extends End<TrackBase> {
   protected jointTo: TrackJoint;
   protected connectedEnd: TrackEnd;
 
-  connect(otherEnd: TrackEnd, joint?: TrackJoint) {
-    if (this.connectedEnd) return;
+  connect(otherEnd: TrackEnd, joint?: TrackJoint): boolean {
+    if (this.connectedEnd) return false;
 
     this.connectedEnd = otherEnd;
     if (joint) this.jointTo = joint;
@@ -17,6 +18,11 @@ export class TrackEnd extends End<TrackBase> {
     }
 
     this.endOf.update();
+    return true;
+  }
+
+  getWhichTrackEnd(): WhichTrackEnd {
+    return this.whichEnd;
   }
 
   hasConnectedEndOf(): boolean {

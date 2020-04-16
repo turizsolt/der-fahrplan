@@ -1,10 +1,9 @@
 import * as BABYLON from 'babylonjs';
 import { CoordinateToBabylonVector3 } from './converters/CoordinateToBabylonVector3';
-import { Engine } from '../../structs/Interfaces/Engine';
 import { injectable, inject } from 'inversify';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
 import { MeshProvider } from './MeshProvider';
-import { TYPES } from '../../structs/TYPES';
+import { TYPES } from '../../di/TYPES';
 import { WagonRenderer } from '../../structs/Renderers/WagonRenderer';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 import { MaterialName } from './MaterialName';
@@ -25,6 +24,7 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
   private meshProvider: MeshProvider;
 
   private lastSelected: boolean = false;
+  private inited: boolean = false;
 
   init(engine: Wagon) {
     this.meshProvider = this.meshProviderFactory();
@@ -45,10 +45,13 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
       'clickable-wagon-' + this.wagon.getId() + '-endB'
     );
 
+    this.inited = true;
     this.update();
   }
 
   update() {
+    if (!this.inited) return;
+
     if (this.wagon.isRemoved()) {
       this.mesh.setEnabled(false);
       this.selectedMesh.setEnabled(false);
@@ -101,6 +104,10 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
 
       case 'backward':
         this.wagon.moveTowardsWagonA(1);
+        break;
+
+      case 'stop':
+        this.wagon.stop();
         break;
 
       case 'endA':

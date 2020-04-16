@@ -4,7 +4,7 @@ import { TrackJointRenderer } from '../../structs/Renderers/TrackJointRenderer';
 import { injectable, inject } from 'inversify';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
 import { MeshProvider } from './MeshProvider';
-import { TYPES } from '../../structs/TYPES';
+import { TYPES } from '../../di/TYPES';
 import { MaterialName } from './MaterialName';
 
 @injectable()

@@ -1,20 +1,35 @@
 import { TrackBase } from '../../Interfaces/TrackBase';
 import { Platform } from '../../Interfaces/Platform';
-import { Engine } from '../../Interfaces/Engine';
 import { Ray } from '../../Geometry/Ray';
 import { TrackEnd } from './TrackEnd';
 import { Circle } from '../../Geometry/Circle';
+import { Store } from '../../Interfaces/Store';
 
 export class PositionOnTrack {
   private percentage: number;
   constructor(
     private track: TrackBase,
-    private engine: Engine,
     private position: number = 0,
     private direction: number = 1
   ) {
     this.percentage = position;
     this.position = position * track.getSegment().getLength();
+  }
+
+  persist(): Object {
+    return {
+      track: this.track && this.track.getId(),
+      position: this.position,
+      percentage: this.percentage,
+      direction: this.direction
+    };
+  }
+
+  load(obj: any, store: Store): void {
+    this.track = store.get(obj.track) as TrackBase;
+    this.position = obj.position;
+    this.percentage = obj.percentage;
+    this.direction = obj.direction;
   }
 
   swapDirection() {
@@ -42,6 +57,16 @@ export class PositionOnTrack {
     return this.direction;
   }
 
+  getConstantAngle(): number {
+    const dir = this.getRay().dirXZ;
+    if (this.direction === 1) {
+      return dir;
+    } else {
+      if (dir > 0) return dir - Math.PI;
+      return dir + Math.PI;
+    }
+  }
+
   isBeside(platform: Platform): boolean {
     return platform.isBeside(this.position);
   }
@@ -53,7 +78,7 @@ export class PositionOnTrack {
 
   setPercentage(percentage: number): void {
     this.percentage = percentage;
-    //this.position = this.track.getLength() * percentage;
+    this.position = this.track.getLength() * percentage;
   }
 
   move(distance: number) {

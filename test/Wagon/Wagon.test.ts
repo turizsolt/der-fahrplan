@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { testContainer } from '../inversify.config';
-import { TYPES } from '../../src/structs/TYPES';
+import { testContainer } from '../../src/di/test.config';
+import { TYPES } from '../../src/di/TYPES';
 import { Wagon } from '../../src/structs/Interfaces/Wagon';
 chai.use(chaiAlmost());
 

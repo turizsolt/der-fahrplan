@@ -1,8 +1,8 @@
 import { TrackJoint } from '../../src/structs/Interfaces/TrackJoint';
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { testContainer } from '../inversify.config';
-import { TYPES } from '../../src/structs/TYPES';
+import { testContainer } from '../../src/di/test.config';
+import { TYPES } from '../../src/di/TYPES';
 import { Track } from '../../src/structs/Interfaces/Track';
 import { Coordinate } from '../../src/structs/Geometry/Coordinate';
 import { TrackSwitch } from '../../src/structs/Interfaces/TrackSwitch';

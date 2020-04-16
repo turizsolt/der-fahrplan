@@ -1,10 +1,6 @@
 import { BaseRenderer } from '../Renderers/BaseRenderer';
-import { Store } from '../Actuals/Store/Store';
+import { BaseStorable } from './BaseStorable';
 
-export interface BaseBrick {
-  getId(): string;
+export interface BaseBrick extends BaseStorable {
   getRenderer(): BaseRenderer;
-  persist(): Object;
-  load(obj: Object, store: Store): void;
-  presetId(id: string): void;
 }

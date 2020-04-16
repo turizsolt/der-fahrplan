@@ -23,7 +23,11 @@ export class MeshProvider {
     return this.materials[name];
   }
 
-  init(scene: BABYLON.Scene) {
+  init(): MeshProvider {
+    return this;
+  }
+
+  setScene(scene: BABYLON.Scene): void {
     this.scene = scene;
 
     BABYLON.SceneLoader.ImportMesh(
@@ -112,6 +116,19 @@ export class MeshProvider {
       null
     );
     mesh.material = this.selectorRed;
+    return mesh;
+  }
+
+  createStationMesh(name: string, radius): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateTorus(
+      name,
+      {
+        diameter: 2 * radius,
+        thickness: 1,
+        tessellation: 24
+      },
+      null
+    );
     return mesh;
   }
 

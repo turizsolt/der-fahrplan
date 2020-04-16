@@ -1,6 +1,6 @@
 import { TrackJointRenderer } from '../../Renderers/TrackJointRenderer';
 import { Coordinate } from '../../Geometry/Coordinate';
-import { TYPES } from '../../TYPES';
+import { TYPES } from '../../../di/TYPES';
 import { TrackJointEnd } from './TrackJointEnd';
 import { inject, injectable } from 'inversify';
 import { TrackJoint } from '../../Interfaces/TrackJoint';
@@ -11,7 +11,7 @@ import { Ray } from '../../Geometry/Ray';
 import { TrackJointConnector } from './TrackJointConnector';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { Store } from '../Store/Store';
+import { Store } from '../../Interfaces/Store';
 
 @injectable()
 export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
@@ -26,7 +26,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   private connector: TrackJointConnector;
 
   init(x: number, z: number, rot: number): TrackJoint {
-    super.initStore();
+    super.initStore(TYPES.TrackJoint);
 
     this.connector = this.TrackJointConnectorFactory();
 
@@ -170,13 +170,13 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
       A: this.ends.A.isSet()
         ? {
             track: this.ends.A.track.getId(),
-            whichEnd: this.ends.A.end.getWhichEnd()
+            whichEnd: this.ends.A.end.getWhichTrackEnd()
           }
         : null,
       B: this.ends.B.isSet()
         ? {
             track: this.ends.B.track.getId(),
-            whichEnd: this.ends.B.end.getWhichEnd()
+            whichEnd: this.ends.B.end.getWhichTrackEnd()
           }
         : null
     };

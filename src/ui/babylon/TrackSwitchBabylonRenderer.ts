@@ -3,7 +3,7 @@ import { TrackSwitchRenderer } from '../../structs/Renderers/TrackSwitchRenderer
 import { injectable, inject } from 'inversify';
 import { TrackSwitch } from '../../structs/Interfaces/TrackSwitch';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
-import { TYPES } from '../../structs/TYPES';
+import { TYPES } from '../../di/TYPES';
 import { MeshProvider } from './MeshProvider';
 import { Left, Right } from '../../structs/Geometry/Directions';
 import { CoordinateToBabylonVector3 } from './converters/CoordinateToBabylonVector3';

@@ -4,13 +4,12 @@ export const TYPES = {
   Store: Symbol.for('Store'),
   FactoryOfStore: Symbol.for('Factory<Store>'),
 
-  Engine: Symbol.for('Engine'),
-  EngineRenderer: Symbol.for('EngineRenderer'),
-  FactoryOfEngine: Symbol.for('Factory<Engine>'),
-
   Wagon: Symbol.for('Wagon'),
   WagonRenderer: Symbol.for('WagonRenderer'),
   FactoryOfWagon: Symbol.for('Factory<Wagon>'),
+
+  Train: Symbol.for('Train'),
+  FactoryOfTrain: Symbol.for('Factory<Train>'),
 
   Track: Symbol.for('Track'),
   TrackRenderer: Symbol.for('TrackRenderer'),
@@ -20,7 +19,11 @@ export const TYPES = {
   TrackSwitchRenderer: Symbol.for('TrackSwitchRenderer'),
   FactoryOfTrackSwitch: Symbol.for('Factory<TrackSwitch>'),
 
+  Passenger: Symbol.for('Passenger'),
   PassengerRenderer: Symbol.for('PassengerRenderer'),
+  FactoryOfPassenger: Symbol.for('Factory<Passenger>'),
+
+  PassengerGenerator: Symbol.for('PassengerGenerator'),
 
   Platform: Symbol.for('Platform'),
   PlatformRenderer: Symbol.for('PlatformRenderer'),
@@ -34,5 +37,15 @@ export const TYPES = {
   FactoryOfTrackJointConnector: Symbol.for('Factory<TrackJointConnector>'),
 
   MeshProvider: Symbol.for('MeshProvider'),
-  FactoryOfMeshProvider: Symbol.for('Factory<MeshProvider>')
+  FactoryOfMeshProvider: Symbol.for('Factory<MeshProvider>'),
+
+  Route: Symbol.for('Route'),
+  FactoryOfRoute: Symbol.for('Factory<Route>'),
+
+  RouteStop: Symbol.for('RouteStop'),
+  FactoryOfRouteStop: Symbol.for('Factory<RouteStop>'),
+
+  Station: Symbol.for('Station'),
+  StationRenderer: Symbol.for('StationRenderer'),
+  FactoryOfStation: Symbol.for('Factory<Station>')
 };

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <title>Der Fahrplan instructions</title>
+    <style>
+        .para, .task {
+            line-height: 24px;
+            font-size: 16px;
+            margin-top: 0.25em;
+            margin-bottom: 1em;
+        }
+
+        .key {
+            width: 17px;
+            height: 22px;
+            display: inline-block;
+            background-color: #CCC;
+            text-align: left;
+            padding-left: 5px;
+            line-height: 22px;
+            border-radius: 2px;
+            margin: 1px 4px 1px 4px;
+
+            font-size: 12px;
+        }
+
+        .arrow {
+            text-align: center;
+            width: 12px;
+            padding-right: 5px;
+        }
+
+        .min-margin {
+            margin: 1px;
+        }
+
+        .wider {
+            width: inherit;
+            padding-right: 5px;
+        }
+
+        .mouse {
+            width: 14px;
+            height: 22px;
+            border-radius: 6px;
+            background-color: #AAA;
+            margin: 1px;
+            display: inline-block;
+            line-height: 22px;
+        }
+
+        .mouse-left, .mouse-middle, .mouse-right {
+            width: 7px;
+            height: 10px;
+            background-color: #666;
+            position: relative;
+            border: 1px solid white;
+            top: -5.5px;
+            display: inline-block;
+        }
+
+        .mouse-left {
+            border-top-left-radius: 6px;
+            left: -1px;
+        }
+
+        .mouse-right {
+            border-top-right-radius: 6px;
+            left: 6px;
+        }
+
+        .mouse-middle {
+            border-radius: 0;
+            left: 4px;
+            width: 4px;
+        }
+
+        .front {
+            margin-left: 8px;
+            margin-right: 8px;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 1.25em;
+            margin-bottom: 1em;
+        }
+
+        .task {
+            background-color: khaki;
+            border: 1px solid #a18d6f;
+            border-radius: 0.5em;
+            padding: 0.5em;
+            margin-bottom: 2em;
+        }
+
+        .huhu {
+            margin-top: 1em;
+            margin-bottom: 0em;
+        }
+
+        .legend {
+            line-height: 30px;
+            margin-top: 3em;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 0.5em;
+            padding: 0.5em;
+        }
+
+        #page {
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 1em;
+        }
+
+        .right {
+            text-align: right;
+            margin-top: -2.25em;
+        }
+
+        .button {
+            border: 1px solid #a18d6f;
+            border-radius: 0.25em;
+            background-color: khaki;
+            margin: 0.25em;
+            padding: 0.5em;
+            display: inline-block;
+            cursor: pointer;
+            color: black;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background-color: #a18d6f;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="page">
+        <div class="title">2. szint</div>
+        <div class="task">
+            📝 Célod, hogy <b>Oakbarrow</b> és <b>Deepsage</b> állomásokról eljuttass a másik állomásra <b>10-10 utast</b>.
+        </div>
+        <div class="para">
+            Ahhoz, hogy a két vonat ki tudjon térni, a váltóra
+            <div class="mouse front"><div class="mouse-right"></div></div>
+            jobb egérgombbal kattintva azt át tudod állítani.
+        </div>
+        <div class="para">
+                A két vonatot nem tudod egyszerre mozgatni.
+            </div>
+            <div class="para huhu">
+            <i>🚂🚃🚃🚃🚃 Hu-húúúúú!</i>
+        </div>
+        <div class="right">
+            <a class="button" href="game.html?second">Kezdjük!</a>
+        </div>
+        
+        <div class="legend">
+            <b>Vezérlés röviden:</b>
+            <br />
+            <div class="mouse front"><div class="mouse-left"></div></div> Mozdony kijelölése
+            <br />
+            <div class="mouse front"><div class="mouse-right"></div></div> Váltó állítása
+            <br />
+            <div class="key arrow">↑</div> Mozdony előre
+            <br />
+            <div class="key arrow">↓</div> Mozdony hátra
+            <br />
+            <div class="key wider">⏎ Enter</div> Utascsere
+        </div>
+    </div>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import * as BABYLON from 'babylonjs';
+import Vue from 'vue/dist/vue.js';
 import { InputHandler } from './InputHandler';
 import { CreateTrackInputHandler } from './CreateTrackInputHandler';
 import { BabylonVector3ToCoordinate } from '../../ui/babylon/converters/BabylonVector3ToCoordinate';
@@ -8,9 +9,8 @@ import {
   snapPositionOnTrack,
   snapJoint
 } from '../../structs/Geometry/Snap';
-import { babylonContainer } from '../../structs/inversify.config';
-import { Store } from '../../structs/Actuals/Store/Store';
-import { TYPES } from '../../structs/TYPES';
+import { productionContainer } from '../../di/production.config';
+import { TYPES } from '../../di/TYPES';
 import { ActualTrack } from '../../structs/Actuals/Track/ActualTrack';
 import { TrackBase } from '../../structs/Interfaces/TrackBase';
 import { TrackJoint } from '../../structs/Interfaces/TrackJoint';
@@ -22,13 +22,21 @@ import { CameraInputHandler } from './CameraInputHandler';
 import { SelectInputHandler } from './SelectInputHandler';
 import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
 import { CreateEngineInputHandler } from './CreateEngineInputHandler';
+import { Store } from '../../structs/Interfaces/Store';
+import { CreateStationInputHandler } from './CreateStationInputHandler';
+import { Route } from '../../structs/Scheduling/Route';
+import { Station } from '../../structs/Scheduling/Station';
+import { ActualRouteStop } from '../../structs/Scheduling/ActualRouteStop';
+import { RouteStop } from '../../structs/Scheduling/RouteStop';
+import { Wagon } from '../../structs/Interfaces/Wagon';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
   SELECT = 'SELECT',
   CREATE_TRACK = 'CREATE_TRACK',
   CREATE_PLATFORM = 'CREATE_PLATFORM',
-  CREATE_ENGINE = 'CREATE_ENGINE'
+  CREATE_ENGINE = 'CREATE_ENGINE',
+  CREATE_STATION = 'CREATE_STATION'
 }
 
 export class InputController {
@@ -44,43 +52,172 @@ export class InputController {
 
   private mouseButtons: boolean[] = [];
 
+  private vm: Vue;
+  private vmInfoBox: Vue;
+  private vmBigScreen: Vue;
+
   constructor(
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera
   ) {
-    document.getElementById('input-cam').addEventListener('click', () => {
-      this.inputHandler.cancel();
-      this.mode = InputMode.CAMERA;
-      this.inputHandler = this.inputHandlers[this.mode];
-      updBoxes(this.mode);
+    const _this = this;
+    this.vm = new Vue({
+      el: '#button-holder',
+      data: {
+        selected: '',
+        buttons: []
+      },
+      methods: {
+        handleClick: function(event) {
+          _this.selectMode(event.target.id);
+        }
+      }
+    });
+    this.vmInfoBox = new Vue({
+      el: '#info-box',
+      data: { selected: null, type: null, opts: [] }
     });
 
-    document.getElementById('input-sel').addEventListener('click', () => {
-      this.inputHandler.cancel();
-      this.mode = InputMode.SELECT;
-      this.inputHandler = this.inputHandlers[this.mode];
-      updBoxes(this.mode);
+    Vue.component('idtext', {
+      props: ['idt', 'obj'],
+      template: '<div>{{idt}}</div>'
     });
 
-    document.getElementById('input-nt').addEventListener('click', () => {
-      this.inputHandler.cancel();
-      this.mode = InputMode.CREATE_TRACK;
-      this.inputHandler = this.inputHandlers[this.mode];
-      updBoxes(this.mode);
+    Vue.component('wagon', {
+      props: ['idt', 'obj', 'opts'],
+      template: `
+      <div>
+        <div class="item-type">🚂 Mozdony</div>
+        <div class="item-id">{{idt}}</div>
+        <div v-if="obj.trip">
+          <div class="trip">
+            <div class="trip-name">{{obj.trip.name}}</div> 
+            <div class="trip-destination">▶ {{obj.trip.destination}}</div> 
+          </div>
+          <div v-for="(stop, id) in obj.trip.stops">
+            <div class="stop">
+                <div class="stop-circle" :style="{backgroundColor: stop.rgbColor}"></div>
+                <div v-if="id !== obj.trip.stops.length-1" class="stop-after color"></div>
+                <div v-if="id === obj.trip.stops.length-1" class="stop-after nocolor"></div>
+                <div class="stop-name">{{stop.stationName}}</div>
+            </div>
+          </div>
+          <div class="trip-buttons">
+            <div class="xbutton trip-cancel" @click="removeRoute(obj)">❌ Útirány törlése</div>
+          </div>
+        </div>
+        <div v-else>
+        <div v-if="opts && opts.length > 0">
+          <select class="route-select" size="1" @change="assignRoute(obj, $event)">
+            <option>Útirány kiválasztása...</option>
+            <option v-for="route in opts" :value="route.id">
+              {{route.detailedName}}
+            </option>
+          </select>
+        </div>
+        <div v-if="!opts || opts.length === 0">
+        <select class="route-select" size="1" disabled>
+            <option>Nincs kiválsztható útirány</option>
+          </select>
+        </div>
+        
+        </div>
+      </div>
+      `,
+      methods: {
+        assignRoute: function(vWagon, $event) {
+          const vRouteId = $event.target.value;
+          if (!vRouteId) return;
+          const wagon = _this.store.get(vWagon.id) as Wagon;
+          const route = _this.store.get(vRouteId) as Route;
+          wagon.assignTrip(route);
+        },
+        removeRoute: function(vWagon) {
+          const wagon = _this.store.get(vWagon.id) as Wagon;
+          wagon.cancelTrip();
+        }
+      }
     });
 
-    document.getElementById('input-np').addEventListener('click', () => {
-      this.inputHandler.cancel();
-      this.mode = InputMode.CREATE_PLATFORM;
-      this.inputHandler = this.inputHandlers[this.mode];
-      updBoxes(this.mode);
-    });
-
-    document.getElementById('input-ne').addEventListener('click', () => {
-      this.inputHandler.cancel();
-      this.mode = InputMode.CREATE_ENGINE;
-      this.inputHandler = this.inputHandlers[this.mode];
-      updBoxes(this.mode);
+    this.vmBigScreen = new Vue({
+      el: '#big-screen',
+      data: {
+        show: false,
+        routes: [],
+        selectedRoute: null,
+        stations: []
+      },
+      methods: {
+        load: function() {
+          this.routes = _this.store
+            .getAllOf<Route>(TYPES.Route)
+            .map(x => x.persistDeep());
+          this.stations = _this.store
+            .getAllOf<Station>(TYPES.Station)
+            .map(x => x.persistDeep());
+          if (this.selectedRoute) {
+            this.selectedRoute = (_this.store.get(
+              this.selectedRoute.id
+            ) as Route).persistDeep();
+          }
+        },
+        removeRoute: function(vRoute) {
+          const route = _this.store.get(vRoute.id) as Route;
+          route.remove();
+          this.selectedRoute = null;
+          this.load();
+        },
+        createRoute: function() {
+          const route = _this.store.create<Route>(TYPES.Route);
+          route.init();
+          this.load();
+        },
+        createReverseRoute: function(vRouteFrom) {
+          const routeFrom = _this.store.get(vRouteFrom.id) as Route;
+          const route = _this.store.create<Route>(TYPES.Route);
+          route.init();
+          route.setName(routeFrom.getName());
+          for (let stopFrom of [...routeFrom.getStops()].reverse()) {
+            const stop = _this.store.create<RouteStop>(TYPES.RouteStop);
+            stop.init(stopFrom.getStation(), stopFrom.getPlatform());
+            route.addStop(stop);
+          }
+          this.load();
+        },
+        selectRoute: function(route) {
+          this.selectedRoute = route;
+          this.load();
+        },
+        deleteStop: function(stop) {
+          const route = _this.store.get(this.selectedRoute.id) as Route;
+          route.removeStop(stop);
+          this.load();
+        },
+        swapStop: function(vStop) {
+          const stop = _this.store.get(vStop.id) as RouteStop;
+          const route = _this.store.get(this.selectedRoute.id) as Route;
+          route.swapStopWithPrev(stop);
+          this.load();
+        },
+        addStop: function(vStation) {
+          if (this.selectedRoute) {
+            const route = _this.store.get(this.selectedRoute.id) as Route;
+            const station = _this.store.get(vStation.id) as Station;
+            const stop = _this.store.create<RouteStop>(TYPES.RouteStop);
+            stop.init(
+              station,
+              station.getPlatforms().length > 0 && station.getPlatforms()[0]
+            );
+            route.addStop(stop);
+            this.load();
+          }
+        },
+        nameChange: function(event) {
+          const route = _this.store.get(this.selectedRoute.id) as Route;
+          route.setName(event.target.value);
+          this.load();
+        }
+      }
     });
 
     this.inputHandlers = {
@@ -88,14 +225,28 @@ export class InputController {
       [InputMode.SELECT]: new SelectInputHandler(),
       [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(),
       [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(),
-      [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler()
+      [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(),
+      [InputMode.CREATE_STATION]: new CreateStationInputHandler()
     };
 
+    const modeNames = {
+      [InputMode.CAMERA]: 'Cam',
+      [InputMode.SELECT]: 'Sel',
+      [InputMode.CREATE_TRACK]: '+Trac',
+      [InputMode.CREATE_PLATFORM]: '+Plat',
+      [InputMode.CREATE_ENGINE]: '+Eng',
+      [InputMode.CREATE_STATION]: '+Stat'
+    };
+
+    for (let mode of Object.keys(this.inputHandlers)) {
+      this.vm.buttons.push({ id: mode, text: modeNames[mode] });
+    }
+    this.vm.selected = this.mode;
+
     this.inputHandler = this.inputHandlers[this.mode];
-    updBoxes(this.mode);
 
     this.downProps = null;
-    this.store = babylonContainer.get<() => Store>(TYPES.FactoryOfStore)();
+    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
   }
 
   convert(event: PointerEvent): InputProps {
@@ -196,6 +347,7 @@ export class InputController {
 
     if (
       this.downProps.point &&
+      props.point &&
       this.downProps.point.coord.equalsTo(props.point.coord)
     ) {
       let ready = this.selectIfPossible(event);
@@ -212,6 +364,8 @@ export class InputController {
 
   private wheelRotation = 0;
 
+  private selectCallback: (ob: Object) => void = null;
+
   private selectIfPossible(event: PointerEvent) {
     let ready = false;
     if (this.downProps.mesh) {
@@ -222,7 +376,7 @@ export class InputController {
       console.log(meshId);
       if (meshId.startsWith('clickable-')) {
         const [_, type, id, command] = meshId.split('-');
-        const storedObj = this.store.get(id);
+        const storedObj = this.store.get(id) as BaseBrick;
         if (storedObj) {
           if (command) {
             storedObj.getRenderer().process(command);
@@ -231,16 +385,82 @@ export class InputController {
           } else {
             let renderer = storedObj.getRenderer();
             if (renderer.isSelected()) {
+              if (
+                this.selectCallback &&
+                this.selected.getType() === Symbol.for('Wagon')
+              ) {
+                (this.selected as Wagon).unsubscribeToUpdates(
+                  this.selectCallback
+                );
+              }
+
               renderer.setSelected(false);
               this.selected = null;
               this.selectedMesh = null;
+              this.vmInfoBox.selected = null;
+              this.vmInfoBox.type = null;
+              this.vmInfoBox.opts = [];
             } else {
               if (this.selected) {
+                if (
+                  this.selectCallback &&
+                  this.selected.getType() === Symbol.for('Wagon')
+                ) {
+                  (this.selected as Wagon).unsubscribeToUpdates(
+                    this.selectCallback
+                  );
+                }
                 this.selected.getRenderer().setSelected(false);
               }
+
               renderer.setSelected(true);
               this.selected = storedObj;
               this.selectedMesh = this.downProps.mesh;
+
+              if (storedObj.getType() === Symbol.for('Wagon')) {
+                console.log('select');
+                this.selectCallback = (obj: Object): void => {
+                  console.log('update');
+                  this.vmInfoBox.selected = obj;
+                };
+                (this.selected as Wagon).subscribeToUpdates(
+                  this.selectCallback
+                );
+              }
+              this.vmInfoBox.selected = storedObj.persistDeep();
+              this.vmInfoBox.type =
+                storedObj.getType() === Symbol.for('Wagon')
+                  ? 'wagon'
+                  : 'idtext';
+              console.log('gt', storedObj.getType(), this.vmInfoBox.type);
+              if (storedObj.getType() === Symbol.for('Wagon')) {
+                this.vmInfoBox.opts = this.store
+                  .getAllOf<Route>(TYPES.Route)
+                  .map(x => x.persistDeep());
+              }
+
+              //   const sel = this.selected as any;
+              //   if (sel.getName) {
+              //     this.vmInfoBox.selectedId = sel.getName();
+              //     if (sel.getPlatforms) {
+              //       this.vmInfoBox.selectedId =
+              //         sel.getName() +
+              //         ' / ' +
+              //         sel
+              //           .getPlatforms()
+              //           .map(p => p.getId())
+              //           .join(', ');
+              //     }
+              //   } else if (sel.getStation) {
+              //     this.vmInfoBox.selectedId =
+              //       id +
+              //       ':' +
+              //       (!sel.getStation()
+              //         ? 'No station'
+              //         : sel.getStation().getName());
+              //   } else {
+              //     this.vmInfoBox.selectedId = id;
+              //   }
             }
           }
           ready = true;
@@ -264,43 +484,46 @@ export class InputController {
     }
   }
 
+  selectMode(mode: InputMode) {
+    this.inputHandler.cancel();
+    this.mode = mode;
+    this.inputHandler = this.inputHandlers[this.mode];
+    this.vm.selected = mode;
+  }
+
   keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {}
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     switch (key) {
       case 'U':
-        this.inputHandler.cancel();
-        this.mode = InputMode.CAMERA;
-        this.inputHandler = this.inputHandlers[this.mode];
-        updBoxes(this.mode);
+        this.selectMode(InputMode.CAMERA);
         break;
 
       case 'I':
-        this.inputHandler.cancel();
-        this.mode = InputMode.SELECT;
-        this.inputHandler = this.inputHandlers[this.mode];
-        updBoxes(this.mode);
+        this.selectMode(InputMode.SELECT);
         break;
 
       case 'O':
-        this.inputHandler.cancel();
-        this.mode = InputMode.CREATE_TRACK;
-        this.inputHandler = this.inputHandlers[this.mode];
-        updBoxes(this.mode);
+        this.selectMode(InputMode.CREATE_TRACK);
         break;
 
       case 'P':
-        this.inputHandler.cancel();
-        this.mode = InputMode.CREATE_PLATFORM;
-        this.inputHandler = this.inputHandlers[this.mode];
-        updBoxes(this.mode);
+        this.selectMode(InputMode.CREATE_PLATFORM);
+        break;
+
+      case '7':
+        this.vmBigScreen.show = !this.vmBigScreen.show;
+        if (this.vmBigScreen.show) {
+          this.vmBigScreen.load();
+        }
+        break;
+
+      case '8':
+        this.selectMode(InputMode.CREATE_ENGINE);
         break;
 
       case '9':
-        this.inputHandler.cancel();
-        this.mode = InputMode.CREATE_ENGINE;
-        this.inputHandler = this.inputHandlers[this.mode];
-        updBoxes(this.mode);
+        this.selectMode(InputMode.CREATE_STATION);
         break;
 
       case 'K':
@@ -360,22 +583,4 @@ export class InputController {
   load(data: any) {
     this.store.loadAll(data);
   }
-}
-
-const choices = {
-  [InputMode.CAMERA]: 'input-cam',
-  [InputMode.SELECT]: 'input-sel',
-  [InputMode.CREATE_TRACK]: 'input-nt',
-  [InputMode.CREATE_PLATFORM]: 'input-np',
-  [InputMode.CREATE_ENGINE]: 'input-ne'
-};
-
-function updBoxes(chosen: InputMode) {
-  document.getElementById('input-cam').classList.remove('selected');
-  document.getElementById('input-sel').classList.remove('selected');
-  document.getElementById('input-nt').classList.remove('selected');
-  document.getElementById('input-np').classList.remove('selected');
-  document.getElementById('input-ne').classList.remove('selected');
-
-  document.getElementById(choices[chosen]).classList.add('selected');
 }

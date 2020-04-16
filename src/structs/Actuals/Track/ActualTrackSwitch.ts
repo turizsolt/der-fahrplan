@@ -3,15 +3,16 @@ import { TrackEnd } from './TrackEnd';
 import { TrackSegment } from './TrackSegment';
 import { Coordinate } from '../../Geometry/Coordinate';
 import { TrackSwitchRenderer } from '../../Renderers/TrackSwitchRenderer';
-import { TYPES } from '../../TYPES';
+import { TYPES } from '../../../di/TYPES';
 import { TrackSwitch } from '../../Interfaces/TrackSwitch';
 import { ActualTrackBase } from './ActualTrackBase';
 import { injectable, inject } from 'inversify';
 import { WhichEnd } from '../../Interfaces/WhichEnd';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { Store } from '../Store/Store';
 import { Ray } from '../../Geometry/Ray';
 import { Left, Right } from '../../Geometry/Directions';
+import { Store } from '../../Interfaces/Store';
+import { WhichSwitchEnd } from '../../Interfaces/WhichTrackEnd';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
@@ -36,11 +37,11 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   @inject(TYPES.TrackSwitchRenderer) private renderer: TrackSwitchRenderer;
 
   init(coordinates1: Coordinate[], coordinates2: Coordinate[]): TrackSwitch {
-    super.initStore();
+    super.initStore(TYPES.TrackSwitch);
 
     this.D = new TrackEnd(WhichEnd.A, this);
-    this.E = new TrackSwitchEnd(WhichEnd.B, this);
-    this.F = new TrackSwitchEnd(WhichEnd.B, this);
+    this.E = new TrackSwitchEnd(WhichEnd.B, WhichSwitchEnd.E, this);
+    this.F = new TrackSwitchEnd(WhichEnd.B, WhichSwitchEnd.F, this);
 
     const last1 = coordinates1.length - 1;
     const last2 = coordinates2.length - 1;
