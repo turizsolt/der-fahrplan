@@ -35,14 +35,7 @@
             background-color: rebeccapurple;
         }
 
-        #info-box {
-            position: fixed;
-            left: 20px;
-            top: 80px;
-            bottom: 20px;
-            width: 200px;
-            background-color: aliceblue;
-        }
+
 
         #big-screen {
             position: fixed;
@@ -58,9 +51,133 @@
             flex-grow: 1;
         }
 
+        /******************************************/
+
+        #info-box {
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    bottom: 20px;
+    width: 200px;
+    background-color:#cec;
+
+    border: 2px solid #070;
+    border-radius: 0.5em;
+
+    padding: 10px;
+
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.to-menu {
+    height: 20px;
+    text-align: center;
+}
+
+.item-type {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 0px;
+}
+
+.item-id {
+    text-align: center;
+    font-style: italic;
+    font-size: 10px;
+    margin-bottom: 20px;
+}
+
+.route-select {
+    width: 100%;
+    border: 1px solid #070;
+    border-radius: 0.25em;
+    background-color: #aca;
+}
+
+.trip {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.trip-name {
+    background-color: #9a9;
+    border: 1px solid #070;
+    border-radius: 0.25em;
+    padding: 3px 0 3px 3px;
+    min-width: 3em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.trip-destination {
+    padding: 3px;
+    font-weight: bold;
+}
+
+.trip-buttons {
+    display: flex;
+    justify-content: flex-end;
+}
+
+
+.xbutton {
+    border: 1px solid #a18d6f;
+    border-radius: 0.25em;
+    background-color: khaki;
+    margin: 0.25em;
+    padding: 0.5em;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.xbutton:hover {
+    background-color: #a18d6f;
+}
+
+.stop {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    height: 15px;
+}
+
+.stop-circle {
+    width: 10px;
+    height: 10px;
+    border: 2px solid #070;
+    border-radius: 50%;
+}
+
+.stop-name {
+    margin-left: 5px;
+    margin-top: -2.5px;
+}
+
+.stop-after {
+    position: relative;
+    width: 4px;
+    height: 15px;
+    top: 12px;
+    left: -9px;
+}
+
+.color {
+    background-color: #070;
+}
+
+.nocolor {
+    background-color: none;
+}
+
+[v-cloak] { display: none; }
+
     </style>
 </head>
 <body>
+    <!--
     <div id="button-holder">
             <button 
                 v-for="button in buttons"
@@ -69,10 +186,15 @@
                 v-bind:class="{ selected: selected === button.id }"
             >{{button.text}}</button>
     </div>
+    -->
     <div id="info-box">
         <component v-if="selected" :is="type" :idt="selected.id" :obj="selected" :opts="opts"></component>
+        <div v-if="!selected"></div>
+        <div class="to-menu">
+            <a href="index.html">Vissza a menübe</a>
+        </div>
     </div>
-    <div id="big-screen" v-if="show">
+    <div v-cloak id="big-screen" v-if="show">
         <div class="column" id="route-list">
             <div>Route list</div>
             <div v-for="route in routes" v-bind:class="{selected: selectedRoute && selectedRoute.id === route.id}">

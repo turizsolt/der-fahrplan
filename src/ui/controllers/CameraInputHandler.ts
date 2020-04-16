@@ -43,25 +43,38 @@ export class CameraInputHandler implements InputHandler {
 
       this.camera.beta =
         downProps.cameraBeta + (props.pointerY - downProps.pointerY) / 100;
+      if (this.camera.beta > Math.PI * 0.45) {
+        this.camera.beta = Math.PI * 0.45;
+      }
+      if (this.camera.beta < Math.PI * 0) {
+        this.camera.beta = Math.PI * 0;
+      }
     } else if (event.ctrlKey) {
       this.camera.radius =
         downProps.cameraRadius + (props.pointerY - downProps.pointerY);
     } else {
       downProps = this.lastProps;
-      const dx = +(props.point.coord.x - downProps.point.coord.x);
-      const dz = +(props.point.coord.z - downProps.point.coord.z);
-      this.camera.setPosition(
-        new Vector3(downProps.fromX + dx, downProps.fromY, downProps.fromZ + dz)
-      );
-      this.camera.setTarget(
-        new Vector3(downProps.targetX + dx, 0, downProps.targetZ + dz)
-      );
-      this.mesh.position = new Vector3(
-        downProps.targetX + dx,
-        0,
-        downProps.targetZ + dz
-      );
-
+      if (props.point && downProps.point) {
+        const dx = +(props.point.coord.x - downProps.point.coord.x);
+        const dz = +(props.point.coord.z - downProps.point.coord.z);
+        this.camera.setPosition(
+          new Vector3(
+            downProps.fromX + dx,
+            downProps.fromY,
+            downProps.fromZ + dz
+          )
+        );
+        this.camera.setTarget(
+          new Vector3(downProps.targetX + dx, 0, downProps.targetZ + dz)
+        );
+        this.mesh.position = new Vector3(
+          downProps.targetX + dx,
+          0,
+          downProps.targetZ + dz
+        );
+      } else {
+        this.cancel();
+      }
       this.lastProps = props;
     }
   }

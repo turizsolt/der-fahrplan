@@ -43,6 +43,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       type: 'RouteStop',
       station: this.station.persistDeep(),
       stationName: this.getStationName(),
+      rgbColor: this.station.getColor().getRgbString(),
       platform: this.platform && this.platform.getId()
     };
   }

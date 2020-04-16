@@ -7,6 +7,7 @@ import { Route } from './Route';
 import { Platform } from '../Interfaces/Platform';
 import { Station } from './Station';
 import { Passenger } from '../Interfaces/Passenger';
+import { BaseStorable } from '../Interfaces/BaseStorable';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private wagons: Wagon[];
@@ -86,7 +87,15 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     for (let wagon of this.wagons) {
       if (wagon !== schWagon) {
         wagon.assignTrip(null);
+        wagon.update();
       }
+    }
+  }
+
+  cancelTrip(): void {
+    this.schedulingWagon.assignTrip(null);
+    for (let wagon of this.wagons) {
+      wagon.update();
     }
   }
 

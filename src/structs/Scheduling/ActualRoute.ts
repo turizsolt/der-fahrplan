@@ -80,6 +80,10 @@ export class ActualRoute extends ActualBaseStorable implements Route {
       id: this.id,
       type: 'Route',
       name: this.name,
+      destination:
+        this.stops.length > 0
+          ? this.stops[this.stops.length - 1].getStationName()
+          : 'Unknown',
       detailedName: this.getDetailedName(),
       stops: this.stops.map(x => x.persistDeep())
     };

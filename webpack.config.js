@@ -16,9 +16,11 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: 'src/index.html'
+      template: 'src/game.html',
+      filename: 'game.html'
     }),
-    new CopyWebpackPlugin([{ from: 'src/assets', to: 'assets' }])
+    new CopyWebpackPlugin([{ from: 'src/assets', to: 'assets' }]),
+    new CopyWebpackPlugin([{ from: 'src/html/*.html', to: '.', flatten: true }])
   ],
   devtool: 'inline-source-map',
   devServer: {

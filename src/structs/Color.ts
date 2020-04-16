@@ -8,4 +8,8 @@ export class Color {
   static White(): Color {
     return new Color(1, 1, 1);
   }
+
+  getRgbString(): string {
+    return `rgb(${this.red * 255},${this.green * 255},${this.blue * 255})`;
+  }
 }

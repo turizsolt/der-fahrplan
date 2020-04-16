@@ -58,40 +58,30 @@ window.addEventListener('DOMContentLoaded', () => {
       return key[0].toUpperCase() + key.slice(1);
     };
 
-    scene.actionManager.registerAction(
-      new BABYLON.ExecuteCodeAction(
-        BABYLON.ActionManager.OnKeyDownTrigger,
-        evt => {
-          const key = upper(evt.sourceEvent.key);
-          if (!map[key]) {
-            if (!modifier(key)) {
-              inputController.keyDown(key, {
-                shift: map['Shift'],
-                ctrl: map['Control']
-              });
-            }
-          }
-          map[key] = evt.sourceEvent.type == 'keydown';
+    document.addEventListener('keydown', event => {
+      const key = upper(event.key);
+      if (!map[key]) {
+        if (!modifier(key)) {
+          inputController.keyDown(key, {
+            shift: map['Shift'],
+            ctrl: map['Control']
+          });
         }
-      )
-    );
+      }
+      map[key] = event.type == 'keydown';
+    });
 
-    scene.actionManager.registerAction(
-      new BABYLON.ExecuteCodeAction(
-        BABYLON.ActionManager.OnKeyUpTrigger,
-        evt => {
-          const key = upper(evt.sourceEvent.key);
-          if (!modifier(key)) {
-            inputController.keyUp(key, {
-              shift: map['Shift'],
-              ctrl: map['Control']
-            });
-          }
+    document.addEventListener('keyup', event => {
+      const key = upper(event.key);
+      if (!modifier(key)) {
+        inputController.keyUp(key, {
+          shift: map['Shift'],
+          ctrl: map['Control']
+        });
+      }
 
-          map[key] = evt.sourceEvent.type == 'keydown';
-        }
-      )
-    );
+      map[key] = event.type == 'keydown';
+    });
 
     scene.registerAfterRender(() => {
       for (let key of Object.keys(map)) {
@@ -136,7 +126,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   canvas.addEventListener('pointerenter', () => {});
 
-  canvas.addEventListener('pointerleave', () => {});
+  canvas.addEventListener('pointerleave', e => {
+    inputController.up(e);
+  });
 
   canvas.addEventListener('focus', () => {});
 
