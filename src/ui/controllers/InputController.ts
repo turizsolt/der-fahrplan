@@ -373,7 +373,7 @@ export class InputController {
       if (meshId.includes('.')) {
         meshId = meshId.slice(0, meshId.indexOf('.'));
       }
-      console.log(meshId);
+      //   console.log(meshId);
       if (meshId.startsWith('clickable-')) {
         const [_, type, id, command] = meshId.split('-');
         const storedObj = this.store.get(id) as BaseBrick;
@@ -418,9 +418,9 @@ export class InputController {
               this.selectedMesh = this.downProps.mesh;
 
               if (storedObj.getType() === Symbol.for('Wagon')) {
-                console.log('select');
+                // console.log('select');
                 this.selectCallback = (obj: Object): void => {
-                  console.log('update');
+                  //   console.log('update');
                   this.vmInfoBox.selected = obj;
                 };
                 (this.selected as Wagon).subscribeToUpdates(
@@ -432,7 +432,7 @@ export class InputController {
                 storedObj.getType() === Symbol.for('Wagon')
                   ? 'wagon'
                   : 'idtext';
-              console.log('gt', storedObj.getType(), this.vmInfoBox.type);
+              //   console.log('gt', storedObj.getType(), this.vmInfoBox.type);
               if (storedObj.getType() === Symbol.for('Wagon')) {
                 this.vmInfoBox.opts = this.store
                   .getAllOf<Route>(TYPES.Route)

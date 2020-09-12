@@ -97,7 +97,7 @@ export class CreateStationInputHandler implements InputHandler {
         props.snappedPoint.coord
       );
       station.init(new Circle(pt, diam / 2));
-      console.log('station', station);
+      //   console.log('station', station);
     }
     this.fromMesh.setEnabled(false);
     this.toMesh.setEnabled(false);
