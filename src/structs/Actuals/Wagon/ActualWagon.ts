@@ -14,17 +14,16 @@ import { Route } from '../../Scheduling/Route';
 import { Platform } from '../../Interfaces/Platform';
 import { Passenger } from '../../Interfaces/Passenger';
 import { Coordinate } from '../../Geometry/Coordinate';
-import { Left } from '../../Geometry/Directions';
 import { Updatable } from '../../../mixins/Updatable';
 import { applyMixins } from '../../../mixins/ApplyMixins';
-import { Boardable } from '../../../mixins/Boardable';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
 import { WagonPosition } from './WagonPosition';
+import { BoardableWagon } from '../../../mixins/BoardableWagon';
 
-export interface ActualWagon extends Updatable, Boardable {}
-const doApply = () => applyMixins(ActualWagon, [Updatable, Boardable]);
+export interface ActualWagon extends Updatable {}
+const doApply = () => applyMixins(ActualWagon, [Updatable]);
 @injectable()
 export class ActualWagon extends ActualBaseBrick implements Wagon {
   private removed: boolean = false;
@@ -33,6 +32,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   protected train: Train;
 
   protected position: WagonPosition;
+  protected boardable: BoardableWagon;
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
@@ -40,6 +40,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     super.initStore(TYPES.Wagon);
 
     this.position = new WagonPosition(this, this.worm);
+    this.boardable = new BoardableWagon(this);
     this.train = this.store.create<Train>(TYPES.Train).init(this);
 
     return this;
@@ -114,13 +115,9 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.train.stoppedAt(platform.getStation(), platform);
   }
 
-  hasFreeSeat(): boolean {
-    return this.seatCount > this.passengerCount;
-  }
-
   announceStoppedAt(platform: Platform): void {
     const station = platform.getStation();
-    this.seats.map(p => {
+    this.getBoardedPassengers().map(p => {
       if (p) {
         p.listenWagonStoppedAtAnnouncement(
           station,
@@ -132,76 +129,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     });
   }
 
-  private seatCount: number = 21;
-  private seatColumns: number = 3;
-  private passengerCount: number = 0;
-  private seats: Passenger[] = [];
-
-  setSeatCount(count: number, columns: number = 3) {
-    this.seatCount = count;
-    this.seatColumns = columns;
-  }
-
-  board(passenger: Passenger): Coordinate {
-    if (this.passengerCount >= this.seatCount) {
-      return null;
-    }
-
-    this.passengerCount += 1;
-    let seatNo: number;
-    do {
-      seatNo = (Math.random() * this.seatCount) | 0;
-    } while (this.seats[seatNo]);
-    this.seats[seatNo] = passenger;
-    const ray = this.seatOffset(seatNo);
-    return ray && ray.coord;
-  }
-
-  moveBoardedPassengers() {
-    this.seats.map((pass, seatNo) => {
-      if (pass) {
-        pass.updatePos(this.seatOffset(seatNo).coord);
-      }
-    });
-  }
-
-  private seatOffset(seatNo) {
-    if (!this.worm || this.worm.getAll().length === 0) return null;
-
-    const colSize = 1.2;
-    const rowSize = 1.2;
-    const colCount = this.seatColumns - 1;
-    const rowCount = Math.ceil(this.seatCount / (colCount + 1)) - 1;
-
-    const col = seatNo % 3;
-    const row = (seatNo - col) / 3;
-    return this.getCenterRay()
-      .fromHere(Left, -((colCount / 2) * colSize) + col * colSize)
-      .fromHere(0, (rowCount / 2) * rowSize - row * rowSize);
-  }
-
-  unboard(passenger: Passenger): void {
-    const seatNo = this.seats.findIndex(x => x === passenger);
-    if (seatNo !== -1) {
-      this.seats[seatNo] = undefined;
-      this.passengerCount -= 1;
-    }
-  }
-
-  getBoardedPassengers(): Passenger[] {
-    return this.seats.filter(x => x);
-  }
-
-  getCenterPos(): Coordinate {
-    return this.position.getCenterPos();
-  }
-
-  getCenterRay(): Ray {
-    return this.position.getCenterRay();
-  }
-
-  getLength(): number {
-    return 14;
+  getWorm(): TrackWorm {
+    return this.worm;
   }
 
   remove(): boolean {
@@ -215,6 +144,61 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.removed;
   }
 
+  getRenderer(): BaseRenderer {
+    return this.renderer;
+  }
+
+  update() {
+    this.renderer.update();
+
+    const deep = this.persistDeep();
+    this.notify(deep);
+  }
+
+  ///////////////////////////
+  // boardable
+  ///////////////////////////
+
+  hasFreeSeat(): boolean {
+    return this.boardable.hasFreeSeat();
+  }
+
+  setSeatCount(count: number, columns: number) {
+    this.boardable.setSeatCount(count, columns);
+  }
+
+  board(passenger: Passenger): Coordinate {
+    return this.boardable.board(passenger);
+  }
+
+  moveBoardedPassengers() {
+    this.boardable.moveBoardedPassengers();
+  }
+
+  unboard(passenger: Passenger): void {
+    this.boardable.unboard(passenger);
+  }
+
+  getBoardedPassengers(): Passenger[] {
+    return this.boardable.getBoardedPassengers();
+  }
+
+  ///////////////////////////
+  // position
+  ///////////////////////////
+
+  getCenterPos(): Coordinate {
+    return this.position.getCenterPos();
+  }
+
+  getCenterRay(): Ray {
+    return this.position.getCenterRay();
+  }
+
+  getLength(): number {
+    return this.position.getLength();
+  }
+
   getA(): WagonEnd {
     return this.position.getA();
   }
@@ -225,65 +209,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   getEnd(whichEnd: WhichEnd): WagonEnd {
     return this.position.getEnd(whichEnd);
-  }
-
-  getRenderer(): BaseRenderer {
-    return this.renderer;
-  }
-  persist(): Object {
-    return {
-      id: this.id,
-      type: 'Wagon',
-
-      seatCount: this.seatCount,
-      seatColumns: this.seatColumns,
-      seats: this.seats.map(p => p && p.getId()),
-
-      A: this.getA().persist(),
-      B: this.getB().persist(),
-
-      trip: this.trip && this.trip.getId(),
-      train: this.train.getId()
-    };
-  }
-
-  persistDeep(): Object {
-    return {
-      id: this.id,
-      type: 'Wagon',
-
-      trip: this.getTrip() && this.getTrip().persistDeep()
-    };
-  }
-
-  load(obj: any, store: Store): void {
-    this.presetId(obj.id);
-    this.init();
-
-    this.setSeatCount(obj.seatCount, obj.seatColumns);
-    this.seats = obj.seats.map(s => (s ? store.get(s.id) : undefined));
-
-    this.getA().load(obj.A, store);
-    this.getB().load(obj.B, store);
-
-    const track = this.getA().positionOnTrack.getTrack();
-    const bTrack = this.getB().positionOnTrack.getTrack();
-    if (track === bTrack) {
-      this.worm = new TrackWorm([track], this);
-    } else {
-      this.worm = new TrackWorm([track, bTrack], this);
-    }
-
-    if (obj.trip) this.assignTrip(store.get(obj.trip) as Trip);
-
-    this.renderer.init(this);
-  }
-
-  update() {
-    this.renderer.update();
-
-    const deep = this.persistDeep();
-    this.notify(deep);
   }
 
   putOnTrack(
@@ -320,6 +245,57 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   swapEnds(): void {
     this.position.swapEnds();
+  }
+
+  ///////////////////////
+  // persist
+  ///////////////////////
+
+  persist(): Object {
+    return {
+      id: this.id,
+      type: 'Wagon',
+
+      ...this.boardable.persist(),
+
+      A: this.getA().persist(),
+      B: this.getB().persist(),
+
+      trip: this.trip && this.trip.getId(),
+      train: this.train.getId()
+    };
+  }
+
+  persistDeep(): Object {
+    return {
+      id: this.id,
+      type: 'Wagon',
+
+      trip: this.getTrip() && this.getTrip().persistDeep()
+    };
+  }
+
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init();
+
+    this.setSeatCount(obj.seatCount, obj.seatColumns);
+    this.boardable.load(obj.seats, store);
+
+    this.getA().load(obj.A, store);
+    this.getB().load(obj.B, store);
+
+    const track = this.getA().positionOnTrack.getTrack();
+    const bTrack = this.getB().positionOnTrack.getTrack();
+    if (track === bTrack) {
+      this.worm = new TrackWorm([track], this);
+    } else {
+      this.worm = new TrackWorm([track, bTrack], this);
+    }
+
+    if (obj.trip) this.assignTrip(store.get(obj.trip) as Trip);
+
+    this.renderer.init(this);
   }
 }
 

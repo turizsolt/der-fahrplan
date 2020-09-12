@@ -2,7 +2,7 @@ import { Coordinate } from '../structs/Geometry/Coordinate';
 import { Passenger } from '../structs/Interfaces/Passenger';
 
 export class Boardable {
-  private boardedPassengers: Passenger[];
+  protected boardedPassengers: Passenger[];
 
   init(...args: any[]) {
     this.boardedPassengers = [];

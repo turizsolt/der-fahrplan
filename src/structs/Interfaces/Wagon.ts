@@ -7,10 +7,10 @@ import { Route } from '../Scheduling/Route';
 import { Platform } from './Platform';
 import { Updatable } from '../../mixins/Updatable';
 import { BaseBrick } from './BaseBrick';
-import { Boardable } from '../../mixins/Boardable';
 import { Train } from '../Scheduling/Train';
+import { TrackWorm } from '../Actuals/Track/TrackWorm';
 
-export interface Wagon extends BaseBrick, Boardable, Updatable {
+export interface Wagon extends BaseBrick, Updatable {
   init(): Wagon;
   update(): void;
   getA(): WagonEnd;
@@ -19,6 +19,9 @@ export interface Wagon extends BaseBrick, Boardable, Updatable {
   getRay(): Ray;
   remove(): boolean;
   isRemoved(): boolean;
+
+  getWorm(): TrackWorm;
+  getCenterRay(): Ray;
 
   putOnTrack(track: Track, position?: number, direction?: number): void;
   moveTowardsWagonB(distance: number): void;
