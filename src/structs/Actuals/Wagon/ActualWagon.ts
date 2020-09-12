@@ -7,7 +7,6 @@ import { Ray } from '../../Geometry/Ray';
 import { TYPES } from '../../../di/TYPES';
 import { WagonRenderer } from '../../Renderers/WagonRenderer';
 import { TrackBase } from '../../Interfaces/TrackBase';
-import { LineSegment } from '../../Geometry/LineSegment';
 import { TrackWorm } from '../Track/TrackWorm';
 import { WagonEnd } from './WagonEnd';
 import { Store } from '../../Interfaces/Store';
@@ -22,8 +21,7 @@ import { Boardable } from '../../../mixins/Boardable';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
-
-const WAGON_GAP: number = 1;
+import { WagonPosition } from './WagonPosition';
 
 export interface ActualWagon extends Updatable, Boardable {}
 const doApply = () => applyMixins(ActualWagon, [Updatable, Boardable]);
@@ -34,7 +32,18 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   protected trip: Route;
   protected train: Train;
 
+  protected position: WagonPosition;
+
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
+
+  init(): Wagon {
+    super.initStore(TYPES.Wagon);
+
+    this.position = new WagonPosition(this, this.worm);
+    this.train = this.store.create<Train>(TYPES.Train).init(this);
+
+    return this;
+  }
 
   assignTrip(route: Route): void {
     const oldTrip = this.getTrip();
@@ -57,7 +66,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   cancelTrip(): void {
-      this.train.cancelTrip();
+    this.train.cancelTrip();
   }
 
   getTrain(): Train {
@@ -82,16 +91,16 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   stop(): void {
     // todo use the worm
     const platformsInvolved: Platform[] = [];
-    const trackA = this.ends.A.positionOnTrack.getTrack();
+    const trackA = this.getA().positionOnTrack.getTrack();
     platformsInvolved.push(
       ...trackA
         .getPlatformsBeside()
-        .filter(p => this.ends.A.positionOnTrack.isBeside(p))
+        .filter(p => this.getA().positionOnTrack.isBeside(p))
     );
-    const trackB = this.ends.B.positionOnTrack.getTrack();
+    const trackB = this.getB().positionOnTrack.getTrack();
     trackB
       .getPlatformsBeside()
-      .filter(p => this.ends.B.positionOnTrack.isBeside(p))
+      .filter(p => this.getB().positionOnTrack.isBeside(p))
       .map((p: Platform) => {
         if (!platformsInvolved.find(x => x === p)) {
           platformsInvolved.push(p);
@@ -184,18 +193,11 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   getCenterPos(): Coordinate {
-    return this.ends.A.positionOnTrack
-      .getRay()
-      .coord.midpoint(this.ends.B.positionOnTrack.getRay().coord);
+    return this.position.getCenterPos();
   }
 
   getCenterRay(): Ray {
-    return new Ray(
-      this.getCenterPos(),
-      this.ends.A.positionOnTrack
-        .getRay()
-        .coord.whichDir2d(this.ends.B.positionOnTrack.getRay().coord)
-    );
+    return this.position.getCenterRay();
   }
 
   getLength(): number {
@@ -205,40 +207,25 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   remove(): boolean {
     this.removed = true;
     this.worm.checkoutAll();
-    this.ends.A.disconnect();
-    this.ends.B.disconnect();
+    this.position.remove();
     this.update();
     return true;
   }
   isRemoved(): boolean {
     return this.removed;
   }
-  init(): Wagon {
-    super.initStore(TYPES.Wagon);
-
-    this.ends = {
-      [WhichEnd.A]: new WagonEnd(WhichEnd.A, this),
-      [WhichEnd.B]: new WagonEnd(WhichEnd.B, this)
-    };
-
-    this.train = this.store.create<Train>(TYPES.Train).init(this);
-
-    return this;
-  }
 
   getA(): WagonEnd {
-    return this.ends.A;
+    return this.position.getA();
   }
 
   getB(): WagonEnd {
-    return this.ends.B;
+    return this.position.getB();
   }
 
   getEnd(whichEnd: WhichEnd): WagonEnd {
-    return this.ends[whichEnd];
+    return this.position.getEnd(whichEnd);
   }
-
-  private ends: Record<WhichEnd, WagonEnd>;
 
   getRenderer(): BaseRenderer {
     return this.renderer;
@@ -252,8 +239,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       seatColumns: this.seatColumns,
       seats: this.seats.map(p => p && p.getId()),
 
-      A: this.ends.A.persist(),
-      B: this.ends.B.persist(),
+      A: this.getA().persist(),
+      B: this.getB().persist(),
 
       trip: this.trip && this.trip.getId(),
       train: this.train.getId()
@@ -276,11 +263,11 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.setSeatCount(obj.seatCount, obj.seatColumns);
     this.seats = obj.seats.map(s => (s ? store.get(s.id) : undefined));
 
-    this.ends.A.load(obj.A, store);
-    this.ends.B.load(obj.B, store);
+    this.getA().load(obj.A, store);
+    this.getB().load(obj.B, store);
 
-    const track = this.ends.A.positionOnTrack.getTrack();
-    const bTrack = this.ends.B.positionOnTrack.getTrack();
+    const track = this.getA().positionOnTrack.getTrack();
+    const bTrack = this.getB().positionOnTrack.getTrack();
     if (track === bTrack) {
       this.worm = new TrackWorm([track], this);
     } else {
@@ -304,207 +291,35 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     position: number = 0,
     direction: number = 1
   ): void {
-    this.ends.A.positionOnTrack = new PositionOnTrack(
-      track,
-      position,
-      direction
-    );
-
-    this.ends.B.positionOnTrack = new PositionOnTrack(
-      track,
-      position,
-      direction
-    );
-
-    this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
-    this.ends.B.positionOnTrack.hop(this.getLength());
-
-    const bTrack = this.ends.B.positionOnTrack.getTrack();
-    if (track === bTrack) {
-      this.worm = new TrackWorm([track], this);
-    } else {
-      this.worm = new TrackWorm([track, bTrack], this);
-    }
-
+    this.worm = this.position.putOnTrack(track, position, direction);
     this.renderer.init(this);
     this.update();
   }
 
   getRay(): Ray {
-    const ls = LineSegment.fromTwoPoints(
-      this.ends.A.positionOnTrack.getRay().coord,
-      this.ends.B.positionOnTrack.getRay().coord
-    );
-    return ls.getPointAtHalfway();
+    return this.position.getRay();
   }
 
   moveTowardsWagonB(distance: number): void {
-    if (this.ends.B.hasConnectedEndOf()) return;
-
-    const initDist = this.getB()
-      .getPositionOnTrack()
-      .getRay()
-      .coord.distance2d(
-        this.getA()
-          .getPositionOnTrack()
-          .getRay().coord
-      );
-
-    this.ends.B.positionOnTrack.hop(distance);
-
-    const newDist = this.getB()
-      .getPositionOnTrack()
-      .getRay()
-      .coord.distance2d(
-        this.getA()
-          .getPositionOnTrack()
-          .getRay().coord
-      );
-
-    let inv = 1;
-    if (newDist < initDist) {
-      this.ends.B.positionOnTrack.hop(-distance);
-      this.ends.B.positionOnTrack.hop(-distance);
-      inv = -1;
-    }
-
-    this.ends.A.positionOnTrack.copyFrom(this.ends.B.positionOnTrack);
-    const newWorm = this.ends.A.positionOnTrack
-      .hop(-1 * inv * this.getLength())
-      .reverse();
-    this.worm.moveForward(newWorm);
-    this.update();
-
-    if (this.ends.A.hasConnectedEndOf()) {
-      const next = this.ends.A.getConnectedEndOf();
-      next.pullToPos(this.ends.A.positionOnTrack, -1 * inv);
-    }
-
-    const nearest = this.getNearestWagon(WhichEnd.B);
-    if (nearest) {
-      const dist = nearest.end
-        .getPositionOnTrack()
-        .getRay()
-        .coord.distance2d(this.ends.B.getPositionOnTrack().getRay().coord);
-
-      if (dist <= 1) {
-        this.ends.B.connect(nearest.end);
-      }
-    }
-
+    this.position.moveTowardsWagonB(distance);
     this.train.moveBoardedPassengers();
   }
 
   pullToPos(pot: PositionOnTrack, dir: number) {
-    const isACloser =
-      this.getA()
-        .getPositionOnTrack()
-        .getRay()
-        .coord.distance2d(pot.getRay().coord) <
-      this.getB()
-        .getPositionOnTrack()
-        .getRay()
-        .coord.distance2d(pot.getRay().coord);
-    const closer = isACloser ? this.getA() : this.getB();
-    const further = isACloser ? this.getB() : this.getA();
-
-    closer.positionOnTrack.copyFrom(pot);
-    closer.positionOnTrack.hop(dir * WAGON_GAP);
-    further.positionOnTrack.copyFrom(closer.positionOnTrack);
-    const newWorm = further.positionOnTrack.hop(dir * this.getLength());
-    this.worm.moveBackward(newWorm);
-    this.update();
-
-    if (further.hasConnectedEndOf()) {
-      const next = further.getConnectedEndOf();
-      next.pullToPos(further.positionOnTrack, dir); // or -dir
-    }
+    this.position.pullToPos(pot, dir);
   }
 
   moveTowardsWagonA(distance: number): void {
-    if (this.ends.A.hasConnectedEndOf()) return;
-
-    const initDist = this.getB()
-      .getPositionOnTrack()
-      .getRay()
-      .coord.distance2d(
-        this.getA()
-          .getPositionOnTrack()
-          .getRay().coord
-      );
-
-    this.ends.A.positionOnTrack.hop(-distance);
-
-    const newDist = this.getB()
-      .getPositionOnTrack()
-      .getRay()
-      .coord.distance2d(
-        this.getA()
-          .getPositionOnTrack()
-          .getRay().coord
-      );
-
-    let inv = 1;
-    if (newDist < initDist) {
-      this.ends.A.positionOnTrack.hop(distance);
-      this.ends.A.positionOnTrack.hop(distance);
-      inv = -1;
-    }
-
-    this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
-    const newWorm = this.ends.B.positionOnTrack.hop(inv * this.getLength());
-    this.worm.moveBackward(newWorm);
-    this.update();
-
-    // move some wagons behind be (on B end)
-    if (this.ends.B.hasConnectedEndOf()) {
-      const next = this.ends.B.getConnectedEndOf();
-      next.pullToPos(this.ends.B.positionOnTrack, 1 * inv);
-    }
-
-    const nearest = this.getNearestWagon(WhichEnd.A);
-    if (nearest) {
-      const dist = nearest.end
-        .getPositionOnTrack()
-        .getRay()
-        .coord.distance2d(this.ends.A.getPositionOnTrack().getRay().coord);
-
-      if (dist <= 1) {
-        this.ends.A.connect(nearest.end);
-      }
-    }
-
+    this.position.moveTowardsWagonA(distance);
     this.train.moveBoardedPassengers();
   }
 
   getNearestWagon(whichEnd: WhichEnd): NearestWagon {
-    const end = whichEnd === WhichEnd.A ? this.getA() : this.getB();
-
-    const track = end.positionOnTrack.getTrack();
-
-    let to = 0;
-    if (end.positionOnTrack.getDirection() === 1) {
-      to = whichEnd === WhichEnd.A ? 0 : 1;
-    } else {
-      to = whichEnd === WhichEnd.A ? 1 : 0;
-    }
-
-    return track.getWagonClosest(
-      end.positionOnTrack.getPercentage(),
-      to,
-      this,
-      2
-    );
+    return this.position.getNearestWagon(whichEnd);
   }
 
   swapEnds(): void {
-    if (this.getA().hasConnectedEndOf() || this.getB().hasConnectedEndOf())
-      return;
-
-    const [tmpA, tmpB] = [this.getA(), this.getB()];
-    this.ends = { A: tmpB, B: tmpA };
-    this.getA().swapDirection();
-    this.getB().swapDirection();
+    this.position.swapEnds();
   }
 }
 
