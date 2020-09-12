@@ -1,11 +1,11 @@
 import { Coordinate } from '../structs/Geometry/Coordinate';
 import { Passenger } from '../structs/Interfaces/Passenger';
-import { Boardable } from './Boardable';
+import { ActualBoardable } from './ActualBoardable';
 import { Wagon } from '../structs/Interfaces/Wagon';
 import { Left } from '../structs/Geometry/Directions';
 import { Store } from '../structs/Interfaces/Store';
 
-export class BoardableWagon extends Boardable {
+export class BoardableWagon extends ActualBoardable {
   private seatCount: number = 21;
   private seatColumns: number = 3;
   private passengerCount: number = 0;

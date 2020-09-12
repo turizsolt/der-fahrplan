@@ -9,8 +9,10 @@ import { Updatable } from '../../mixins/Updatable';
 import { BaseBrick } from './BaseBrick';
 import { Train } from '../Scheduling/Train';
 import { TrackWorm } from '../Actuals/Track/TrackWorm';
+import { Passenger } from './Passenger';
+import { Boardable } from '../../mixins/Boardable';
 
-export interface Wagon extends BaseBrick, Updatable {
+export interface Wagon extends Boardable, BaseBrick, Updatable {
   init(): Wagon;
   update(): void;
   getA(): WagonEnd;
@@ -44,6 +46,8 @@ export interface Wagon extends BaseBrick, Updatable {
 
   getTrain(): Train;
   setTrain(train: Train): void;
+
+  getBoardedPassengers(): Passenger[];
 }
 
 export interface NearestWagon {

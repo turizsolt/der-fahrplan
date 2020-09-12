@@ -12,13 +12,10 @@ import { Color } from '../Color';
 import { NameGenerator } from '../NameGenerator';
 import { Route } from './Route';
 import { Passenger } from '../Interfaces/Passenger';
-import { Boardable } from '../../mixins/Boardable';
-import { applyMixins } from '../../mixins/ApplyMixins';
+import { ActualBoardable } from '../../mixins/ActualBoardable';
 import { Trip } from './Trip';
 import { Train } from './Train';
 
-export interface ActualStation extends Boardable {}
-const doApply = () => applyMixins(ActualStation, [], [Boardable]);
 export class ActualStation extends ActualBaseBrick implements Station {
   private name: string;
   private circle: Circle;
@@ -30,7 +27,37 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
   private announcedTrips: Route[] = [];
 
-  private boardable: Boardable = new Boardable();
+  private boardable: ActualBoardable = new ActualBoardable();
+
+  init(circle: Circle): Station {
+    super.initStore(TYPES.Station);
+    this.circle = circle;
+    this.name = NameGenerator.next();
+    this.platforms = [];
+    this.color = Color.CreateRandom();
+    this.store
+      .getFiltered(x => x.constructor.name === 'ActualPlatform')
+      .forEach(pl => {
+        const platform = pl as Platform;
+        if (platform.isPartOfStation(this)) {
+          this.addPlatform(platform);
+        }
+      });
+
+    this.renderer.init(this);
+
+    return this;
+  }
+
+  initX(): Station {
+    super.initStore(TYPES.Station);
+    this.circle = null;
+    this.name = NameGenerator.next();
+    this.platforms = [];
+    this.color = Color.CreateRandom();
+    this.renderer.init(this);
+    return this;
+  }
 
   announce(trip: Route) {
     this.announcedTrips.push(trip);
@@ -91,7 +118,6 @@ export class ActualStation extends ActualBaseBrick implements Station {
   }
 
   board(passenger: Passenger): Coordinate {
-    //super.board(passenger);
     this.boardable.board(passenger);
 
     if (!this.circle) return null;
@@ -106,35 +132,12 @@ export class ActualStation extends ActualBaseBrick implements Station {
     return this.circle.a.add(offset);
   }
 
-  init(circle: Circle): Station {
-    super.initStore(TYPES.Station);
-    this.circle = circle;
-    this.name = NameGenerator.next();
-    this.platforms = [];
-    this.color = Color.CreateRandom();
-    this.store
-      .getFiltered(x => x.constructor.name === 'ActualPlatform')
-      .forEach(pl => {
-        const platform = pl as Platform;
-        if (platform.isPartOfStation(this)) {
-          this.addPlatform(platform);
-        }
-      });
-
-    this.renderer.init(this);
-
-    return this;
+  unboard(passenger: Passenger): void {
+    this.boardable.unboard(passenger);
   }
 
-  initX(): Station {
-    super.initStore(TYPES.Station);
-    this.boardable.init();
-    this.circle = null;
-    this.name = NameGenerator.next();
-    this.platforms = [];
-    this.color = Color.CreateRandom();
-    this.renderer.init(this);
-    return this;
+  getBoardedPassengers(): Passenger[] {
+    return this.boardable.getBoardedPassengers();
   }
 
   getPlatforms(): Platform[] {
@@ -210,4 +213,3 @@ export class ActualStation extends ActualBaseBrick implements Station {
     this.setName(obj.name);
   }
 }
-doApply();
