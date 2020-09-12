@@ -39,7 +39,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   init(): Wagon {
     super.initStore(TYPES.Wagon);
 
-    this.position = new WagonPosition(this, this.worm);
+    this.position = new WagonPosition(this);
     this.boardable = new BoardableWagon(this);
     this.train = this.store.create<Train>(TYPES.Train).init(this);
 

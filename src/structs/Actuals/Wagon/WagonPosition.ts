@@ -15,7 +15,7 @@ const WAGON_GAP: number = 1;
 export class WagonPosition {
   private ends: Record<WhichEnd, WagonEnd>;
 
-  constructor(private parent: Wagon, private worm: TrackWorm) {
+  constructor(private parent: Wagon) {
     this.ends = {
       [WhichEnd.A]: new WagonEnd(WhichEnd.A, this.parent),
       [WhichEnd.B]: new WagonEnd(WhichEnd.B, this.parent)
@@ -44,12 +44,10 @@ export class WagonPosition {
 
     const bTrack = this.ends.B.positionOnTrack.getTrack();
     if (track === bTrack) {
-      this.worm = new TrackWorm([track], this.parent);
+      return new TrackWorm([track], this.parent);
     } else {
-      this.worm = new TrackWorm([track, bTrack], this.parent);
+      return new TrackWorm([track, bTrack], this.parent);
     }
-
-    return this.worm;
   }
 
   moveTowardsWagonB(distance: number): void {
@@ -86,7 +84,7 @@ export class WagonPosition {
     const newWorm = this.ends.A.positionOnTrack
       .hop(-1 * inv * this.getLength())
       .reverse();
-    this.worm.moveForward(newWorm);
+    this.parent.getWorm().moveForward(newWorm);
     this.parent.update();
 
     if (this.ends.A.hasConnectedEndOf()) {
@@ -124,7 +122,7 @@ export class WagonPosition {
     closer.positionOnTrack.hop(dir * WAGON_GAP);
     further.positionOnTrack.copyFrom(closer.positionOnTrack);
     const newWorm = further.positionOnTrack.hop(dir * this.getLength());
-    this.worm.moveBackward(newWorm);
+    this.parent.getWorm().moveBackward(newWorm);
     this.parent.update();
 
     if (further.hasConnectedEndOf()) {
@@ -165,7 +163,7 @@ export class WagonPosition {
 
     this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
     const newWorm = this.ends.B.positionOnTrack.hop(inv * this.getLength());
-    this.worm.moveBackward(newWorm);
+    this.parent.getWorm().moveBackward(newWorm);
     this.parent.update();
 
     // move some wagons behind be (on B end)
