@@ -21,6 +21,7 @@ import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
 import { WagonPosition } from './WagonPosition';
 import { BoardableWagon } from '../../../mixins/BoardableWagon';
+import { WagonAnnouncement } from './WagonAnnouncement';
 
 export interface ActualWagon extends Updatable {}
 const doApply = () => applyMixins(ActualWagon, [Updatable]);
@@ -28,11 +29,10 @@ const doApply = () => applyMixins(ActualWagon, [Updatable]);
 export class ActualWagon extends ActualBaseBrick implements Wagon {
   private removed: boolean = false;
   protected worm: TrackWorm;
-  protected trip: Route;
-  protected train: Train;
 
   protected position: WagonPosition;
   protected boardable: BoardableWagon;
+  protected announcement: WagonAnnouncement;
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
@@ -41,92 +41,9 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
     this.position = new WagonPosition(this);
     this.boardable = new BoardableWagon(this);
-    this.train = this.store.create<Train>(TYPES.Train).init(this);
+    this.announcement = new WagonAnnouncement(this, this.store);
 
     return this;
-  }
-
-  assignTrip(route: Route): void {
-    const oldTrip = this.getTrip();
-    if (oldTrip) {
-      for (let stop of oldTrip.getStops()) {
-        stop.getStation().deannounce(oldTrip);
-      }
-    }
-    this.trip = route;
-    if (route) {
-      this.train.setSchedulingWagon(this);
-    }
-    const newTrip = this.getTrip();
-    if (newTrip) {
-      for (let stop of newTrip.getStops()) {
-        stop.getStation().announce(newTrip);
-      }
-    }
-    this.update();
-  }
-
-  cancelTrip(): void {
-    this.train.cancelTrip();
-  }
-
-  getTrain(): Train {
-    return this.train;
-  }
-
-  setTrain(train: Train): void {
-    if (train) {
-      this.train = train;
-    } else {
-      this.train = this.store.create<Train>(TYPES.Train).init(this);
-    }
-  }
-
-  getTrip(): Route {
-    if (this.trip) return this.trip;
-    if (this.getTrain().getSchedulingWagon() !== this)
-      return this.getTrain().getTrip();
-    return null;
-  }
-
-  stop(): void {
-    // todo use the worm
-    const platformsInvolved: Platform[] = [];
-    const trackA = this.getA().positionOnTrack.getTrack();
-    platformsInvolved.push(
-      ...trackA
-        .getPlatformsBeside()
-        .filter(p => this.getA().positionOnTrack.isBeside(p))
-    );
-    const trackB = this.getB().positionOnTrack.getTrack();
-    trackB
-      .getPlatformsBeside()
-      .filter(p => this.getB().positionOnTrack.isBeside(p))
-      .map((p: Platform) => {
-        if (!platformsInvolved.find(x => x === p)) {
-          platformsInvolved.push(p);
-        }
-      });
-
-    platformsInvolved.map(p => this.stoppedAt(p));
-  }
-
-  stoppedAt(platform: Platform): void {
-    this.train.stoppedAt(platform.getStation(), platform);
-  }
-
-  announceStoppedAt(platform: Platform): void {
-    const station = platform.getStation();
-    this.getBoardedPassengers().map(p => {
-      if (p) {
-        p.listenWagonStoppedAtAnnouncement(
-          station,
-          platform,
-          this.train,
-          this.trip
-        );
-      }
-    });
   }
 
   getWorm(): TrackWorm {
@@ -153,6 +70,43 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
     const deep = this.persistDeep();
     this.notify(deep);
+  }
+
+  ///////////////////////////
+  // announcement
+  ///////////////////////////
+
+  getTrain(): Train {
+    return this.announcement.getTrain();
+  }
+
+  setTrain(train: Train): void {
+    this.announcement.setTrain(train);
+  }
+
+  assignTrip(route: Route): void {
+    this.announcement.assignTrip(route);
+    this.update();
+  }
+
+  cancelTrip(): void {
+    this.announcement.cancelTrip();
+  }
+
+  getTrip(): Route {
+    return this.announcement.getTrip();
+  }
+
+  stop(): void {
+    this.announcement.stop();
+  }
+
+  stoppedAt(platform: Platform): void {
+    this.announcement.stoppedAt(platform);
+  }
+
+  announceStoppedAt(platform: Platform): void {
+    this.announcement.announceStoppedAt(platform);
   }
 
   ///////////////////////////
@@ -227,7 +181,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   moveTowardsWagonB(distance: number): void {
     this.position.moveTowardsWagonB(distance);
-    this.train.moveBoardedPassengers();
+    this.getTrain().moveBoardedPassengers();
   }
 
   pullToPos(pot: PositionOnTrack, dir: number) {
@@ -236,7 +190,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   moveTowardsWagonA(distance: number): void {
     this.position.moveTowardsWagonA(distance);
-    this.train.moveBoardedPassengers();
+    this.getTrain().moveBoardedPassengers();
   }
 
   getNearestWagon(whichEnd: WhichEnd): NearestWagon {
@@ -261,8 +215,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       A: this.getA().persist(),
       B: this.getB().persist(),
 
-      trip: this.trip && this.trip.getId(),
-      train: this.train.getId()
+      ...this.announcement.persist()
     };
   }
 
