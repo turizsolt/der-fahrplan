@@ -22,6 +22,7 @@ import { Trip } from '../../Scheduling/Trip';
 import { WagonPosition } from './WagonPosition';
 import { BoardableWagon } from '../../../mixins/BoardableWagon';
 import { WagonAnnouncement } from './WagonAnnouncement';
+import WagonEngine from '../../NewOne/WagonEngine';
 
 export interface ActualWagon extends Updatable {}
 const doApply = () => applyMixins(ActualWagon, [Updatable]);
@@ -33,6 +34,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   protected position: WagonPosition;
   protected boardable: BoardableWagon;
   protected announcement: WagonAnnouncement;
+  protected control: WagonControl;
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
@@ -42,6 +44,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.position = new WagonPosition(this);
     this.boardable = new BoardableWagon(this);
     this.announcement = new WagonAnnouncement(this, this.store);
+    this.control = new WagonEngine(3);
 
     return this;
   }
