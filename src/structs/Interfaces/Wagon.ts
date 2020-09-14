@@ -21,6 +21,8 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   getRay(): Ray;
   remove(): boolean;
   isRemoved(): boolean;
+  isAFree(): boolean;
+  isBFree(): boolean;
 
   getWorm(): TrackWorm;
   getCenterRay(): Ray;

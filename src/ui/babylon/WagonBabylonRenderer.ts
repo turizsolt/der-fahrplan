@@ -19,6 +19,9 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
   private endAMesh: BABYLON.AbstractMesh;
   private endBMesh: BABYLON.AbstractMesh;
 
+  private selectedAMesh: BABYLON.AbstractMesh;
+  private selectedBMesh: BABYLON.AbstractMesh;
+
   @inject(TYPES.FactoryOfMeshProvider)
   private meshProviderFactory: () => MeshProvider;
   private meshProvider: MeshProvider;
@@ -45,6 +48,9 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
       'clickable-wagon-' + this.wagon.getId() + '-endB'
     );
 
+    this.selectedAMesh = this.meshProvider.createSelectorMesh();
+    this.selectedBMesh = this.meshProvider.createSelectorMesh();
+
     this.inited = true;
     this.update();
   }
@@ -55,6 +61,8 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
     if (this.wagon.isRemoved()) {
       this.mesh.setEnabled(false);
       this.selectedMesh.setEnabled(false);
+      this.selectedAMesh.setEnabled(false);
+      this.selectedBMesh.setEnabled(false);
       this.endAMesh.setEnabled(false);
       this.endBMesh.setEnabled(false);
     } else {
@@ -71,7 +79,7 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
       this.endAMesh.position = CoordinateToBabylonVector3(
         this.wagon.getA().positionOnTrack.getRay().coord
       );
-      this.endAMesh.position.y = 10;
+      this.endAMesh.position.y = 5;
       this.endAMesh.material = this.wagon.getA().hasConnectedEndOf()
         ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
         : this.meshProvider.getMaterial(MaterialName.BedGray);
@@ -82,6 +90,22 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
       this.endBMesh.position.y = 10;
       this.endBMesh.material = this.wagon.getB().hasConnectedEndOf()
         ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
+        : this.meshProvider.getMaterial(MaterialName.BedGray);
+
+      this.selectedAMesh.position = CoordinateToBabylonVector3(
+        ray.fromHere(0, -5).coord
+      );
+      this.selectedAMesh.position.y = 10;
+      this.selectedAMesh.material = this.wagon.isAFree()
+        ? this.meshProvider.getMaterial(MaterialName.SleeperBrown)
+        : this.meshProvider.getMaterial(MaterialName.BedGray);
+
+      this.selectedBMesh.position = CoordinateToBabylonVector3(
+        ray.fromHere(0, 5).coord
+      );
+      this.selectedBMesh.position.y = 10;
+      this.selectedBMesh.material = this.wagon.isBFree()
+        ? this.meshProvider.getMaterial(MaterialName.SleeperBrown)
         : this.meshProvider.getMaterial(MaterialName.BedGray);
     }
 

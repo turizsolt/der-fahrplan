@@ -168,6 +168,14 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.position.getEnd(whichEnd);
   }
 
+  isAFree(): boolean {
+    return !this.position.getA().hasConnectedEndOf();
+  }
+
+  isBFree(): boolean {
+    return !this.position.getB().hasConnectedEndOf();
+  }
+
   putOnTrack(
     track: TrackBase,
     position: number = 0,
