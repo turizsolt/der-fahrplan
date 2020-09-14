@@ -426,10 +426,9 @@ export class InputController {
     storedObj.getRenderer().setSelected(true);
 
     this.selected = storedObj;
-    this.selectedMesh = this.downProps.mesh;
+    this.selectedMesh = null;
 
     if (storedObj.getType() === Symbol.for('Wagon')) {
-      // console.log('select');
       this.selectCallback = (obj: Object): void => {
         //   console.log('update');
         this.vmInfoBox.selected = obj;

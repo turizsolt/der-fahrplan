@@ -80,7 +80,7 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
       this.endAMesh.position = CoordinateToBabylonVector3(
         this.wagon.getA().positionOnTrack.getRay().coord
       );
-      this.endAMesh.position.y = 5;
+      this.endAMesh.position.y = 10;
       this.endAMesh.material = this.wagon.getA().hasConnectedEndOf()
         ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
         : this.meshProvider.getMaterial(MaterialName.BedGray);

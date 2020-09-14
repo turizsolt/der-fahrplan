@@ -19,7 +19,7 @@
         }
         #button-holder {
             position: fixed;
-            left: 20px;
+            right: 20px;
             top: 20px;
             /*width: 200px;
             height: 40px;*/
@@ -177,7 +177,6 @@
     </style>
 </head>
 <body>
-    <!--
     <div id="button-holder">
             <button 
                 v-for="button in buttons"
@@ -186,7 +185,6 @@
                 v-bind:class="{ selected: selected === button.id }"
             >{{button.text}}</button>
     </div>
-    -->
     <div id="info-box">
         <component v-if="selected" :is="type" :idt="selected.id" :obj="selected" :opts="opts"></component>
         <div v-if="!selected"></div>
