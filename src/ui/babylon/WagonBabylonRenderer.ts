@@ -7,6 +7,7 @@ import { TYPES } from '../../di/TYPES';
 import { WagonRenderer } from '../../structs/Renderers/WagonRenderer';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 import { MaterialName } from './MaterialName';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 
 @injectable()
 export class WagonBabylonRenderer extends BaseBabylonRenderer
@@ -96,26 +97,40 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         ray.fromHere(0, -5).coord
       );
       this.selectedAMesh.position.y = 10;
-      this.selectedAMesh.material = this.wagon.isAFree()
-        ? this.meshProvider.getMaterial(MaterialName.SleeperBrown)
-        : this.meshProvider.getMaterial(MaterialName.BedGray);
 
       this.selectedBMesh.position = CoordinateToBabylonVector3(
         ray.fromHere(0, 5).coord
       );
       this.selectedBMesh.position.y = 10;
-      this.selectedBMesh.material = this.wagon.isBFree()
-        ? this.meshProvider.getMaterial(MaterialName.SleeperBrown)
-        : this.meshProvider.getMaterial(MaterialName.BedGray);
+
+      if (!this.wagon.isAFree()) {
+        this.selectedAMesh.setEnabled(false);
+      } else {
+        this.selectedAMesh.setEnabled(true);
+        this.selectedAMesh.material =
+          this.wagon.getSelectedSide() === WhichEnd.A
+            ? this.selected
+              ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
+              : this.meshProvider.getMaterial(MaterialName.SleeperBrown)
+            : this.meshProvider.getMaterial(MaterialName.BedGray);
+      }
+
+      if (!this.wagon.isBFree()) {
+        this.selectedBMesh.setEnabled(false);
+      } else {
+        this.selectedBMesh.setEnabled(true);
+        this.selectedBMesh.material =
+          this.wagon.getSelectedSide() === WhichEnd.B
+            ? this.selected
+              ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
+              : this.meshProvider.getMaterial(MaterialName.SleeperBrown)
+            : this.meshProvider.getMaterial(MaterialName.BedGray);
+      }
     }
 
-    if (this.selected && !this.lastSelected) {
-      this.selectedMesh.setEnabled(true);
-    }
-
-    if (!this.selected && this.lastSelected) {
-      this.selectedMesh.setEnabled(false);
-    }
+    this.selectedMesh.setEnabled(
+      this.selected && !this.wagon.isAFree() && !this.wagon.isBFree()
+    );
 
     this.lastSelected = this.selected;
   }
@@ -123,11 +138,11 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
   process(command: string) {
     switch (command) {
       case 'forward':
-        this.wagon.moveTowardsWagonB(1);
+        this.wagon.accelerate();
         break;
 
       case 'backward':
-        this.wagon.moveTowardsWagonA(1);
+        this.wagon.break();
         break;
 
       case 'stop':
@@ -142,6 +157,10 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.wagon.getB().disconnect();
         break;
 
+      case 'swapSide':
+        this.wagon.swapSelectedSide();
+        break;
+
       //   case 'stop':
       //     this.wagon.stop();
       //     break;
@@ -150,5 +169,10 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.wagon.remove();
         break;
     }
+  }
+
+  setSelected(selected: boolean): void {
+    this.wagon.onSelected(selected);
+    super.setSelected(selected);
   }
 }

@@ -49,6 +49,20 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this;
   }
 
+  accelerate(): void {
+    // this.control.accelerate();
+    if (this.getSelectedSide() === WhichEnd.A) {
+      this.moveTowardsWagonA(1);
+    } else if (this.getSelectedSide() === WhichEnd.B) {
+      this.moveTowardsWagonB(1);
+    }
+  }
+
+  break(): void {
+    // this.control.break();
+    this.accelerate();
+  }
+
   getWorm(): TrackWorm {
     return this.worm;
   }
@@ -174,6 +188,55 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   isBFree(): boolean {
     return !this.position.getB().hasConnectedEndOf();
+  }
+
+  isOneFree(): boolean {
+    return this.isAFree() !== this.isBFree(); // xor
+  }
+
+  private selectedSide: WhichEnd | null = null;
+
+  getSelectedSide(): WhichEnd | null {
+    return this.selectedSide;
+  }
+
+  onSelected(selected: boolean): void {
+    if (selected && this.selectedSide === null) {
+      if (this.isAFree()) {
+        this.selectedSide = WhichEnd.A;
+      } else if (this.isBFree()) {
+        this.selectedSide = WhichEnd.B;
+      } else {
+        this.selectedSide = null;
+      }
+    }
+  }
+
+  swapSelectedSide(): void {
+    if (this.selectedSide === WhichEnd.A && this.isBFree()) {
+      this.selectedSide = WhichEnd.B;
+      this.update();
+    } else if (this.selectedSide === WhichEnd.B && this.isAFree()) {
+      this.selectedSide = WhichEnd.A;
+      this.update();
+    }
+  }
+
+  onStocked(): void {
+    console.log('onStocked', this.id);
+    if (this.selectedSide === WhichEnd.A && !this.isAFree()) {
+      if (this.isBFree()) {
+        this.selectedSide = WhichEnd.B;
+      } else {
+        this.selectedSide = null;
+      }
+    } else if (this.selectedSide === WhichEnd.B && !this.isBFree()) {
+      if (this.isAFree()) {
+        this.selectedSide = WhichEnd.A;
+      } else {
+        this.selectedSide = null;
+      }
+    }
   }
 
   putOnTrack(

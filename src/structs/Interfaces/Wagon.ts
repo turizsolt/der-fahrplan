@@ -23,6 +23,13 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   isRemoved(): boolean;
   isAFree(): boolean;
   isBFree(): boolean;
+  isOneFree(): boolean;
+  onSelected(selected: boolean): void;
+  onStocked(): void;
+  getSelectedSide(): WhichEnd | null;
+  swapSelectedSide(): void;
+  accelerate(): void;
+  break(): void;
 
   getWorm(): TrackWorm;
   getCenterRay(): Ray;

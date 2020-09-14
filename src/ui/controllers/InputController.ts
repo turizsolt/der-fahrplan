@@ -29,6 +29,7 @@ import { Station } from '../../structs/Scheduling/Station';
 import { ActualRouteStop } from '../../structs/Scheduling/ActualRouteStop';
 import { RouteStop } from '../../structs/Scheduling/RouteStop';
 import { Wagon } from '../../structs/Interfaces/Wagon';
+import { ActualWagon } from '../../structs/Actuals/Wagon/ActualWagon';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -401,66 +402,7 @@ export class InputController {
               this.vmInfoBox.type = null;
               this.vmInfoBox.opts = [];
             } else {
-              if (this.selected) {
-                if (
-                  this.selectCallback &&
-                  this.selected.getType() === Symbol.for('Wagon')
-                ) {
-                  (this.selected as Wagon).unsubscribeToUpdates(
-                    this.selectCallback
-                  );
-                }
-                this.selected.getRenderer().setSelected(false);
-              }
-
-              renderer.setSelected(true);
-              this.selected = storedObj;
-              this.selectedMesh = this.downProps.mesh;
-
-              if (storedObj.getType() === Symbol.for('Wagon')) {
-                // console.log('select');
-                this.selectCallback = (obj: Object): void => {
-                  //   console.log('update');
-                  this.vmInfoBox.selected = obj;
-                };
-                (this.selected as Wagon).subscribeToUpdates(
-                  this.selectCallback
-                );
-              }
-              this.vmInfoBox.selected = storedObj.persistDeep();
-              this.vmInfoBox.type =
-                storedObj.getType() === Symbol.for('Wagon')
-                  ? 'wagon'
-                  : 'idtext';
-              //   console.log('gt', storedObj.getType(), this.vmInfoBox.type);
-              if (storedObj.getType() === Symbol.for('Wagon')) {
-                this.vmInfoBox.opts = this.store
-                  .getAllOf<Route>(TYPES.Route)
-                  .map(x => x.persistDeep());
-              }
-
-              //   const sel = this.selected as any;
-              //   if (sel.getName) {
-              //     this.vmInfoBox.selectedId = sel.getName();
-              //     if (sel.getPlatforms) {
-              //       this.vmInfoBox.selectedId =
-              //         sel.getName() +
-              //         ' / ' +
-              //         sel
-              //           .getPlatforms()
-              //           .map(p => p.getId())
-              //           .join(', ');
-              //     }
-              //   } else if (sel.getStation) {
-              //     this.vmInfoBox.selectedId =
-              //       id +
-              //       ':' +
-              //       (!sel.getStation()
-              //         ? 'No station'
-              //         : sel.getStation().getName());
-              //   } else {
-              //     this.vmInfoBox.selectedId = id;
-              //   }
+              this.select(storedObj);
             }
           }
           ready = true;
@@ -468,6 +410,41 @@ export class InputController {
       }
     }
     return ready;
+  }
+
+  select(storedObj: BaseBrick) {
+    if (this.selected) {
+      if (
+        this.selectCallback &&
+        this.selected.getType() === Symbol.for('Wagon')
+      ) {
+        (this.selected as Wagon).unsubscribeToUpdates(this.selectCallback);
+      }
+      this.selected.getRenderer().setSelected(false);
+    }
+
+    storedObj.getRenderer().setSelected(true);
+
+    this.selected = storedObj;
+    this.selectedMesh = this.downProps.mesh;
+
+    if (storedObj.getType() === Symbol.for('Wagon')) {
+      // console.log('select');
+      this.selectCallback = (obj: Object): void => {
+        //   console.log('update');
+        this.vmInfoBox.selected = obj;
+      };
+      (this.selected as Wagon).subscribeToUpdates(this.selectCallback);
+    }
+    this.vmInfoBox.selected = storedObj.persistDeep();
+    this.vmInfoBox.type =
+      storedObj.getType() === Symbol.for('Wagon') ? 'wagon' : 'idtext';
+    //   console.log('gt', storedObj.getType(), this.vmInfoBox.type);
+    if (storedObj.getType() === Symbol.for('Wagon')) {
+      this.vmInfoBox.opts = this.store
+        .getAllOf<Route>(TYPES.Route)
+        .map(x => x.persistDeep());
+    }
   }
 
   wheel(event: WheelEvent) {
@@ -546,6 +523,25 @@ export class InputController {
           (0 + 100000)}.fahrplan`;
 
         download(JSON.stringify(data), fileName, 'application/json');
+        break;
+
+      case 'ArrowRight':
+        if (this.selected.getType() === TYPES.Wagon) {
+          const sel = this.selected as ActualWagon;
+          if (!sel.isOneFree()) {
+            this.selected.getRenderer().process('swapSide');
+          } else {
+            // van-e helyette mas
+            sel
+              .getTrain()
+              .getWagons()
+              .map(wagon => {
+                if (wagon !== sel && wagon.isOneFree()) {
+                  this.select(wagon);
+                }
+              });
+          }
+        }
         break;
     }
 
