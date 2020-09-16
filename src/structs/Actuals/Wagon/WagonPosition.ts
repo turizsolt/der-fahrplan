@@ -10,12 +10,16 @@ import { WagonEnd } from './WagonEnd';
 import { Coordinate } from '../../Geometry/Coordinate';
 
 const WAGON_GAP: number = 1;
+const DEFAULT_WAGON_LENGTH: number = 14;
 
 @injectable()
 export class WagonPosition {
   private ends: Record<WhichEnd, WagonEnd>;
 
-  constructor(private parent: Wagon) {
+  constructor(
+    private parent: Wagon,
+    private length: number = DEFAULT_WAGON_LENGTH
+  ) {
     this.ends = {
       [WhichEnd.A]: new WagonEnd(WhichEnd.A, this.parent),
       [WhichEnd.B]: new WagonEnd(WhichEnd.B, this.parent)
@@ -235,7 +239,7 @@ export class WagonPosition {
   }
 
   getLength(): number {
-    return 14;
+    return this.length;
   }
 
   getA(): WagonEnd {

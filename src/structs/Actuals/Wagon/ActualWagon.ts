@@ -47,12 +47,14 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   protected speed: WagonSpeed;
   protected control: WagonControl;
 
+  private appearanceId: string;
+
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
   init(config?: WagonConfig): Wagon {
     super.initStore(TYPES.Wagon);
 
-    this.position = new WagonPosition(this);
+    this.position = new WagonPosition(this, config && config.length);
     this.boardable = new BoardableWagon(
       this,
       config && config.passengerArrangement
@@ -70,6 +72,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     } else {
       this.control = new WagonControlNothing();
     }
+
+    this.appearanceId = config ? config.appearanceId : 'wagon';
 
     return this;
   }
@@ -91,7 +95,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   getAppearanceId(): string {
-    return 'wagon';
+    return this.appearanceId;
   }
 
   getConnectable(A: WhichEnd): WagonConnectable {
