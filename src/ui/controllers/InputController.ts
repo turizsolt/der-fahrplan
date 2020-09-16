@@ -557,6 +557,10 @@ export class InputController {
         this.selected.getRenderer().process('swapEnds');
         break;
 
+      case '/':
+        this.selected.getRenderer().process('detach');
+        break;
+
       case 'Delete':
         this.selected.getRenderer().process('delete');
         break;

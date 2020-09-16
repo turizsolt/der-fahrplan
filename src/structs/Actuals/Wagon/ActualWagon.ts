@@ -78,6 +78,14 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this;
   }
 
+  detach(): void {
+    if (this.getControlType() === WagonControlType.Nothing) return;
+    if (!this.isOneFree()) return;
+
+    this.getA().disconnect();
+    this.getB().disconnect();
+  }
+
   getMaxSpeed(): number {
     return this.speed.getMaxSpeed();
   }

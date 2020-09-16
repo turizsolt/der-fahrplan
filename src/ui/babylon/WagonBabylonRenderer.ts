@@ -166,6 +166,10 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.wagon.swapEnds();
         break;
 
+      case 'detach':
+        this.wagon.detach();
+        break;
+
       case 'delete':
         this.wagon.remove();
         break;

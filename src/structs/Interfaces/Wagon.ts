@@ -68,6 +68,7 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   setTrain(train: Train): void;
 
   getBoardedPassengers(): Passenger[];
+  detach(): void;
 }
 
 export interface NearestWagon {
