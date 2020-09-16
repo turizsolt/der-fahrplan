@@ -22,7 +22,14 @@ import { Trip } from '../../Scheduling/Trip';
 import { WagonPosition } from './WagonPosition';
 import { BoardableWagon } from '../../../mixins/BoardableWagon';
 import { WagonAnnouncement } from './WagonAnnouncement';
-import WagonEngine from '../../NewOne/WagonEngine';
+import WagonSpeed from './WagonSpeed';
+import { WagonControlType } from './WagonControl/WagonControlType';
+import { WagonConnectable } from './WagonConnectable';
+import { WagonConfig } from './WagonConfig';
+import { WagonControl } from './WagonControl/WagonControl';
+import { WagonControlLocomotive } from './WagonControl/WagonControlLocomotive';
+import { WagonControlControlCar } from './WagonControl/WagonControlControlCar';
+import { WagonControlNothing } from './WagonControl/WagonControlNothing';
 
 export interface ActualWagon extends Updatable {}
 const doApply = () => applyMixins(ActualWagon, [Updatable]);
@@ -34,19 +41,55 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   protected position: WagonPosition;
   protected boardable: BoardableWagon;
   protected announcement: WagonAnnouncement;
+  protected speed: WagonSpeed;
   protected control: WagonControl;
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
-  init(): Wagon {
+  init(config?: WagonConfig): Wagon {
     super.initStore(TYPES.Wagon);
 
     this.position = new WagonPosition(this);
     this.boardable = new BoardableWagon(this);
     this.announcement = new WagonAnnouncement(this, this.store);
-    this.control = new WagonEngine(3);
+    this.speed = new WagonSpeed(
+      (config && config.maxSpeed) || 3,
+      (config && config.accelerateBy) || 1
+    );
+
+    if (!config || config.controlType === WagonControlType.Locomotive) {
+      this.control = new WagonControlLocomotive(this);
+    } else if (config.controlType === WagonControlType.ControlCar) {
+      this.control = new WagonControlControlCar(this);
+    } else {
+      this.control = new WagonControlNothing();
+    }
 
     return this;
+  }
+
+  getMaxSpeed(): any {
+    return this.speed.getMaxSpeed();
+  }
+
+  getAccelerateBy(): any {
+    return this.speed.getAcceleateBy();
+  }
+
+  getControlType(): any {
+    return this.control.getControlType();
+  }
+
+  getPassengerArrangement(): any {
+    return { rows: 7, seats: 3 };
+  }
+
+  getAppearanceId(): any {
+    return 'wagon';
+  }
+
+  getConnectable(A: WhichEnd): any {
+    return WagonConnectable.Connectable;
   }
 
   accelerate(): void {

@@ -1,11 +1,11 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import WagonEngine from '../../../src/structs/NewOne/WagonEngine';
+import WagonSpeed from '../../../src/structs/Actuals/Wagon/WagonSpeed';
 chai.use(chaiAlmost());
 
-describe('WagonControl', () => {
+describe('WagonSpeedControl', () => {
   it('accelerates til maxSpeed', () => {
-    const control: WagonControl = new WagonEngine(2);
+    const control: WagonSpeed = new WagonSpeed(2);
     expect(control.getSpeed()).equals(0);
     control.accelerate();
     expect(control.getSpeed()).equals(1);
@@ -16,7 +16,7 @@ describe('WagonControl', () => {
   });
 
   it('breaks till zero', () => {
-    const control: WagonControl = new WagonEngine(2);
+    const control: WagonSpeed = new WagonSpeed(2);
     control.accelerate();
     control.accelerate();
     expect(control.getSpeed()).equals(2);
@@ -29,7 +29,7 @@ describe('WagonControl', () => {
   });
 
   it('can shount forward and only once', () => {
-    const control: WagonControl = new WagonEngine(2);
+    const control: WagonSpeed = new WagonSpeed(2);
     expect(control.getSpeed()).equals(0);
     control.shountForward();
     expect(control.getSpeed()).equals(1);
@@ -40,7 +40,7 @@ describe('WagonControl', () => {
   });
 
   it('can shount backward and only once', () => {
-    const control: WagonControl = new WagonEngine(2);
+    const control: WagonSpeed = new WagonSpeed(2);
     expect(control.getSpeed()).equals(0);
     control.shountBackward();
     expect(control.getSpeed()).equals(-1);
@@ -51,7 +51,7 @@ describe('WagonControl', () => {
   });
 
   it('cannot shount when not stopped', () => {
-    const control: WagonControl = new WagonEngine(2);
+    const control: WagonSpeed = new WagonSpeed(2);
     control.accelerate();
     control.accelerate();
     expect(control.getSpeed()).equals(2);
@@ -62,7 +62,7 @@ describe('WagonControl', () => {
   });
 
   it('cannot shount when not stopped', () => {
-    const control: WagonControl = new WagonEngine(2);
+    const control: WagonSpeed = new WagonSpeed(2);
     control.accelerate();
     control.accelerate();
     expect(control.getSpeed()).equals(2);
@@ -73,7 +73,7 @@ describe('WagonControl', () => {
   });
 
   it('emergency break applied', () => {
-    const control: WagonControl = new WagonEngine(2);
+    const control: WagonSpeed = new WagonSpeed(2);
     control.accelerate();
     control.accelerate();
     control.tick();
@@ -86,7 +86,7 @@ describe('WagonControl', () => {
   });
 
   it('cannot start, while emergency break applied', () => {
-    const control: WagonControl = new WagonEngine(2);
+    const control: WagonSpeed = new WagonSpeed(2);
     control.emergencyBreak();
     control.accelerate();
     expect(control.getSpeed()).equals(0);

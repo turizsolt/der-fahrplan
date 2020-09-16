@@ -1,22 +1,30 @@
-export default class WagonEngine implements WagonControl {
+export default class WagonSpeed {
   private speed: number = 0;
   private emergencyBreakApplied: boolean = false;
 
-  constructor(private maxSpeed: number) {}
+  constructor(private maxSpeed: number, private accelerateBy: number = 1) {}
 
   getSpeed(): number {
     return this.speed;
   }
 
+  getMaxSpeed(): number {
+    return this.maxSpeed;
+  }
+
+  getAcceleateBy(): number {
+    return this.accelerateBy;
+  }
+
   accelerate(): void {
     if (this.canAccelerate() && this.speed < this.maxSpeed) {
-      this.speed++;
+      this.speed += this.accelerateBy;
     }
   }
 
   break(): void {
     if (this.speed > 0) {
-      this.speed--;
+      this.speed -= this.accelerateBy;
     } else {
       this.speed = 0;
     }
