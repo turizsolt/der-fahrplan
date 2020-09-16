@@ -56,7 +56,7 @@ describe('WagonConfig', () => {
 
     expect(wagon.getControlType()).equals(WagonControlType.Nothing);
 
-    // expect(wagon.getPassengerArrangement()).deep.equals({ rows: 5, seats: 2 });
+    expect(wagon.getPassengerArrangement()).deep.equals({ rows: 5, seats: 2 });
 
     // expect(wagon.getAppearanceId()).equals('utas');
     // expect(wagon.getLength()).equals(15);

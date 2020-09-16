@@ -12,6 +12,9 @@ import { TrackWorm } from '../Actuals/Track/TrackWorm';
 import { Passenger } from './Passenger';
 import { Boardable } from '../../mixins/Boardable';
 import { WagonConfig } from '../Actuals/Wagon/WagonConfig';
+import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
+import { PassengerArrangement } from '../../mixins/BoardableWagon';
+import { WagonConnectable } from '../Actuals/Wagon/WagonConnectable';
 
 export interface Wagon extends Boardable, BaseBrick, Updatable {
   init(config?: WagonConfig): Wagon;
@@ -32,12 +35,12 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   accelerate(): void;
   break(): void;
 
-  getMaxSpeed(): any;
-  getAccelerateBy(): any;
-  getControlType(): any;
-  getPassengerArrangement(): any;
-  getAppearanceId(): any;
-  getConnectable(A: WhichEnd): any;
+  getMaxSpeed(): number;
+  getAccelerateBy(): number;
+  getControlType(): WagonControlType;
+  getPassengerArrangement(): PassengerArrangement;
+  getAppearanceId(): string;
+  getConnectable(A: WhichEnd): WagonConnectable;
 
   getWorm(): TrackWorm;
   getCenterRay(): Ray;

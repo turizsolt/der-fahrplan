@@ -20,7 +20,10 @@ import { ActualBaseBrick } from '../ActualBaseBrick';
 import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
 import { WagonPosition } from './WagonPosition';
-import { BoardableWagon } from '../../../mixins/BoardableWagon';
+import {
+  BoardableWagon,
+  PassengerArrangement
+} from '../../../mixins/BoardableWagon';
 import { WagonAnnouncement } from './WagonAnnouncement';
 import WagonSpeed from './WagonSpeed';
 import { WagonControlType } from './WagonControl/WagonControlType';
@@ -50,7 +53,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     super.initStore(TYPES.Wagon);
 
     this.position = new WagonPosition(this);
-    this.boardable = new BoardableWagon(this);
+    this.boardable = new BoardableWagon(
+      this,
+      config && config.passengerArrangement
+    );
     this.announcement = new WagonAnnouncement(this, this.store);
     this.speed = new WagonSpeed(
       (config && config.maxSpeed) || 3,
@@ -68,27 +74,27 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this;
   }
 
-  getMaxSpeed(): any {
+  getMaxSpeed(): number {
     return this.speed.getMaxSpeed();
   }
 
-  getAccelerateBy(): any {
+  getAccelerateBy(): number {
     return this.speed.getAcceleateBy();
   }
 
-  getControlType(): any {
+  getControlType(): WagonControlType {
     return this.control.getControlType();
   }
 
-  getPassengerArrangement(): any {
-    return { rows: 7, seats: 3 };
+  getPassengerArrangement(): PassengerArrangement {
+    return this.boardable.getPassengerArrangement();
   }
 
-  getAppearanceId(): any {
+  getAppearanceId(): string {
     return 'wagon';
   }
 
-  getConnectable(A: WhichEnd): any {
+  getConnectable(A: WhichEnd): WagonConnectable {
     return WagonConnectable.Connectable;
   }
 

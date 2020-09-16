@@ -2,8 +2,8 @@ import { Coordinate } from '../structs/Geometry/Coordinate';
 import { Passenger } from '../structs/Interfaces/Passenger';
 import { ActualBoardable } from './ActualBoardable';
 import { Wagon } from '../structs/Interfaces/Wagon';
-import { Left } from '../structs/Geometry/Directions';
-import { Store } from '../structs/Interfaces/Store';
+
+export type PassengerArrangement = { rows: number; seats: number };
 
 export class BoardableWagon extends ActualBoardable {
   private seatCount: number = 21;
@@ -11,8 +11,19 @@ export class BoardableWagon extends ActualBoardable {
   private passengerCount: number = 0;
   private seats: Passenger[] = [];
 
-  constructor(private parent: Wagon) {
+  constructor(private parent: Wagon, config?: PassengerArrangement) {
     super();
+    if (config) {
+      this.seatColumns = config.seats;
+      this.seatCount = config.rows * config.seats;
+    }
+  }
+
+  getPassengerArrangement(): PassengerArrangement {
+    return {
+      seats: this.seatColumns,
+      rows: this.seatCount / this.seatColumns
+    };
   }
 
   board(passenger: Passenger): Coordinate {
