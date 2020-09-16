@@ -2,6 +2,8 @@ import { Coordinate } from '../structs/Geometry/Coordinate';
 import { Passenger } from '../structs/Interfaces/Passenger';
 import { ActualBoardable } from './ActualBoardable';
 import { Wagon } from '../structs/Interfaces/Wagon';
+import { Store } from '../structs/Interfaces/Store';
+import { Left } from '../structs/Geometry/Directions';
 
 export type PassengerArrangement = { rows: number; seats: number };
 

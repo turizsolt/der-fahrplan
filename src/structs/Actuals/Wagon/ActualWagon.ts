@@ -247,51 +247,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.isAFree() !== this.isBFree(); // xor
   }
 
-  private selectedSide: WhichEnd | null = null;
-
-  getSelectedSide(): WhichEnd | null {
-    return this.selectedSide;
-  }
-
-  onSelected(selected: boolean): void {
-    if (selected && this.selectedSide === null) {
-      if (this.isAFree()) {
-        this.selectedSide = WhichEnd.A;
-      } else if (this.isBFree()) {
-        this.selectedSide = WhichEnd.B;
-      } else {
-        this.selectedSide = null;
-      }
-    }
-  }
-
-  swapSelectedSide(): void {
-    if (this.selectedSide === WhichEnd.A && this.isBFree()) {
-      this.selectedSide = WhichEnd.B;
-      this.update();
-    } else if (this.selectedSide === WhichEnd.B && this.isAFree()) {
-      this.selectedSide = WhichEnd.A;
-      this.update();
-    }
-  }
-
-  onStocked(): void {
-    console.log('onStocked', this.id);
-    if (this.selectedSide === WhichEnd.A && !this.isAFree()) {
-      if (this.isBFree()) {
-        this.selectedSide = WhichEnd.B;
-      } else {
-        this.selectedSide = null;
-      }
-    } else if (this.selectedSide === WhichEnd.B && !this.isBFree()) {
-      if (this.isAFree()) {
-        this.selectedSide = WhichEnd.A;
-      } else {
-        this.selectedSide = null;
-      }
-    }
-  }
-
   putOnTrack(
     track: TrackBase,
     position: number = 0,
@@ -326,6 +281,26 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   swapEnds(): void {
     this.position.swapEnds();
+  }
+
+  ///////////////////////
+  // control
+  ///////////////////////
+
+  getSelectedSide(): WhichEnd | null {
+    return this.control.getSelectedSide();
+  }
+
+  onSelected(selected: boolean): void {
+    this.control.onSelected(selected);
+  }
+
+  swapSelectedSide(): void {
+    this.control.swapSelectedSide();
+  }
+
+  onStocked(): void {
+    this.control.onStocked();
   }
 
   ///////////////////////
