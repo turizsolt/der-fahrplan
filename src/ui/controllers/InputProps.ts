@@ -42,4 +42,6 @@ export interface InputProps {
   fromX: number;
   fromY: number;
   fromZ: number;
+
+  wagonType: string;
 }

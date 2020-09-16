@@ -178,6 +178,14 @@
 </head>
 <body>
     <div id="button-holder">
+            <select size="1" v-if="selected === 'CREATE_ENGINE'"
+            v-model="wagon"
+            v-on:click="handleWagonClick">
+                    <option value="wagon">Mozdony</option>
+                    <option value="mot">Motorvonat</option>
+                    <option value="vez">Vezérlőkocsi</option>
+                    <option value="utas">Utaskocsi</option>
+                </select>
             <button 
                 v-for="button in buttons"
                 v-bind:id="button.id"

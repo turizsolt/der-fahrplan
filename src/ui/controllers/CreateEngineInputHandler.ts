@@ -7,6 +7,7 @@ import { productionContainer } from '../../di/production.config';
 import { TYPES } from '../../di/TYPES';
 import { Track } from '../../structs/Interfaces/Track';
 import { Wagon } from '../../structs/Interfaces/Wagon';
+import { getPredefinedWagonConfig } from '../../structs/Actuals/Wagon/ActualWagonConfigs';
 
 export class CreateEngineInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
@@ -62,7 +63,10 @@ export class CreateEngineInputHandler implements InputHandler {
     if (dpot && dpot.track.constructor.name === ActualTrack.name) {
       //const engine = this.engineFactory().init();
       //engine.putOnTrack(dpot.track as Track, dpot.position);
-      const wagon = this.wagonFactory().init();
+
+      const wagon = this.wagonFactory().init(
+        getPredefinedWagonConfig(downProps.wagonType)
+      );
       wagon.putOnTrack(dpot.track as Track, dpot.position);
 
       //   const pot = new PositionOnTrack(dpot.track, null, dpot.position, 1);

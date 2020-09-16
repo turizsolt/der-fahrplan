@@ -35,6 +35,7 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
     this.wagon = engine;
 
     this.mesh = this.meshProvider.createWagonMesh(
+      this.wagon.getAppearanceId(),
       'clickable-wagon-' + this.wagon.getId()
     );
     this.mesh.setEnabled(true);

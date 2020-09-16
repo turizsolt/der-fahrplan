@@ -66,11 +66,15 @@ export class InputController {
       el: '#button-holder',
       data: {
         selected: '',
-        buttons: []
+        buttons: [],
+        wagon: 'wagon'
       },
       methods: {
         handleClick: function(event) {
           _this.selectMode(event.target.id);
+        },
+        handleWagonClick: function(event) {
+          this.wagon = event.target.value;
         }
       }
     });
@@ -277,7 +281,8 @@ export class InputController {
         targetZ: this.camera.target.z,
         fromX: this.camera.position.x,
         fromY: this.camera.position.y,
-        fromZ: this.camera.position.z
+        fromZ: this.camera.position.z,
+        wagonType: this.vm.wagon
       };
 
       return ret;
@@ -319,7 +324,8 @@ export class InputController {
       targetZ: this.camera.target.z,
       fromX: this.camera.position.x,
       fromY: this.camera.position.y,
-      fromZ: this.camera.position.z
+      fromZ: this.camera.position.z,
+      wagonType: this.vm.wagon
     };
     ret.snappedPoint.dirXZ = ret.wheelRad;
 

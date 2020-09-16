@@ -83,8 +83,8 @@ export class MeshProvider {
     };
   }
 
-  createWagonMesh(name: string): BABYLON.AbstractMesh {
-    const clone = this.library['wagon'].clone(name, null);
+  createWagonMesh(id:string, name: string): BABYLON.AbstractMesh {
+    const clone = this.library[id].clone(name, null);
     return clone;
   }
 
