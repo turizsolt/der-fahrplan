@@ -162,9 +162,9 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.wagon.swapSelectedSide();
         break;
 
-      //   case 'stop':
-      //     this.wagon.stop();
-      //     break;
+      case 'swapEnds':
+        this.wagon.swapEnds();
+        break;
 
       case 'delete':
         this.wagon.remove();

@@ -281,6 +281,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   swapEnds(): void {
     this.position.swapEnds();
+    this.update();
   }
 
   ///////////////////////

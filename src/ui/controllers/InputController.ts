@@ -529,7 +529,11 @@ export class InputController {
 
         download(JSON.stringify(data), fileName, 'application/json');
         break;
+    }
 
+    if (!this.selected) return;
+
+    switch (key) {
       case 'ArrowRight':
         if (this.selected.getType() === TYPES.Wagon) {
           const sel = this.selected as ActualWagon;
@@ -548,11 +552,11 @@ export class InputController {
           }
         }
         break;
-    }
 
-    if (!this.selected) return;
+      case 'Z':
+        this.selected.getRenderer().process('swapEnds');
+        break;
 
-    switch (key) {
       case 'Delete':
         this.selected.getRenderer().process('delete');
         break;
