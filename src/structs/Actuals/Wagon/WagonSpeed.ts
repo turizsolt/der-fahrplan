@@ -2,7 +2,10 @@ export default class WagonSpeed {
   private speed: number = 0;
   private emergencyBreakApplied: boolean = false;
 
-  constructor(private maxSpeed: number, private accelerateBy: number = 1) {}
+  constructor(
+    private maxSpeed: number = 3,
+    private accelerateBy: number = 0.25
+  ) {}
 
   getSpeed(): number {
     return this.speed;

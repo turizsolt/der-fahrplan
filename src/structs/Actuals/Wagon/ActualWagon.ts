@@ -61,8 +61,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     );
     this.announcement = new WagonAnnouncement(this, this.store);
     this.speed = new WagonSpeed(
-      (config && config.maxSpeed) || 3,
-      (config && config.accelerateBy) || 1
+      (config && config.maxSpeed) || undefined,
+      (config && config.accelerateBy) || undefined
     );
 
     if (!config || config.controlType === WagonControlType.Locomotive) {
@@ -76,6 +76,31 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.appearanceId = config ? config.appearanceId : 'wagon';
 
     return this;
+  }
+
+  getSpeed(): number {
+    return this.speed.getSpeed();
+  }
+
+  tick(): void {
+    this.speed.tick();
+    if (this.getSpeed() != 0) {
+      if (this.getSelectedSide() === WhichEnd.A) {
+        this.moveTowardsWagonA(this.getSpeed());
+      } else if (this.getSelectedSide() === WhichEnd.B) {
+        this.moveTowardsWagonB(this.getSpeed());
+      }
+    } else {
+      this.update();
+    }
+  }
+
+  accelerate(): void {
+    this.speed.accelerate();
+  }
+
+  break(): void {
+    this.speed.break();
   }
 
   detach(): void {
@@ -108,20 +133,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   getConnectable(A: WhichEnd): WagonConnectable {
     return WagonConnectable.Connectable;
-  }
-
-  accelerate(): void {
-    // this.control.accelerate();
-    if (this.getSelectedSide() === WhichEnd.A) {
-      this.moveTowardsWagonA(1);
-    } else if (this.getSelectedSide() === WhichEnd.B) {
-      this.moveTowardsWagonB(1);
-    }
-  }
-
-  break(): void {
-    // this.control.break();
-    this.accelerate();
   }
 
   getWorm(): TrackWorm {
@@ -347,6 +358,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return {
       id: this.id,
       type: 'Wagon',
+      speed: this.getSpeed(),
 
       trip: this.getTrip() && this.getTrip().persistDeep()
     };

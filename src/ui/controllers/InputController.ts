@@ -94,6 +94,7 @@ export class InputController {
       <div>
         <div class="item-type">🚂 Mozdony</div>
         <div class="item-id">{{idt}}</div>
+        <div class="item-id">Speed: {{obj.speed ? obj.speed : '???'}}</div>
         <div v-if="obj.trip">
           <div class="trip">
             <div class="trip-name">{{obj.trip.name}}</div> 
@@ -473,7 +474,19 @@ export class InputController {
     this.vm.selected = mode;
   }
 
-  keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {}
+  keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    if (!this.selected) return;
+
+    switch (key) {
+      case 'ArrowUp':
+        this.selected.getRenderer().process('forward');
+        break;
+
+      case 'ArrowDown':
+        this.selected.getRenderer().process('backward');
+        break;
+    }
+  }
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     switch (key) {
@@ -575,18 +588,12 @@ export class InputController {
     }
   }
 
-  keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    if (!this.selected) return;
+  keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {}
 
-    switch (key) {
-      case 'ArrowUp':
-        this.selected.getRenderer().process('forward');
-        break;
-
-      case 'ArrowDown':
-        this.selected.getRenderer().process('backward');
-        break;
-    }
+  tick() {
+    this.store.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {
+      wagon.tick();
+    });
   }
 
   load(data: any) {

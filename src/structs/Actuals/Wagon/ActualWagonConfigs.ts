@@ -4,7 +4,7 @@ import { WagonConnectable } from './WagonConnectable';
 
 const wagon: WagonConfig = {
   maxSpeed: 3,
-  accelerateBy: 1,
+  accelerateBy: 0.25,
   controlType: WagonControlType.Locomotive,
   passengerArrangement: { rows: 0, seats: 0 },
   appearanceId: 'wagon',
@@ -17,7 +17,7 @@ const wagon: WagonConfig = {
 
 const vez: WagonConfig = {
   maxSpeed: 3,
-  accelerateBy: 1,
+  accelerateBy: 0.25,
   controlType: WagonControlType.ControlCar,
   passengerArrangement: { rows: 7, seats: 3 },
   appearanceId: 'vez',
@@ -30,7 +30,7 @@ const vez: WagonConfig = {
 
 const mot: WagonConfig = {
   maxSpeed: 3,
-  accelerateBy: 1,
+  accelerateBy: 0.25,
   controlType: WagonControlType.Locomotive,
   passengerArrangement: { rows: 7, seats: 3 },
   appearanceId: 'mot',
@@ -43,7 +43,7 @@ const mot: WagonConfig = {
 
 const utas: WagonConfig = {
   maxSpeed: 3,
-  accelerateBy: 1,
+  accelerateBy: 0.25,
   controlType: WagonControlType.Nothing,
   passengerArrangement: { rows: 7, seats: 3 },
   appearanceId: 'utas',
