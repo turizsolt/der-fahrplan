@@ -109,7 +109,10 @@ export class InputController {
             </div>
           </div>
           <div class="trip-buttons">
-            <div class="xbutton trip-cancel" @click="removeRoute(obj)">❌ Útirány törlése</div>
+            <div class="trip-buttons-inner">
+              <div class="xbutton trip-cancel" @click="removeRoute(obj)">❌ Útirány törlése</div>
+              <div v-if="obj.trip.reverse" class="xbutton trip-reverse" @click="reverseRoute(obj)">↩ Ellenirány</div>
+            </div>
           </div>
         </div>
         <div v-else>
@@ -141,6 +144,10 @@ export class InputController {
         removeRoute: function(vWagon) {
           const wagon = _this.store.get(vWagon.id) as Wagon;
           wagon.cancelTrip();
+        },
+        reverseRoute: function(vWagon) {
+          const wagon = _this.store.get(vWagon.id) as Wagon;
+          wagon.reverseTrip();
         }
       }
     });
@@ -564,6 +571,10 @@ export class InputController {
               });
           }
         }
+        break;
+
+      case 'R':
+        this.selected.getRenderer().process('reverseTrip');
         break;
 
       case 'Z':

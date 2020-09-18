@@ -78,6 +78,13 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this;
   }
 
+  reverseTrip(): void {
+    const trip = this.getTrip();
+    if (trip && trip.getReverse()) {
+      this.assignTrip(trip.getReverse());
+    }
+  }
+
   getSpeed(): number {
     return this.speed.getSpeed();
   }

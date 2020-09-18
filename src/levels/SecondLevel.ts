@@ -250,7 +250,8 @@ export const SECOND_LEVEL = {
       id: 'hPQB0MCYt4',
       type: 'Route',
       name: '2',
-      stops: ['Czc2exolfQ', 'EjkPdS1T8']
+      stops: ['Czc2exolfQ', 'EjkPdS1T8'],
+      reverse: '*alyqWBQ1'
     },
     {
       id: 'Czc2exolfQ',
@@ -268,7 +269,8 @@ export const SECOND_LEVEL = {
       id: '*alyqWBQ1',
       type: 'Route',
       name: '2',
-      stops: ['Vj6WDtG9Fr', '5Rv7JQSER9']
+      stops: ['Vj6WDtG9Fr', '5Rv7JQSER9'],
+      reverse: 'hPQB0MCYt4'
     },
     {
       id: 'Vj6WDtG9Fr',

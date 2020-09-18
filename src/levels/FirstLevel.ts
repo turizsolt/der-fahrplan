@@ -90,7 +90,8 @@ export const FIRST_LEVEL = {
       id: 'mFEeGSi7D',
       type: 'Route',
       name: '1',
-      stops: ['lIF4xyOGE', 'jcXLbpcdJ']
+      stops: ['lIF4xyOGE', 'jcXLbpcdJ'],
+      reverse: 'kTZFipKmw'
     },
     {
       id: 'lIF4xyOGE',
@@ -108,7 +109,8 @@ export const FIRST_LEVEL = {
       id: 'kTZFipKmw',
       type: 'Route',
       name: '1',
-      stops: ['KmIltK66Cv', '9O3lK9M*gN']
+      stops: ['KmIltK66Cv', '9O3lK9M*gN'],
+      reverse: 'mFEeGSi7D'
     },
     {
       id: 'KmIltK66Cv',
