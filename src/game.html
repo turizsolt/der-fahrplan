@@ -148,11 +148,53 @@
     height: 15px;
 }
 
-.stop-circle {
+.stop-circle, .route-circle {
     width: 10px;
     height: 10px;
     border: 2px solid #070;
     border-radius: 50%;
+}
+
+.route-line {
+    display: flex;
+    width: 100%;
+
+    border: 1px solid #070;
+    border-radius: 0.25em;
+    background-color: #aca;
+
+    margin-top: 5px;
+
+    cursor: pointer;
+}
+
+.route-line:hover {
+    background-color: #dfd;
+}
+
+.route-sign {
+    width: 1em;
+    text-align: center;
+}
+
+.route-circle {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.route-circle-left {
+    margin-left: 3px;
+}
+
+.route-circle-right {
+    margin-right: 3px;
+    margin-left: -5px;
+}
+
+.route-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .stop-name {

@@ -116,26 +116,29 @@ export class InputController {
           </div>
         </div>
         <div v-else>
-        <div v-if="opts && opts.length > 0">
-          <select class="route-select" size="1" @change="assignRoute(obj, $event)">
-            <option>Útirány kiválasztása...</option>
-            <option v-for="route in opts" :value="route.id">
-              {{route.detailedName}}
-            </option>
-          </select>
-        </div>
-        <div v-if="!opts || opts.length === 0">
-        <select class="route-select" size="1" disabled>
-            <option>Nincs kiválsztható útirány</option>
-          </select>
-        </div>
-        
+          <div v-if="opts && opts.length > 0">
+            <div>Útirány kiválasztása...</div>
+            <div class="route-line" v-for="route in opts" @click="assignRoute(obj, route.id)"> 
+              <div class="route-sign">{{route.name}}</div>
+              <div class="route-circle route-circle-left" :style="{backgroundColor: route.stops[0].rgbColor}"></div>
+              <div class="route-circle route-circle-right" :style="{backgroundColor: route.stops[route.stops.length-1].rgbColor}"></div>
+              <div class="route-name">
+                {{route.stops[0].stationName}}
+                >
+                {{route.stops[route.stops.length-1].stationName}}
+              </div>
+            </div>
+          </div>
+          <div v-if="!opts || opts.length === 0">
+          <select class="route-select" size="1" disabled>
+              <option>Nincs kiválsztható útirány</option>
+            </select>
+          </div>
         </div>
       </div>
       `,
       methods: {
-        assignRoute: function(vWagon, $event) {
-          const vRouteId = $event.target.value;
+        assignRoute: function(vWagon, vRouteId) {
           if (!vRouteId) return;
           const wagon = _this.store.get(vWagon.id) as Wagon;
           const route = _this.store.get(vRouteId) as Route;
