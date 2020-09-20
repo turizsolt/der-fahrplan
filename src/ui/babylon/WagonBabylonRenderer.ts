@@ -146,6 +146,14 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.wagon.break();
         break;
 
+      case 'shuntForward':
+        this.wagon.shuntForward();
+        break;
+
+      case 'shuntBackward':
+        this.wagon.shuntBackward();
+        break;
+
       case 'stop':
         this.wagon.stop();
         break;

@@ -72,6 +72,9 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   tick(): void;
   getSpeed(): number;
   reverseTrip(): void;
+
+  shuntForward(): void;
+  shuntBackward(): void;
 }
 
 export interface NearestWagon {

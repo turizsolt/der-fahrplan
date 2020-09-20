@@ -602,7 +602,19 @@ export class InputController {
     }
   }
 
-  keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {}
+  keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    if (!this.selected) return;
+
+    switch (key) {
+      case 'C':
+        this.selected.getRenderer().process('shuntForward');
+        break;
+
+      case 'V':
+        this.selected.getRenderer().process('shuntBackward');
+        break;
+    }
+  }
 
   tick() {
     this.store.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {

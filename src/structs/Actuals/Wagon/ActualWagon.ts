@@ -110,6 +110,14 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.speed.break();
   }
 
+  shuntForward(): void {
+    this.speed.shountForward();
+  }
+
+  shuntBackward(): void {
+    this.speed.shountBackward();
+  }
+
   detach(): void {
     if (this.getControlType() === WagonControlType.Nothing) return;
     if (!this.isOneFree()) return;
