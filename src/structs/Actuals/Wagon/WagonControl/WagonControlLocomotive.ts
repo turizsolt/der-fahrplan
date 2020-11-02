@@ -35,15 +35,16 @@ export class WagonControlLocomotive implements WagonControl {
       } else {
         this.selectOtherEnd();
       }
-      this.wagon.update();
     } else if (this.selectedSide === WhichEnd.B) {
       if (this.wagon.isAFree()) {
         this.selectedSide = WhichEnd.A;
       } else {
         this.selectOtherEnd();
       }
-      this.wagon.update();
+    } else {
+      this.selectOtherEnd();
     }
+    this.wagon.update();
   }
 
   protected selectOtherEnd(): void {
