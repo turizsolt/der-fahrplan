@@ -66,6 +66,6 @@ export default class WagonSpeed {
   }
 
   getMovingState(): WagonMovingState {
-    return WagonMovingState.Standing;
+    return this.speed > 0 ? WagonMovingState.Moving : WagonMovingState.Standing;
   }
 }

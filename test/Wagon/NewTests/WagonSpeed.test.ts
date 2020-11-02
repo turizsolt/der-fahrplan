@@ -105,5 +105,11 @@ describe('WagonSpeedControl', () => {
       const control: WagonSpeed = new WagonSpeed(2, 1);
       expect(control.getMovingState()).equals(WagonMovingState.Standing);
     });
+
+    it('moving - when there is speed', () => {
+      const control: WagonSpeed = new WagonSpeed(2, 1);
+      control.accelerate();
+      expect(control.getMovingState()).equals(WagonMovingState.Moving);
+    });
   });
 });
