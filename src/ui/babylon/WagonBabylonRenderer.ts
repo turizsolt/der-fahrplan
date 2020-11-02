@@ -156,11 +156,11 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         break;
 
       case 'endA':
-        this.wagon.getA().disconnect();
+        this.wagon.disconnect(WhichEnd.A);
         break;
 
       case 'endB':
-        this.wagon.getB().disconnect();
+        this.wagon.disconnect(WhichEnd.B);
         break;
 
       case 'swapSide':
