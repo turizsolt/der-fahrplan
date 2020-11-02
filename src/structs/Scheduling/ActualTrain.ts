@@ -12,6 +12,7 @@ import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType
 export class ActualTrain extends ActualBaseStorable implements Train {
   private wagons: Wagon[];
   private schedulingWagon: Wagon;
+  private controlingWagon: Wagon = null;
 
   init(first: Wagon): Train {
     super.initStore(TYPES.Train);
@@ -147,7 +148,11 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   getControlingWagon(): Wagon {
-    return null;
+    return this.controlingWagon;
+  }
+
+  setControlingWagon(wagon: Wagon): void {
+    this.controlingWagon = wagon;
   }
 
   persist(): Object {

@@ -33,6 +33,7 @@ import { WagonControl } from './WagonControl/WagonControl';
 import { WagonControlLocomotive } from './WagonControl/WagonControlLocomotive';
 import { WagonControlControlCar } from './WagonControl/WagonControlControlCar';
 import { WagonControlNothing } from './WagonControl/WagonControlNothing';
+import WagonSpeedPassenger from './WagonSpeedPassenger';
 
 export interface ActualWagon extends Updatable {}
 const doApply = () => applyMixins(ActualWagon, [Updatable]);
@@ -60,10 +61,19 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       config && config.passengerArrangement
     );
     this.announcement = new WagonAnnouncement(this, this.store);
-    this.speed = new WagonSpeed(
-      (config && config.maxSpeed) || undefined,
-      (config && config.accelerateBy) || undefined
-    );
+    if (config && config.controlType === WagonControlType.Nothing) {
+      this.speed = new WagonSpeedPassenger(
+        this,
+        (config && config.maxSpeed) || undefined,
+        (config && config.accelerateBy) || undefined
+      );
+    } else {
+      this.speed = new WagonSpeed(
+        this,
+        (config && config.maxSpeed) || undefined,
+        (config && config.accelerateBy) || undefined
+      );
+    }
 
     if (!config || config.controlType === WagonControlType.Locomotive) {
       this.control = new WagonControlLocomotive(this);
@@ -84,6 +94,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       end = end.getConnectedEnd().getOppositeEnd();
     }
     return end.getEndOf();
+  }
+
+  setControlingWagon(wagon: Wagon): void {
+    this.getTrain().setControlingWagon(wagon);
   }
 
   reverseTrip(): void {

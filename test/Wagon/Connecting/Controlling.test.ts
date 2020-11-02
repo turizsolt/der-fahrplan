@@ -23,4 +23,9 @@ describe('WagonControlling', () => {
     pass2.accelerate();
     expect(train.getControlingWagon()).equals(null);
   });
+
+  step('controller can control the speed', () => {
+    cont1.accelerate();
+    expect(train.getControlingWagon().getId()).equals(cont1.getId());
+  });
 });

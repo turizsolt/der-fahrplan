@@ -21,4 +21,5 @@ export interface Train extends BaseStorable {
   moveBoardedPassengers(): void;
   hasLocomotive(): boolean;
   getControlingWagon(): Wagon;
+  setControlingWagon(wagon: Wagon): void;
 }

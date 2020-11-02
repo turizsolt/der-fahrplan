@@ -1,4 +1,5 @@
 import { WagonMovingState } from './WagonMovingState';
+import { Wagon } from '../../Interfaces/Wagon';
 
 export default class WagonSpeed {
   private speed: number = 0;
@@ -6,6 +7,7 @@ export default class WagonSpeed {
   private shunting: boolean = false;
 
   constructor(
+    private wagon: Wagon,
     private maxSpeed: number = 3,
     private accelerateBy: number = 0.25
   ) {}
@@ -25,6 +27,7 @@ export default class WagonSpeed {
   accelerate(): void {
     if (this.canAccelerate() && this.speed < this.maxSpeed) {
       this.speed += this.accelerateBy;
+      this.wagon.setControlingWagon(this.wagon);
     }
   }
 
