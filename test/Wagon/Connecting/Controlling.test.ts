@@ -22,10 +22,18 @@ describe('WagonControlling', () => {
   step('passenger should not control the speed', () => {
     pass2.accelerate();
     expect(train.getControlingWagon()).equals(null);
+    pass2.break();
   });
 
   step('controller can control the speed', () => {
     cont1.accelerate();
     expect(train.getControlingWagon().getId()).equals(cont1.getId());
+    cont1.break();
+  });
+
+  step('locomotive can control the speed', () => {
+    loco3.accelerate();
+    expect(train.getControlingWagon().getId()).equals(loco3.getId());
+    loco3.break();
   });
 });
