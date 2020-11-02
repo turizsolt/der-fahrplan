@@ -79,4 +79,17 @@ describe('WagonShunting', () => {
     expect(perc(loco5.getB())).almost(0.84);
     loco3.break();
   });
+
+  step('cont cannot shunt on its own', () => {
+    pass2.getB().disconnect();
+    cont1.select();
+    cont1.shuntForward();
+    cont1.tick();
+
+    expect(perc(cont1.getA())).almost(0.1);
+    expect(perc(cont1.getB())).almost(0.24);
+    expect(perc(loco5.getA())).almost(0.7);
+    expect(perc(loco5.getB())).almost(0.84);
+    cont1.break();
+  });
 });

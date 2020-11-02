@@ -81,7 +81,8 @@ export default class WagonSpeed {
     return (
       !this.emergencyBreakApplied &&
       this.wagon.canThisWagonControl() &&
-      (this.speed === 0 || this.shunting)
+      (this.speed === 0 || this.shunting) &&
+      this.wagon.getTrain().hasLocomotive()
     );
   }
 
