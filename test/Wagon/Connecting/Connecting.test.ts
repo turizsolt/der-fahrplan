@@ -15,34 +15,36 @@ store.clear();
 const WagonFactory: () => Wagon = () => store.create<Wagon>(TYPES.Wagon);
 
 describe('WagonConnect and Control', () => {
-  it('single passenger wagon - cannot be controlled', () => {
-    const [w1]: Wagon[] = buildTrain(W.Pass);
-    expect(w1.getSelectedSide()).equals(null);
-    w1.select();
-    w1.swapSelectedSide();
-    expect(w1.getSelectedSide()).equals(null);
-  });
+  describe('single wagon', () => {
+    it('single passenger wagon - cannot be controlled', () => {
+      const [pass]: Wagon[] = buildTrain(W.Pass);
+      expect(pass.getSelectedSide()).equals(null);
+      pass.select();
+      pass.swapSelectedSide();
+      expect(pass.getSelectedSide()).equals(null);
+    });
 
-  it('single controller wagon - can be controlled only on A side', () => {
-    const [w1]: Wagon[] = buildTrain(W.Cont);
-    expect(w1.getSelectedSide()).equals(null);
-    w1.select();
-    expect(w1.getSelectedSide()).equals(WhichEnd.A);
-    w1.swapSelectedSide();
-    expect(w1.getSelectedSide()).equals(WhichEnd.A);
-    w1.swapSelectedSide();
-    expect(w1.getSelectedSide()).equals(WhichEnd.A);
-  });
+    it('single controller wagon - can be controlled only on A side', () => {
+      const [cont]: Wagon[] = buildTrain(W.Cont);
+      expect(cont.getSelectedSide()).equals(null);
+      cont.select();
+      expect(cont.getSelectedSide()).equals(WhichEnd.A);
+      cont.swapSelectedSide();
+      expect(cont.getSelectedSide()).equals(WhichEnd.A);
+      cont.swapSelectedSide();
+      expect(cont.getSelectedSide()).equals(WhichEnd.A);
+    });
 
-  it('single locomotive wagon - can be controlled', () => {
-    const [w1]: Wagon[] = buildTrain(W.Loco);
-    expect(w1.getSelectedSide()).equals(null);
-    w1.select();
-    expect(w1.getSelectedSide()).equals(WhichEnd.A);
-    w1.swapSelectedSide();
-    expect(w1.getSelectedSide()).equals(WhichEnd.B);
-    w1.swapSelectedSide();
-    expect(w1.getSelectedSide()).equals(WhichEnd.A);
+    it('single locomotive wagon - can be controlled', () => {
+      const [loco]: Wagon[] = buildTrain(W.Loco);
+      expect(loco.getSelectedSide()).equals(null);
+      loco.select();
+      expect(loco.getSelectedSide()).equals(WhichEnd.A);
+      loco.swapSelectedSide();
+      expect(loco.getSelectedSide()).equals(WhichEnd.B);
+      loco.swapSelectedSide();
+      expect(loco.getSelectedSide()).equals(WhichEnd.A);
+    });
   });
 });
 
