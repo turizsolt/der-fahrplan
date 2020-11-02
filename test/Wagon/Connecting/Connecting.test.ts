@@ -18,85 +18,82 @@ describe('WagonConnect and Control', () => {
   describe('single wagon', () => {
     it('single passenger wagon - cannot be controlled', () => {
       const [pass]: Wagon[] = buildTrain(W.Pass);
-      expect(pass.getSelectedSide()).equals(null);
+      expectTrainSide(pass, null);
+
       pass.select();
+      expectTrainSide(pass, null, pass);
+
       pass.swapSelectedSide();
-      expect(pass.getSelectedSide()).equals(null);
+      expectTrainSide(pass, null, pass);
     });
 
     it('single controller wagon - can be controlled only on A side', () => {
       const [cont]: Wagon[] = buildTrain(W.Cont);
-      expect(cont.getSelectedSide()).equals(null);
+      expectTrainSide(cont, null);
+
       cont.select();
-      expect(cont.getSelectedSide()).equals(WhichEnd.A);
+      expectTrainSide(cont, A, cont);
+
       cont.swapSelectedSide();
-      expect(cont.getSelectedSide()).equals(WhichEnd.A);
+      expectTrainSide(cont, A, cont);
+
       cont.swapSelectedSide();
-      expect(cont.getSelectedSide()).equals(WhichEnd.A);
+      expectTrainSide(cont, A, cont);
     });
 
     it('single locomotive wagon - can be controlled', () => {
       const [loco]: Wagon[] = buildTrain(W.Loco);
-      expect(loco.getSelectedSide()).equals(null);
+      expectTrainSide(loco, null);
+
       loco.select();
-      expect(loco.getSelectedSide()).equals(WhichEnd.A);
+      expectTrainSide(loco, A, loco);
+
       loco.swapSelectedSide();
-      expect(loco.getSelectedSide()).equals(WhichEnd.B);
+      expectTrainSide(loco, B, loco);
+
       loco.swapSelectedSide();
-      expect(loco.getSelectedSide()).equals(WhichEnd.A);
+      expectTrainSide(loco, A, loco);
     });
   });
 
   describe('two wagons', () => {
     it("loco and pass - can select loco's A", () => {
       const [loco, pass]: Wagon[] = buildTrain(W.Loco, W.Pass);
-      expect(loco.getSelectedSide()).equals(null);
-      expect(pass.getSelectedSide()).equals(null);
+      expectTrainSides([loco, pass], [null, null]);
 
       loco.select();
-      expect(loco.getSelectedSide()).equals(WhichEnd.A);
-      expect(pass.getSelectedSide()).equals(null);
-      expect(store.getSelected().getId()).equals(loco.getId());
+      expectTrainSides([loco, pass], [A, null], loco);
 
       loco.swapSelectedSide();
-      expect(loco.getSelectedSide()).equals(WhichEnd.A);
-      expect(pass.getSelectedSide()).equals(null);
-      expect(store.getSelected().getId()).equals(loco.getId());
+      expectTrainSides([loco, pass], [A, null], loco);
     });
 
     it('loco and loco AB - can select both ends', () => {
       const [locoA, locoB]: Wagon[] = buildTrain(W.Loco, W.Loco);
-      expect(locoA.getSelectedSide()).equals(null);
-      expect(locoB.getSelectedSide()).equals(null);
+      expectTrainSides([locoA, locoB], [null, null]);
 
       locoA.select();
-      expect(locoA.getSelectedSide()).equals(WhichEnd.A);
-      expect(locoB.getSelectedSide()).equals(null);
-      expect(store.getSelected().getId()).equals(locoA.getId());
+      expectTrainSides([locoA, locoB], [A, null], locoA);
 
       locoA.swapSelectedSide();
-      expect(locoA.getSelectedSide()).equals(WhichEnd.A);
-      expect(locoB.getSelectedSide()).equals(WhichEnd.B);
-      expect(store.getSelected().getId()).equals(locoB.getId());
+      expectTrainSides([locoA, locoB], [A, B], locoB);
     });
 
     it('loco and loco BA - can select both ends', () => {
       const [locoA, locoB]: Wagon[] = buildTrain(W.Loco, W.Loco);
-      expect(locoA.getSelectedSide()).equals(null);
-      expect(locoB.getSelectedSide()).equals(null);
+      expectTrainSides([locoA, locoB], [null, null]);
 
       locoB.select();
-      expect(locoA.getSelectedSide()).equals(null);
-      expect(locoB.getSelectedSide()).equals(WhichEnd.B);
-      expect(store.getSelected().getId()).equals(locoB.getId());
+      expectTrainSides([locoA, locoB], [null, B], locoB);
 
       locoB.swapSelectedSide();
-      expect(locoA.getSelectedSide()).equals(WhichEnd.A);
-      expect(locoB.getSelectedSide()).equals(WhichEnd.B);
-      expect(store.getSelected().getId()).equals(locoA.getId());
+      expectTrainSides([locoA, locoB], [A, B], locoA);
     });
   });
 });
+
+const A = WhichEnd.A;
+const B = WhichEnd.B;
 
 enum W {
   Loco = 'locomotive',
@@ -117,4 +114,30 @@ function buildTrain(...wagonStrings: string[]): Wagon[] {
   }
 
   return returnedWagons;
+}
+
+function expectTrainSides(
+  wagons: Wagon[],
+  sides: WhichEnd[],
+  selected?: Wagon
+) {
+  for (let i = 0; i < wagons.length; i++) {
+    expect(wagons[i].getSelectedSide()).equals(sides[i]);
+  }
+  expectTrainSelected(selected);
+}
+
+function expectTrainSide(wagon: Wagon, side: WhichEnd, selected?: Wagon) {
+  expect(wagon.getSelectedSide()).equals(side);
+  expectTrainSelected(selected);
+}
+
+function expectTrainSelected(selected?: Wagon) {
+  if (selected !== undefined) {
+    if (selected) {
+      expect(store.getSelected().getId()).equals(selected.getId());
+    } else {
+      expect(store.getSelected()).equals(null);
+    }
+  }
 }
