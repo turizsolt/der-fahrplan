@@ -46,6 +46,7 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   getCenterRay(): Ray;
 
   putOnTrack(track: Track, position?: number, direction?: number): void;
+  moveTowardsWagon(whichEnd: WhichEnd, distance: number): void;
   moveTowardsWagonB(distance: number): void;
   moveTowardsWagonA(distance: number): void;
   stop(): void;

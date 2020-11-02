@@ -43,14 +43,14 @@ export default class WagonSpeed {
 
   shountForward(): void {
     if (this.canAccelerate() && this.speed === 0) {
-      this.speed = 1;
+      this.speed = this.accelerateBy;
       this.shunting = true;
     }
   }
 
   shountBackward(): void {
     if (this.canAccelerate() && this.speed === 0) {
-      this.speed = -1;
+      this.speed = -this.accelerateBy;
       this.shunting = true;
     }
   }

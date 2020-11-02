@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { PositionOnTrack } from '../Track/PositionOnTrack';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { WhichEnd } from '../../Interfaces/WhichEnd';
+import { WhichEnd, otherEnd } from '../../Interfaces/WhichEnd';
 import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
 import { Ray } from '../../Geometry/Ray';
 import { TYPES } from '../../../di/TYPES';
@@ -34,6 +34,7 @@ import { WagonControlLocomotive } from './WagonControl/WagonControlLocomotive';
 import { WagonControlControlCar } from './WagonControl/WagonControlControlCar';
 import { WagonControlNothing } from './WagonControl/WagonControlNothing';
 import WagonSpeedPassenger from './WagonSpeedPassenger';
+import { WagonMovingState } from './WagonMovingState';
 
 export interface ActualWagon extends Updatable {}
 const doApply = () => applyMixins(ActualWagon, [Updatable]);
@@ -96,6 +97,14 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return end.getEndOf();
   }
 
+  private getLastWagonEnd(whichEnd: WhichEnd): WagonEnd {
+    let end = this.getEnd(whichEnd);
+    while (end.hasConnectedEndOf()) {
+      end = end.getConnectedEnd().getOppositeEnd();
+    }
+    return end;
+  }
+
   setControlingWagon(wagon: Wagon): void {
     this.getTrain().setControlingWagon(wagon);
   }
@@ -126,11 +135,23 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   tick(): void {
     this.speed.tick();
-    if (this.getSpeed() != 0) {
-      if (this.getSelectedSide() === WhichEnd.A) {
-        this.moveTowardsWagonA(this.getSpeed());
-      } else if (this.getSelectedSide() === WhichEnd.B) {
-        this.moveTowardsWagonB(this.getSpeed());
+    if (this.getSpeed() !== 0) {
+      if (this.speed.getMovingState() === WagonMovingState.Shunting) {
+        const whichEnd = this.getSelectedSide() || WhichEnd.A;
+        const shuntingTo = this.getSpeed() < 0 ? otherEnd(whichEnd) : whichEnd;
+        const headingWagonEnd = this.getLastWagonEnd(shuntingTo);
+        const headingWagon = headingWagonEnd.getEndOf();
+        const headingWhichEnd = headingWagonEnd.getWhichEnd();
+        headingWagon.moveTowardsWagon(
+          headingWhichEnd,
+          Math.abs(this.getSpeed())
+        );
+      } else {
+        if (this.getSelectedSide() === WhichEnd.A) {
+          this.moveTowardsWagonA(this.getSpeed());
+        } else if (this.getSelectedSide() === WhichEnd.B) {
+          this.moveTowardsWagonB(this.getSpeed());
+        }
       }
     } else {
       this.update();
@@ -328,6 +349,14 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   getRay(): Ray {
     return this.position.getRay();
+  }
+
+  moveTowardsWagon(whichEnd: WhichEnd, distance: number): void {
+    if (whichEnd === WhichEnd.A) {
+      this.moveTowardsWagonA(distance);
+    } else if (whichEnd === WhichEnd.B) {
+      this.moveTowardsWagonB(distance);
+    }
   }
 
   moveTowardsWagonB(distance: number): void {
