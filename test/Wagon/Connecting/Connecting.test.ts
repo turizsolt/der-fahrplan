@@ -101,6 +101,9 @@ describe('WagonConnect and Control', () => {
 
       loco.swapSelectedSide();
       expectTrainSides([loco, cont], [A, A], cont);
+
+      cont.swapSelectedSide();
+      expectTrainSides([loco, cont], [A, A], loco);
     });
   });
 });

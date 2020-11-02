@@ -4,9 +4,9 @@ import { WagonControl } from './WagonControl';
 import { WagonControlType } from './WagonControlType';
 
 export class WagonControlLocomotive implements WagonControl {
-  private selectedSide: WhichEnd | null = null;
+  protected selectedSide: WhichEnd | null = null;
 
-  constructor(private wagon: Wagon) {}
+  constructor(protected wagon: Wagon) {}
 
   getControlType(): WagonControlType {
     return WagonControlType.Locomotive;
@@ -35,17 +35,18 @@ export class WagonControlLocomotive implements WagonControl {
       } else {
         this.selectOtherEnd();
       }
+      this.wagon.update();
     } else if (this.selectedSide === WhichEnd.B) {
       if (this.wagon.isAFree()) {
         this.selectedSide = WhichEnd.A;
       } else {
         this.selectOtherEnd();
       }
+      this.wagon.update();
     }
-    this.wagon.update();
   }
 
-  private selectOtherEnd(): void {
+  protected selectOtherEnd(): void {
     this.wagon
       .getTrain()
       .getWagons()

@@ -1,19 +1,10 @@
 import { WhichEnd } from '../../../Interfaces/WhichEnd';
-import { Wagon } from '../../../Interfaces/Wagon';
-import { WagonControl } from './WagonControl';
 import { WagonControlType } from './WagonControlType';
+import { WagonControlLocomotive } from './WagonControlLocomotive';
 
-export class WagonControlControlCar implements WagonControl {
-  private selectedSide: WhichEnd | null = null;
-
-  constructor(private wagon: Wagon) {}
-
+export class WagonControlControlCar extends WagonControlLocomotive {
   getControlType(): WagonControlType {
     return WagonControlType.ControlCar;
-  }
-
-  getSelectedSide(): WhichEnd | null {
-    return this.selectedSide;
   }
 
   onSelected(selected: boolean): void {
@@ -26,7 +17,12 @@ export class WagonControlControlCar implements WagonControl {
     }
   }
 
-  swapSelectedSide(): void {}
+  swapSelectedSide(): void {
+    if (this.selectedSide === WhichEnd.A) {
+      this.selectOtherEnd();
+      this.wagon.update();
+    }
+  }
 
   onStocked(): void {
     if (this.selectedSide === WhichEnd.A && !this.wagon.isAFree()) {
