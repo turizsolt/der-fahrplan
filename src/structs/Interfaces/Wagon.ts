@@ -77,6 +77,8 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   shuntBackward(): void;
 
   setControlingWagon(wagon: Wagon): void;
+  clearControlingWagon(): void;
+  canThisWagonControl(): boolean;
 }
 
 export interface NearestWagon {

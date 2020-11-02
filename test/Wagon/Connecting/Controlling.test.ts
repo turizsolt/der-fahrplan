@@ -36,4 +36,13 @@ describe('WagonControlling', () => {
     expect(train.getControlingWagon().getId()).equals(loco3.getId());
     loco3.break();
   });
+
+  step('cannot control the speed, when somebody also controls', () => {
+    loco3.accelerate();
+    loco4.accelerate();
+    expect(train.getControlingWagon().getId()).equals(loco3.getId());
+    expect(loco4.getSpeed()).equals(0);
+    loco3.break();
+    expect(train.getControlingWagon()).equals(null);
+  });
 });

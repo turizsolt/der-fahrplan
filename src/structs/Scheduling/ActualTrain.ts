@@ -152,7 +152,13 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   setControlingWagon(wagon: Wagon): void {
-    this.controlingWagon = wagon;
+    if (!this.controlingWagon) {
+      this.controlingWagon = wagon;
+    }
+  }
+
+  clearControlingWagon(): void {
+    this.controlingWagon = null;
   }
 
   persist(): Object {

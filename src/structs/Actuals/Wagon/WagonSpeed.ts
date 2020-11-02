@@ -32,10 +32,11 @@ export default class WagonSpeed {
   }
 
   break(): void {
-    if (this.speed > 0) {
+    if (this.speed > this.accelerateBy) {
       this.speed -= this.accelerateBy;
     } else {
       this.speed = 0;
+      this.wagon.clearControlingWagon();
     }
     this.shunting = false;
   }
@@ -69,7 +70,11 @@ export default class WagonSpeed {
   }
 
   private canAccelerate(): boolean {
-    return !this.emergencyBreakApplied && !this.shunting;
+    return (
+      !this.emergencyBreakApplied &&
+      !this.shunting &&
+      this.wagon.canThisWagonControl()
+    );
   }
 
   getMovingState(): WagonMovingState {
