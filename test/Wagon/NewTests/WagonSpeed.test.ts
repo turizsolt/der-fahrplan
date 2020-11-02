@@ -100,6 +100,14 @@ describe('WagonSpeedControl', () => {
     expect(control.getSpeed()).equals(1);
   });
 
+  it('cannot accelerate on shunting', () => {
+    const control: WagonSpeed = new WagonSpeed(2, 1);
+    control.shountForward();
+    expect(control.getSpeed()).equals(1);
+    control.accelerate();
+    expect(control.getSpeed()).equals(1);
+  });
+
   describe('movingState', () => {
     it('standing - when there is no moving', () => {
       const control: WagonSpeed = new WagonSpeed(2, 1);

@@ -66,7 +66,7 @@ export default class WagonSpeed {
   }
 
   private canAccelerate(): boolean {
-    return !this.emergencyBreakApplied;
+    return !this.emergencyBreakApplied && !this.shunting;
   }
 
   getMovingState(): WagonMovingState {
