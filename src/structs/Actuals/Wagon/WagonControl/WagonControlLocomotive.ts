@@ -53,7 +53,7 @@ export class WagonControlLocomotive implements WagonControl {
         if (
           wagon !== this.wagon &&
           wagon.isOneFree() &&
-          wagon.getControlType() === WagonControlType.Locomotive
+          wagon.getControlType() !== WagonControlType.Nothing
         ) {
           wagon.select();
         }

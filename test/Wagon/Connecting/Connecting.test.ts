@@ -89,6 +89,19 @@ describe('WagonConnect and Control', () => {
       locoB.swapSelectedSide();
       expectTrainSides([locoA, locoB], [A, B], locoA);
     });
+
+    it('loco and cont-good-side - can select both', () => {
+      const [loco, cont]: Wagon[] = buildTrain(W.Loco, W.Cont);
+      loco.getB().disconnect();
+      loco.getB().connect(cont.getB());
+      expectTrainSides([loco, cont], [null, null]);
+
+      loco.select();
+      expectTrainSides([loco, cont], [A, null], loco);
+
+      loco.swapSelectedSide();
+      expectTrainSides([loco, cont], [A, A], cont);
+    });
   });
 });
 
@@ -122,7 +135,10 @@ function expectTrainSides(
   selected?: Wagon
 ) {
   for (let i = 0; i < wagons.length; i++) {
-    expect(wagons[i].getSelectedSide()).equals(sides[i]);
+    expect(wagons[i].getSelectedSide()).equals(
+      sides[i],
+      'offset ' + i.toString()
+    );
   }
   expectTrainSelected(selected);
 }
