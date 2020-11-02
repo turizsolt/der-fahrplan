@@ -58,7 +58,11 @@ const library: { [id: string]: WagonConfig } = {
   utas,
   mot,
   vez,
-  wagon
+  wagon,
+  locomotive: wagon,
+  passenger: utas,
+  controlCar: vez,
+  combined: mot
 };
 
 export const getPredefinedWagonConfig = (id: string): WagonConfig => {
