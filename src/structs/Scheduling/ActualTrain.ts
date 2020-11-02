@@ -146,6 +146,10 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     );
   }
 
+  getControlingWagon(): Wagon {
+    return null;
+  }
+
   persist(): Object {
     return {
       id: this.id,

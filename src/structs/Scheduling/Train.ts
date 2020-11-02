@@ -20,4 +20,5 @@ export interface Train extends BaseStorable {
   separateThese(wagons: Wagon[]): void;
   moveBoardedPassengers(): void;
   hasLocomotive(): boolean;
+  getControlingWagon(): Wagon;
 }
