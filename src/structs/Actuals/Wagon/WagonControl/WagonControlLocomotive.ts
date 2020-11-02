@@ -51,12 +51,15 @@ export class WagonControlLocomotive implements WagonControl {
       .getTrain()
       .getWagons()
       .map(wagon => {
-        if (
-          wagon !== this.wagon &&
-          wagon.isOneFree() &&
-          wagon.getControlType() !== WagonControlType.Nothing
-        ) {
-          wagon.select();
+        if (wagon !== this.wagon && wagon.isOneFree()) {
+          if (wagon.getControlType() === WagonControlType.Locomotive) {
+            wagon.select();
+          } else if (
+            wagon.getControlType() === WagonControlType.ControlCar &&
+            wagon.isAFree()
+          ) {
+            wagon.select();
+          }
         }
       });
   }
