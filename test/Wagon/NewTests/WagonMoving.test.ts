@@ -32,6 +32,6 @@ describe('Wagon moving', () => {
     wagon.tick();
     console.log(wagon.getRay().coord.x, wagon.getSpeed());
 
-    expect(wagon.getRay().coord.x).equals(1);
+    expect(wagon.getRay().coord.x).almost.equals(5.5);
   });
 });
