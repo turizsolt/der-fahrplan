@@ -90,20 +90,18 @@ describe('WagonConnect and Control', () => {
       expectTrainSides([locoA, locoB], [A, B], locoA);
     });
 
-    it('loco and cont-good-side - can select both', () => {
-      const [loco, cont]: Wagon[] = buildTrain(W.Loco, W.Cont);
-      loco.getB().disconnect();
-      loco.getB().connect(cont.getB());
-      expectTrainSides([loco, cont], [null, null]);
+    it('cont-good-side and loco - can select both', () => {
+      const [cont, loco]: Wagon[] = buildTrain(W.Cont, W.Loco);
+      expectTrainSides([cont, loco], [null, null]);
 
       loco.select();
-      expectTrainSides([loco, cont], [A, null], loco);
+      expectTrainSides([cont, loco], [null, B], loco);
 
       loco.swapSelectedSide();
-      expectTrainSides([loco, cont], [A, A], cont);
+      expectTrainSides([cont, loco], [A, B], cont);
 
       cont.swapSelectedSide();
-      expectTrainSides([loco, cont], [A, A], loco);
+      expectTrainSides([cont, loco], [A, B], loco);
     });
 
     it('loco and cont-bad-side - can select only loco', () => {
