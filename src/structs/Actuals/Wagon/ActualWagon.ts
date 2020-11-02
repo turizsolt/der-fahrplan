@@ -100,6 +100,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.getTrain().setControlingWagon(wagon);
   }
 
+  getControlingWagon(): Wagon {
+    return this.getTrain().getControlingWagon();
+  }
+
   clearControlingWagon(): void {
     this.getTrain().clearControlingWagon();
   }

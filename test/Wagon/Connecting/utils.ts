@@ -8,7 +8,7 @@ import { getPredefinedWagonConfig } from '../../../src/structs/Actuals/Wagon/Act
 import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
 chai.use(chaiAlmost());
 
-const store: Store = testContainer
+export const store: Store = testContainer
   .get<() => Store>(TYPES.FactoryOfStore)()
   .init();
 store.clear();

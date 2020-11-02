@@ -29,6 +29,8 @@ export class WagonControlLocomotive implements WagonControl {
   }
 
   swapSelectedSide(): void {
+    if (!!this.wagon.getControlingWagon()) return;
+
     if (this.selectedSide === WhichEnd.A) {
       if (this.wagon.isBFree()) {
         this.selectedSide = WhichEnd.B;

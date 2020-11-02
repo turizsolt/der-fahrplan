@@ -18,6 +18,8 @@ export class WagonControlControlCar extends WagonControlLocomotive {
   }
 
   swapSelectedSide(): void {
+    if (!!this.wagon.getControlingWagon()) return;
+
     this.selectOtherEnd();
     this.wagon.update();
   }

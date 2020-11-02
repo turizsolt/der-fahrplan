@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import { Wagon } from '../../../src/structs/Interfaces/Wagon';
-import { buildTrain, W } from './utils';
+import { buildTrain, W, store } from './utils';
 chai.use(chaiAlmost());
 
 describe('WagonControlling', () => {
@@ -44,5 +44,21 @@ describe('WagonControlling', () => {
     expect(loco4.getSpeed()).equals(0);
     loco3.break();
     expect(train.getControlingWagon()).equals(null);
+  });
+
+  step('cannot swap when controling speed (loco)', () => {
+    loco3.accelerate();
+    loco3.select();
+    loco3.swapSelectedSide();
+    expect(store.getSelected().getId()).equals(loco3.getId());
+    loco3.break();
+  });
+
+  step('cannot swap when controling speed (cont)', () => {
+    cont1.accelerate();
+    cont1.select();
+    cont1.swapSelectedSide();
+    expect(store.getSelected().getId()).equals(cont1.getId());
+    cont1.break();
   });
 });
