@@ -78,6 +78,14 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this;
   }
 
+  getLastWagon(whichEnd: WhichEnd): Wagon {
+    let end = this.getEnd(whichEnd);
+    while (end.hasConnectedEndOf()) {
+      end = end.getConnectedEnd().getOppositeEnd();
+    }
+    return end.getEndOf();
+  }
+
   reverseTrip(): void {
     const trip = this.getTrip();
     if (trip && trip.getReverse()) {

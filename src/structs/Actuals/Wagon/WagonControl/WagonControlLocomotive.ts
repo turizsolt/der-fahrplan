@@ -48,22 +48,46 @@ export class WagonControlLocomotive implements WagonControl {
   }
 
   protected selectOtherEnd(): void {
-    this.wagon
-      .getTrain()
-      .getWagons()
-      .map(wagon => {
-        if (wagon !== this.wagon) {
-          if (wagon.getControlType() === WagonControlType.Locomotive) {
-            wagon.select();
-          } else if (
-            wagon.getControlType() === WagonControlType.ControlCar &&
-            wagon.isAFree() &&
-            wagon.getTrain().hasLocomotive()
-          ) {
-            wagon.select();
-          }
+    let candidate: Wagon = null;
+    if (!this.wagon.isAFree()) {
+      const wagon = this.wagon.getLastWagon(WhichEnd.A);
+      if (this.isWagonSelectable(wagon)) {
+        candidate = wagon;
+      }
+    }
+    if (!candidate && !this.wagon.isBFree()) {
+      const wagon = this.wagon.getLastWagon(WhichEnd.B);
+      if (this.isWagonSelectable(wagon)) {
+        candidate = wagon;
+      }
+    }
+    if (!candidate) {
+      for (let wagon of this.wagon.getTrain().getWagons()) {
+        if (this.isWagonSelectable(wagon)) {
+          candidate = wagon;
+          break;
         }
-      });
+      }
+    }
+
+    if (candidate) {
+      candidate.select();
+    }
+  }
+
+  protected isWagonSelectable(wagon: Wagon): boolean {
+    if (wagon === this.wagon) return false;
+
+    if (wagon.getControlType() === WagonControlType.Locomotive) {
+      return true;
+    } else if (
+      wagon.getControlType() === WagonControlType.ControlCar &&
+      wagon.isAFree() &&
+      wagon.getTrain().hasLocomotive()
+    ) {
+      return true;
+    }
+    return false;
   }
 
   onStocked(): void {

@@ -33,6 +33,7 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   swapSelectedSide(): void;
   accelerate(): void;
   break(): void;
+  getLastWagon(whichEnd: WhichEnd): Wagon;
 
   getMaxSpeed(): number;
   getAccelerateBy(): number;

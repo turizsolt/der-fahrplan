@@ -149,6 +149,25 @@ describe('WagonConnect and Control', () => {
       cont.swapSelectedSide();
       expectTrainSides([cont, loco, pass], [A, null, null], loco);
     });
+
+    it('cont loco cont - can select both ends', () => {
+      const [cont, loco, cont2]: Wagon[] = buildTrain(W.Cont, W.Loco, W.Cont);
+      loco.getB().disconnect();
+      loco.getB().connect(cont2.getB());
+      expectTrainSides([cont, loco, cont2], [null, null, null]);
+
+      loco.select();
+      expectTrainSides([cont, loco, cont2], [null, null, null], loco);
+
+      loco.swapSelectedSide();
+      expectTrainSides([cont, loco, cont2], [A, null, null], cont);
+
+      cont.swapSelectedSide();
+      expectTrainSides([cont, loco, cont2], [A, null, A], cont2);
+
+      cont2.swapSelectedSide();
+      expectTrainSides([cont, loco, cont2], [A, null, A], cont);
+    });
   });
 });
 
