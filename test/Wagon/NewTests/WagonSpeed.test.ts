@@ -118,5 +118,24 @@ describe('WagonSpeedControl', () => {
       control.break();
       expect(control.getMovingState()).equals(WagonMovingState.Standing);
     });
+
+    it('shunting - when there is shunting forward', () => {
+      const control: WagonSpeed = new WagonSpeed(2, 1);
+      control.shountForward();
+      expect(control.getMovingState()).equals(WagonMovingState.Shunting);
+    });
+
+    it('shunting - when there is shunting backward', () => {
+      const control: WagonSpeed = new WagonSpeed(2, 1);
+      control.shountBackward();
+      expect(control.getMovingState()).equals(WagonMovingState.Shunting);
+    });
+
+    it('shunting - when stopped after shunting', () => {
+      const control: WagonSpeed = new WagonSpeed(2, 1);
+      control.shountBackward();
+      control.break();
+      expect(control.getMovingState()).equals(WagonMovingState.Standing);
+    });
   });
 });

@@ -3,6 +3,7 @@ import { WagonMovingState } from './WagonMovingState';
 export default class WagonSpeed {
   private speed: number = 0;
   private emergencyBreakApplied: boolean = false;
+  private shunting: boolean = false;
 
   constructor(
     private maxSpeed: number = 3,
@@ -33,17 +34,20 @@ export default class WagonSpeed {
     } else {
       this.speed = 0;
     }
+    this.shunting = false;
   }
 
   shountForward(): void {
     if (this.canAccelerate() && this.speed === 0) {
       this.speed = 1;
+      this.shunting = true;
     }
   }
 
   shountBackward(): void {
     if (this.canAccelerate() && this.speed === 0) {
       this.speed = -1;
+      this.shunting = true;
     }
   }
 
@@ -66,6 +70,10 @@ export default class WagonSpeed {
   }
 
   getMovingState(): WagonMovingState {
-    return this.speed > 0 ? WagonMovingState.Moving : WagonMovingState.Standing;
+    return this.shunting
+      ? WagonMovingState.Shunting
+      : this.speed > 0
+      ? WagonMovingState.Moving
+      : WagonMovingState.Standing;
   }
 }
