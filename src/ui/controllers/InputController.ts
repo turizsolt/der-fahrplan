@@ -559,22 +559,9 @@ export class InputController {
     switch (key) {
       case 'ArrowRight':
         if (this.getSelected().getType() === TYPES.Wagon) {
-          const sel = this.getSelected() as ActualWagon;
-          if (!sel.isOneFree()) {
-            this.getSelectedBrick()
-              .getRenderer()
-              .process('swapSide');
-          } else {
-            // van-e helyette mas
-            sel
-              .getTrain()
-              .getWagons()
-              .map(wagon => {
-                if (wagon !== sel && wagon.isOneFree()) {
-                  this.select(wagon);
-                }
-              });
-          }
+          this.getSelectedBrick()
+            .getRenderer()
+            .process('swapSide');
         }
         break;
 

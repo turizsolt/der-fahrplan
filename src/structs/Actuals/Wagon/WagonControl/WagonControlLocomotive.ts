@@ -29,13 +29,31 @@ export class WagonControlLocomotive implements WagonControl {
   }
 
   swapSelectedSide(): void {
-    if (this.selectedSide === WhichEnd.A && this.wagon.isBFree()) {
-      this.selectedSide = WhichEnd.B;
-      this.wagon.update();
+    if (this.selectedSide === WhichEnd.A) {
+      if (this.wagon.isBFree()) {
+        this.selectedSide = WhichEnd.B;
+      } else {
+        this.selectOtherEnd();
+      }
     } else if (this.selectedSide === WhichEnd.B && this.wagon.isAFree()) {
       this.selectedSide = WhichEnd.A;
-      this.wagon.update();
     }
+    this.wagon.update();
+  }
+
+  private selectOtherEnd(): void {
+    this.wagon
+      .getTrain()
+      .getWagons()
+      .map(wagon => {
+        if (
+          wagon !== this.wagon &&
+          wagon.isOneFree() &&
+          wagon.getControlType() === WagonControlType.Locomotive
+        ) {
+          wagon.select();
+        }
+      });
   }
 
   onStocked(): void {

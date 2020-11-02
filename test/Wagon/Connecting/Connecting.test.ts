@@ -56,12 +56,28 @@ describe('WagonConnect and Control', () => {
       loco.select();
       expect(loco.getSelectedSide()).equals(WhichEnd.A);
       expect(pass.getSelectedSide()).equals(null);
-      expect(store.getSelected()).equals(loco);
+      expect(store.getSelected().getId()).equals(loco.getId());
 
       loco.swapSelectedSide();
       expect(loco.getSelectedSide()).equals(WhichEnd.A);
       expect(pass.getSelectedSide()).equals(null);
-      expect(store.getSelected()).equals(loco);
+      expect(store.getSelected().getId()).equals(loco.getId());
+    });
+
+    it('loco and loco AB - can select both ends', () => {
+      const [locoA, locoB]: Wagon[] = buildTrain(W.Loco, W.Loco);
+      expect(locoA.getSelectedSide()).equals(null);
+      expect(locoB.getSelectedSide()).equals(null);
+
+      locoA.select();
+      expect(locoA.getSelectedSide()).equals(WhichEnd.A);
+      expect(locoB.getSelectedSide()).equals(null);
+      expect(store.getSelected().getId()).equals(locoA.getId());
+
+      locoA.swapSelectedSide();
+      expect(locoA.getSelectedSide()).equals(WhichEnd.A);
+      expect(locoB.getSelectedSide()).equals(WhichEnd.B);
+      expect(store.getSelected().getId()).equals(locoB.getId());
     });
   });
 });
