@@ -18,10 +18,8 @@ export class WagonControlControlCar extends WagonControlLocomotive {
   }
 
   swapSelectedSide(): void {
-    if (this.selectedSide === WhichEnd.A) {
-      this.selectOtherEnd();
-      this.wagon.update();
-    }
+    this.selectOtherEnd();
+    this.wagon.update();
   }
 
   onStocked(): void {
