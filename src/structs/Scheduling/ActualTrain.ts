@@ -7,7 +7,7 @@ import { Route } from './Route';
 import { Platform } from '../Interfaces/Platform';
 import { Station } from './Station';
 import { Passenger } from '../Interfaces/Passenger';
-import { BaseStorable } from '../Interfaces/BaseStorable';
+import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private wagons: Wagon[];
@@ -136,6 +136,14 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       }
     }
     return null;
+  }
+
+  hasLocomotive(): boolean {
+    return (
+      this.wagons.filter(
+        x => x.getControlType() === WagonControlType.Locomotive
+      ).length > 0
+    );
   }
 
   persist(): Object {

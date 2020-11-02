@@ -9,7 +9,7 @@ export class WagonControlControlCar extends WagonControlLocomotive {
 
   onSelected(selected: boolean): void {
     if (selected && this.selectedSide === null) {
-      if (this.wagon.isAFree()) {
+      if (this.wagon.isAFree() && this.wagon.getTrain().hasLocomotive()) {
         this.selectedSide = WhichEnd.A;
       } else {
         this.selectedSide = null;

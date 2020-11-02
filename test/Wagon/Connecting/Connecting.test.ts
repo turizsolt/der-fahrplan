@@ -27,18 +27,15 @@ describe('WagonConnect and Control', () => {
       expectTrainSide(pass, null, pass);
     });
 
-    it('single controller wagon - can be controlled only on A side', () => {
+    it('single controller wagon - cannot be controlled', () => {
       const [cont]: Wagon[] = buildTrain(W.Cont);
       expectTrainSide(cont, null);
 
       cont.select();
-      expectTrainSide(cont, A, cont);
+      expectTrainSide(cont, null, cont);
 
       cont.swapSelectedSide();
-      expectTrainSide(cont, A, cont);
-
-      cont.swapSelectedSide();
-      expectTrainSide(cont, A, cont);
+      expectTrainSide(cont, null, cont);
     });
 
     it('single locomotive wagon - can be controlled', () => {
@@ -115,15 +112,15 @@ describe('WagonConnect and Control', () => {
       expectTrainSides([loco, cont], [A, null], loco);
     });
 
-    it('cont-good-side and pass - can select cont only', () => {
+    it('cont-good-side (without loco) and pass - cannot select', () => {
       const [cont, pass]: Wagon[] = buildTrain(W.Cont, W.Pass);
       expectTrainSides([cont, pass], [null, null]);
 
       cont.select();
-      expectTrainSides([cont, pass], [A, null], cont);
+      expectTrainSides([cont, pass], [null, null], cont);
 
       cont.swapSelectedSide();
-      expectTrainSides([cont, pass], [A, null], cont);
+      expectTrainSides([cont, pass], [null, null], cont);
     });
 
     it('pass and cont-bad-side - can select nothing', () => {

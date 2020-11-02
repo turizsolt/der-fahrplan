@@ -56,7 +56,8 @@ export class WagonControlLocomotive implements WagonControl {
             wagon.select();
           } else if (
             wagon.getControlType() === WagonControlType.ControlCar &&
-            wagon.isAFree()
+            wagon.isAFree() &&
+            wagon.getTrain().hasLocomotive()
           ) {
             wagon.select();
           }
