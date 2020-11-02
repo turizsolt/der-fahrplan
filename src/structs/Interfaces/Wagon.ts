@@ -15,6 +15,7 @@ import { WagonConfig } from '../Actuals/Wagon/WagonConfig';
 import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
 import { PassengerArrangement } from '../../mixins/BoardableWagon';
 import { WagonConnectable } from '../Actuals/Wagon/WagonConnectable';
+import { WagonMovingState } from '../Actuals/Wagon/WagonMovingState';
 
 export interface Wagon extends Boardable, BaseBrick, Updatable {
   init(config?: WagonConfig): Wagon;
@@ -83,6 +84,7 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   canThisWagonControl(): boolean;
 
   disconnect(whichEnd: WhichEnd): void;
+  getMovingState(): WagonMovingState;
 }
 
 export interface NearestWagon {
