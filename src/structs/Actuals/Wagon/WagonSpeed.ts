@@ -1,3 +1,5 @@
+import { WagonMovingState } from './WagonMovingState';
+
 export default class WagonSpeed {
   private speed: number = 0;
   private emergencyBreakApplied: boolean = false;
@@ -61,5 +63,9 @@ export default class WagonSpeed {
 
   private canAccelerate(): boolean {
     return !this.emergencyBreakApplied;
+  }
+
+  getMovingState(): WagonMovingState {
+    return WagonMovingState.Standing;
   }
 }

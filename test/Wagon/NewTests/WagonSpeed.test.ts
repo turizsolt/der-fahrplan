@@ -1,6 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import WagonSpeed from '../../../src/structs/Actuals/Wagon/WagonSpeed';
+import { WagonMovingState } from '../../../src/structs/Actuals/Wagon/WagonMovingState';
 chai.use(chaiAlmost());
 
 describe('WagonSpeedControl', () => {
@@ -97,5 +98,12 @@ describe('WagonSpeedControl', () => {
     control.releaseEmergencyBreak();
     control.accelerate();
     expect(control.getSpeed()).equals(1);
+  });
+
+  describe('movingState', () => {
+    it('standing - when there is no moving', () => {
+      const control: WagonSpeed = new WagonSpeed(2, 1);
+      expect(control.getMovingState()).equals(WagonMovingState.Standing);
+    });
   });
 });
