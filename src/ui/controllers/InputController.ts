@@ -616,6 +616,12 @@ export class InputController {
       case 'V':
         this.getSelectedBrick()
           .getRenderer()
+          .process('backward');
+        break;
+
+      case 'B':
+        this.getSelectedBrick()
+          .getRenderer()
           .process('shuntBackward');
         break;
     }
