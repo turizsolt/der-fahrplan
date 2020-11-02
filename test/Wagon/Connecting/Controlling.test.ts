@@ -18,4 +18,9 @@ describe('WagonControlling', () => {
   step('initially no wagon controls the train', () => {
     expect(train.getControlingWagon()).equals(null);
   });
+
+  step('passenger should not control the speed', () => {
+    pass2.accelerate();
+    expect(train.getControlingWagon()).equals(null);
+  });
 });
