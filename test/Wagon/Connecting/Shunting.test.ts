@@ -65,4 +65,18 @@ describe('WagonShunting', () => {
     expect(perc(loco5.getB())).almost(0.84);
     loco3.break();
   });
+
+  step('shunting forward, then backward with the middle loco', () => {
+    loco3.select();
+    loco3.shuntForward();
+    loco3.tick();
+    loco3.shuntBackward();
+    loco3.tick();
+
+    expect(perc(cont1.getA())).almost(0.1);
+    expect(perc(cont1.getB())).almost(0.24);
+    expect(perc(loco5.getA())).almost(0.7);
+    expect(perc(loco5.getB())).almost(0.84);
+    loco3.break();
+  });
 });

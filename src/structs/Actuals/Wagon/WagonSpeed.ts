@@ -42,14 +42,14 @@ export default class WagonSpeed {
   }
 
   shountForward(): void {
-    if (this.canAccelerate() && this.speed === 0) {
+    if (this.canShunt()) {
       this.speed = this.accelerateBy;
       this.shunting = true;
     }
   }
 
   shountBackward(): void {
-    if (this.canAccelerate() && this.speed === 0) {
+    if (this.canShunt()) {
       this.speed = -this.accelerateBy;
       this.shunting = true;
     }
@@ -74,6 +74,14 @@ export default class WagonSpeed {
       !this.emergencyBreakApplied &&
       !this.shunting &&
       this.wagon.canThisWagonControl()
+    );
+  }
+
+  private canShunt(): boolean {
+    return (
+      !this.emergencyBreakApplied &&
+      this.wagon.canThisWagonControl() &&
+      (this.speed === 0 || this.shunting)
     );
   }
 
