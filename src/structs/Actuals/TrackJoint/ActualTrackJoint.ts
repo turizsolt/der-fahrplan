@@ -18,7 +18,6 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   private ray: Ray;
   private removed: boolean = false;
   private ends: Record<WhichEnd, TrackJointEnd>;
-  private selected: boolean = false;
 
   @inject(TYPES.TrackJointRenderer) private renderer: TrackJointRenderer;
   @inject(TYPES.FactoryOfTrackJointConnector)
@@ -134,20 +133,6 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
 
   isRemoved(): boolean {
     return this.removed;
-  }
-
-  select(): void {
-    this.selected = true;
-    this.renderer.update();
-  }
-
-  deselect(): void {
-    this.selected = false;
-    this.renderer.update();
-  }
-
-  isSelected(): boolean {
-    return this.selected;
   }
 
   verbose(): void {

@@ -12,4 +12,8 @@ export interface Store {
   persistAll(): Object;
   loadAll(arr: any[]);
   create<T>(type: symbol): T;
+
+  setSelected(selected: BaseStorable): void;
+  getSelected(): BaseStorable;
+  clearSelected(): void;
 }

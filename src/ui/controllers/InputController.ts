@@ -30,6 +30,7 @@ import { ActualRouteStop } from '../../structs/Scheduling/ActualRouteStop';
 import { RouteStop } from '../../structs/Scheduling/RouteStop';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 import { ActualWagon } from '../../structs/Actuals/Wagon/ActualWagon';
+import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -48,8 +49,6 @@ export class InputController {
   private inputHandlers: Record<InputMode, InputHandler>;
 
   private downProps: InputProps;
-  private selectedMesh: BABYLON.AbstractMesh;
-  private selected: BaseBrick;
 
   private mouseButtons: boolean[] = [];
 
@@ -281,8 +280,7 @@ export class InputController {
         snappedJointOnTrack: null,
         wheelDeg: this.wheelRotation,
         wheelRad: (this.wheelRotation / 180) * Math.PI,
-        selected: this.selected,
-        selectedMesh: this.selectedMesh,
+        selected: this.store.getSelected(),
         cameraRadius: this.camera.radius,
         cameraAlpha: this.camera.alpha,
         cameraBeta: this.camera.beta,
@@ -324,8 +322,7 @@ export class InputController {
       snappedJointOnTrack: snapPositionOnTrack(snapXZ(point), trackList),
       wheelDeg: this.wheelRotation,
       wheelRad: (this.wheelRotation / 180) * Math.PI,
-      selected: this.selected,
-      selectedMesh: this.selectedMesh,
+      selected: this.store.getSelected(),
       cameraRadius: this.camera.radius,
       cameraAlpha: this.camera.alpha,
       cameraBeta: this.camera.beta,
@@ -394,32 +391,29 @@ export class InputController {
       //   console.log(meshId);
       if (meshId.startsWith('clickable-')) {
         const [_, type, id, command] = meshId.split('-');
-        const storedObj = this.store.get(id) as BaseBrick;
-        if (storedObj) {
+        const storedObj = this.store.get(id);
+        const storedBrick = storedObj as BaseBrick;
+        if (storedBrick) {
           if (command) {
-            storedObj.getRenderer().process(command);
+            storedBrick.getRenderer().process(command);
           } else if (event.button === 2) {
-            storedObj.getRenderer().process('switch');
+            storedBrick.getRenderer().process('switch');
           } else {
-            let renderer = storedObj.getRenderer();
-            if (renderer.isSelected()) {
+            let selected: BaseStorable = this.store.getSelected();
+            if (storedObj.isSelected()) {
               if (
                 this.selectCallback &&
-                this.selected.getType() === Symbol.for('Wagon')
+                selected.getType() === Symbol.for('Wagon')
               ) {
-                (this.selected as Wagon).unsubscribeToUpdates(
-                  this.selectCallback
-                );
+                (selected as Wagon).unsubscribeToUpdates(this.selectCallback);
               }
 
-              renderer.setSelected(false);
-              this.selected = null;
-              this.selectedMesh = null;
+              this.store.clearSelected();
               this.vmInfoBox.selected = null;
               this.vmInfoBox.type = null;
               this.vmInfoBox.opts = [];
             } else {
-              this.select(storedObj);
+              this.select(storedBrick);
             }
           }
           ready = true;
@@ -429,33 +423,35 @@ export class InputController {
     return ready;
   }
 
+  getSelected(): BaseStorable {
+    return this.store.getSelected();
+  }
+
+  getSelectedBrick(): BaseBrick {
+    return this.store.getSelected() as BaseBrick;
+  }
+
   select(storedObj: BaseBrick) {
-    if (this.selected) {
+    if (this.getSelected()) {
       if (
         this.selectCallback &&
-        this.selected.getType() === Symbol.for('Wagon')
+        this.getSelected().getType() === Symbol.for('Wagon')
       ) {
-        (this.selected as Wagon).unsubscribeToUpdates(this.selectCallback);
+        (this.getSelected() as Wagon).unsubscribeToUpdates(this.selectCallback);
       }
-      this.selected.getRenderer().setSelected(false);
     }
 
-    storedObj.getRenderer().setSelected(true);
-
-    this.selected = storedObj;
-    this.selectedMesh = null;
+    storedObj.select();
 
     if (storedObj.getType() === Symbol.for('Wagon')) {
       this.selectCallback = (obj: Object): void => {
-        //   console.log('update');
         this.vmInfoBox.selected = obj;
       };
-      (this.selected as Wagon).subscribeToUpdates(this.selectCallback);
+      (this.getSelected() as Wagon).subscribeToUpdates(this.selectCallback);
     }
     this.vmInfoBox.selected = storedObj.persistDeep();
     this.vmInfoBox.type =
       storedObj.getType() === Symbol.for('Wagon') ? 'wagon' : 'idtext';
-    //   console.log('gt', storedObj.getType(), this.vmInfoBox.type);
     if (storedObj.getType() === Symbol.for('Wagon')) {
       this.vmInfoBox.opts = this.store
         .getAllOf<Route>(TYPES.Route)
@@ -485,15 +481,19 @@ export class InputController {
   }
 
   keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    if (!this.selected) return;
+    if (!this.getSelected()) return;
 
     switch (key) {
       case 'ArrowUp':
-        this.selected.getRenderer().process('forward');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('forward');
         break;
 
       case 'ArrowDown':
-        this.selected.getRenderer().process('backward');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('backward');
         break;
     }
   }
@@ -554,14 +554,16 @@ export class InputController {
         break;
     }
 
-    if (!this.selected) return;
+    if (!this.getSelected()) return;
 
     switch (key) {
       case 'ArrowRight':
-        if (this.selected.getType() === TYPES.Wagon) {
-          const sel = this.selected as ActualWagon;
+        if (this.getSelected().getType() === TYPES.Wagon) {
+          const sel = this.getSelected() as ActualWagon;
           if (!sel.isOneFree()) {
-            this.selected.getRenderer().process('swapSide');
+            this.getSelectedBrick()
+              .getRenderer()
+              .process('swapSide');
           } else {
             // van-e helyette mas
             sel
@@ -577,41 +579,57 @@ export class InputController {
         break;
 
       case 'R':
-        this.selected.getRenderer().process('reverseTrip');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('reverseTrip');
         break;
 
       case 'Z':
-        this.selected.getRenderer().process('swapEnds');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('swapEnds');
         break;
 
       case '/':
-        this.selected.getRenderer().process('detach');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('detach');
         break;
 
       case 'Delete':
-        this.selected.getRenderer().process('delete');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('delete');
         break;
 
       case 'Enter':
-        this.selected.getRenderer().process('stop');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('stop');
         break;
 
       case 'S':
-        this.selected.getRenderer().process('switch');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('switch');
         break;
     }
   }
 
   keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    if (!this.selected) return;
+    if (!this.getSelected()) return;
 
     switch (key) {
       case 'C':
-        this.selected.getRenderer().process('shuntForward');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('shuntForward');
         break;
 
       case 'V':
-        this.selected.getRenderer().process('shuntBackward');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('shuntBackward');
         break;
     }
   }

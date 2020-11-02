@@ -27,7 +27,6 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
   private meshProviderFactory: () => MeshProvider;
   private meshProvider: MeshProvider;
 
-  private lastSelected: boolean = false;
   private inited: boolean = false;
 
   init(engine: Wagon) {
@@ -73,7 +72,7 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
       this.mesh.position.y = 4.2;
       this.mesh.rotation.y = ray.dirXZ + Math.PI / 2;
 
-      if (this.selected) {
+      if (this.wagon.isSelected()) {
         this.selectedMesh.position = CoordinateToBabylonVector3(ray.coord);
         this.selectedMesh.position.y = 10;
       }
@@ -110,7 +109,7 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.selectedAMesh.setEnabled(true);
         this.selectedAMesh.material =
           this.wagon.getSelectedSide() === WhichEnd.A
-            ? this.selected
+            ? this.wagon.isSelected()
               ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
               : this.meshProvider.getMaterial(MaterialName.SleeperBrown)
             : this.meshProvider.getMaterial(MaterialName.BedGray);
@@ -122,7 +121,7 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.selectedBMesh.setEnabled(true);
         this.selectedBMesh.material =
           this.wagon.getSelectedSide() === WhichEnd.B
-            ? this.selected
+            ? this.wagon.isSelected()
               ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
               : this.meshProvider.getMaterial(MaterialName.SleeperBrown)
             : this.meshProvider.getMaterial(MaterialName.BedGray);
@@ -130,10 +129,8 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
     }
 
     this.selectedMesh.setEnabled(
-      this.selected && !this.wagon.isAFree() && !this.wagon.isBFree()
+      this.wagon.isSelected() && !this.wagon.isAFree() && !this.wagon.isBFree()
     );
-
-    this.lastSelected = this.selected;
   }
 
   process(command: string) {
@@ -186,10 +183,5 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.wagon.remove();
         break;
     }
-  }
-
-  setSelected(selected: boolean): void {
-    this.wagon.onSelected(selected);
-    super.setSelected(selected);
   }
 }

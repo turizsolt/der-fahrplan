@@ -18,7 +18,7 @@ describe('WagonConnect and Control', () => {
   it('single passenger wagon - cannot be controlled', () => {
     const [w1]: Wagon[] = buildTrain(W.Pass);
     expect(w1.getSelectedSide()).equals(null);
-    w1.onSelected(true);
+    w1.select();
     w1.swapSelectedSide();
     expect(w1.getSelectedSide()).equals(null);
   });
@@ -26,7 +26,7 @@ describe('WagonConnect and Control', () => {
   it('single controller wagon - can be controlled only on A side', () => {
     const [w1]: Wagon[] = buildTrain(W.Cont);
     expect(w1.getSelectedSide()).equals(null);
-    w1.onSelected(true);
+    w1.select();
     expect(w1.getSelectedSide()).equals(WhichEnd.A);
     w1.swapSelectedSide();
     expect(w1.getSelectedSide()).equals(WhichEnd.A);
@@ -37,7 +37,7 @@ describe('WagonConnect and Control', () => {
   it('single locomotive wagon - can be controlled', () => {
     const [w1]: Wagon[] = buildTrain(W.Loco);
     expect(w1.getSelectedSide()).equals(null);
-    w1.onSelected(true);
+    w1.select();
     expect(w1.getSelectedSide()).equals(WhichEnd.A);
     w1.swapSelectedSide();
     expect(w1.getSelectedSide()).equals(WhichEnd.B);

@@ -326,7 +326,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.control.getSelectedSide();
   }
 
-  onSelected(selected: boolean): void {
+  onSelectChanged(selected: boolean): void {
     this.control.onSelected(selected);
   }
 

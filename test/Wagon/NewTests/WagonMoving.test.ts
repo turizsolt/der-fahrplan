@@ -21,7 +21,7 @@ describe('Wagon moving', () => {
     wagon.putOnTrack(track, 0.5, 1);
 
     console.log(wagon.getRay().coord.x, wagon.getSpeed());
-    wagon.onSelected(true);
+    wagon.select();
     wagon.accelerate();
     wagon.tick();
     console.log(wagon.getRay().coord.x, wagon.getSpeed());
