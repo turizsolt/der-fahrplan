@@ -125,6 +125,17 @@ describe('WagonConnect and Control', () => {
       cont.swapSelectedSide();
       expectTrainSides([cont, pass], [A, null], cont);
     });
+
+    it('pass and cont-bad-side - can select nothing', () => {
+      const [pass, cont]: Wagon[] = buildTrain(W.Pass, W.Cont);
+      expectTrainSides([pass, cont], [null, null]);
+
+      cont.select();
+      expectTrainSides([pass, cont], [null, null], cont);
+
+      cont.swapSelectedSide();
+      expectTrainSides([pass, cont], [null, null], cont);
+    });
   });
 });
 
