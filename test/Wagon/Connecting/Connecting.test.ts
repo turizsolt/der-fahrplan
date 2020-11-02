@@ -46,6 +46,24 @@ describe('WagonConnect and Control', () => {
       expect(loco.getSelectedSide()).equals(WhichEnd.A);
     });
   });
+
+  describe('two wagons', () => {
+    it("loco and pass - can select loco's A", () => {
+      const [loco, pass]: Wagon[] = buildTrain(W.Loco, W.Pass);
+      expect(loco.getSelectedSide()).equals(null);
+      expect(pass.getSelectedSide()).equals(null);
+
+      loco.select();
+      expect(loco.getSelectedSide()).equals(WhichEnd.A);
+      expect(pass.getSelectedSide()).equals(null);
+      expect(store.getSelected()).equals(loco);
+
+      loco.swapSelectedSide();
+      expect(loco.getSelectedSide()).equals(WhichEnd.A);
+      expect(pass.getSelectedSide()).equals(null);
+      expect(store.getSelected()).equals(loco);
+    });
+  });
 });
 
 enum W {
