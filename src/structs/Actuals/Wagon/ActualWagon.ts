@@ -89,6 +89,11 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this;
   }
 
+  halt(): void {
+    this.speed.halt();
+    this.update();
+  }
+
   disconnect(whichEnd: WhichEnd): void {
     if (this.speed.getMovingState() === WagonMovingState.Moving) return;
 

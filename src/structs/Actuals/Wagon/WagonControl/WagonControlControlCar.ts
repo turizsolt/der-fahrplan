@@ -25,8 +25,8 @@ export class WagonControlControlCar extends WagonControlLocomotive {
   }
 
   onStocked(): void {
-    if (this.selectedSide === WhichEnd.A && !this.wagon.isAFree()) {
-      this.selectedSide = null;
-    }
+    // if (this.selectedSide === WhichEnd.A && !this.wagon.isAFree()) {
+    //  this.selectedSide = null;
+    //}
   }
 }

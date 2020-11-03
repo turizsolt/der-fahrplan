@@ -12,6 +12,12 @@ export default class WagonSpeed {
     private accelerateBy: number = 0.25
   ) {}
 
+  halt(): void {
+    this.speed = 0;
+    this.wagon.clearControlingWagon();
+    this.shunting = false;
+  }
+
   getSpeed(): number {
     return this.speed;
   }

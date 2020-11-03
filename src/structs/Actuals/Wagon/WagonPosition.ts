@@ -8,6 +8,7 @@ import { LineSegment } from '../../Geometry/LineSegment';
 import { TrackWorm } from '../Track/TrackWorm';
 import { WagonEnd } from './WagonEnd';
 import { Coordinate } from '../../Geometry/Coordinate';
+import { WagonMovingState } from './WagonMovingState';
 
 const WAGON_GAP: number = 1;
 const DEFAULT_WAGON_LENGTH: number = 14;
@@ -84,6 +85,24 @@ export class WagonPosition {
       inv = -1;
     }
 
+    const nearest = this.getNearestWagon(WhichEnd.B);
+    if (nearest) {
+      const dist = nearest.end
+        .getPositionOnTrack()
+        .getRay()
+        .coord.distance2d(this.ends.B.getPositionOnTrack().getRay().coord);
+
+      if (dist <= 1) {
+        if (this.parent.getMovingState() === WagonMovingState.Moving) {
+          this.parent.halt();
+          this.ends.B.positionOnTrack.hop(-distance * inv);
+          return;
+        } else {
+          this.ends.B.connect(nearest.end);
+        }
+      }
+    }
+
     this.ends.A.positionOnTrack.copyFrom(this.ends.B.positionOnTrack);
     const newWorm = this.ends.A.positionOnTrack
       .hop(-1 * inv * this.getLength())
@@ -94,18 +113,6 @@ export class WagonPosition {
     if (this.ends.A.hasConnectedEndOf()) {
       const next = this.ends.A.getConnectedEndOf();
       next.pullToPos(this.ends.A.positionOnTrack, -1 * inv);
-    }
-
-    const nearest = this.getNearestWagon(WhichEnd.B);
-    if (nearest) {
-      const dist = nearest.end
-        .getPositionOnTrack()
-        .getRay()
-        .coord.distance2d(this.ends.B.getPositionOnTrack().getRay().coord);
-
-      if (dist <= 1) {
-        this.ends.B.connect(nearest.end);
-      }
     }
   }
 
@@ -165,6 +172,24 @@ export class WagonPosition {
       inv = -1;
     }
 
+    const nearest = this.getNearestWagon(WhichEnd.A);
+    if (nearest) {
+      const dist = nearest.end
+        .getPositionOnTrack()
+        .getRay()
+        .coord.distance2d(this.ends.A.getPositionOnTrack().getRay().coord);
+
+      if (dist <= 1) {
+        if (this.parent.getMovingState() === WagonMovingState.Moving) {
+          this.parent.halt();
+          this.ends.A.positionOnTrack.hop(distance * inv);
+          return;
+        } else {
+          this.ends.A.connect(nearest.end);
+        }
+      }
+    }
+
     this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
     const newWorm = this.ends.B.positionOnTrack.hop(inv * this.getLength());
     this.parent.getWorm().moveBackward(newWorm);
@@ -174,18 +199,6 @@ export class WagonPosition {
     if (this.ends.B.hasConnectedEndOf()) {
       const next = this.ends.B.getConnectedEndOf();
       next.pullToPos(this.ends.B.positionOnTrack, 1 * inv);
-    }
-
-    const nearest = this.getNearestWagon(WhichEnd.A);
-    if (nearest) {
-      const dist = nearest.end
-        .getPositionOnTrack()
-        .getRay()
-        .coord.distance2d(this.ends.A.getPositionOnTrack().getRay().coord);
-
-      if (dist <= 1) {
-        this.ends.A.connect(nearest.end);
-      }
     }
   }
 

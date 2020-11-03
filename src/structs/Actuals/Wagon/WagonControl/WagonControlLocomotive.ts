@@ -93,6 +93,7 @@ export class WagonControlLocomotive implements WagonControl {
   }
 
   onStocked(): void {
+    /*
     if (this.selectedSide === WhichEnd.A && !this.wagon.isAFree()) {
       if (this.wagon.isBFree()) {
         this.selectedSide = WhichEnd.B;
@@ -105,6 +106,6 @@ export class WagonControlLocomotive implements WagonControl {
       } else {
         this.selectedSide = null;
       }
-    }
+    }*/
   }
 }
