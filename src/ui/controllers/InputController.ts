@@ -29,6 +29,8 @@ import { Station } from '../../structs/Scheduling/Station';
 import { ActualRouteStop } from '../../structs/Scheduling/ActualRouteStop';
 import { RouteStop } from '../../structs/Scheduling/RouteStop';
 import { Wagon } from '../../structs/Interfaces/Wagon';
+import { ActualWagon } from '../../structs/Actuals/Wagon/ActualWagon';
+import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -47,8 +49,6 @@ export class InputController {
   private inputHandlers: Record<InputMode, InputHandler>;
 
   private downProps: InputProps;
-  private selectedMesh: BABYLON.AbstractMesh;
-  private selected: BaseBrick;
 
   private mouseButtons: boolean[] = [];
 
@@ -65,11 +65,15 @@ export class InputController {
       el: '#button-holder',
       data: {
         selected: '',
-        buttons: []
+        buttons: [],
+        wagon: 'wagon'
       },
       methods: {
         handleClick: function(event) {
           _this.selectMode(event.target.id);
+        },
+        handleWagonClick: function(event) {
+          this.wagon = event.target.value;
         }
       }
     });
@@ -89,6 +93,7 @@ export class InputController {
       <div>
         <div class="item-type">🚂 Mozdony</div>
         <div class="item-id">{{idt}}</div>
+        <div class="item-id">Speed: {{obj.speed ? obj.speed : '???'}}</div>
         <div v-if="obj.trip">
           <div class="trip">
             <div class="trip-name">{{obj.trip.name}}</div> 
@@ -103,30 +108,36 @@ export class InputController {
             </div>
           </div>
           <div class="trip-buttons">
-            <div class="xbutton trip-cancel" @click="removeRoute(obj)">❌ Útirány törlése</div>
+            <div class="trip-buttons-inner">
+              <div class="xbutton trip-cancel" @click="removeRoute(obj)">❌ Útirány törlése</div>
+              <div v-if="obj.trip.reverse" class="xbutton trip-reverse" @click="reverseRoute(obj)">↩ Ellenirány</div>
+            </div>
           </div>
         </div>
         <div v-else>
-        <div v-if="opts && opts.length > 0">
-          <select class="route-select" size="1" @change="assignRoute(obj, $event)">
-            <option>Útirány kiválasztása...</option>
-            <option v-for="route in opts" :value="route.id">
-              {{route.detailedName}}
-            </option>
-          </select>
-        </div>
-        <div v-if="!opts || opts.length === 0">
-        <select class="route-select" size="1" disabled>
-            <option>Nincs kiválsztható útirány</option>
-          </select>
-        </div>
-        
+          <div v-if="opts && opts.length > 0">
+            <div>Útirány kiválasztása...</div>
+            <div class="route-line" v-for="route in opts" @click="assignRoute(obj, route.id)"> 
+              <div class="route-sign">{{route.name}}</div>
+              <div class="route-circle route-circle-left" :style="{backgroundColor: route.stops[0].rgbColor}"></div>
+              <div class="route-circle route-circle-right" :style="{backgroundColor: route.stops[route.stops.length-1].rgbColor}"></div>
+              <div class="route-name">
+                {{route.stops[0].stationName}}
+                >
+                {{route.stops[route.stops.length-1].stationName}}
+              </div>
+            </div>
+          </div>
+          <div v-if="!opts || opts.length === 0">
+          <select class="route-select" size="1" disabled>
+              <option>Nincs kiválsztható útirány</option>
+            </select>
+          </div>
         </div>
       </div>
       `,
       methods: {
-        assignRoute: function(vWagon, $event) {
-          const vRouteId = $event.target.value;
+        assignRoute: function(vWagon, vRouteId) {
           if (!vRouteId) return;
           const wagon = _this.store.get(vWagon.id) as Wagon;
           const route = _this.store.get(vRouteId) as Route;
@@ -135,6 +146,10 @@ export class InputController {
         removeRoute: function(vWagon) {
           const wagon = _this.store.get(vWagon.id) as Wagon;
           wagon.cancelTrip();
+        },
+        reverseRoute: function(vWagon) {
+          const wagon = _this.store.get(vWagon.id) as Wagon;
+          wagon.reverseTrip();
         }
       }
     });
@@ -265,8 +280,7 @@ export class InputController {
         snappedJointOnTrack: null,
         wheelDeg: this.wheelRotation,
         wheelRad: (this.wheelRotation / 180) * Math.PI,
-        selected: this.selected,
-        selectedMesh: this.selectedMesh,
+        selected: this.store.getSelected(),
         cameraRadius: this.camera.radius,
         cameraAlpha: this.camera.alpha,
         cameraBeta: this.camera.beta,
@@ -276,7 +290,8 @@ export class InputController {
         targetZ: this.camera.target.z,
         fromX: this.camera.position.x,
         fromY: this.camera.position.y,
-        fromZ: this.camera.position.z
+        fromZ: this.camera.position.z,
+        wagonType: this.vm.wagon
       };
 
       return ret;
@@ -307,8 +322,7 @@ export class InputController {
       snappedJointOnTrack: snapPositionOnTrack(snapXZ(point), trackList),
       wheelDeg: this.wheelRotation,
       wheelRad: (this.wheelRotation / 180) * Math.PI,
-      selected: this.selected,
-      selectedMesh: this.selectedMesh,
+      selected: this.store.getSelected(),
       cameraRadius: this.camera.radius,
       cameraAlpha: this.camera.alpha,
       cameraBeta: this.camera.beta,
@@ -318,7 +332,8 @@ export class InputController {
       targetZ: this.camera.target.z,
       fromX: this.camera.position.x,
       fromY: this.camera.position.y,
-      fromZ: this.camera.position.z
+      fromZ: this.camera.position.z,
+      wagonType: this.vm.wagon
     };
     ret.snappedPoint.dirXZ = ret.wheelRad;
 
@@ -373,94 +388,32 @@ export class InputController {
       if (meshId.includes('.')) {
         meshId = meshId.slice(0, meshId.indexOf('.'));
       }
-      console.log(meshId);
+      //   console.log(meshId);
       if (meshId.startsWith('clickable-')) {
         const [_, type, id, command] = meshId.split('-');
-        const storedObj = this.store.get(id) as BaseBrick;
-        if (storedObj) {
+        const storedObj = this.store.get(id);
+        const storedBrick = storedObj as BaseBrick;
+        if (storedBrick) {
           if (command) {
-            storedObj.getRenderer().process(command);
+            storedBrick.getRenderer().process(command);
           } else if (event.button === 2) {
-            storedObj.getRenderer().process('switch');
+            storedBrick.getRenderer().process('switch');
           } else {
-            let renderer = storedObj.getRenderer();
-            if (renderer.isSelected()) {
+            let selected: BaseStorable = this.store.getSelected();
+            if (storedObj.isSelected()) {
               if (
                 this.selectCallback &&
-                this.selected.getType() === Symbol.for('Wagon')
+                selected.getType() === Symbol.for('Wagon')
               ) {
-                (this.selected as Wagon).unsubscribeToUpdates(
-                  this.selectCallback
-                );
+                (selected as Wagon).unsubscribeToUpdates(this.selectCallback);
               }
 
-              renderer.setSelected(false);
-              this.selected = null;
-              this.selectedMesh = null;
+              this.store.clearSelected();
               this.vmInfoBox.selected = null;
               this.vmInfoBox.type = null;
               this.vmInfoBox.opts = [];
             } else {
-              if (this.selected) {
-                if (
-                  this.selectCallback &&
-                  this.selected.getType() === Symbol.for('Wagon')
-                ) {
-                  (this.selected as Wagon).unsubscribeToUpdates(
-                    this.selectCallback
-                  );
-                }
-                this.selected.getRenderer().setSelected(false);
-              }
-
-              renderer.setSelected(true);
-              this.selected = storedObj;
-              this.selectedMesh = this.downProps.mesh;
-
-              if (storedObj.getType() === Symbol.for('Wagon')) {
-                console.log('select');
-                this.selectCallback = (obj: Object): void => {
-                  console.log('update');
-                  this.vmInfoBox.selected = obj;
-                };
-                (this.selected as Wagon).subscribeToUpdates(
-                  this.selectCallback
-                );
-              }
-              this.vmInfoBox.selected = storedObj.persistDeep();
-              this.vmInfoBox.type =
-                storedObj.getType() === Symbol.for('Wagon')
-                  ? 'wagon'
-                  : 'idtext';
-              console.log('gt', storedObj.getType(), this.vmInfoBox.type);
-              if (storedObj.getType() === Symbol.for('Wagon')) {
-                this.vmInfoBox.opts = this.store
-                  .getAllOf<Route>(TYPES.Route)
-                  .map(x => x.persistDeep());
-              }
-
-              //   const sel = this.selected as any;
-              //   if (sel.getName) {
-              //     this.vmInfoBox.selectedId = sel.getName();
-              //     if (sel.getPlatforms) {
-              //       this.vmInfoBox.selectedId =
-              //         sel.getName() +
-              //         ' / ' +
-              //         sel
-              //           .getPlatforms()
-              //           .map(p => p.getId())
-              //           .join(', ');
-              //     }
-              //   } else if (sel.getStation) {
-              //     this.vmInfoBox.selectedId =
-              //       id +
-              //       ':' +
-              //       (!sel.getStation()
-              //         ? 'No station'
-              //         : sel.getStation().getName());
-              //   } else {
-              //     this.vmInfoBox.selectedId = id;
-              //   }
+              this.select(storedBrick);
             }
           }
           ready = true;
@@ -468,6 +421,42 @@ export class InputController {
       }
     }
     return ready;
+  }
+
+  getSelected(): BaseStorable {
+    return this.store.getSelected();
+  }
+
+  getSelectedBrick(): BaseBrick {
+    return this.store.getSelected() as BaseBrick;
+  }
+
+  select(storedObj: BaseBrick) {
+    if (this.getSelected()) {
+      if (
+        this.selectCallback &&
+        this.getSelected().getType() === Symbol.for('Wagon')
+      ) {
+        (this.getSelected() as Wagon).unsubscribeToUpdates(this.selectCallback);
+      }
+    }
+
+    storedObj.select();
+
+    if (storedObj.getType() === Symbol.for('Wagon')) {
+      this.selectCallback = (obj: Object): void => {
+        this.vmInfoBox.selected = obj;
+      };
+      (this.getSelected() as Wagon).subscribeToUpdates(this.selectCallback);
+    }
+    this.vmInfoBox.selected = storedObj.persistDeep();
+    this.vmInfoBox.type =
+      storedObj.getType() === Symbol.for('Wagon') ? 'wagon' : 'idtext';
+    if (storedObj.getType() === Symbol.for('Wagon')) {
+      this.vmInfoBox.opts = this.store
+        .getAllOf<Route>(TYPES.Route)
+        .map(x => x.persistDeep());
+    }
   }
 
   wheel(event: WheelEvent) {
@@ -491,7 +480,23 @@ export class InputController {
     this.vm.selected = mode;
   }
 
-  keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {}
+  keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    if (!this.getSelected()) return;
+
+    switch (key) {
+      case 'ArrowUp':
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('forward');
+        break;
+
+      case 'ArrowDown':
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('backward');
+        break;
+    }
+  }
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     switch (key) {
@@ -549,35 +554,83 @@ export class InputController {
         break;
     }
 
-    if (!this.selected) return;
+    if (!this.getSelected()) return;
 
     switch (key) {
+      case 'ArrowRight':
+        if (this.getSelected().getType() === TYPES.Wagon) {
+          this.getSelectedBrick()
+            .getRenderer()
+            .process('swapSide');
+        }
+        break;
+
+      case 'R':
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('reverseTrip');
+        break;
+
+      case 'Z':
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('swapEnds');
+        break;
+
+      case '/':
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('detach');
+        break;
+
       case 'Delete':
-        this.selected.getRenderer().process('delete');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('delete');
         break;
 
       case 'Enter':
-        this.selected.getRenderer().process('stop');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('stop');
         break;
 
       case 'S':
-        this.selected.getRenderer().process('switch');
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('switch');
         break;
     }
   }
 
   keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    if (!this.selected) return;
+    if (!this.getSelected()) return;
 
     switch (key) {
-      case 'ArrowUp':
-        this.selected.getRenderer().process('forward');
+      case 'C':
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('shuntForward');
         break;
 
-      case 'ArrowDown':
-        this.selected.getRenderer().process('backward');
+      case 'V':
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('backward');
+        break;
+
+      case 'B':
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('shuntBackward');
         break;
     }
+  }
+
+  tick() {
+    this.store.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {
+      wagon.tick();
+    });
   }
 
   load(data: any) {

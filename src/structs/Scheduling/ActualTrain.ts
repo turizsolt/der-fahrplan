@@ -7,11 +7,12 @@ import { Route } from './Route';
 import { Platform } from '../Interfaces/Platform';
 import { Station } from './Station';
 import { Passenger } from '../Interfaces/Passenger';
-import { BaseStorable } from '../Interfaces/BaseStorable';
+import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private wagons: Wagon[];
   private schedulingWagon: Wagon;
+  private controlingWagon: Wagon = null;
 
   init(first: Wagon): Train {
     super.initStore(TYPES.Train);
@@ -136,6 +137,28 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       }
     }
     return null;
+  }
+
+  hasLocomotive(): boolean {
+    return (
+      this.wagons.filter(
+        x => x.getControlType() === WagonControlType.Locomotive
+      ).length > 0
+    );
+  }
+
+  getControlingWagon(): Wagon {
+    return this.controlingWagon;
+  }
+
+  setControlingWagon(wagon: Wagon): void {
+    if (!this.controlingWagon) {
+      this.controlingWagon = wagon;
+    }
+  }
+
+  clearControlingWagon(): void {
+    this.controlingWagon = null;
   }
 
   persist(): Object {

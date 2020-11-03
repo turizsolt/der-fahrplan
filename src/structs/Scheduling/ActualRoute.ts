@@ -7,12 +7,24 @@ import { TYPES } from '../../di/TYPES';
 export class ActualRoute extends ActualBaseStorable implements Route {
   private name: string;
   private stops: RouteStop[];
+  private reverse: Route;
 
   init(): Route {
     super.initStore(TYPES.Route);
     this.name = this.id;
     this.stops = [];
     return this;
+  }
+
+  setReverse(route: Route): void {
+    this.reverse = route;
+    if (route.getReverse() != this) {
+      route.setReverse(this);
+    }
+  }
+
+  getReverse(): Route {
+    return this.reverse;
   }
 
   remove(): void {
@@ -71,7 +83,8 @@ export class ActualRoute extends ActualBaseStorable implements Route {
       id: this.id,
       type: 'Route',
       name: this.name,
-      stops: this.stops.map(x => x.getId())
+      stops: this.stops.map(x => x.getId()),
+      reverse: this.getReverse() && this.getReverse().getId()
     };
   }
 
@@ -85,7 +98,8 @@ export class ActualRoute extends ActualBaseStorable implements Route {
           ? this.stops[this.stops.length - 1].getStationName()
           : 'Unknown',
       detailedName: this.getDetailedName(),
-      stops: this.stops.map(x => x.persistDeep())
+      stops: this.stops.map(x => x.persistDeep()),
+      reverse: this.getReverse() && this.getReverse().getId()
     };
   }
 
@@ -96,6 +110,9 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     for (let stopId of obj.stops) {
       const x = store.get(stopId) as RouteStop;
       this.addStop(x);
+    }
+    if (obj.reverse && store.get(obj.reverse)) {
+      this.setReverse(store.get(obj.reverse) as Route);
     }
   }
 }

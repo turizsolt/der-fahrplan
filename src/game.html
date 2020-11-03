@@ -19,7 +19,7 @@
         }
         #button-holder {
             position: fixed;
-            left: 20px;
+            right: 20px;
             top: 20px;
             /*width: 200px;
             height: 40px;*/
@@ -122,6 +122,10 @@
     justify-content: flex-end;
 }
 
+.trip-buttons-inner {
+    text-align: right;
+}
+
 
 .xbutton {
     border: 1px solid #a18d6f;
@@ -144,11 +148,53 @@
     height: 15px;
 }
 
-.stop-circle {
+.stop-circle, .route-circle {
     width: 10px;
     height: 10px;
     border: 2px solid #070;
     border-radius: 50%;
+}
+
+.route-line {
+    display: flex;
+    width: 100%;
+
+    border: 1px solid #070;
+    border-radius: 0.25em;
+    background-color: #aca;
+
+    margin-top: 5px;
+
+    cursor: pointer;
+}
+
+.route-line:hover {
+    background-color: #dfd;
+}
+
+.route-sign {
+    width: 1em;
+    text-align: center;
+}
+
+.route-circle {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.route-circle-left {
+    margin-left: 3px;
+}
+
+.route-circle-right {
+    margin-right: 3px;
+    margin-left: -5px;
+}
+
+.route-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .stop-name {
@@ -177,8 +223,15 @@
     </style>
 </head>
 <body>
-    <!--
     <div id="button-holder">
+            <select size="1" v-if="selected === 'CREATE_ENGINE'"
+            v-model="wagon"
+            v-on:click="handleWagonClick">
+                    <option value="wagon">Mozdony</option>
+                    <option value="mot">Motorvonat</option>
+                    <option value="vez">Vezérlőkocsi</option>
+                    <option value="utas">Utaskocsi</option>
+                </select>
             <button 
                 v-for="button in buttons"
                 v-bind:id="button.id"
@@ -186,7 +239,6 @@
                 v-bind:class="{ selected: selected === button.id }"
             >{{button.text}}</button>
     </div>
-    -->
     <div id="info-box">
         <component v-if="selected" :is="type" :idt="selected.id" :obj="selected" :opts="opts"></component>
         <div v-if="!selected"></div>

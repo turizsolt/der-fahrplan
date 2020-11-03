@@ -12,15 +12,12 @@ import { Store } from '../Interfaces/Store';
 import { LineSegmentChain } from '../Geometry/LineSegmentChain';
 import { Station } from '../Scheduling/Station';
 import { Left, Right } from '../Geometry/Directions';
-import { Boardable } from '../../mixins/Boardable';
+import { ActualBoardable } from '../../mixins/ActualBoardable';
 import { ActualBaseBrick } from './ActualBaseBrick';
-import { applyMixins } from '../../mixins/ApplyMixins';
 
-export interface ActualPlatform extends Boardable {}
-const doApply = () => applyMixins(ActualPlatform, [], [Boardable]);
 @injectable()
 export class ActualPlatform extends ActualBaseBrick implements Platform {
-  private boardable: Boardable = new Boardable();
+  private boardable: ActualBoardable = new ActualBoardable();
 
   private position: Coordinate;
   private rotation: number;
@@ -50,6 +47,14 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     const w = 2.8 + Math.random() * (this.width - 1);
     const x = ray.fromHere(this.side === Side.Left ? Left : Right, w);
     return x.coord;
+  }
+
+  unboard(passenger: Passenger): void {
+    this.boardable.unboard(passenger);
+  }
+
+  getBoardedPassengers(): Passenger[] {
+    return this.boardable.getBoardedPassengers();
   }
 
   getRenderer(): BaseRenderer {
@@ -198,7 +203,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
 
   initX(station: Station, no: string): Platform {
     super.initStore(TYPES.Platform);
-    this.boardable.init();
     this.position = null;
     this.no = no;
     station.addPlatform(this);
@@ -252,4 +256,3 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     );
   }
 }
-doApply();

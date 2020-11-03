@@ -3,9 +3,9 @@ import { Platform } from '../Interfaces/Platform';
 import { Color } from '../Color';
 import { Route } from './Route';
 import { BaseBrick } from '../Interfaces/BaseBrick';
-import { Boardable } from '../../mixins/Boardable';
 import { Trip } from './Trip';
 import { Train } from './Train';
+import { Boardable } from '../../mixins/Boardable';
 
 export interface Station extends BaseBrick, Boardable {
   init(circle: Circle): Station;

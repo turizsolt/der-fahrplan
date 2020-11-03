@@ -19,4 +19,8 @@ export interface Train extends BaseStorable {
   mergeWith(other: Train): void;
   separateThese(wagons: Wagon[]): void;
   moveBoardedPassengers(): void;
+  hasLocomotive(): boolean;
+  getControlingWagon(): Wagon;
+  setControlingWagon(wagon: Wagon): void;
+  clearControlingWagon(): void;
 }

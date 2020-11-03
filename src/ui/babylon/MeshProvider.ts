@@ -9,8 +9,7 @@ import { MaterialName } from './MaterialName';
 
 @injectable()
 export class MeshProvider {
-  private engine: BABYLON.AbstractMesh;
-  private wagon: BABYLON.AbstractMesh;
+  private library: { [id: string]: BABYLON.AbstractMesh };
   private scene: BABYLON.Scene;
 
   private materials: Record<MaterialName, BABYLON.StandardMaterial>;
@@ -30,33 +29,23 @@ export class MeshProvider {
   setScene(scene: BABYLON.Scene): void {
     this.scene = scene;
 
-    BABYLON.SceneLoader.ImportMesh(
-      '', //['Engine'],
-      './assets/',
-      'engine.glb',
-      scene,
-      newMeshes => {
-        //console.log('x', newMeshes.map(x => x.name));
-        newMeshes[0].rotationQuaternion = null;
-        newMeshes[0].setEnabled(false);
+    this.library = {};
+    const names = ['wagon', 'engine', 'mot', 'utas', 'vez'];
 
-        this.engine = newMeshes[0];
-      }
-    );
+    names.map(name => {
+      BABYLON.SceneLoader.ImportMesh(
+        '', //['Engine'],
+        './assets/',
+        `${name}.glb`,
+        scene,
+        newMeshes => {
+          newMeshes[0].rotationQuaternion = null;
+          newMeshes[0].setEnabled(false);
 
-    BABYLON.SceneLoader.ImportMesh(
-      '', //['Engine'],
-      './assets/',
-      'wagon.glb',
-      scene,
-      newMeshes => {
-        //console.log('x', newMeshes.map(x => x.name));
-        newMeshes[0].rotationQuaternion = null;
-        newMeshes[0].setEnabled(false);
-
-        this.wagon = newMeshes[0];
-      }
-    );
+          this.library[name] = newMeshes[0];
+        }
+      );
+    });
 
     this.sleeperBrown = new BABYLON.StandardMaterial('sleeperBrown', null);
     this.sleeperBrown.diffuseColor = new BABYLON.Color3(
@@ -94,13 +83,8 @@ export class MeshProvider {
     };
   }
 
-  createEngineMesh(name: string): BABYLON.AbstractMesh {
-    const clone = this.engine.clone(name, null);
-    return clone;
-  }
-
-  createWagonMesh(name: string): BABYLON.AbstractMesh {
-    const clone = this.wagon.clone(name, null);
+  createWagonMesh(id:string, name: string): BABYLON.AbstractMesh {
+    const clone = this.library[id].clone(name, null);
     return clone;
   }
 

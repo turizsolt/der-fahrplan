@@ -7,11 +7,18 @@ import { Route } from '../Scheduling/Route';
 import { Platform } from './Platform';
 import { Updatable } from '../../mixins/Updatable';
 import { BaseBrick } from './BaseBrick';
-import { Boardable } from '../../mixins/Boardable';
 import { Train } from '../Scheduling/Train';
+import { TrackWorm } from '../Actuals/Track/TrackWorm';
+import { Passenger } from './Passenger';
+import { Boardable } from '../../mixins/Boardable';
+import { WagonConfig } from '../Actuals/Wagon/WagonConfig';
+import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
+import { PassengerArrangement } from '../../mixins/BoardableWagon';
+import { WagonConnectable } from '../Actuals/Wagon/WagonConnectable';
+import { WagonMovingState } from '../Actuals/Wagon/WagonMovingState';
 
-export interface Wagon extends BaseBrick, Boardable, Updatable {
-  init(): Wagon;
+export interface Wagon extends Boardable, BaseBrick, Updatable {
+  init(config?: WagonConfig): Wagon;
   update(): void;
   getA(): WagonEnd;
   getB(): WagonEnd;
@@ -19,8 +26,28 @@ export interface Wagon extends BaseBrick, Boardable, Updatable {
   getRay(): Ray;
   remove(): boolean;
   isRemoved(): boolean;
+  isAFree(): boolean;
+  isBFree(): boolean;
+  isOneFree(): boolean;
+  onStocked(): void;
+  getSelectedSide(): WhichEnd | null;
+  swapSelectedSide(): void;
+  accelerate(): void;
+  break(): void;
+  getLastWagon(whichEnd: WhichEnd): Wagon;
+
+  getMaxSpeed(): number;
+  getAccelerateBy(): number;
+  getControlType(): WagonControlType;
+  getPassengerArrangement(): PassengerArrangement;
+  getAppearanceId(): string;
+  getConnectable(A: WhichEnd): WagonConnectable;
+
+  getWorm(): TrackWorm;
+  getCenterRay(): Ray;
 
   putOnTrack(track: Track, position?: number, direction?: number): void;
+  moveTowardsWagon(whichEnd: WhichEnd, distance: number): void;
   moveTowardsWagonB(distance: number): void;
   moveTowardsWagonA(distance: number): void;
   stop(): void;
@@ -41,6 +68,24 @@ export interface Wagon extends BaseBrick, Boardable, Updatable {
 
   getTrain(): Train;
   setTrain(train: Train): void;
+
+  getBoardedPassengers(): Passenger[];
+  detach(): void;
+  tick(): void;
+  getSpeed(): number;
+  reverseTrip(): void;
+
+  shuntForward(): void;
+  shuntBackward(): void;
+
+  setControlingWagon(wagon: Wagon): void;
+  getControlingWagon(): Wagon;
+  clearControlingWagon(): void;
+  canThisWagonControl(): boolean;
+
+  disconnect(whichEnd: WhichEnd): void;
+  getMovingState(): WagonMovingState;
+  halt(): void;
 }
 
 export interface NearestWagon {

@@ -11,4 +11,6 @@ export interface Route extends BaseStorable {
   removeStop(stop: RouteStop): void;
   swapStopWithPrev(stop: RouteStop): void;
   remove(): void;
+  setReverse(route: Route): void;
+  getReverse(): Route;
 }
