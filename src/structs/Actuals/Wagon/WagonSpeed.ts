@@ -1,5 +1,6 @@
 import { WagonMovingState } from './WagonMovingState';
 import { Wagon } from '../../Interfaces/Wagon';
+import { WagonControlType } from './WagonControl/WagonControlType';
 
 export default class WagonSpeed {
   private speed: number = 0;
@@ -79,7 +80,9 @@ export default class WagonSpeed {
     return (
       !this.emergencyBreakApplied &&
       !this.shunting &&
-      this.wagon.canThisWagonControl()
+      this.wagon.canThisWagonControl() &&
+      (this.wagon.getControlType() !== WagonControlType.ControlCar ||
+        this.wagon.getTrain().hasLocomotive())
     );
   }
 
