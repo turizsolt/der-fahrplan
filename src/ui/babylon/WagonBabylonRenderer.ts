@@ -9,6 +9,7 @@ import { Wagon } from '../../structs/Interfaces/Wagon';
 import { MaterialName } from './MaterialName';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { WagonMovingState } from '../../structs/Actuals/Wagon/WagonMovingState';
+import { WagonControlType } from '../../structs/Actuals/Wagon/WagonControl/WagonControlType';
 
 @injectable()
 export class WagonBabylonRenderer extends BaseBabylonRenderer
@@ -73,7 +74,12 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
       this.mesh.position.y = 4.2;
       this.mesh.rotation.y = ray.dirXZ + Math.PI / 2;
 
-      if (this.wagon.isSelected()) {
+      if (
+        this.wagon.getControlType() !== WagonControlType.Nothing ||
+        !this.wagon.isSelected()
+      ) {
+        this.selectedMesh.setEnabled(false);
+      } else {
         this.selectedMesh.position = CoordinateToBabylonVector3(ray.coord);
         this.selectedMesh.position.y = 10;
       }
@@ -111,44 +117,60 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
           : this.meshProvider.getMaterial(MaterialName.BedGray);
       }
 
-      this.selectedAMesh.position = CoordinateToBabylonVector3(
-        ray.fromHere(0, -5).coord
-      );
-      this.selectedAMesh.position.y = 10;
+      let matA = null;
+      let matB = null;
 
-      this.selectedBMesh.position = CoordinateToBabylonVector3(
-        ray.fromHere(0, 5).coord
-      );
-      this.selectedBMesh.position.y = 10;
+      if (this.wagon.getControlType() !== WagonControlType.Nothing) {
+        if (this.wagon.isAFree()) matA = MaterialName.BedGray;
+        if (this.wagon.isAFree() && this.wagon.getSelectedSide() === WhichEnd.A)
+          matA = MaterialName.SleeperBrown;
+        if (
+          this.wagon.isSelected() &&
+          this.wagon.getSelectedSide() !== WhichEnd.B
+        )
+          matA = MaterialName.SelectorRed;
 
-      if (!this.wagon.isAFree()) {
+        if (this.wagon.getControlType() !== WagonControlType.ControlCar) {
+          if (this.wagon.isBFree()) matB = MaterialName.BedGray;
+          if (
+            this.wagon.isBFree() &&
+            this.wagon.getSelectedSide() === WhichEnd.B
+          )
+            matB = MaterialName.SleeperBrown;
+          if (
+            this.wagon.isSelected() &&
+            this.wagon.getSelectedSide() === WhichEnd.B
+          )
+            matB = MaterialName.SelectorRed;
+        } else {
+          if (!this.wagon.getTrain().hasLocomotive()) {
+            matA = null;
+          }
+        }
+      }
+
+      if (!matA) {
         this.selectedAMesh.setEnabled(false);
       } else {
         this.selectedAMesh.setEnabled(true);
-        this.selectedAMesh.material =
-          this.wagon.getSelectedSide() === WhichEnd.A
-            ? this.wagon.isSelected()
-              ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
-              : this.meshProvider.getMaterial(MaterialName.SleeperBrown)
-            : this.meshProvider.getMaterial(MaterialName.BedGray);
+        this.selectedAMesh.position = CoordinateToBabylonVector3(
+          ray.fromHere(0, -5).coord
+        );
+        this.selectedAMesh.position.y = 10;
+        this.selectedAMesh.material = this.meshProvider.getMaterial(matA);
       }
 
-      if (!this.wagon.isBFree()) {
+      if (!matB) {
         this.selectedBMesh.setEnabled(false);
       } else {
         this.selectedBMesh.setEnabled(true);
-        this.selectedBMesh.material =
-          this.wagon.getSelectedSide() === WhichEnd.B
-            ? this.wagon.isSelected()
-              ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
-              : this.meshProvider.getMaterial(MaterialName.SleeperBrown)
-            : this.meshProvider.getMaterial(MaterialName.BedGray);
+        this.selectedBMesh.position = CoordinateToBabylonVector3(
+          ray.fromHere(0, 5).coord
+        );
+        this.selectedBMesh.position.y = 10;
+        this.selectedBMesh.material = this.meshProvider.getMaterial(matB);
       }
     }
-
-    this.selectedMesh.setEnabled(
-      this.wagon.isSelected() && !this.wagon.isAFree() && !this.wagon.isBFree()
-    );
   }
 
   process(command: string) {
