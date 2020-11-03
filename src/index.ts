@@ -92,6 +92,7 @@ window.addEventListener('DOMContentLoaded', () => {
           });
         }
       }
+      inputController.tick();
     });
 
     return { scene, camera };

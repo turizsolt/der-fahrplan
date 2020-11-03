@@ -145,4 +145,22 @@ export class ActualStore implements Store {
       }
     });
   }
+
+  private selected: BaseStorable = null;
+
+  clearSelected(): void {
+    if (this.selected) {
+      this.selected.removeSelect();
+      this.selected = null;
+    }
+  }
+
+  setSelected(selected: BaseStorable): void {
+    this.clearSelected();
+    this.selected = selected;
+  }
+
+  getSelected(): BaseStorable {
+    return this.selected;
+  }
 }

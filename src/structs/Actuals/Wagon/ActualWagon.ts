@@ -1,13 +1,12 @@
 import { inject, injectable } from 'inversify';
 import { PositionOnTrack } from '../Track/PositionOnTrack';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { WhichEnd } from '../../Interfaces/WhichEnd';
+import { WhichEnd, otherEnd } from '../../Interfaces/WhichEnd';
 import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
 import { Ray } from '../../Geometry/Ray';
 import { TYPES } from '../../../di/TYPES';
 import { WagonRenderer } from '../../Renderers/WagonRenderer';
 import { TrackBase } from '../../Interfaces/TrackBase';
-import { LineSegment } from '../../Geometry/LineSegment';
 import { TrackWorm } from '../Track/TrackWorm';
 import { WagonEnd } from './WagonEnd';
 import { Store } from '../../Interfaces/Store';
@@ -15,281 +14,239 @@ import { Route } from '../../Scheduling/Route';
 import { Platform } from '../../Interfaces/Platform';
 import { Passenger } from '../../Interfaces/Passenger';
 import { Coordinate } from '../../Geometry/Coordinate';
-import { Left } from '../../Geometry/Directions';
 import { Updatable } from '../../../mixins/Updatable';
 import { applyMixins } from '../../../mixins/ApplyMixins';
-import { Boardable } from '../../../mixins/Boardable';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
+import { WagonPosition } from './WagonPosition';
+import {
+  BoardableWagon,
+  PassengerArrangement
+} from '../../../mixins/BoardableWagon';
+import { WagonAnnouncement } from './WagonAnnouncement';
+import WagonSpeed from './WagonSpeed';
+import { WagonControlType } from './WagonControl/WagonControlType';
+import { WagonConnectable } from './WagonConnectable';
+import { WagonConfig } from './WagonConfig';
+import { WagonControl } from './WagonControl/WagonControl';
+import { WagonControlLocomotive } from './WagonControl/WagonControlLocomotive';
+import { WagonControlControlCar } from './WagonControl/WagonControlControlCar';
+import { WagonControlNothing } from './WagonControl/WagonControlNothing';
+import WagonSpeedPassenger from './WagonSpeedPassenger';
+import { WagonMovingState } from './WagonMovingState';
 
-const WAGON_GAP: number = 1;
-
-export interface ActualWagon extends Updatable, Boardable {}
-const doApply = () => applyMixins(ActualWagon, [Updatable, Boardable]);
+export interface ActualWagon extends Updatable {}
+const doApply = () => applyMixins(ActualWagon, [Updatable]);
 @injectable()
 export class ActualWagon extends ActualBaseBrick implements Wagon {
   private removed: boolean = false;
   protected worm: TrackWorm;
-  protected trip: Route;
-  protected train: Train;
+
+  protected position: WagonPosition;
+  protected boardable: BoardableWagon;
+  protected announcement: WagonAnnouncement;
+  protected speed: WagonSpeed;
+  protected control: WagonControl;
+
+  private appearanceId: string;
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
-  assignTrip(route: Route): void {
-    const oldTrip = this.getTrip();
-    if (oldTrip) {
-      for (let stop of oldTrip.getStops()) {
-        stop.getStation().deannounce(oldTrip);
-      }
+  init(config?: WagonConfig): Wagon {
+    super.initStore(TYPES.Wagon);
+
+    this.position = new WagonPosition(this, config && config.length);
+    this.boardable = new BoardableWagon(
+      this,
+      config && config.passengerArrangement
+    );
+    this.announcement = new WagonAnnouncement(this, this.store);
+    if (config && config.controlType === WagonControlType.Nothing) {
+      this.speed = new WagonSpeedPassenger(
+        this,
+        (config && config.maxSpeed) || undefined,
+        (config && config.accelerateBy) || undefined
+      );
+    } else {
+      this.speed = new WagonSpeed(
+        this,
+        (config && config.maxSpeed) || undefined,
+        (config && config.accelerateBy) || undefined
+      );
     }
-    this.trip = route;
-    if (route) {
-      this.train.setSchedulingWagon(this);
+
+    if (!config || config.controlType === WagonControlType.Locomotive) {
+      this.control = new WagonControlLocomotive(this);
+    } else if (config.controlType === WagonControlType.ControlCar) {
+      this.control = new WagonControlControlCar(this);
+    } else {
+      this.control = new WagonControlNothing();
     }
-    const newTrip = this.getTrip();
-    if (newTrip) {
-      for (let stop of newTrip.getStops()) {
-        stop.getStation().announce(newTrip);
-      }
-    }
+
+    this.appearanceId = config ? config.appearanceId : 'wagon';
+
+    return this;
+  }
+
+  halt(): void {
+    this.speed.halt();
     this.update();
   }
 
-  cancelTrip(): void {
-      this.train.cancelTrip();
+  disconnect(whichEnd: WhichEnd): void {
+    if (this.speed.getMovingState() === WagonMovingState.Moving) return;
+
+    this.getEnd(whichEnd).disconnect();
   }
 
-  getTrain(): Train {
-    return this.train;
-  }
+  getMovingState(): WagonMovingState {
+    if (!this.getTrain().getControlingWagon()) {
+      return WagonMovingState.Standing;
+    }
+    const controllingWagon = this.getTrain().getControlingWagon();
 
-  setTrain(train: Train): void {
-    if (train) {
-      this.train = train;
+    if (controllingWagon === this) {
+      return this.speed.getMovingState();
     } else {
-      this.train = this.store.create<Train>(TYPES.Train).init(this);
+      return controllingWagon.getMovingState();
     }
   }
 
-  getTrip(): Route {
-    if (this.trip) return this.trip;
-    if (this.getTrain().getSchedulingWagon() !== this)
-      return this.getTrain().getTrip();
-    return null;
+  getLastWagon(whichEnd: WhichEnd): Wagon {
+    let end = this.getEnd(whichEnd);
+    while (end.hasConnectedEndOf()) {
+      end = end.getConnectedEnd().getOppositeEnd();
+    }
+    return end.getEndOf();
   }
 
-  stop(): void {
-    // todo use the worm
-    const platformsInvolved: Platform[] = [];
-    const trackA = this.ends.A.positionOnTrack.getTrack();
-    platformsInvolved.push(
-      ...trackA
-        .getPlatformsBeside()
-        .filter(p => this.ends.A.positionOnTrack.isBeside(p))
-    );
-    const trackB = this.ends.B.positionOnTrack.getTrack();
-    trackB
-      .getPlatformsBeside()
-      .filter(p => this.ends.B.positionOnTrack.isBeside(p))
-      .map((p: Platform) => {
-        if (!platformsInvolved.find(x => x === p)) {
-          platformsInvolved.push(p);
-        }
-      });
-
-    platformsInvolved.map(p => this.stoppedAt(p));
+  private getLastWagonEnd(whichEnd: WhichEnd): WagonEnd {
+    let end = this.getEnd(whichEnd);
+    while (end.hasConnectedEndOf()) {
+      end = end.getConnectedEnd().getOppositeEnd();
+    }
+    return end;
   }
 
-  stoppedAt(platform: Platform): void {
-    this.train.stoppedAt(platform.getStation(), platform);
+  setControlingWagon(wagon: Wagon): void {
+    this.getTrain().setControlingWagon(wagon);
   }
 
-  hasFreeSeat(): boolean {
-    return this.seatCount > this.passengerCount;
+  getControlingWagon(): Wagon {
+    return this.getTrain().getControlingWagon();
   }
 
-  announceStoppedAt(platform: Platform): void {
-    const station = platform.getStation();
-    this.seats.map(p => {
-      if (p) {
-        p.listenWagonStoppedAtAnnouncement(
-          station,
-          platform,
-          this.train,
-          this.trip
+  clearControlingWagon(): void {
+    this.getTrain().clearControlingWagon();
+  }
+
+  canThisWagonControl(): boolean {
+    const controlingWagon = this.getTrain().getControlingWagon();
+    return !controlingWagon || controlingWagon === this;
+  }
+
+  reverseTrip(): void {
+    const trip = this.getTrip();
+    if (trip && trip.getReverse()) {
+      this.assignTrip(trip.getReverse());
+    }
+  }
+
+  getSpeed(): number {
+    return this.speed.getSpeed();
+  }
+
+  tick(): void {
+    this.speed.tick();
+    if (this.getSpeed() !== 0) {
+      if (this.speed.getMovingState() === WagonMovingState.Shunting) {
+        const whichEnd = this.getSelectedSide() || WhichEnd.A;
+        const shuntingTo = this.getSpeed() < 0 ? otherEnd(whichEnd) : whichEnd;
+        const headingWagonEnd = this.getLastWagonEnd(shuntingTo);
+        const headingWagon = headingWagonEnd.getEndOf();
+        const headingWhichEnd = headingWagonEnd.getWhichEnd();
+        headingWagon.moveTowardsWagon(
+          headingWhichEnd,
+          Math.abs(this.getSpeed())
         );
+      } else {
+        if (this.getSelectedSide() === WhichEnd.A) {
+          this.moveTowardsWagonA(this.getSpeed());
+        } else if (this.getSelectedSide() === WhichEnd.B) {
+          this.moveTowardsWagonB(this.getSpeed());
+        }
       }
-    });
-  }
-
-  private seatCount: number = 21;
-  private seatColumns: number = 3;
-  private passengerCount: number = 0;
-  private seats: Passenger[] = [];
-
-  setSeatCount(count: number, columns: number = 3) {
-    this.seatCount = count;
-    this.seatColumns = columns;
-  }
-
-  board(passenger: Passenger): Coordinate {
-    if (this.passengerCount >= this.seatCount) {
-      return null;
-    }
-
-    this.passengerCount += 1;
-    let seatNo: number;
-    do {
-      seatNo = (Math.random() * this.seatCount) | 0;
-    } while (this.seats[seatNo]);
-    this.seats[seatNo] = passenger;
-    const ray = this.seatOffset(seatNo);
-    return ray && ray.coord;
-  }
-
-  moveBoardedPassengers() {
-    this.seats.map((pass, seatNo) => {
-      if (pass) {
-        pass.updatePos(this.seatOffset(seatNo).coord);
-      }
-    });
-  }
-
-  private seatOffset(seatNo) {
-    if (!this.worm || this.worm.getAll().length === 0) return null;
-
-    const colSize = 1.2;
-    const rowSize = 1.2;
-    const colCount = this.seatColumns - 1;
-    const rowCount = Math.ceil(this.seatCount / (colCount + 1)) - 1;
-
-    const col = seatNo % 3;
-    const row = (seatNo - col) / 3;
-    return this.getCenterRay()
-      .fromHere(Left, -((colCount / 2) * colSize) + col * colSize)
-      .fromHere(0, (rowCount / 2) * rowSize - row * rowSize);
-  }
-
-  unboard(passenger: Passenger): void {
-    const seatNo = this.seats.findIndex(x => x === passenger);
-    if (seatNo !== -1) {
-      this.seats[seatNo] = undefined;
-      this.passengerCount -= 1;
+    } else {
+      this.update();
     }
   }
 
-  getBoardedPassengers(): Passenger[] {
-    return this.seats.filter(x => x);
+  accelerate(): void {
+    this.speed.accelerate();
   }
 
-  getCenterPos(): Coordinate {
-    return this.ends.A.positionOnTrack
-      .getRay()
-      .coord.midpoint(this.ends.B.positionOnTrack.getRay().coord);
+  break(): void {
+    this.speed.break();
   }
 
-  getCenterRay(): Ray {
-    return new Ray(
-      this.getCenterPos(),
-      this.ends.A.positionOnTrack
-        .getRay()
-        .coord.whichDir2d(this.ends.B.positionOnTrack.getRay().coord)
-    );
+  shuntForward(): void {
+    this.speed.shountForward();
   }
 
-  getLength(): number {
-    return 14;
+  shuntBackward(): void {
+    this.speed.shountBackward();
+  }
+
+  detach(): void {
+    if (this.getControlType() === WagonControlType.Nothing) return;
+    if (!this.isOneFree()) return;
+
+    this.getA().disconnect();
+    this.getB().disconnect();
+  }
+
+  getMaxSpeed(): number {
+    return this.speed.getMaxSpeed();
+  }
+
+  getAccelerateBy(): number {
+    return this.speed.getAcceleateBy();
+  }
+
+  getControlType(): WagonControlType {
+    return this.control.getControlType();
+  }
+
+  getPassengerArrangement(): PassengerArrangement {
+    return this.boardable.getPassengerArrangement();
+  }
+
+  getAppearanceId(): string {
+    return this.appearanceId;
+  }
+
+  getConnectable(A: WhichEnd): WagonConnectable {
+    return WagonConnectable.Connectable;
+  }
+
+  getWorm(): TrackWorm {
+    return this.worm;
   }
 
   remove(): boolean {
     this.removed = true;
     this.worm.checkoutAll();
-    this.ends.A.disconnect();
-    this.ends.B.disconnect();
+    this.position.remove();
     this.update();
     return true;
   }
   isRemoved(): boolean {
     return this.removed;
   }
-  init(): Wagon {
-    super.initStore(TYPES.Wagon);
-
-    this.ends = {
-      [WhichEnd.A]: new WagonEnd(WhichEnd.A, this),
-      [WhichEnd.B]: new WagonEnd(WhichEnd.B, this)
-    };
-
-    this.train = this.store.create<Train>(TYPES.Train).init(this);
-
-    return this;
-  }
-
-  getA(): WagonEnd {
-    return this.ends.A;
-  }
-
-  getB(): WagonEnd {
-    return this.ends.B;
-  }
-
-  getEnd(whichEnd: WhichEnd): WagonEnd {
-    return this.ends[whichEnd];
-  }
-
-  private ends: Record<WhichEnd, WagonEnd>;
 
   getRenderer(): BaseRenderer {
     return this.renderer;
-  }
-  persist(): Object {
-    return {
-      id: this.id,
-      type: 'Wagon',
-
-      seatCount: this.seatCount,
-      seatColumns: this.seatColumns,
-      seats: this.seats.map(p => p && p.getId()),
-
-      A: this.ends.A.persist(),
-      B: this.ends.B.persist(),
-
-      trip: this.trip && this.trip.getId(),
-      train: this.train.getId()
-    };
-  }
-
-  persistDeep(): Object {
-    return {
-      id: this.id,
-      type: 'Wagon',
-
-      trip: this.getTrip() && this.getTrip().persistDeep()
-    };
-  }
-
-  load(obj: any, store: Store): void {
-    this.presetId(obj.id);
-    this.init();
-
-    this.setSeatCount(obj.seatCount, obj.seatColumns);
-    this.seats = obj.seats.map(s => (s ? store.get(s.id) : undefined));
-
-    this.ends.A.load(obj.A, store);
-    this.ends.B.load(obj.B, store);
-
-    const track = this.ends.A.positionOnTrack.getTrack();
-    const bTrack = this.ends.B.positionOnTrack.getTrack();
-    if (track === bTrack) {
-      this.worm = new TrackWorm([track], this);
-    } else {
-      this.worm = new TrackWorm([track, bTrack], this);
-    }
-
-    if (obj.trip) this.assignTrip(store.get(obj.trip) as Trip);
-
-    this.renderer.init(this);
   }
 
   update() {
@@ -299,212 +256,238 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.notify(deep);
   }
 
+  ///////////////////////////
+  // announcement
+  ///////////////////////////
+
+  getTrain(): Train {
+    return this.announcement.getTrain();
+  }
+
+  setTrain(train: Train): void {
+    this.announcement.setTrain(train);
+  }
+
+  assignTrip(route: Route): void {
+    this.announcement.assignTrip(route);
+    this.update();
+  }
+
+  cancelTrip(): void {
+    this.announcement.cancelTrip();
+  }
+
+  getTrip(): Route {
+    return this.announcement.getTrip();
+  }
+
+  stop(): void {
+    this.announcement.stop();
+  }
+
+  stoppedAt(platform: Platform): void {
+    this.announcement.stoppedAt(platform);
+  }
+
+  announceStoppedAt(platform: Platform): void {
+    this.announcement.announceStoppedAt(platform);
+  }
+
+  ///////////////////////////
+  // boardable
+  ///////////////////////////
+
+  hasFreeSeat(): boolean {
+    return this.boardable.hasFreeSeat();
+  }
+
+  setSeatCount(count: number, columns: number) {
+    this.boardable.setSeatCount(count, columns);
+  }
+
+  board(passenger: Passenger): Coordinate {
+    return this.boardable.board(passenger);
+  }
+
+  moveBoardedPassengers() {
+    this.boardable.moveBoardedPassengers();
+  }
+
+  unboard(passenger: Passenger): void {
+    this.boardable.unboard(passenger);
+  }
+
+  getBoardedPassengers(): Passenger[] {
+    return this.boardable.getBoardedPassengers();
+  }
+
+  ///////////////////////////
+  // position
+  ///////////////////////////
+
+  getCenterPos(): Coordinate {
+    return this.position.getCenterPos();
+  }
+
+  getCenterRay(): Ray {
+    return this.position.getCenterRay();
+  }
+
+  getLength(): number {
+    return this.position.getLength();
+  }
+
+  getA(): WagonEnd {
+    return this.position.getA();
+  }
+
+  getB(): WagonEnd {
+    return this.position.getB();
+  }
+
+  getEnd(whichEnd: WhichEnd): WagonEnd {
+    return this.position.getEnd(whichEnd);
+  }
+
+  isAFree(): boolean {
+    return !this.position.getA().hasConnectedEndOf();
+  }
+
+  isBFree(): boolean {
+    return !this.position.getB().hasConnectedEndOf();
+  }
+
+  isOneFree(): boolean {
+    return this.isAFree() !== this.isBFree(); // xor
+  }
+
   putOnTrack(
     track: TrackBase,
     position: number = 0,
     direction: number = 1
   ): void {
-    this.ends.A.positionOnTrack = new PositionOnTrack(
-      track,
-      position,
-      direction
-    );
+    this.worm = this.position.putOnTrack(track, position, direction);
+    this.renderer.init(this);
+    this.update();
+  }
 
-    this.ends.B.positionOnTrack = new PositionOnTrack(
-      track,
-      position,
-      direction
-    );
+  getRay(): Ray {
+    return this.position.getRay();
+  }
 
-    this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
-    this.ends.B.positionOnTrack.hop(this.getLength());
+  moveTowardsWagon(whichEnd: WhichEnd, distance: number): void {
+    if (whichEnd === WhichEnd.A) {
+      this.moveTowardsWagonA(distance);
+    } else if (whichEnd === WhichEnd.B) {
+      this.moveTowardsWagonB(distance);
+    }
+  }
 
-    const bTrack = this.ends.B.positionOnTrack.getTrack();
+  moveTowardsWagonB(distance: number): void {
+    this.position.moveTowardsWagonB(distance);
+    this.getTrain().moveBoardedPassengers();
+  }
+
+  pullToPos(pot: PositionOnTrack, dir: number) {
+    this.position.pullToPos(pot, dir);
+  }
+
+  moveTowardsWagonA(distance: number): void {
+    this.position.moveTowardsWagonA(distance);
+    this.getTrain().moveBoardedPassengers();
+  }
+
+  getNearestWagon(whichEnd: WhichEnd): NearestWagon {
+    return this.position.getNearestWagon(whichEnd);
+  }
+
+  swapEnds(): void {
+    this.position.swapEnds();
+    this.update();
+  }
+
+  ///////////////////////
+  // control
+  ///////////////////////
+
+  getSelectedSide(): WhichEnd | null {
+    return this.control.getSelectedSide();
+  }
+
+  onSelectChanged(selected: boolean): void {
+    this.control.onSelected(selected);
+  }
+
+  swapSelectedSide(): void {
+    this.control.swapSelectedSide();
+  }
+
+  onStocked(): void {
+    this.control.onStocked();
+  }
+
+  ///////////////////////
+  // persist
+  ///////////////////////
+
+  persist(): Object {
+    return {
+      id: this.id,
+      type: 'Wagon',
+
+      ...this.boardable.persist(),
+
+      config: {
+        maxSpeed: this.getMaxSpeed(),
+        accelerateBy: this.getAccelerateBy(),
+        controlType: this.getControlType(),
+        passengerArrangement: this.getPassengerArrangement(),
+        appearanceId: this.getAppearanceId(),
+        length: this.getLength(),
+        connectable: {
+          A: this.getConnectable(WhichEnd.A),
+          B: this.getConnectable(WhichEnd.B)
+        }
+      },
+
+      A: this.getA().persist(),
+      B: this.getB().persist(),
+
+      ...this.announcement.persist()
+    };
+  }
+
+  persistDeep(): Object {
+    return {
+      id: this.id,
+      type: 'Wagon',
+      speed: this.getSpeed(),
+
+      trip: this.getTrip() && this.getTrip().persistDeep()
+    };
+  }
+
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(obj.config);
+
+    this.setSeatCount(obj.seatCount, obj.seatColumns);
+    this.boardable.load(obj.seats, store);
+
+    this.getA().load(obj.A, store);
+    this.getB().load(obj.B, store);
+
+    const track = this.getA().positionOnTrack.getTrack();
+    const bTrack = this.getB().positionOnTrack.getTrack();
     if (track === bTrack) {
       this.worm = new TrackWorm([track], this);
     } else {
       this.worm = new TrackWorm([track, bTrack], this);
     }
 
+    if (obj.trip) this.assignTrip(store.get(obj.trip) as Trip);
+
     this.renderer.init(this);
-    this.update();
-  }
-
-  getRay(): Ray {
-    const ls = LineSegment.fromTwoPoints(
-      this.ends.A.positionOnTrack.getRay().coord,
-      this.ends.B.positionOnTrack.getRay().coord
-    );
-    return ls.getPointAtHalfway();
-  }
-
-  moveTowardsWagonB(distance: number): void {
-    if (this.ends.B.hasConnectedEndOf()) return;
-
-    const initDist = this.getB()
-      .getPositionOnTrack()
-      .getRay()
-      .coord.distance2d(
-        this.getA()
-          .getPositionOnTrack()
-          .getRay().coord
-      );
-
-    this.ends.B.positionOnTrack.hop(distance);
-
-    const newDist = this.getB()
-      .getPositionOnTrack()
-      .getRay()
-      .coord.distance2d(
-        this.getA()
-          .getPositionOnTrack()
-          .getRay().coord
-      );
-
-    let inv = 1;
-    if (newDist < initDist) {
-      this.ends.B.positionOnTrack.hop(-distance);
-      this.ends.B.positionOnTrack.hop(-distance);
-      inv = -1;
-    }
-
-    this.ends.A.positionOnTrack.copyFrom(this.ends.B.positionOnTrack);
-    const newWorm = this.ends.A.positionOnTrack
-      .hop(-1 * inv * this.getLength())
-      .reverse();
-    this.worm.moveForward(newWorm);
-    this.update();
-
-    if (this.ends.A.hasConnectedEndOf()) {
-      const next = this.ends.A.getConnectedEndOf();
-      next.pullToPos(this.ends.A.positionOnTrack, -1 * inv);
-    }
-
-    const nearest = this.getNearestWagon(WhichEnd.B);
-    if (nearest) {
-      const dist = nearest.end
-        .getPositionOnTrack()
-        .getRay()
-        .coord.distance2d(this.ends.B.getPositionOnTrack().getRay().coord);
-
-      if (dist <= 1) {
-        this.ends.B.connect(nearest.end);
-      }
-    }
-
-    this.train.moveBoardedPassengers();
-  }
-
-  pullToPos(pot: PositionOnTrack, dir: number) {
-    const isACloser =
-      this.getA()
-        .getPositionOnTrack()
-        .getRay()
-        .coord.distance2d(pot.getRay().coord) <
-      this.getB()
-        .getPositionOnTrack()
-        .getRay()
-        .coord.distance2d(pot.getRay().coord);
-    const closer = isACloser ? this.getA() : this.getB();
-    const further = isACloser ? this.getB() : this.getA();
-
-    closer.positionOnTrack.copyFrom(pot);
-    closer.positionOnTrack.hop(dir * WAGON_GAP);
-    further.positionOnTrack.copyFrom(closer.positionOnTrack);
-    const newWorm = further.positionOnTrack.hop(dir * this.getLength());
-    this.worm.moveBackward(newWorm);
-    this.update();
-
-    if (further.hasConnectedEndOf()) {
-      const next = further.getConnectedEndOf();
-      next.pullToPos(further.positionOnTrack, dir); // or -dir
-    }
-  }
-
-  moveTowardsWagonA(distance: number): void {
-    if (this.ends.A.hasConnectedEndOf()) return;
-
-    const initDist = this.getB()
-      .getPositionOnTrack()
-      .getRay()
-      .coord.distance2d(
-        this.getA()
-          .getPositionOnTrack()
-          .getRay().coord
-      );
-
-    this.ends.A.positionOnTrack.hop(-distance);
-
-    const newDist = this.getB()
-      .getPositionOnTrack()
-      .getRay()
-      .coord.distance2d(
-        this.getA()
-          .getPositionOnTrack()
-          .getRay().coord
-      );
-
-    let inv = 1;
-    if (newDist < initDist) {
-      this.ends.A.positionOnTrack.hop(distance);
-      this.ends.A.positionOnTrack.hop(distance);
-      inv = -1;
-    }
-
-    this.ends.B.positionOnTrack.copyFrom(this.ends.A.positionOnTrack);
-    const newWorm = this.ends.B.positionOnTrack.hop(inv * this.getLength());
-    this.worm.moveBackward(newWorm);
-    this.update();
-
-    // move some wagons behind be (on B end)
-    if (this.ends.B.hasConnectedEndOf()) {
-      const next = this.ends.B.getConnectedEndOf();
-      next.pullToPos(this.ends.B.positionOnTrack, 1 * inv);
-    }
-
-    const nearest = this.getNearestWagon(WhichEnd.A);
-    if (nearest) {
-      const dist = nearest.end
-        .getPositionOnTrack()
-        .getRay()
-        .coord.distance2d(this.ends.A.getPositionOnTrack().getRay().coord);
-
-      if (dist <= 1) {
-        this.ends.A.connect(nearest.end);
-      }
-    }
-
-    this.train.moveBoardedPassengers();
-  }
-
-  getNearestWagon(whichEnd: WhichEnd): NearestWagon {
-    const end = whichEnd === WhichEnd.A ? this.getA() : this.getB();
-
-    const track = end.positionOnTrack.getTrack();
-
-    let to = 0;
-    if (end.positionOnTrack.getDirection() === 1) {
-      to = whichEnd === WhichEnd.A ? 0 : 1;
-    } else {
-      to = whichEnd === WhichEnd.A ? 1 : 0;
-    }
-
-    return track.getWagonClosest(
-      end.positionOnTrack.getPercentage(),
-      to,
-      this,
-      2
-    );
-  }
-
-  swapEnds(): void {
-    if (this.getA().hasConnectedEndOf() || this.getB().hasConnectedEndOf())
-      return;
-
-    const [tmpA, tmpB] = [this.getA(), this.getB()];
-    this.ends = { A: tmpB, B: tmpA };
-    this.getA().swapDirection();
-    this.getB().swapDirection();
   }
 }
 

@@ -44,14 +44,14 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
           : this.passenger.getPlace().getType() === Symbol.for('Wagon')
           ? 6
           : 12;
-      console.log(
-        `pass #${this.passenger.getId()} on ${this.passenger.getPlace() &&
-          this.passenger
-            .getPlace()
-            .getType()
-            .toString()} #${this.passenger.getPlace() &&
-          this.passenger.getPlace().getId()}`
-      );
+      //   console.log(
+      //     `pass #${this.passenger.getId()} on ${this.passenger.getPlace() &&
+      //       this.passenger
+      //         .getPlace()
+      //         .getType()
+      //         .toString()} #${this.passenger.getPlace() &&
+      //       this.passenger.getPlace().getId()}`
+      //   );
     }
   }
 }

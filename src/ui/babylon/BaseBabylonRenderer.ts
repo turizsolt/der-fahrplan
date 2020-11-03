@@ -15,13 +15,4 @@ export class BaseBabylonRenderer {
   }
 
   process(command: string): void {}
-
-  setSelected(selected: boolean): void {
-    this.selected = selected;
-    this.update();
-  }
-
-  isSelected(): boolean {
-    return this.selected;
-  }
 }
