@@ -31,6 +31,7 @@ import { RouteStop } from '../../structs/Scheduling/RouteStop';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 import { ActualWagon } from '../../structs/Actuals/Wagon/ActualWagon';
 import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
+import { Vector3 } from 'babylonjs';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -542,6 +543,7 @@ export class InputController {
 
         const data = {
           data: this.store.persistAll(),
+          camera: this.saveCamera(),
           _version: 1,
           _format: 'fahrplan'
         };
@@ -635,5 +637,35 @@ export class InputController {
 
   load(data: any) {
     this.store.loadAll(data);
+  }
+
+  saveCamera(): any {
+    return {
+      alpha: this.camera.alpha,
+      beta: this.camera.beta,
+      radius: this.camera.radius,
+      target: {
+        x: this.camera.target.x,
+        y: this.camera.target.y,
+        z: this.camera.target.z
+      },
+      position: {
+        x: this.camera.position.x,
+        y: this.camera.position.y,
+        z: this.camera.position.z
+      }
+    };
+  }
+
+  setCamera(camera: any) {
+    this.camera.alpha = camera.alpha;
+    this.camera.beta = camera.beta;
+    this.camera.radius = camera.radius;
+    this.camera.setTarget(
+      new Vector3(camera.target.x, camera.target.y, camera.target.z)
+    );
+    this.camera.setPosition(
+      new Vector3(camera.position.x, camera.position.y, camera.position.z)
+    );
   }
 }

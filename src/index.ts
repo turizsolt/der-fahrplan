@@ -172,6 +172,9 @@ window.addEventListener('DOMContentLoaded', () => {
             if (!obj._version) throw new Error();
             if (!obj._format || obj._format !== 'fahrplan') throw new Error();
             inputController.load(obj.data);
+            if (obj.camera) {
+              inputController.setCamera(obj.camera);
+            }
           } catch {
             console.error('Not proper JSON, hey!');
           }
