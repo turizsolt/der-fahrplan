@@ -26,6 +26,15 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     };
   }
 
+  undefine(stop: RouteStop, props: OptionalTripStop): void {
+    const id = stop.getId();
+    for(let prop of Object.keys(props)) {
+      if(this.redefinedProps[id]?.[prop]) {
+        delete this.redefinedProps[id][prop];
+      }
+    }
+  }
+
   getStops(): TripStop[] {
     return this.route.getStops().map(stop => ({
       station: stop.getStation(),

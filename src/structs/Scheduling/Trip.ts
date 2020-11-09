@@ -8,4 +8,5 @@ export interface Trip extends BaseStorable {
   getRoute(): Route;
   getStops(): TripStop[];
   redefine(stop: RouteStop, props: OptionalTripStop): void;
+  undefine(stop: RouteStop, props: OptionalTripStop): void;
 }
