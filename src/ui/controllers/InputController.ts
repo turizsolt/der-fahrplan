@@ -80,7 +80,7 @@ export class InputController {
     });
     this.vmInfoBox = new Vue({
       el: '#info-box',
-      data: { selected: null, type: null, opts: [] }
+      data: { selected: null, type: null, opts: [], tickCount: '0:00' }
     });
 
     Vue.component('idtext', {
@@ -554,6 +554,19 @@ export class InputController {
 
         download(JSON.stringify(data), fileName, 'application/json');
         break;
+
+      case '`':
+      case '0':
+        this.store.setTickSpeed(0);
+        break;
+
+      case '1':
+        this.store.setTickSpeed(1);
+        break;
+
+      case '2':
+        this.store.setTickSpeed(2);
+        break;
     }
 
     if (!this.getSelected()) return;
@@ -630,9 +643,19 @@ export class InputController {
   }
 
   tick() {
-    this.store.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {
-      wagon.tick();
-    });
+    const speed = this.store.getTickSpeed();
+    for (let i = 0; i < speed; i++) {
+      this.store.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {
+        wagon.tick();
+      });
+    }
+    this.store.tick();
+    const count = Math.floor(this.store.getTickCount() / 60);
+    this.vmInfoBox.tickCount =
+      Math.floor(count / 60) +
+      ':' +
+      (count % 60 < 10 ? '0' : '') +
+      (count % 60);
   }
 
   load(data: any) {

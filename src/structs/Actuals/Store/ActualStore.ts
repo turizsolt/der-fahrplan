@@ -163,4 +163,25 @@ export class ActualStore implements Store {
   getSelected(): BaseStorable {
     return this.selected;
   }
+
+  private tickSpeed: number = 0;
+  private tickCount: number = 0;
+
+  tick(): void {
+    if (this.tickSpeed) {
+      this.tickCount += this.tickSpeed;
+    }
+  }
+
+  setTickSpeed(speed: number): void {
+    this.tickSpeed = speed;
+  }
+
+  getTickSpeed(): number {
+    return this.tickSpeed;
+  }
+
+  getTickCount(): number {
+    return this.tickCount;
+  }
 }
