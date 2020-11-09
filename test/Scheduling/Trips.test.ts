@@ -7,6 +7,7 @@ import { Store } from '../../src/structs/Interfaces/Store';
 import { Trip } from '../../src/structs/Scheduling/Trip';
 import { RouteStop } from '../../src/structs/Scheduling/RouteStop';
 import { Station } from '../../src/structs/Scheduling/Station';
+import { Platform } from '../../src/structs/Interfaces/Platform';
 chai.use(chaiAlmost());
 
 export const store: Store = testContainer
@@ -16,6 +17,8 @@ store.clear();
 const RouteFactory: () => Route = () => store.create<Route>(TYPES.Route);
 const RouteStopFactory: () => RouteStop = () =>
   store.create<RouteStop>(TYPES.RouteStop);
+const PlatformFactory: () => Platform = () =>
+  store.create<Platform>(TYPES.Platform);
 const StationFactory: () => Station = () =>
   store.create<Station>(TYPES.Station);
 const TripFactory: () => Trip = () => store.create<Trip>(TYPES.Trip);
@@ -25,16 +28,19 @@ describe('Trips', () => {
   route.setName('S12');
 
   const station0 = StationFactory().init(null);
-  station0.setName('Alpha');
-  const stop0 = RouteStopFactory().init(station0, null, undefined, 0);
-
   const station1 = StationFactory().init(null);
-  station1.setName('Bravo');
-  const stop1 = RouteStopFactory().init(station1, null, 3, 4);
-
   const station2 = StationFactory().init(null);
+  station0.setName('Alpha');
+  station1.setName('Bravo');
   station2.setName('Charlie');
-  const stop2 = RouteStopFactory().init(station2, null, 8, 9);
+
+  const platform0A = PlatformFactory().initX(station0, 'A');
+  const stop0 = RouteStopFactory().init(station0, platform0A, undefined, 0);
+
+  const platform1B = PlatformFactory().initX(station1, 'B');
+  const stop1 = RouteStopFactory().init(station1, platform1B, 3, 4);
+
+  const stop2 = RouteStopFactory().init(station2, null);
 
   route.addStop(stop0);
   route.addStop(stop1);
@@ -80,5 +86,11 @@ describe('Trips', () => {
 
     expect(trip.getStops().map(x => x.arrivalTime)).deep.equals([10, 15]);
     expect(trip.getStops().map(x => x.departureTime)).deep.equals([10, 16]);
+  });
+
+  it('platforms read correctly', () => {
+    const trip = TripFactory().init(route, 10);
+
+    expect(trip.getStops().map(x => x.platformNo)).deep.equals(['A', 'B']);
   });
 });

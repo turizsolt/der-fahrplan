@@ -5,6 +5,7 @@ export interface TripStop {
   stationName: string;
   station: Station;
   platform: Platform;
+  platformNo: string;
   arrivalTime: number;
   departureTime: number;
 }
