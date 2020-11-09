@@ -8,7 +8,6 @@ import { Station } from '../../../src/structs/Scheduling/Station';
 import { Platform } from '../../../src/structs/Interfaces/Platform';
 import { Route } from '../../../src/structs/Scheduling/Route';
 import { RouteStop } from '../../../src/structs/Scheduling/RouteStop';
-import { Trip } from '../../../src/structs/Scheduling/Trip';
 import { Passenger } from '../../../src/structs/Interfaces/Passenger';
 import { createConnectedWagons } from '../Train/GetTrip.test';
 chai.use(chaiAlmost());
@@ -34,19 +33,19 @@ describe('MultiWagon departing', () => {
   const tripStopA = RouteStopFactory().init(stationA, null);
   const tripStopB2 = RouteStopFactory().init(stationB, platformB2);
 
-  const trip: Trip = RouteFactory().init();
-  trip.addStop(tripStopA1);
-  trip.addStop(tripStopB2);
+  const route: Route = RouteFactory().init();
+  route.addStop(tripStopA1);
+  route.addStop(tripStopB2);
 
-  const trip2: Trip = RouteFactory().init();
-  trip2.addStop(tripStopA);
-  trip2.addStop(tripStopB2);
+  const route2: Route = RouteFactory().init();
+  route2.addStop(tripStopA);
+  route2.addStop(tripStopB2);
 
   it('single wagon, some passenger left at station', () => {
     const passenger: Passenger[] = [];
     const wagon = WagonFactory().init();
     wagon.setSeatCount(2, 2);
-    wagon.assignTrip(trip);
+    wagon.assignTrip(route);
 
     for (let i = 0; i < 3; i++) {
       passenger[i] = PassengerFactory().init(stationA, stationB);
@@ -64,7 +63,7 @@ describe('MultiWagon departing', () => {
     const [wagon1, wagon2] = createConnectedWagons(2);
     wagon1.setSeatCount(4, 2);
     wagon2.setSeatCount(4, 2);
-    wagon1.assignTrip(trip);
+    wagon1.assignTrip(route);
 
     for (let i = 0; i < 3; i++) {
       passenger[i] = PassengerFactory().init(stationA, stationB);
@@ -82,7 +81,7 @@ describe('MultiWagon departing', () => {
     const [wagon1, wagon2] = createConnectedWagons(2);
     wagon1.setSeatCount(2, 2);
     wagon2.setSeatCount(2, 2);
-    wagon1.assignTrip(trip);
+    wagon1.assignTrip(route);
 
     for (let i = 0; i < 3; i++) {
       passenger[i] = PassengerFactory().init(stationA, stationB);
@@ -101,7 +100,7 @@ describe('MultiWagon departing', () => {
     wagon1.setSeatCount(2, 2);
     wagon2.setSeatCount(2, 2);
     wagon3.setSeatCount(2, 2);
-    wagon1.assignTrip(trip);
+    wagon1.assignTrip(route);
 
     for (let i = 0; i < 7; i++) {
       passenger[i] = PassengerFactory().init(stationA, stationB);

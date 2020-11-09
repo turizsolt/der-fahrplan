@@ -8,7 +8,6 @@ import { Station } from '../../../src/structs/Scheduling/Station';
 import { Platform } from '../../../src/structs/Interfaces/Platform';
 import { Route } from '../../../src/structs/Scheduling/Route';
 import { RouteStop } from '../../../src/structs/Scheduling/RouteStop';
-import { Trip } from '../../../src/structs/Scheduling/Trip';
 import { Passenger } from '../../../src/structs/Interfaces/Passenger';
 chai.use(chaiAlmost());
 
@@ -36,13 +35,13 @@ describe('Announcing train trips to stations', () => {
   const tripStopA3 = RouteStopFactory().init(stationA, platformA3);
   const tripStopB2 = RouteStopFactory().init(stationB, platformB2);
 
-  const trip: Trip = RouteFactory().init();
-  trip.addStop(tripStopA1);
-  trip.addStop(tripStopB2);
+  const route: Route = RouteFactory().init();
+  route.addStop(tripStopA1);
+  route.addStop(tripStopB2);
 
-  const trip2: Trip = RouteFactory().init();
-  trip2.addStop(tripStopA3);
-  trip2.addStop(tripStopB2);
+  const route2: Route = RouteFactory().init();
+  route2.addStop(tripStopA3);
+  route2.addStop(tripStopB2);
 
   const passenger = PassengerFactory().init(stationA, stationB);
 
@@ -54,10 +53,10 @@ describe('Announcing train trips to stations', () => {
     expect(stationA.getPlatformTo(stationB)).equals(undefined);
     expect(stationA.getAnnouncedTrips()).deep.equals([]);
 
-    wagon.assignTrip(trip);
+    wagon.assignTrip(route);
 
     expect(stationA.getPlatformTo(stationB)).equals(platformA1);
-    expect(stationA.getAnnouncedTrips()).deep.equals([trip]);
+    expect(stationA.getAnnouncedTrips()).deep.equals([route]);
   });
 
   step('passenger at platformA1', () => {
@@ -65,10 +64,10 @@ describe('Announcing train trips to stations', () => {
   });
 
   step('train reassigns a trip, stations get it', () => {
-    wagon.assignTrip(trip2);
+    wagon.assignTrip(route2);
 
     expect(stationA.getPlatformTo(stationB)).equals(platformA3);
-    expect(stationA.getAnnouncedTrips()).deep.equals([trip2]);
+    expect(stationA.getAnnouncedTrips()).deep.equals([route2]);
   });
 
   step('passenger at platformA3', () => {
