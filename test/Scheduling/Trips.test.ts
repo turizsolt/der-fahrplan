@@ -26,15 +26,15 @@ describe('Trips', () => {
 
   const station0 = StationFactory().init(null);
   station0.setName('Alpha');
-  const stop0 = RouteStopFactory().init(station0);
+  const stop0 = RouteStopFactory().init(station0, null, undefined, 0);
 
   const station1 = StationFactory().init(null);
   station1.setName('Bravo');
-  const stop1 = RouteStopFactory().init(station1);
+  const stop1 = RouteStopFactory().init(station1, null, 3, 4);
 
   const station2 = StationFactory().init(null);
   station2.setName('Charlie');
-  const stop2 = RouteStopFactory().init(station2);
+  const stop2 = RouteStopFactory().init(station2, null, 8, 9);
 
   route.addStop(stop0);
   route.addStop(stop1);
@@ -65,5 +65,12 @@ describe('Trips', () => {
     ]);
 
     route.removeStop(stop2);
+  });
+
+  it('arrival and departure times read correctly', () => {
+    const trip = TripFactory().init(route, 10);
+
+    expect(trip.getStops().map(x => x.arrivalTime)).deep.equals([10, 13]);
+    expect(trip.getStops().map(x => x.departureTime)).deep.equals([10, 14]);
   });
 });
