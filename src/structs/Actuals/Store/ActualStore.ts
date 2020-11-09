@@ -80,6 +80,7 @@ export class ActualStore implements Store {
 
   clear() {
     this.elements = {};
+    this.typedElements = {};
   }
 
   register(object: BaseStorable, presetId: string = null): string {

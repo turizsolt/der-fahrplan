@@ -13,7 +13,6 @@ chai.use(chaiAlmost());
 export const store: Store = testContainer
   .get<() => Store>(TYPES.FactoryOfStore)()
   .init();
-store.clear();
 const RouteFactory: () => Route = () => store.create<Route>(TYPES.Route);
 const RouteStopFactory: () => RouteStop = () =>
   store.create<RouteStop>(TYPES.RouteStop);
@@ -24,27 +23,42 @@ const StationFactory: () => Station = () =>
 const TripFactory: () => Trip = () => store.create<Trip>(TYPES.Trip);
 
 describe('Trips', () => {
-  const route = RouteFactory().init();
-  route.setName('S12');
+  let route,
+    station0,
+    station1,
+    station2,
+    stop0,
+    stop1,
+    stop2,
+    platform0A,
+    platform1B,
+    platform1C;
 
-  const station0 = StationFactory().init(null);
-  const station1 = StationFactory().init(null);
-  const station2 = StationFactory().init(null);
-  station0.setName('Alpha');
-  station1.setName('Bravo');
-  station2.setName('Charlie');
+  before(() => {
+    store.clear();
 
-  const platform0A = PlatformFactory().initX(station0, 'A');
-  const stop0 = RouteStopFactory().init(station0, platform0A, undefined, 0);
+    route = RouteFactory().init();
+    route.setName('S12');
 
-  const platform1B = PlatformFactory().initX(station1, 'B');
-  const platform1C = PlatformFactory().initX(station1, 'C');
-  const stop1 = RouteStopFactory().init(station1, platform1B, 3, 4);
+    station0 = StationFactory().init(null);
+    station1 = StationFactory().init(null);
+    station2 = StationFactory().init(null);
+    station0.setName('Alpha');
+    station1.setName('Bravo');
+    station2.setName('Charlie');
 
-  const stop2 = RouteStopFactory().init(station2, null);
+    platform0A = PlatformFactory().initX(station0, 'A');
+    stop0 = RouteStopFactory().init(station0, platform0A, undefined, 0);
 
-  route.addStop(stop0);
-  route.addStop(stop1);
+    platform1B = PlatformFactory().initX(station1, 'B');
+    platform1C = PlatformFactory().initX(station1, 'C');
+    stop1 = RouteStopFactory().init(station1, platform1B, 3, 4);
+
+    stop2 = RouteStopFactory().init(station2, null);
+
+    route.addStop(stop0);
+    route.addStop(stop1);
+  });
 
   it('creates a new trip from route', () => {
     const trip = TripFactory().init(route, 0);
@@ -115,5 +129,20 @@ describe('Trips', () => {
     trip.undefine(stop0, { platform: undefined });
 
     expect(trip.getStops().map(x => x.platformNo)).deep.equals(['A', 'B']);
+  });
+
+  it('persist', () => {
+    const trip = TripFactory().init(route, 10);
+    trip.redefine(stop0, { arrivalTime: 9 });
+    trip.redefine(stop1, { platform: platform1C });
+
+    const json = trip.persist();
+    const trip2 = TripFactory();
+    trip2.load(json, store);
+
+    expect(trip2.getRoute().getId()).equals(route.getId());
+    expect(trip2.getStops().map(x => x.arrivalTime)).deep.equals([9, 13]);
+    expect(trip2.getStops().map(x => x.departureTime)).deep.equals([10, 14]);
+    expect(trip2.getStops().map(x => x.platformNo)).deep.equals(['A', 'C']);
   });
 });
