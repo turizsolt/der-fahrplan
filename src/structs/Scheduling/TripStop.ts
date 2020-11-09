@@ -1,3 +1,8 @@
-import { RouteStop } from './RouteStop';
+import { BaseStorable } from '../Interfaces/BaseStorable';
+import { Station } from './Station';
+import { Platform } from '../Interfaces/Platform';
 
-export type TripStop = RouteStop;
+export interface TripStop extends BaseStorable {
+  init(station: Station, platform?: Platform): TripStop;
+  getStationName(): string;
+}
