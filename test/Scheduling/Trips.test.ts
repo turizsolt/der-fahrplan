@@ -38,6 +38,7 @@ describe('Trips', () => {
   const stop0 = RouteStopFactory().init(station0, platform0A, undefined, 0);
 
   const platform1B = PlatformFactory().initX(station1, 'B');
+  const platform1C = PlatformFactory().initX(station1, 'C');
   const stop1 = RouteStopFactory().init(station1, platform1B, 3, 4);
 
   const stop2 = RouteStopFactory().init(station2, null);
@@ -92,5 +93,12 @@ describe('Trips', () => {
     const trip = TripFactory().init(route, 10);
 
     expect(trip.getStops().map(x => x.platformNo)).deep.equals(['A', 'B']);
+  });
+
+  it('redefined platform read correctly', () => {
+    const trip = TripFactory().init(route, 10);
+    trip.redefine(stop1, { platform: platform1C });
+
+    expect(trip.getStops().map(x => x.platformNo)).deep.equals(['A', 'C']);
   });
 });

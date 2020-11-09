@@ -31,7 +31,9 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       station: stop.getStation(),
       platform: stop.getPlatform(),
       stationName: stop.getStationName(),
-      platformNo: stop.getPlatform()?.getNo(),
+      platformNo: 
+        (this.redefinedProps[stop.getId()]?.platform?.getNo()) ??
+        stop.getPlatform()?.getNo(),
       arrivalTime:
         (this.redefinedProps[stop.getId()]?.arrivalTime) ??
         this.departureTime + stop.getArrivalTime(),
