@@ -104,7 +104,15 @@ describe('Trips', () => {
 
   it('redefined then cleared platform read correctly', () => {
     const trip = TripFactory().init(route, 10);
+    trip.redefine(stop1, { platform: platform1C });
     trip.undefine(stop1, { platform: undefined });
+
+    expect(trip.getStops().map(x => x.platformNo)).deep.equals(['A', 'B']);
+  });
+
+  it('cleared not redefined', () => {
+    const trip = TripFactory().init(route, 10);
+    trip.undefine(stop0, { platform: undefined });
 
     expect(trip.getStops().map(x => x.platformNo)).deep.equals(['A', 'B']);
   });
