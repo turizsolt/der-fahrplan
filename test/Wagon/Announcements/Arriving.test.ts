@@ -8,7 +8,6 @@ import { Station } from '../../../src/structs/Scheduling/Station';
 import { Platform } from '../../../src/structs/Interfaces/Platform';
 import { Route } from '../../../src/structs/Scheduling/Route';
 import { RouteStop } from '../../../src/structs/Scheduling/RouteStop';
-import { Trip } from '../../../src/structs/Scheduling/Trip';
 import { Passenger } from '../../../src/structs/Interfaces/Passenger';
 chai.use(chaiAlmost());
 
@@ -36,19 +35,19 @@ describe('Announcing departing trains', () => {
   const tripStopB2 = RouteStopFactory().init(stationB, platformB2);
   const tripStopC3 = RouteStopFactory().init(stationC, platformC3);
 
-  const tripAB: Trip = RouteFactory().init();
-  tripAB.addStop(tripStopA1);
-  tripAB.addStop(tripStopB2);
+  const routeAB: Route = RouteFactory().init();
+  routeAB.addStop(tripStopA1);
+  routeAB.addStop(tripStopB2);
 
-  const tripAC: Trip = RouteFactory().init();
-  tripAC.addStop(tripStopA1);
-  tripAC.addStop(tripStopB2);
-  tripAC.addStop(tripStopC3);
+  const routeAC: Route = RouteFactory().init();
+  routeAC.addStop(tripStopA1);
+  routeAC.addStop(tripStopB2);
+  routeAC.addStop(tripStopC3);
 
   it('train stops where passenger goes to', () => {
     const passenger = PassengerFactory().init(stationA, stationB);
     const wagon = WagonFactory().init();
-    wagon.assignTrip(tripAB);
+    wagon.assignTrip(routeAB);
     wagon.stoppedAt(platformA1);
     wagon.stoppedAt(platformB2);
 
@@ -58,7 +57,7 @@ describe('Announcing departing trains', () => {
   it('train stops where passenger goes to', () => {
     const passenger = PassengerFactory().init(stationA, stationC);
     const wagon = WagonFactory().init();
-    wagon.assignTrip(tripAC);
+    wagon.assignTrip(routeAC);
     wagon.stoppedAt(platformA1);
     wagon.stoppedAt(platformB2);
 
@@ -68,7 +67,7 @@ describe('Announcing departing trains', () => {
   it('train stops, get off because no trip assigned', () => {
     const passenger = PassengerFactory().init(stationA, stationC);
     const wagon = WagonFactory().init();
-    wagon.assignTrip(tripAC);
+    wagon.assignTrip(routeAC);
     wagon.stoppedAt(platformA1);
     wagon.assignTrip(null);
     wagon.stoppedAt(platformB2);
@@ -79,9 +78,9 @@ describe('Announcing departing trains', () => {
   it('train stops, get off because trip is not mine anymore', () => {
     const passenger = PassengerFactory().init(stationA, stationC);
     const wagon = WagonFactory().init();
-    wagon.assignTrip(tripAC);
+    wagon.assignTrip(routeAC);
     wagon.stoppedAt(platformA1);
-    wagon.assignTrip(tripAB);
+    wagon.assignTrip(routeAB);
     wagon.stoppedAt(platformB2);
 
     expect(passenger.getPlace()).equals(stationB);

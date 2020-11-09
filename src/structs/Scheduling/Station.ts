@@ -3,7 +3,6 @@ import { Platform } from '../Interfaces/Platform';
 import { Color } from '../Color';
 import { Route } from './Route';
 import { BaseBrick } from '../Interfaces/BaseBrick';
-import { Trip } from './Trip';
 import { Train } from './Train';
 import { Boardable } from '../../mixins/Boardable';
 
@@ -12,7 +11,7 @@ export interface Station extends BaseBrick, Boardable {
   initX(): Station;
   getName(): string;
   setName(name: string);
-  getAnnouncedTrips(): Trip[];
+  getAnnouncedTrips(): Route[];
   getPlatformTo(station: Station): Platform;
   getPlatforms(): Platform[];
   getCircle(): Circle;

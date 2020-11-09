@@ -18,7 +18,6 @@ import { Updatable } from '../../../mixins/Updatable';
 import { applyMixins } from '../../../mixins/ApplyMixins';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { Train } from '../../Scheduling/Train';
-import { Trip } from '../../Scheduling/Trip';
 import { WagonPosition } from './WagonPosition';
 import {
   BoardableWagon,
@@ -485,7 +484,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       this.worm = new TrackWorm([track, bTrack], this);
     }
 
-    if (obj.trip) this.assignTrip(store.get(obj.trip) as Trip);
+    if (obj.trip) this.assignTrip(store.get(obj.trip) as Route);
 
     this.renderer.init(this);
   }

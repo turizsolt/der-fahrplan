@@ -8,11 +8,20 @@ import { Platform } from '../Interfaces/Platform';
 export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
   private station: Station;
   private platform: Platform;
+  private arrivalTime: number;
+  private departureTime: number;
 
-  init(station: Station, platform?: Platform): RouteStop {
+  init(
+    station: Station,
+    platform?: Platform,
+    arrivalTime?: number,
+    departureTime?: number
+  ): RouteStop {
     super.initStore(TYPES.RouteStop);
     this.station = station;
     this.platform = platform;
+    this.arrivalTime = arrivalTime;
+    this.departureTime = departureTime;
     return this;
   }
 
@@ -26,6 +35,14 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
 
   getPlatform(): Platform {
     return this.platform;
+  }
+
+  getArrivalTime(): number {
+    return this.arrivalTime || this.departureTime;
+  }
+
+  getDepartureTime(): number {
+    return this.departureTime;
   }
 
   persist(): Object {

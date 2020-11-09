@@ -13,7 +13,6 @@ import { NameGenerator } from '../NameGenerator';
 import { Route } from './Route';
 import { Passenger } from '../Interfaces/Passenger';
 import { ActualBoardable } from '../../mixins/ActualBoardable';
-import { Trip } from './Trip';
 import { Train } from './Train';
 
 export class ActualStation extends ActualBaseBrick implements Station {
@@ -100,7 +99,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
     }
   }
 
-  getAnnouncedTrips(): Trip[] {
+  getAnnouncedTrips(): Route[] {
     return this.announcedTrips;
   }
 

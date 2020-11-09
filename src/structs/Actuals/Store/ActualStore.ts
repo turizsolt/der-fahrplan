@@ -13,6 +13,7 @@ import { Store } from '../../Interfaces/Store';
 import { Wagon } from '../../Interfaces/Wagon';
 import { Passenger } from '../../Interfaces/Passenger';
 import { Train } from '../../Scheduling/Train';
+import { Trip } from '../../Scheduling/Trip';
 
 @injectable()
 export class ActualStore implements Store {
@@ -23,6 +24,7 @@ export class ActualStore implements Store {
 
   @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
   @inject(TYPES.FactoryOfRouteStop) private RouteStopFactory: () => RouteStop;
+  @inject(TYPES.FactoryOfTrip) private TripFactory: () => Trip;
   @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
   @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
 
@@ -40,6 +42,7 @@ export class ActualStore implements Store {
     this.typedElements = {};
     this.factoryMethods = {
       [TYPES.Route]: this.RouteFactory,
+      [TYPES.Trip]: this.TripFactory,
       [TYPES.RouteStop]: this.RouteStopFactory,
       [TYPES.Station]: this.StationFactory,
       [TYPES.Passenger]: this.PassengerFactory,
@@ -54,6 +57,7 @@ export class ActualStore implements Store {
       [TYPES.Station]: 12,
       [TYPES.RouteStop]: 11,
       [TYPES.Route]: 10,
+      [TYPES.Trip]: 8,
       [TYPES.Track]: 4,
       [TYPES.TrackSwitch]: 3,
       [TYPES.TrackJoint]: 2,
@@ -76,6 +80,7 @@ export class ActualStore implements Store {
 
   clear() {
     this.elements = {};
+    this.typedElements = {};
   }
 
   register(object: BaseStorable, presetId: string = null): string {

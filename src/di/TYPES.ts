@@ -45,6 +45,12 @@ export const TYPES = {
   RouteStop: Symbol.for('RouteStop'),
   FactoryOfRouteStop: Symbol.for('Factory<RouteStop>'),
 
+  Trip: Symbol.for('Trip'),
+  FactoryOfTrip: Symbol.for('Factory<Trip>'),
+
+  TripStop: Symbol.for('TripStop'),
+  FactoryOfTripStop: Symbol.for('Factory<TripStop>'),
+
   Station: Symbol.for('Station'),
   StationRenderer: Symbol.for('StationRenderer'),
   FactoryOfStation: Symbol.for('Factory<Station>')
