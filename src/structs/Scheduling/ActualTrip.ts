@@ -3,11 +3,13 @@ import { Route } from './Route';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
 import { Trip } from './Trip';
-import { TripStop } from './TripStop';
+import { TripStop, OptionalTripStop } from './TripStop';
+import { RouteStop } from './RouteStop';
 
 export class ActualTrip extends ActualBaseStorable implements Trip {
   private route: Route = null;
   private departureTime: number;
+  private redefinedProps: Record<string, OptionalTripStop> = {};
 
   init(route: Route, departureTime: number): Trip {
     super.initStore(TYPES.Trip);
@@ -16,13 +18,25 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return this;
   }
 
+  redefine(stop: RouteStop, props: OptionalTripStop): void {
+    const id = stop.getId();
+    this.redefinedProps[id] = {
+      ...this.redefinedProps[id],
+      ...props
+    };
+  }
+
   getStops(): TripStop[] {
     return this.route.getStops().map(stop => ({
       station: stop.getStation(),
       platform: stop.getPlatform(),
       stationName: stop.getStationName(),
-      arrivalTime: this.departureTime + stop.getArrivalTime(),
-      departureTime: this.departureTime + stop.getDepartureTime()
+      arrivalTime:
+        (this.redefinedProps[stop.getId()]?.arrivalTime) ??
+        this.departureTime + stop.getArrivalTime(),
+      departureTime:
+        (this.redefinedProps[stop.getId()]?.departureTime) ??
+        this.departureTime + stop.getDepartureTime()
     }));
   }
 

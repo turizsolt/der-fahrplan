@@ -73,4 +73,12 @@ describe('Trips', () => {
     expect(trip.getStops().map(x => x.arrivalTime)).deep.equals([10, 13]);
     expect(trip.getStops().map(x => x.departureTime)).deep.equals([10, 14]);
   });
+
+  it('redefined arrival and departure times read correctly', () => {
+    const trip = TripFactory().init(route, 10);
+    trip.redefine(stop1, { arrivalTime: 15, departureTime: 16 });
+
+    expect(trip.getStops().map(x => x.arrivalTime)).deep.equals([10, 15]);
+    expect(trip.getStops().map(x => x.departureTime)).deep.equals([10, 16]);
+  });
 });

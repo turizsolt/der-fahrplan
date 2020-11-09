@@ -8,3 +8,9 @@ export interface TripStop {
   arrivalTime: number;
   departureTime: number;
 }
+
+export interface OptionalTripStop {
+  platform?: Platform;
+  arrivalTime?: number;
+  departureTime?: number;
+}
