@@ -15,8 +15,10 @@ const RouteFactory: () => Route = () => store.create<Route>(TYPES.Route);
 const TripFactory: () => Trip = () => store.create<Trip>(TYPES.Trip);
 
 describe('Trips', () => {
-  it('creates a new trip', () => {
+  it('creates a new trip from route', () => {
     const route = RouteFactory().init();
     const trip = TripFactory().init(route, 0);
+
+    expect(trip.getRoute().getId()).equals(route.getId());
   });
 });

@@ -3,4 +3,5 @@ import { BaseStorable } from '../Interfaces/BaseStorable';
 
 export interface Trip extends BaseStorable {
   init(route: Route, startTime: number): Trip;
+  getRoute(): Route;
 }
