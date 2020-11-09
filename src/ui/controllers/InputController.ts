@@ -80,7 +80,7 @@ export class InputController {
     });
     this.vmInfoBox = new Vue({
       el: '#info-box',
-      data: { selected: null, type: null, opts: [] }
+      data: { selected: null, type: null, opts: [], tickCount: '0:00' }
     });
 
     Vue.component('idtext', {
@@ -650,6 +650,12 @@ export class InputController {
       });
     }
     this.store.tick();
+    const count = Math.floor(this.store.getTickCount() / 60);
+    this.vmInfoBox.tickCount =
+      Math.floor(count / 60) +
+      ':' +
+      (count % 60 < 10 ? '0' : '') +
+      (count % 60);
   }
 
   load(data: any) {
