@@ -32,6 +32,10 @@ describe('Trips', () => {
   station1.setName('Bravo');
   const stop1 = RouteStopFactory().init(station1);
 
+  const station2 = StationFactory().init(null);
+  station2.setName('Charlie');
+  const stop2 = RouteStopFactory().init(station2);
+
   route.addStop(stop0);
   route.addStop(stop1);
 
@@ -44,9 +48,22 @@ describe('Trips', () => {
   it('copies the stops from route', () => {
     const trip = TripFactory().init(route, 0);
 
-    expect(trip.getStops().map(x => x.getStationName())).deep.equals([
+    expect(trip.getStops().map(x => x.stationName)).deep.equals([
       'Alpha',
       'Bravo'
     ]);
+  });
+
+  it('stops changes when changes on route', () => {
+    const trip = TripFactory().init(route, 0);
+    route.addStop(stop2);
+
+    expect(trip.getStops().map(x => x.stationName)).deep.equals([
+      'Alpha',
+      'Bravo',
+      'Charlie'
+    ]);
+
+    route.removeStop(stop2);
   });
 });

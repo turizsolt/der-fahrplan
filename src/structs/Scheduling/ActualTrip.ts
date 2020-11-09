@@ -7,23 +7,19 @@ import { TripStop } from './TripStop';
 
 export class ActualTrip extends ActualBaseStorable implements Trip {
   private route: Route = null;
-  private stops: TripStop[] = [];
 
   init(route: Route, startTime: number): Trip {
     super.initStore(TYPES.Trip);
     this.route = route;
-    this.stops = route
-      .getStops()
-      .map(stop =>
-        this.store
-          .create<TripStop>(TYPES.TripStop)
-          .init(stop.getStation(), stop.getPlatform())
-      );
     return this;
   }
 
-  getStops(): any[] {
-    return this.stops;
+  getStops(): TripStop[] {
+    return this.route.getStops().map(stop => ({
+      station: stop.getStation(),
+      platform: stop.getPlatform(),
+      stationName: stop.getStationName()
+    }));
   }
 
   getRoute(): Route {

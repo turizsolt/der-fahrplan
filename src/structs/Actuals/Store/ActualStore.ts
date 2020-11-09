@@ -14,7 +14,6 @@ import { Wagon } from '../../Interfaces/Wagon';
 import { Passenger } from '../../Interfaces/Passenger';
 import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
-import { TripStop } from '../../Scheduling/TripStop';
 
 @injectable()
 export class ActualStore implements Store {
@@ -26,7 +25,6 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
   @inject(TYPES.FactoryOfRouteStop) private RouteStopFactory: () => RouteStop;
   @inject(TYPES.FactoryOfTrip) private TripFactory: () => Trip;
-  @inject(TYPES.FactoryOfTripStop) private TripStopFactory: () => TripStop;
   @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
   @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
 
@@ -46,7 +44,6 @@ export class ActualStore implements Store {
       [TYPES.Route]: this.RouteFactory,
       [TYPES.Trip]: this.TripFactory,
       [TYPES.RouteStop]: this.RouteStopFactory,
-      [TYPES.TripStop]: this.TripStopFactory,
       [TYPES.Station]: this.StationFactory,
       [TYPES.Passenger]: this.PassengerFactory,
       [TYPES.Track]: this.TrackFactory,
@@ -60,7 +57,6 @@ export class ActualStore implements Store {
       [TYPES.Station]: 12,
       [TYPES.RouteStop]: 11,
       [TYPES.Route]: 10,
-      [TYPES.TripStop]: 9,
       [TYPES.Trip]: 8,
       [TYPES.Track]: 4,
       [TYPES.TrackSwitch]: 3,

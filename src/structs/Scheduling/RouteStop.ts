@@ -5,4 +5,6 @@ import { Platform } from '../Interfaces/Platform';
 export interface RouteStop extends BaseStorable {
   init(station: Station, platform?: Platform): RouteStop;
   getStationName(): string;
+  getStation(): Station;
+  getPlatform(): Platform;
 }
