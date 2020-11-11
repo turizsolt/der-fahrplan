@@ -53,9 +53,9 @@ describe('MultiWagon departing', () => {
 
     wagon.stoppedAt(platformA1);
 
-    expect(passenger[0].getPlace()).equals(wagon);
-    expect(passenger[1].getPlace()).equals(wagon);
-    expect(passenger[2].getPlace()).equals(platformA1);
+    expect(passenger[0].getPlace().getId()).equals(wagon.getId());
+    expect(passenger[1].getPlace().getId()).equals(wagon.getId());
+    expect(passenger[2].getPlace().getId()).equals(platformA1.getId());
   });
 
   it('two wagons, put everybody into the same', () => {
@@ -71,9 +71,9 @@ describe('MultiWagon departing', () => {
 
     wagon1.stoppedAt(platformA1);
 
-    expect(passenger[0].getPlace()).equals(wagon2);
-    expect(passenger[1].getPlace()).equals(wagon2);
-    expect(passenger[2].getPlace()).equals(wagon2);
+    expect(passenger[0].getPlace().getId()).equals(wagon2.getId());
+    expect(passenger[1].getPlace().getId()).equals(wagon2.getId());
+    expect(passenger[2].getPlace().getId()).equals(wagon2.getId());
   });
 
   it('two wagons, put into all', () => {
@@ -89,9 +89,9 @@ describe('MultiWagon departing', () => {
 
     wagon1.stoppedAt(platformA1);
 
-    expect(passenger[0].getPlace()).equals(wagon2);
-    expect(passenger[1].getPlace()).equals(wagon2);
-    expect(passenger[2].getPlace()).equals(wagon1);
+    expect(passenger[0].getPlace().getId()).equals(wagon2.getId());
+    expect(passenger[1].getPlace().getId()).equals(wagon2.getId());
+    expect(passenger[2].getPlace().getId()).equals(wagon1.getId());
   });
 
   it('three wagons, some passengers left at station', () => {
@@ -108,12 +108,12 @@ describe('MultiWagon departing', () => {
 
     wagon1.stoppedAt(platformA1);
 
-    expect(passenger[0].getPlace()).equals(wagon3);
-    expect(passenger[1].getPlace()).equals(wagon3);
-    expect(passenger[2].getPlace()).equals(wagon2);
-    expect(passenger[3].getPlace()).equals(wagon2);
-    expect(passenger[4].getPlace()).equals(wagon1);
-    expect(passenger[5].getPlace()).equals(wagon1);
-    expect(passenger[6].getPlace()).equals(platformA1);
+    expect(passenger[0].getPlace().getId()).equals(wagon3.getId());
+    expect(passenger[1].getPlace().getId()).equals(wagon3.getId());
+    expect(passenger[2].getPlace().getId()).equals(wagon2.getId());
+    expect(passenger[3].getPlace().getId()).equals(wagon2.getId());
+    expect(passenger[4].getPlace().getId()).equals(wagon1.getId());
+    expect(passenger[5].getPlace().getId()).equals(wagon1.getId());
+    expect(passenger[6].getPlace().getId()).equals(platformA1.getId());
   });
 });
