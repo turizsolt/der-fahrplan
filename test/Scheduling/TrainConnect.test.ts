@@ -24,7 +24,7 @@ describe('Trains', () => {
     ]);
   });
 
-  it('connecting two trains AB,BA->', () => {
+  it('connecting two trains AB+,BA->', () => {
     const wagon1 = WagonFactory().init();
     const wagon2 = WagonFactory().init();
     wagon1.getB().connect(wagon2.getB());
@@ -33,6 +33,42 @@ describe('Trains', () => {
     expect(train.getWagonIdsWithSides()).deep.equals([
       { wagonId: wagon1.getId(), side: A },
       { wagonId: wagon2.getId(), side: B }
+    ]);
+  });
+
+  it('connecting two trains BA+,BA->', () => {
+    const wagon1 = WagonFactory().init();
+    const wagon2 = WagonFactory().init();
+    wagon1.getB().connect(wagon2.getA());
+    const train = wagon1.getTrain();
+
+    expect(train.getWagonIdsWithSides()).deep.equals([
+      { wagonId: wagon1.getId(), side: A },
+      { wagonId: wagon2.getId(), side: A }
+    ]);
+  });
+
+  it('connecting two trains BA,AB+->', () => {
+    const wagon1 = WagonFactory().init();
+    const wagon2 = WagonFactory().init();
+    wagon1.getA().connect(wagon2.getA());
+    const train = wagon1.getTrain();
+
+    expect(train.getWagonIdsWithSides()).deep.equals([
+      { wagonId: wagon2.getId(), side: B },
+      { wagonId: wagon1.getId(), side: A }
+    ]);
+  });
+
+  it('connecting two trains BA,BA+->', () => {
+    const wagon1 = WagonFactory().init();
+    const wagon2 = WagonFactory().init();
+    wagon1.getA().connect(wagon2.getB());
+    const train = wagon1.getTrain();
+
+    expect(train.getWagonIdsWithSides()).deep.equals([
+      { wagonId: wagon2.getId(), side: A },
+      { wagonId: wagon1.getId(), side: A }
     ]);
   });
 });

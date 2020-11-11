@@ -5,6 +5,7 @@ import { Platform } from '../Interfaces/Platform';
 import { Station } from './Station';
 import { WagonWithSide, WagonIdWithSide } from '../Interfaces/WagonWithSide';
 import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
+import { WhichEnd } from '../Interfaces/WhichEnd';
 
 export interface Train extends BaseStorable {
   init(first: Wagon): Train;
@@ -28,4 +29,5 @@ export interface Train extends BaseStorable {
 
   getWagonsWithSides(): WagonWithSide[];
   getWagonIdsWithSides(): WagonIdWithSide[];
+  whichEndIsOn(end: WagonEnd): WhichEnd;
 }

@@ -40,11 +40,49 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return this.removed;
   }
 
+  whichEndIsOn(end: WagonEnd): WhichEnd {
+    if (this.wagonsWithSides[0].wagon === end.getEndOf()) {
+      if (this.wagonsWithSides[0].side === end.getWhichEnd()) {
+        return WhichEnd.A;
+      }
+    }
+
+    const last = this.wagonsWithSides.length - 1;
+    if (this.wagonsWithSides[last].wagon === end.getEndOf()) {
+      if (this.wagonsWithSides[last].side === otherEnd(end.getWhichEnd())) {
+        return WhichEnd.B;
+      }
+    }
+
+    return null;
+  }
+
   mergeWith(thisEnd: WagonEnd, other: Train, otherEnd: WagonEnd): void {
-    this.wagonsWithSides = [
-      ...this.getWagonsWithSides(),
-      ...rev(other.getWagonsWithSides())
-    ];
+    const thisWhichEnd = this.whichEndIsOn(thisEnd);
+    const otherWhichEnd = other.whichEndIsOn(otherEnd);
+
+    if (thisWhichEnd === WhichEnd.A && otherWhichEnd === WhichEnd.A) {
+      this.wagonsWithSides = [
+        ...rev(other.getWagonsWithSides()),
+        ...this.getWagonsWithSides()
+      ];
+    } else if (thisWhichEnd === WhichEnd.A && otherWhichEnd === WhichEnd.B) {
+      this.wagonsWithSides = [
+        ...other.getWagonsWithSides(),
+        ...this.getWagonsWithSides()
+      ];
+    } else if (thisWhichEnd === WhichEnd.B && otherWhichEnd === WhichEnd.A) {
+      this.wagonsWithSides = [
+        ...this.getWagonsWithSides(),
+        ...other.getWagonsWithSides()
+      ];
+    } else if (thisWhichEnd === WhichEnd.B && otherWhichEnd === WhichEnd.B) {
+      this.wagonsWithSides = [
+        ...this.getWagonsWithSides(),
+        ...rev(other.getWagonsWithSides())
+      ];
+    }
+
     other.getWagons().map(wagon => wagon.setTrain(this));
     other.remove();
   }
