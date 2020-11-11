@@ -21,7 +21,7 @@ const RouteFactory = () => store.create<Route>(TYPES.Route);
 const RouteStopFactory = () => store.create<RouteStop>(TYPES.RouteStop);
 const PassengerFactory = () => store.create<Passenger>(TYPES.Passenger);
 
-describe('Departing only forward stations', () => {
+xdescribe('Departing only forward stations', () => {
   const stationA = StationFactory().initX();
   const platformA1 = PlatformFactory().initX(stationA, '1');
 
@@ -44,7 +44,7 @@ describe('Departing only forward stations', () => {
     const passengerToA = PassengerFactory().init(stationB, stationA);
     const passengerToC = PassengerFactory().init(stationB, stationC);
     const wagon = WagonFactory().init();
-    wagon.assignTrip(route);
+    // wagon.assignTrip(route);
 
     wagon.stoppedAt(platformA1);
     wagon.stoppedAt(platformB2);
