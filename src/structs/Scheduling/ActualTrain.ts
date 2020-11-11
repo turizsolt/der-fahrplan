@@ -8,17 +8,20 @@ import { Platform } from '../Interfaces/Platform';
 import { Station } from './Station';
 import { Passenger } from '../Interfaces/Passenger';
 import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
-import { WagonWithSide } from '../Interfaces/WagonWithSide';
-import { WhichEnd } from '../Interfaces/WhichEnd';
+import { WagonWithSide, WagonIdWithSide } from '../Interfaces/WagonWithSide';
+import { WhichEnd, otherEnd } from '../Interfaces/WhichEnd';
+import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private wagons: Wagon[];
+  private wagonsWithSides: WagonWithSide[] = [];
   private schedulingWagon: Wagon;
   private controlingWagon: Wagon = null;
 
   init(first: Wagon): Train {
     super.initStore(TYPES.Train);
     this.wagons = [first];
+    this.wagonsWithSides = [{ wagon: first, side: WhichEnd.A }];
     this.schedulingWagon = first;
     return this;
   }
@@ -37,23 +40,13 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return this.removed;
   }
 
-  mergeWith(other: Train): void {
-    if (!other.getTrip()) {
-      for (let wagon of other.getWagons()) {
-        wagon.setTrain(this);
-      }
-      this.wagons = [...this.wagons, ...other.getWagons()];
-      other.remove();
-    } else if (!this.getTrip()) {
-      other.mergeWith(this);
-    } else {
-      for (let wagon of other.getWagons()) {
-        wagon.setTrain(this);
-      }
-      this.wagons = [...this.wagons, ...other.getWagons()];
-      other.getWagons().map(wagon => wagon.assignTrip(null)); // extra compared above
-      other.remove();
-    }
+  mergeWith(thisEnd: WagonEnd, other: Train, otherEnd: WagonEnd): void {
+    this.wagonsWithSides = [
+      ...this.getWagonsWithSides(),
+      ...rev(other.getWagonsWithSides())
+    ];
+    other.getWagons().map(wagon => wagon.setTrain(this));
+    other.remove();
   }
 
   separateThese(wagons: Wagon[]): void {
@@ -164,7 +157,14 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   getWagonsWithSides(): WagonWithSide[] {
-    return [{ wagon: this.wagons[0], side: WhichEnd.A }];
+    return this.wagonsWithSides;
+  }
+
+  getWagonIdsWithSides(): WagonIdWithSide[] {
+    return this.wagonsWithSides.map(x => ({
+      wagonId: x.wagon.getId(),
+      side: x.side
+    }));
   }
 
   persist(): Object {
@@ -184,4 +184,10 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       wagon.setTrain(this);
     }
   }
+}
+
+function rev(wagonsWithSides: WagonWithSide[]): WagonWithSide[] {
+  return wagonsWithSides
+    .reverse()
+    .map(x => ({ wagon: x.wagon, side: otherEnd(x.side) }));
 }

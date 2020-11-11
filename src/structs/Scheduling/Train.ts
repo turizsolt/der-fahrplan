@@ -3,7 +3,8 @@ import { Wagon } from '../Interfaces/Wagon';
 import { Route } from './Route';
 import { Platform } from '../Interfaces/Platform';
 import { Station } from './Station';
-import { WagonWithSide } from '../Interfaces/WagonWithSide';
+import { WagonWithSide, WagonIdWithSide } from '../Interfaces/WagonWithSide';
+import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
 
 export interface Train extends BaseStorable {
   init(first: Wagon): Train;
@@ -17,7 +18,7 @@ export interface Train extends BaseStorable {
   getSchedulingWagon(): Wagon;
   setSchedulingWagon(wagon: Wagon): void;
   cancelTrip(): void;
-  mergeWith(other: Train): void;
+  mergeWith(thisEnd: WagonEnd, other: Train, otherEnd: WagonEnd): void;
   separateThese(wagons: Wagon[]): void;
   moveBoardedPassengers(): void;
   hasLocomotive(): boolean;
@@ -26,4 +27,5 @@ export interface Train extends BaseStorable {
   clearControlingWagon(): void;
 
   getWagonsWithSides(): WagonWithSide[];
+  getWagonIdsWithSides(): WagonIdWithSide[];
 }

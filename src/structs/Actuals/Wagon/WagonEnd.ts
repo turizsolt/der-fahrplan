@@ -14,7 +14,7 @@ export class WagonEnd extends End<Wagon> {
       const train = this.endOf.getTrain();
       const otherTrain = otherEnd.getEndOf().getTrain();
       if (train !== otherTrain) {
-        train.mergeWith(otherTrain);
+        otherTrain.mergeWith(otherEnd, train, this);
       }
 
       this.endOf.onStocked();

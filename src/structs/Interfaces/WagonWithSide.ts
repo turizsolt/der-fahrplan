@@ -5,3 +5,8 @@ export interface WagonWithSide {
   wagon: Wagon;
   side: WhichEnd;
 }
+
+export interface WagonIdWithSide {
+  wagonId: string;
+  side: WhichEnd;
+}
