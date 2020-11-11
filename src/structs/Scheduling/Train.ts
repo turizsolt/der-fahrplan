@@ -13,11 +13,9 @@ export interface Train extends BaseStorable {
   remove(): void;
   isRemoved(): boolean;
   getWagons(): Wagon[];
-  setWagons(wagons: Wagon[]);
+  setWagonsWithSides(wagonsWithSides: WagonWithSide[]);
   stoppedAt(station: Station, platform: Platform): void;
   getFreeWagon(): Wagon;
-  getSchedulingWagon(): Wagon;
-  setSchedulingWagon(wagon: Wagon): void;
   mergeWith(thisEnd: WagonEnd, other: Train, otherEnd: WagonEnd): void;
   separateThese(wagons: Wagon[]): void;
   moveBoardedPassengers(): void;
@@ -27,8 +25,6 @@ export interface Train extends BaseStorable {
   clearControlingWagon(): void;
 
   assignTrip(trip: Trip, wagons?: Wagon[]): void;
-  getTrip(): Trip;
-  cancelTrip(): void;
 
   getWagonsWithSides(): WagonWithSide[];
   getWagonIdsWithSides(): WagonIdWithSide[];

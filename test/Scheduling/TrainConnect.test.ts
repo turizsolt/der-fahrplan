@@ -71,4 +71,21 @@ describe('Trains', () => {
       { wagonId: wagon1.getId(), side: A }
     ]);
   });
+
+  it('disconnecting two trains', () => {
+    const wagon1 = WagonFactory().init();
+    const wagon2 = WagonFactory().init();
+    wagon1.getA().connect(wagon2.getB());
+    wagon1.disconnect(A);
+    const train1 = wagon1.getTrain();
+    const train2 = wagon2.getTrain();
+
+    expect(train1.getWagonIdsWithSides()).deep.equals([
+      { wagonId: wagon1.getId(), side: A }
+    ]);
+
+    expect(train2.getWagonIdsWithSides()).deep.equals([
+      { wagonId: wagon2.getId(), side: A }
+    ]);
+  });
 });

@@ -13,24 +13,16 @@ import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
 import { Trip } from './Trip';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
-  private wagons: Wagon[];
   private wagonsWithSides: WagonWithSide[] = [];
-  private schedulingWagon: Wagon;
   private controlingWagon: Wagon = null;
+  private removed: boolean = false;
 
   init(first: Wagon): Train {
     super.initStore(TYPES.Train);
-    this.wagons = [first];
     this.wagonsWithSides = [{ wagon: first, side: WhichEnd.A }];
-    this.schedulingWagon = first;
     return this;
   }
 
-  getWagons(): Wagon[] {
-    return this.wagons;
-  }
-
-  private removed: boolean = false;
   remove(): void {
     this.store.unregister(this);
     this.removed = true;
@@ -38,6 +30,21 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   isRemoved(): boolean {
     return this.removed;
+  }
+
+  getWagons(): Wagon[] {
+    return this.wagonsWithSides.map(x => x.wagon);
+  }
+
+  getWagonsWithSides(): WagonWithSide[] {
+    return this.wagonsWithSides;
+  }
+
+  getWagonIdsWithSides(): WagonIdWithSide[] {
+    return this.wagonsWithSides.map(x => ({
+      wagonId: x.wagon.getId(),
+      side: x.side
+    }));
   }
 
   whichEndIsOn(end: WagonEnd): WhichEnd {
@@ -88,23 +95,18 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   separateThese(wagons: Wagon[]): void {
-    let newTrain: Train;
-    if (wagons.includes(this.schedulingWagon)) {
-      this.schedulingWagon.setTrain(undefined);
-      newTrain = this.schedulingWagon.getTrain();
-    } else {
-      wagons[0].setTrain(undefined);
-      newTrain = wagons[0].getTrain();
-    }
-    ////
-    for (let wagon of wagons) {
-      this.wagons = this.wagons.filter(x => x !== wagon);
-      wagon.setTrain(newTrain);
-    }
-    newTrain.setWagons(wagons);
-    ////
-    if (wagons.includes(this.schedulingWagon)) {
-      this.setSchedulingWagon(this.wagons[0]);
+    const newWagonsWithSides = this.wagonsWithSides.filter(x =>
+      wagons.includes(x.wagon)
+    );
+    const newTrain = this.store.create<Train>(TYPES.Train).init(wagons[0]);
+    newTrain.setWagonsWithSides(newWagonsWithSides);
+    newWagonsWithSides.map(x => x.wagon.setTrain(newTrain));
+
+    this.wagonsWithSides = this.wagonsWithSides.filter(
+      x => !wagons.includes(x.wagon)
+    );
+    if (this.wagonsWithSides.length === 0) {
+      this.remove();
     }
   }
 
@@ -120,63 +122,40 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }
   }
 
-  getTrip(): Trip {
-    return this.schedulingWagon.getTrip();
+  setWagonsWithSides(wagonsWithSides: WagonWithSide[]) {
+    this.wagonsWithSides = wagonsWithSides;
   }
 
-  getSchedulingWagon(): Wagon {
-    return this.schedulingWagon;
-  }
-
-  setSchedulingWagon(schWagon: Wagon): void {
-    this.schedulingWagon = schWagon;
-    for (let wagon of this.wagons) {
-      if (wagon !== schWagon) {
-        wagon.assignTrip(null);
-        wagon.update();
-      }
-    }
-  }
-
-  cancelTrip(): void {
-    this.schedulingWagon.assignTrip(null);
-    for (let wagon of this.wagons) {
-      wagon.update();
-    }
-  }
-
-  setWagons(wagons: Wagon[]) {
-    this.wagons = wagons;
-  }
+  // boarding and announcements
 
   stoppedAt(station: Station, platform: Platform) {
-    this.callOnPassengers((p: Passenger) => {
-      p.listenWagonStoppedAtAnnouncement(
-        station,
-        platform,
-        this,
-        this.getTrip().getRoute()
-      );
-    });
-    if (station) {
-      station.announceArrived(this, platform, this.getTrip().getRoute());
-    }
+    // this.callOnPassengers((p: Passenger) => {
+    //   p.listenWagonStoppedAtAnnouncement(
+    //     station,
+    //     platform,
+    //     this,
+    //     this.getTrip().getRoute()
+    //   );
+    // });
+    // if (station) {
+    //   station.announceArrived(this, platform, this.getTrip().getRoute());
+    // }
   }
 
   moveBoardedPassengers(): void {
-    for (let wagon of this.wagons) {
+    for (let wagon of this.getWagons()) {
       wagon.moveBoardedPassengers();
     }
   }
 
   private callOnPassengers(f: (p: Passenger) => void): void {
-    for (let wagon of this.wagons) {
+    for (let wagon of this.getWagons()) {
       wagon.getBoardedPassengers().map(p => f(p));
     }
   }
 
   getFreeWagon(): Wagon {
-    for (let wagon of this.wagons) {
+    for (let wagon of this.getWagons()) {
       if (wagon.hasFreeSeat()) {
         return wagon;
       }
@@ -184,9 +163,11 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return null;
   }
 
+  // controlling the train
+
   hasLocomotive(): boolean {
     return (
-      this.wagons.filter(
+      this.getWagons().filter(
         x => x.getControlType() === WagonControlType.Locomotive
       ).length > 0
     );
@@ -206,35 +187,31 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.controlingWagon = null;
   }
 
-  getWagonsWithSides(): WagonWithSide[] {
-    return this.wagonsWithSides;
-  }
-
-  getWagonIdsWithSides(): WagonIdWithSide[] {
-    return this.wagonsWithSides.map(x => ({
-      wagonId: x.wagon.getId(),
-      side: x.side
-    }));
-  }
+  // persistance
 
   persist(): Object {
     return {
       id: this.id,
       type: 'Train',
-      wagons: this.wagons.map(x => x.getId()),
-      schedulingWagon: this.schedulingWagon.getId()
+      wagons: this.getWagonsWithSides().map(x => ({trip: x.trip?.getId(), side: x.side, wagon: x.wagon.getId()}))
     };
   }
 
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(store.get(obj.schedulingWagon) as Wagon);
-    this.wagons = obj.wagons.map(x => store.get(x) as Wagon);
-    for (let wagon of this.wagons) {
-      wagon.setTrain(this);
+    this.wagonsWithSides = obj.wagons.map(x => ({
+        side: x.side,
+        trip: store.get(x.trip) as Trip,
+        wagon: store.get(x.wagon) as Wagon
+    }));
+    for (let wagon of this.getWagons()) {
+        wagon.setTrain(this);
     }
   }
 }
+
+// todo should put into some kind of utils
 
 function rev(wagonsWithSides: WagonWithSide[]): WagonWithSide[] {
   return wagonsWithSides
