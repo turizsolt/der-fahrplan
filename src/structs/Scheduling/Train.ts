@@ -3,6 +3,7 @@ import { Wagon } from '../Interfaces/Wagon';
 import { Route } from './Route';
 import { Platform } from '../Interfaces/Platform';
 import { Station } from './Station';
+import { WagonWithSide } from '../Interfaces/WagonWithSide';
 
 export interface Train extends BaseStorable {
   init(first: Wagon): Train;
@@ -23,4 +24,6 @@ export interface Train extends BaseStorable {
   getControlingWagon(): Wagon;
   setControlingWagon(wagon: Wagon): void;
   clearControlingWagon(): void;
+
+  getWagonsWithSides(): WagonWithSide[];
 }

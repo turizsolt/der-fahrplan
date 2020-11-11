@@ -8,6 +8,8 @@ import { Platform } from '../Interfaces/Platform';
 import { Station } from './Station';
 import { Passenger } from '../Interfaces/Passenger';
 import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
+import { WagonWithSide } from '../Interfaces/WagonWithSide';
+import { WhichEnd } from '../Interfaces/WhichEnd';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private wagons: Wagon[];
@@ -159,6 +161,10 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   clearControlingWagon(): void {
     this.controlingWagon = null;
+  }
+
+  getWagonsWithSides(): WagonWithSide[] {
+    return [{ wagon: this.wagons[0], side: WhichEnd.A }];
   }
 
   persist(): Object {
