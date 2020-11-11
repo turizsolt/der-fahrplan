@@ -33,4 +33,14 @@ describe('TrainTrip', () => {
     expect(pass.getTrip().getId()).equals(trip.getId());
     expect(cont.getTrip().getId()).equals(trip.getId());
   });
+
+  it('assigns a trip to a part of a train', () => {
+    const [loco, pass, cont] = buildTrain(W.Loco, W.Pass, W.Cont);
+    const train = loco.getTrain();
+    train.assignTrip(trip, [cont]);
+
+    expect(loco.getTrip()).equals(undefined);
+    expect(pass.getTrip()).equals(undefined);
+    expect(cont.getTrip().getId()).equals(trip.getId());
+  });
 });
