@@ -3,7 +3,6 @@ import { Ray } from '../Geometry/Ray';
 import { Track } from './Track';
 import { PositionOnTrack } from '../Actuals/Track/PositionOnTrack';
 import { WhichEnd } from '../Interfaces/WhichEnd';
-import { Route } from '../Scheduling/Route';
 import { Platform } from './Platform';
 import { Updatable } from '../../mixins/Updatable';
 import { BaseBrick } from './BaseBrick';
@@ -16,6 +15,7 @@ import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType
 import { PassengerArrangement } from '../../mixins/BoardableWagon';
 import { WagonConnectable } from '../Actuals/Wagon/WagonConnectable';
 import { WagonMovingState } from '../Actuals/Wagon/WagonMovingState';
+import { Trip } from '../Scheduling/Trip';
 
 export interface Wagon extends Boardable, BaseBrick, Updatable {
   init(config?: WagonConfig): Wagon;
@@ -57,9 +57,9 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   swapEnds(): void;
   pullToPos(pot: PositionOnTrack, dir: number): void;
 
-  assignTrip(route: Route): void;
+  assignTrip(trip: Trip): void;
   cancelTrip(): void;
-  getTrip(): Route;
+  getTrip(): Trip;
 
   stoppedAt(platform: Platform): void;
   hasFreeSeat(): boolean;
@@ -73,7 +73,6 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   detach(): void;
   tick(): void;
   getSpeed(): number;
-  reverseTrip(): void;
 
   shuntForward(): void;
   shuntBackward(): void;

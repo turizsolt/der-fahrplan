@@ -34,6 +34,7 @@ import { WagonControlControlCar } from './WagonControl/WagonControlControlCar';
 import { WagonControlNothing } from './WagonControl/WagonControlNothing';
 import WagonSpeedPassenger from './WagonSpeedPassenger';
 import { WagonMovingState } from './WagonMovingState';
+import { Trip } from '../../Scheduling/Trip';
 
 export interface ActualWagon extends Updatable {}
 const doApply = () => applyMixins(ActualWagon, [Updatable]);
@@ -143,13 +144,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   canThisWagonControl(): boolean {
     const controlingWagon = this.getTrain().getControlingWagon();
     return !controlingWagon || controlingWagon === this;
-  }
-
-  reverseTrip(): void {
-    const trip = this.getTrip();
-    if (trip && trip.getReverse()) {
-      this.assignTrip(trip.getReverse());
-    }
   }
 
   getSpeed(): number {
@@ -267,8 +261,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.announcement.setTrain(train);
   }
 
-  assignTrip(route: Route): void {
-    this.announcement.assignTrip(route);
+  assignTrip(trip: Trip): void {
+    this.announcement.assignTrip(trip);
     this.update();
   }
 
@@ -276,7 +270,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.announcement.cancelTrip();
   }
 
-  getTrip(): Route {
+  getTrip(): Trip {
     return this.announcement.getTrip();
   }
 
@@ -483,8 +477,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     } else {
       this.worm = new TrackWorm([track, bTrack], this);
     }
-
-    if (obj.trip) this.assignTrip(store.get(obj.trip) as Route);
 
     this.renderer.init(this);
   }

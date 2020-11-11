@@ -3,7 +3,6 @@ import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
 import { Train } from './Train';
 import { Wagon } from '../Interfaces/Wagon';
-import { Route } from './Route';
 import { Platform } from '../Interfaces/Platform';
 import { Station } from './Station';
 import { Passenger } from '../Interfaces/Passenger';
@@ -11,6 +10,7 @@ import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType
 import { WagonWithSide, WagonIdWithSide } from '../Interfaces/WagonWithSide';
 import { WhichEnd, otherEnd } from '../Interfaces/WhichEnd';
 import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
+import { Trip } from './Trip';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private wagons: Wagon[];
@@ -108,7 +108,19 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }
   }
 
-  getTrip(): Route {
+  assignTrip(trip: Trip, wagons?: Wagon[]): void {
+    for (let i = 0; i < this.wagonsWithSides.length; i++) {
+      if (
+        (!wagons || wagons.includes(this.wagonsWithSides[i].wagon)) &&
+        this.wagonsWithSides[i].wagon.getControlType() !==
+          WagonControlType.Locomotive
+      ) {
+        this.wagonsWithSides[i].trip = trip;
+      }
+    }
+  }
+
+  getTrip(): Trip {
     return this.schedulingWagon.getTrip();
   }
 
@@ -143,11 +155,11 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         station,
         platform,
         this,
-        this.getTrip()
+        this.getTrip().getRoute()
       );
     });
     if (station) {
-      station.announceArrived(this, platform, this.getTrip());
+      station.announceArrived(this, platform, this.getTrip().getRoute());
     }
   }
 

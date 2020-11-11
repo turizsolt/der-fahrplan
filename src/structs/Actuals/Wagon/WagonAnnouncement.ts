@@ -1,18 +1,11 @@
 import { injectable } from 'inversify';
-import { PositionOnTrack } from '../Track/PositionOnTrack';
-import { WhichEnd } from '../../Interfaces/WhichEnd';
-import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
-import { Ray } from '../../Geometry/Ray';
-import { TrackBase } from '../../Interfaces/TrackBase';
-import { LineSegment } from '../../Geometry/LineSegment';
-import { TrackWorm } from '../Track/TrackWorm';
-import { WagonEnd } from './WagonEnd';
-import { Coordinate } from '../../Geometry/Coordinate';
+import { Wagon } from '../../Interfaces/Wagon';
 import { Route } from '../../Scheduling/Route';
 import { Train } from '../../Scheduling/Train';
 import { TYPES } from '../../../di/TYPES';
 import { Store } from '../../Interfaces/Store';
 import { Platform } from '../../Interfaces/Platform';
+import { Trip } from '../../Scheduling/Trip';
 
 @injectable()
 export class WagonAnnouncement {
@@ -23,27 +16,38 @@ export class WagonAnnouncement {
     this.train = this.store.create<Train>(TYPES.Train).init(this.parent);
   }
 
-  assignTrip(route: Route): void {
-    const oldTrip = this.getTrip();
-    if (oldTrip) {
-      for (let stop of oldTrip.getStops()) {
-        stop.getStation().deannounce(oldTrip);
-      }
-    }
-    this.trip = route;
-    if (route) {
-      this.train.setSchedulingWagon(this.parent);
-    }
-    const newTrip = this.getTrip();
-    if (newTrip) {
-      for (let stop of newTrip.getStops()) {
-        stop.getStation().announce(newTrip);
-      }
-    }
+  assignTrip(trip: Trip): void {
+    // const oldTrip = this.getTrip();
+    // if (oldTrip) {
+    //   for (let stop of oldTrip.getStops()) {
+    //     stop.getStation().deannounce(oldTrip);
+    //   }
+    // }
+    // this.trip = route;
+    // if (route) {
+    //   this.train.setSchedulingWagon(this.parent);
+    // }
+    // const newTrip = this.getTrip();
+    // if (newTrip) {
+    //   for (let stop of newTrip.getStops()) {
+    //     stop.getStation().announce(newTrip);
+    //   }
+    // }
   }
 
   cancelTrip(): void {
-    this.train.cancelTrip();
+    // this.train.cancelTrip();
+  }
+
+  getTrip(): Trip {
+    // if (this.trip) return this.trip;
+    // if (this.getTrain().getSchedulingWagon() !== this.parent)
+    //   return this.getTrain().getTrip();
+    // return null;
+    const wagonWithTrip = this.train
+      .getWagonsWithSides()
+      .find(x => x.wagon === this.parent);
+    return wagonWithTrip?.trip;
   }
 
   getTrain(): Train {
@@ -56,13 +60,6 @@ export class WagonAnnouncement {
     } else {
       this.train = this.store.create<Train>(TYPES.Train).init(this.parent);
     }
-  }
-
-  getTrip(): Route {
-    if (this.trip) return this.trip;
-    if (this.getTrain().getSchedulingWagon() !== this.parent)
-      return this.getTrain().getTrip();
-    return null;
   }
 
   stop(): void {

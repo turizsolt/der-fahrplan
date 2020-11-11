@@ -215,10 +215,6 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.wagon.detach();
         break;
 
-      case 'reverseTrip':
-        this.wagon.reverseTrip();
-        break;
-
       case 'delete':
         this.wagon.remove();
         break;
