@@ -36,6 +36,8 @@
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.6.2",
     "typescript": "^3.5.2",
+    "vue-loader": "^15.9.5",
+    "vue-template-compiler": "^2.5.2",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.5",
     "webpack-dev-server": "^3.7.2"
@@ -54,6 +56,8 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.2",
     "shortid": "^2.2.15",
-    "vue": "^2.6.11"
+    "vue": "^2.5.2",
+    "vue-property-decorator": "^6.0.0",
+    "vue-ts-loader": "^0.0.3"
   }
 }
