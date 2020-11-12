@@ -32,6 +32,7 @@ import { Wagon } from '../../structs/Interfaces/Wagon';
 import { ActualWagon } from '../../structs/Actuals/Wagon/ActualWagon';
 import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
 import { Vector3 } from 'babylonjs';
+import { VueSidebar } from './VueSidebar';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -54,14 +55,16 @@ export class InputController {
   private mouseButtons: boolean[] = [];
 
   private vm: Vue;
-  private vmInfoBox: Vue;
   private vmBigScreen: Vue;
+  private vueSidebar: VueSidebar;
 
   constructor(
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera
   ) {
     const _this = this;
+    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
+    this.vueSidebar = new VueSidebar(this.store);
     this.vm = new Vue({
       el: '#button-holder',
       data: {
@@ -75,76 +78,6 @@ export class InputController {
         },
         handleWagonClick: function(event) {
           this.wagon = event.target.value;
-        }
-      }
-    });
-    this.vmInfoBox = new Vue({
-      el: '#info-box',
-      data: { selected: null, type: null, opts: [], tickCount: '0:00' }
-    });
-
-    Vue.component('idtext', {
-      props: ['idt', 'obj'],
-      template: '<div>{{idt}}</div>'
-    });
-
-    Vue.component('wagon', {
-      props: ['idt', 'obj', 'opts'],
-      template: `
-      <div>
-        <div class="item-type">🚂 Mozdony</div>
-        <div class="item-id">{{idt}}</div>
-        <div class="item-id">Speed: {{obj.speed ? obj.speed : '???'}}</div>
-        <div v-if="obj.trip">
-          <div class="trip">
-            <div class="trip-name">{{obj.trip.name}}</div> 
-            <div class="trip-destination">▶ {{obj.trip.destination}}</div> 
-          </div>
-          <div v-for="(stop, id) in obj.trip.stops">
-            <div class="stop">
-                <div class="stop-circle" :style="{backgroundColor: stop.rgbColor}"></div>
-                <div v-if="id !== obj.trip.stops.length-1" class="stop-after color"></div>
-                <div v-if="id === obj.trip.stops.length-1" class="stop-after nocolor"></div>
-                <div class="stop-name">{{stop.stationName}}</div>
-            </div>
-          </div>
-          <div class="trip-buttons">
-            <div class="trip-buttons-inner">
-              <div class="xbutton trip-cancel" @click="removeRoute(obj)">❌ Útirány törlése</div>
-            </div>
-          </div>
-        </div>
-        <div v-else>
-          <div v-if="opts && opts.length > 0">
-            <div>Útirány kiválasztása...</div>
-            <div class="route-line" v-for="route in opts" @click="assignRoute(obj, route.id)"> 
-              <div class="route-sign">{{route.name}}</div>
-              <div class="route-circle route-circle-left" :style="{backgroundColor: route.stops[0].rgbColor}"></div>
-              <div class="route-circle route-circle-right" :style="{backgroundColor: route.stops[route.stops.length-1].rgbColor}"></div>
-              <div class="route-name">
-                {{route.stops[0].stationName}}
-                >
-                {{route.stops[route.stops.length-1].stationName}}
-              </div>
-            </div>
-          </div>
-          <div v-if="!opts || opts.length === 0">
-          <select class="route-select" size="1" disabled>
-              <option>Nincs kiválsztható útirány</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      `,
-      methods: {
-        assignRoute: function(vWagon, vRouteId) {
-          if (!vRouteId) return;
-          const wagon = _this.store.get(vWagon.id) as Wagon;
-          const route = _this.store.get(vRouteId) as Route;
-        },
-        removeRoute: function(vWagon) {
-          const wagon = _this.store.get(vWagon.id) as Wagon;
-          wagon.cancelTrip();
         }
       }
     });
@@ -256,7 +189,6 @@ export class InputController {
     this.inputHandler = this.inputHandlers[this.mode];
 
     this.downProps = null;
-    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
   }
 
   convert(event: PointerEvent): InputProps {
@@ -404,9 +336,9 @@ export class InputController {
               }
 
               this.store.clearSelected();
-              this.vmInfoBox.selected = null;
-              this.vmInfoBox.type = null;
-              this.vmInfoBox.opts = [];
+              this.vueSidebar.setData('selected', null);
+              this.vueSidebar.setData('type', null);
+              this.vueSidebar.setData('opts', []);
             } else {
               this.select(storedBrick);
             }
@@ -440,17 +372,20 @@ export class InputController {
 
     if (storedObj.getType() === Symbol.for('Wagon')) {
       this.selectCallback = (obj: Object): void => {
-        this.vmInfoBox.selected = obj;
+        this.vueSidebar.setData('selected', obj);
       };
       (this.getSelected() as Wagon).subscribeToUpdates(this.selectCallback);
     }
-    this.vmInfoBox.selected = storedObj.persistDeep();
-    this.vmInfoBox.type =
-      storedObj.getType() === Symbol.for('Wagon') ? 'wagon' : 'idtext';
+    this.vueSidebar.setData('selected', storedObj.persistDeep());
+    this.vueSidebar.setData(
+      'type',
+      storedObj.getType() === Symbol.for('Wagon') ? 'wagon' : 'idtext'
+    );
     if (storedObj.getType() === Symbol.for('Wagon')) {
-      this.vmInfoBox.opts = this.store
-        .getAllOf<Route>(TYPES.Route)
-        .map(x => x.persistDeep());
+      this.vueSidebar.setData(
+        'opts',
+        this.store.getAllOf<Route>(TYPES.Route).map(x => x.persistDeep())
+      );
     }
   }
 
@@ -639,11 +574,10 @@ export class InputController {
     }
     this.store.tick();
     const count = Math.floor(this.store.getTickCount() / 60);
-    this.vmInfoBox.tickCount =
-      Math.floor(count / 60) +
-      ':' +
-      (count % 60 < 10 ? '0' : '') +
-      (count % 60);
+    this.vueSidebar.setData(
+      'tickCount',
+      Math.floor(count / 60) + ':' + (count % 60 < 10 ? '0' : '') + (count % 60)
+    );
   }
 
   load(data: any) {
