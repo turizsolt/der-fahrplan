@@ -6,8 +6,9 @@
 
       <!-- train -->
       <div class="train">
-          <div :key="wagon.id" v-for="wagon in obj.train.wagons" :class="'wagon-box '+wagon.appearanceId">
+          <div @click="selectWagon(wagon.id)" :key="wagon.id+selectedWagons[wagon.id]?'-0':'-1'" v-for="wagon in obj.train.wagons" :class="'wagon-box '+wagon.appearanceId">
               <div :class="'wagon-inner '+wagon.appearanceId+' side-'+(wagon.side == 'A'?'a':'b')">
+                  {{selectedWagons[wagon.id]?'*':''}}
               </div>
           </div> 
       </div>
@@ -66,6 +67,12 @@ export default class VueWagon extends Vue {
   @Prop() obj: any;
   @Prop() opts: any[];
 
+  selectedWagons: Record<string, boolean> = {};
+
+  selectWagon(wagonId) {
+      Vue.set(this.selectedWagons, wagonId, !this.selectedWagons[wagonId]);
+  }
+
   assignRoute(vWagon, vRouteId) {
     if (!vRouteId) return;
     console.log('assignRoute');
@@ -84,6 +91,7 @@ export default class VueWagon extends Vue {
 <style>
 .train {
     display: flex;
+    margin-bottom: 20px;
 }
 
 .wagon-box{
@@ -91,33 +99,34 @@ export default class VueWagon extends Vue {
     height: 10px;
     border-radius: 2px;
     margin-right: 1px;
+    user-select: none;
 }
 
 .wagon-inner {
     height: 10px;
-    /*
-    font-size: 10px;
-    line-height: 10px;
+    user-select: none;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 16px;
     text-align: center;
-    */
 }
 
 .wagon-inner.wagon{
     border: 1px solid darkred;
-    background-color: red;
+    background-color: lightsalmon;
     width: 26px;
     border-radius: 2px;
 }
 
 .wagon-box.mot{
     border: 1px solid darkred;
-    background-color: red;
+    background-color: lightsalmon;
 }
 
 .wagon-inner.mot{
     border-top: 1px solid darkblue;
     border-bottom: 1px solid darkblue;
-    background-color: blue;
+    background-color: lightblue;
     margin-left: 5px;
     margin-right: 5px;
     margin-top: -1px;
@@ -126,20 +135,20 @@ export default class VueWagon extends Vue {
 
 .wagon-inner.utas{
     border: 1px solid darkblue;
-    background-color: blue;
+    background-color: lightblue;
     width: 26px;
     border-radius: 2px;
 }
 
 .wagon-box.vez{
     border: 1px solid darkred;
-    background-color: red;
+    background-color: lightsalmon;
 }
 
 .wagon-inner.vez{
     border-top: 1px solid darkblue;
     border-bottom: 1px solid darkblue;
-    background-color: blue;
+    background-color: lightblue;
     margin-top: -1px;
     border-radius: 0px;
 }
