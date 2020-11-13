@@ -3,6 +3,7 @@ import { Store } from '../../structs/Interfaces/Store';
 import VueIdtext from './VueIdtext.vue';
 import VueWagon from './VueWagon.vue';
 import RouteTitle from './RouteTitle.vue';
+import RouteStop from './RouteStop.vue';
 
 export class VueSidebar {
   private vmInfoBox: Vue;
@@ -14,6 +15,7 @@ export class VueSidebar {
     });
 
     Vue.component('route-title', RouteTitle);
+    Vue.component('route-stop', RouteStop);
 
     Vue.component('idtext', VueIdtext);
     Vue.component('wagon', VueWagon);

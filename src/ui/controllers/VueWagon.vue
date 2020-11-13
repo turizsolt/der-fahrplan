@@ -19,13 +19,9 @@
           <div class="trip-name">{{obj.trip.name}}</div>
           <div class="trip-destination">▶ {{obj.trip.destination}}</div>
         </div>
-        <div :key="id" v-for="(stop, id) in obj.trip.stops">
-          <div class="stop">
-              <div class="stop-circle" :style="{backgroundColor: stop.rgbColor}"></div>
-              <div v-if="id !== obj.trip.stops.length-1" class="stop-after color"></div>
-              <div v-if="id === obj.trip.stops.length-1" class="stop-after nocolor"></div>
-              <div class="stop-name">{{stop.stationName}}</div>
-          </div>
+        <div :key="stop.id" v-for="(stop, index) in obj.trip.stops">
+          <route-stop :route="obj.trip" :stop="stop" :index="index">
+          </route-stop>
         </div>
         <div class="trip-buttons">
           <div class="trip-buttons-inner">

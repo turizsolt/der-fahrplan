@@ -59,7 +59,8 @@ export class VueBigscreen {
           this.selectedRoute = route;
           this.load();
         },
-        deleteStop: function(stop) {
+        deleteStop: function(vStop) {
+          const stop = _this.store.get(vStop.id) as RouteStop;
           const route = _this.store.get(this.selectedRoute.id) as Route;
           route.removeStop(stop);
           this.load();

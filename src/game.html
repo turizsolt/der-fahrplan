@@ -63,6 +63,12 @@
             margin-right: 10px;
         }
 
+        .column-route-stops {
+            width: 200px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
         /******************************************/
 
         #info-box {
@@ -188,22 +194,45 @@
     background-color: none;
 }
 
+.route-create-holder {
+    margin-top: 5px;
+}
+
 .route-create {
     border: 1px solid #070;
     border-radius: 0.25em;
     background-color: #aca;
 
-    margin-top: 5px;
-
     padding-left: 10px;
     padding-right: 10px;
-    width: 80px;
 
     cursor: pointer;
+
+    white-space: nowrap;
 }
 
 .route-create:hover {
     background-color: #dfd;
+}
+
+.route-details {
+    margin-top: 5px;
+}
+
+.route-details-stops {
+    margin-top: 10px;
+}
+
+.route-input-name {
+    border-radius: 2px;
+    border: 1px solid #070;
+    padding: 0 3px 0 3px;
+    width: 96px;
+}
+
+.column-title {
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
 [v-cloak] { display: none; }
@@ -237,7 +266,7 @@
     </div>
     <div v-cloak id="big-screen" v-if="show">
         <div class="column-routes" id="route-list">
-            <div>Route list</div>
+            <div class="column-title">Route list</div>
             <route-title 
                 :key="route.id"
                 v-for="route in routes"
@@ -247,26 +276,39 @@
                 @click="selectRoute(route)"
                 @delete="removeRoute(route)"
             ></route-title>
-            <div>
-                <div class="route-create" v-on:click="createRoute()">Create route</div>
+            <div class="route-create-holder">
+                <span class="route-create" v-on:click="createRoute()">Create route</span>
             </div>
         </div>
-        <div class="column" id="route-details">
-            <div>Edit route</div>
+        <div class="column-route-stops" id="route-details">
+            <div class="column-title">Edit route</div>
             <div v-if="selectedRoute">
-                Id: {{selectedRoute.id}}<br />
-                Name: <input type="text" v-model="selectedRoute.name" @change="nameChange" /><br />
-                Stops:<br />
-                <div v-for="(stop, index) in selectedRoute.stops">
-                    {{stop.stationName}}
-                    <button v-on:click="deleteStop(stop)">Del</button>
-                    <button v-on:click="swapStop(stop)" v-if="index !== 0">Swup</button>
+                <div class="route-details">
+                    Name:
+                    <input class="route-input-name" type="text" v-model="selectedRoute.name" @keyup="nameChange" /><br />
                 </div>
-                <button v-on:click="createReverseRoute(selectedRoute)">Create reverse route</button>
+                <div class="route-details-stops">
+                    Stops:<br />
+                    <route-stop 
+                    v-for="(stop, index) in selectedRoute.stops"
+                    :key="stop.id"
+                    :route="selectedRoute"
+                    :stop="stop"
+                    :index="index"
+                    candelete
+                    :canmove="index !== 0"
+                    @delete="deleteStop(stop)"
+                    @move="swapStop(stop)"
+                    >
+                    </route-stop>
+                </div>
+                <div class="route-details route-create-holder">
+                    <span class="route-create" v-on:click="createReverseRoute(selectedRoute)">Create reverse route</span>
+                </div>
             </div>
         </div>
         <div class="column" id="route-station-options">
-            <div>Add stops</div>
+            <div class="column-title">Add stops</div>
             <div  v-if="selectedRoute">
                 <div v-for="station in stations">
                     <button v-on:click="addStop(station)">Add</button> {{station.name}}
