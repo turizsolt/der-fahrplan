@@ -3,6 +3,16 @@
       <div class="item-type">🚂 Mozdony</div>
       <div class="item-id">{{idt}}</div>
       <div class="item-id">Speed: {{obj.speed ? obj.speed : '???'}}</div>
+
+      <!-- train -->
+      <div class="train">
+          <div :key="wagon.id" v-for="wagon in obj.train.wagons" :class="'wagon-box '+wagon.appearanceId">
+              <div :class="'wagon-inner '+wagon.appearanceId+' side-'+(wagon.side == 'A'?'a':'b')">
+              </div>
+          </div> 
+      </div>
+
+      <!-- trips -->
       <div v-if="obj.trip">
         <div class="trip">
           <div class="trip-name">{{obj.trip.name}}</div>
@@ -22,6 +32,8 @@
           </div>
         </div>
       </div>
+
+      <!-- no trips -->
       <div v-else>
         <div v-if="opts && opts.length > 0">
           <div>Útirány kiválasztása...</div>
@@ -52,7 +64,7 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 export default class VueWagon extends Vue {
   @Prop() idt: string;
   @Prop() obj: any;
-  @Prop() opts: any;
+  @Prop() opts: any[];
 
   assignRoute(vWagon, vRouteId) {
     if (!vRouteId) return;
@@ -70,4 +82,81 @@ export default class VueWagon extends Vue {
 </script>
 
 <style>
+.train {
+    display: flex;
+}
+
+.wagon-box{
+    width: 28px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 1px;
+}
+
+.wagon-inner {
+    height: 10px;
+    /*
+    font-size: 10px;
+    line-height: 10px;
+    text-align: center;
+    */
+}
+
+.wagon-inner.wagon{
+    border: 1px solid darkred;
+    background-color: red;
+    width: 26px;
+    border-radius: 2px;
+}
+
+.wagon-box.mot{
+    border: 1px solid darkred;
+    background-color: red;
+}
+
+.wagon-inner.mot{
+    border-top: 1px solid darkblue;
+    border-bottom: 1px solid darkblue;
+    background-color: blue;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: -1px;
+    border-radius: 0px;
+}
+
+.wagon-inner.utas{
+    border: 1px solid darkblue;
+    background-color: blue;
+    width: 26px;
+    border-radius: 2px;
+}
+
+.wagon-box.vez{
+    border: 1px solid darkred;
+    background-color: red;
+}
+
+.wagon-inner.vez{
+    border-top: 1px solid darkblue;
+    border-bottom: 1px solid darkblue;
+    background-color: blue;
+    margin-top: -1px;
+    border-radius: 0px;
+}
+
+.wagon-inner.vez.side-b{
+    border-left: 1px solid darkblue;
+    margin-left: -1px;
+    margin-right: 5px;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+}
+
+.wagon-inner.vez.side-a{
+    border-right: 1px solid darkblue;
+    margin-left: 5px;
+    margin-right: -1px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
 </style>

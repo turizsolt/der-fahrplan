@@ -197,6 +197,19 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     };
   }
 
+  persistDeep(): Object {
+    return {
+      id: this.id,
+      type: 'Train',
+      wagons: this.wagonsWithSides.map(x => ({
+        id: x.wagon.getId(),
+        appearanceId: x.wagon.getAppearanceId(),
+        trip: x.trip?.getId(),
+        side: x.side,
+      }))
+    };
+  }
+
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(store.get(obj.schedulingWagon) as Wagon);
