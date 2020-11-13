@@ -38,17 +38,29 @@
 
 
         #big-screen {
-            position: fixed;
-            left: 240px;
-            top: 20px;
-            bottom: 20px;
-            right: 20px;
-            background-color: aliceblue;
-            display: flex;
+        position: fixed;
+        left: 20px;
+        top: 20px;
+        bottom: 20px;
+        right: 20px;
+        background-color:#cec;
+
+        border: 2px solid #070;
+        border-radius: 0.5em;
+
+        padding: 10px;
+
+        display: flex;
+        z-index: 1;
         }
 
         .column {
             flex-grow: 1;
+        }
+
+        .column-routes {
+            width: 200px;
+            margin-right: 10px;
         }
 
         /******************************************/
@@ -148,53 +160,11 @@
     height: 15px;
 }
 
-.stop-circle, .route-circle {
+.stop-circle {
     width: 10px;
     height: 10px;
     border: 2px solid #070;
     border-radius: 50%;
-}
-
-.route-line {
-    display: flex;
-    width: 100%;
-
-    border: 1px solid #070;
-    border-radius: 0.25em;
-    background-color: #aca;
-
-    margin-top: 5px;
-
-    cursor: pointer;
-}
-
-.route-line:hover {
-    background-color: #dfd;
-}
-
-.route-sign {
-    width: 1em;
-    text-align: center;
-}
-
-.route-circle {
-    margin-top: auto;
-    margin-bottom: auto;
-}
-
-.route-circle-left {
-    margin-left: 3px;
-}
-
-.route-circle-right {
-    margin-right: 3px;
-    margin-left: -5px;
-}
-
-.route-name {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .stop-name {
@@ -216,6 +186,24 @@
 
 .nocolor {
     background-color: none;
+}
+
+.route-create {
+    border: 1px solid #070;
+    border-radius: 0.25em;
+    background-color: #aca;
+
+    margin-top: 5px;
+
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 80px;
+
+    cursor: pointer;
+}
+
+.route-create:hover {
+    background-color: #dfd;
 }
 
 [v-cloak] { display: none; }
@@ -248,14 +236,19 @@
         </div>
     </div>
     <div v-cloak id="big-screen" v-if="show">
-        <div class="column" id="route-list">
+        <div class="column-routes" id="route-list">
             <div>Route list</div>
-            <div v-for="route in routes" v-bind:class="{selected: selectedRoute && selectedRoute.id === route.id}">
-                <span v-on:click="selectRoute(route)">{{route.detailedName}}</span>
-                <span v-on:click="removeRoute(route)">x</span>
-            </div>
+            <route-title 
+                :key="route.id"
+                v-for="route in routes"
+                :route="route"
+                :selected="selectedRoute && selectedRoute.id === route.id"
+                candelete
+                @click="selectRoute(route)"
+                @delete="removeRoute(route)"
+            ></route-title>
             <div>
-                <span v-on:click="createRoute()">Create route</span>
+                <div class="route-create" v-on:click="createRoute()">Create route</div>
             </div>
         </div>
         <div class="column" id="route-details">
