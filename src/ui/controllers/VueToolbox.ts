@@ -6,6 +6,7 @@ export class VueToolbox {
   private vm: any;
 
   constructor(private store: Store, private inputController: InputController) {
+    const _this = this;
     this.vm = new Vue({
       el: '#button-holder',
       data: {
@@ -15,7 +16,7 @@ export class VueToolbox {
       },
       methods: {
         handleClick: function(event) {
-          this.inputController.selectMode(event.target.id);
+          _this.inputController.selectMode(event.target.id);
         },
         handleWagonClick: function(event) {
           this.wagon = event.target.value;
