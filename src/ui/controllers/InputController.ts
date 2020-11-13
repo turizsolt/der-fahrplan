@@ -1,5 +1,4 @@
 import * as BABYLON from 'babylonjs';
-import Vue from 'vue/dist/vue.js';
 import { InputHandler } from './InputHandler';
 import { CreateTrackInputHandler } from './CreateTrackInputHandler';
 import { BabylonVector3ToCoordinate } from '../../ui/babylon/converters/BabylonVector3ToCoordinate';
@@ -25,15 +24,12 @@ import { CreateEngineInputHandler } from './CreateEngineInputHandler';
 import { Store } from '../../structs/Interfaces/Store';
 import { CreateStationInputHandler } from './CreateStationInputHandler';
 import { Route } from '../../structs/Scheduling/Route';
-import { Station } from '../../structs/Scheduling/Station';
-import { ActualRouteStop } from '../../structs/Scheduling/ActualRouteStop';
-import { RouteStop } from '../../structs/Scheduling/RouteStop';
 import { Wagon } from '../../structs/Interfaces/Wagon';
-import { ActualWagon } from '../../structs/Actuals/Wagon/ActualWagon';
 import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
 import { Vector3 } from 'babylonjs';
 import { VueSidebar } from './VueSidebar';
 import { VueBigscreen } from './VueBigScreen';
+import { VueToolbox } from './VueToolbox';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -55,7 +51,7 @@ export class InputController {
 
   private mouseButtons: boolean[] = [];
 
-  private vm: Vue;
+  private vueToolbox: VueToolbox;
   private vueBigScreen: VueBigscreen;
   private vueSidebar: VueSidebar;
 
@@ -63,26 +59,10 @@ export class InputController {
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera
   ) {
-    const _this = this;
     this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
     this.vueSidebar = new VueSidebar(this.store);
     this.vueBigScreen = new VueBigscreen(this.store);
-    this.vm = new Vue({
-      el: '#button-holder',
-      data: {
-        selected: '',
-        buttons: [],
-        wagon: 'wagon'
-      },
-      methods: {
-        handleClick: function(event) {
-          _this.selectMode(event.target.id);
-        },
-        handleWagonClick: function(event) {
-          this.wagon = event.target.value;
-        }
-      }
-    });
+    this.vueToolbox = new VueToolbox(this.store, this);
 
     this.inputHandlers = {
       [InputMode.CAMERA]: new CameraInputHandler(camera),
@@ -103,9 +83,9 @@ export class InputController {
     };
 
     for (let mode of Object.keys(this.inputHandlers)) {
-      this.vm.buttons.push({ id: mode, text: modeNames[mode] });
+      this.vueToolbox.addButton({ id: mode, text: modeNames[mode] });
     }
-    this.vm.selected = this.mode;
+    this.vueToolbox.setSelected(this.mode);
 
     this.inputHandler = this.inputHandlers[this.mode];
 
@@ -139,7 +119,7 @@ export class InputController {
         fromX: this.camera.position.x,
         fromY: this.camera.position.y,
         fromZ: this.camera.position.z,
-        wagonType: this.vm.wagon
+        wagonType: this.vueToolbox.getWagon()
       };
 
       return ret;
@@ -181,7 +161,7 @@ export class InputController {
       fromX: this.camera.position.x,
       fromY: this.camera.position.y,
       fromZ: this.camera.position.z,
-      wagonType: this.vm.wagon
+      wagonType: this.vueToolbox.getWagon()
     };
     ret.snappedPoint.dirXZ = ret.wheelRad;
 
@@ -328,7 +308,7 @@ export class InputController {
     this.inputHandler.cancel();
     this.mode = mode;
     this.inputHandler = this.inputHandlers[this.mode];
-    this.vm.selected = mode;
+    this.vueToolbox.setSelected(mode);
   }
 
   keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {
