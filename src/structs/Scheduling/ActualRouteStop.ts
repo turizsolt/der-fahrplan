@@ -45,6 +45,14 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     return this.departureTime;
   }
 
+  setArrivalTime(time: number): void {
+    this.arrivalTime = time;
+  }
+
+  setDepartureTime(time: number): void {
+    this.departureTime = time;
+  }
+
   persist(): Object {
     return {
       id: this.id,
@@ -61,8 +69,24 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       station: this.station.persistDeep(),
       stationName: this.getStationName(),
       rgbColor: this.station.getColor().getRgbString(),
-      platform: this.platform && this.platform.getId()
+      platform: this.platform && this.platform.getId(),
+      arrivalTime: this.arrivalTime,
+      arrivalTimeString: this.timeToStr(this.arrivalTime),
+      departureTime: this.departureTime,
+      departureTimeString: this.timeToStr(this.departureTime)
     };
+  }
+
+  private timeToStr(time: number): string {
+    if (time === undefined) return '';
+
+    const sec = time % 60;
+    const minutes = (time - sec) / 60;
+    const min = minutes % 60;
+    const hour = (minutes - min) / 60;
+    return hour
+      ? hour.toString() + (min < 10 ? ':0' : ':') + min.toString()
+      : min.toString();
   }
 
   load(obj: any, store: Store): void {

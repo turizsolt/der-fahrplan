@@ -14,4 +14,7 @@ export interface RouteStop extends BaseStorable {
   getPlatform(): Platform;
   getArrivalTime(): number;
   getDepartureTime(): number;
+
+  setArrivalTime(time: number): void;
+  setDepartureTime(time: number): void;
 }
