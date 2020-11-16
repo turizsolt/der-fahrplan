@@ -285,7 +285,7 @@
             <div v-if="selectedRoute">
                 <div class="route-details">
                     Name:
-                    <input class="route-input-name" type="text" v-model="selectedRoute.name" @keyup="nameChange" /><br />
+                    <input class="route-input-name" type="text" v-model="selectedRoute.name" @keyup.stop="nameChange" /><br />
                 </div>
                 <div class="route-details-stops">
                     Stops:<br />
@@ -313,6 +313,13 @@
                 <div v-for="station in stations">
                     <button v-on:click="addStop(station)">Add</button> {{station.name}}
                 </div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="column-title">Add trips</div>
+            <div  v-if="selectedRoute">
+                <add-trip :route="selectedRoute">
+                </add-trip>
             </div>
         </div>
     </div>

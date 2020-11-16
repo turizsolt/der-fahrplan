@@ -19,6 +19,18 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return this;
   }
 
+  private timeToStr(time: number): string {
+    if (time === undefined) return '';
+
+    const sec = time % 60;
+    const minutes = (time - sec) / 60;
+    const min = minutes % 60;
+    const hour = (minutes - min) / 60;
+    return hour
+      ? hour.toString() + (min < 10 ? ':0' : ':') + min.toString()
+      : min.toString();
+  }
+
   redefine(stop: RouteStop, props: OptionalTripStop): void {
     const id = stop.getId();
     this.redefinedProps[id] = {
@@ -72,6 +84,16 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       route: this.route.getId(),
       departureTime: this.departureTime,
       redefinedProps
+    };
+  }
+
+  persistDeep(): Object {
+    return {
+      id: this.id,
+      type: 'Trip',
+      route: this.route.getId(),
+      departureTime: this.departureTime,
+      departureTimeString: this.timeToStr(this.departureTime)
     };
   }
 

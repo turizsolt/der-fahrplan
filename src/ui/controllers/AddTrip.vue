@@ -1,26 +1,14 @@
 <template>
-  <div class="stop">
-    <div class="stop-circle" :style="{backgroundColor: stop.rgbColor}"></div>
-    <div v-if="index !== route.stops.length-1" class="stop-after color"></div>
-    <div v-if="index === route.stops.length-1" class="stop-after nocolor"></div>
-    <div class="stop-name">{{stop.stationName}}</div>
-    
-    <!-- buttons -->
-    <div class="stop-button-holder" v-if="candelete || canmove">
-      <div v-if="canmove" class="stop-button stop-move" @click.stop="$emit('move')">▲</div>
-      <div v-if="candelete" class="stop-button stop-delete" @click.stop="$emit('delete')">x</div>
-    </div>
-
-    <!-- platform -->
-    <select size="1" class="stop-select-platform">
-      <option value="1">?</option>
-    </select>
-
-    <!-- arrival departure -->
-    <input class="stop-input-time" type="text" v-model="stop.arrivalTimeString" 
-      @keyup.stop="handleTime('arrivalTime', $event)" />
-    <input class="stop-input-time" type="text" v-model="stop.departureTimeString"
-      @keyup.stop="handleTime('departureTime', $event)" />
+  <div>
+    Time:
+    <br />
+    <input style="width: 80px;" @keyup.stop="handleTime" type="text" v-model="timeStr" />
+    <br />
+    <button style="width: 80px;" @click="addTrip">Add&nbsp;trip</button>
+    <hr />
+    <button style="width: 80px;" @click="update">Update list</button>
+    <div>Trip departure times:</div>
+    <div :key="trip.id" v-for="trip in filteredTripList">{{trip.departureTimeString}}</div>
   </div>
 </template>
 
@@ -30,23 +18,40 @@ import { Store } from "../../structs/Interfaces/Store";
 import { productionContainer } from "../../di/production.config";
 import { TYPES } from "../../di/TYPES";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
+import { Route } from "../../structs/Scheduling/Route";
+import { Trip } from "../../structs/Scheduling/Trip";
 
 @Component
 export default class RouteTitle extends Vue {
-  @Prop() stop: any;
   @Prop() route: any;
-  @Prop() index: number;
-  @Prop() candelete?: boolean;
-  @Prop() canmove?: boolean;
-
+  timeStr: string = '';
+  time: number = 0;
+  tripList: any[] = [];
+  get filteredTripList() {
+    return this.tripList.filter(t => t.route === this.route.id);
+  }
+  
   private store:Store;
 
   constructor() {
     super();
     this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
+    setTimeout(() => this.update(), 0);
   }
 
-  handleTime(column: string, event:any): void {
+  update(): void {
+      this.tripList = this.store.getAllOf(TYPES.Trip)
+        .map(x => x.persistDeep());
+  }
+
+  addTrip(): void {
+    const route = this.store.get(this.route.id) as Route;
+    const trip = this.store.create<Trip>(TYPES.Trip).init(route, this.time);
+    this.timeStr = '';
+    this.update();
+  }
+
+  handleTime(event:any): void {
       let value = event.currentTarget.value;
       value = value.split('').filter(x => '0' <= x && x <= '9').join('');
       if(value.length > 4) {
@@ -58,15 +63,9 @@ export default class RouteTitle extends Vue {
           time = parseInt(value.substr(0, value.length-2), 10)*60 + 
             parseInt(value.substr(-2), 10);
       }
-      event.currentTarget.value = value;
-
-      const stop = this.store.get(this.stop.id) as RouteStop;
-      if(column === 'arrivalTime') {
-        stop.setArrivalTime(value === '' ? undefined : time * 60);
-      }
-      if(column === 'departureTime') {
-        stop.setDepartureTime(value === '' ? undefined : time * 60);
-      }
+      //event.currentTarget.value = value;
+      this.timeStr = value;
+      this.time = value === '' ? undefined : time * 60;
 
   }
 }

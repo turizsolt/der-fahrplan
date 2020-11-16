@@ -4,6 +4,7 @@ import { TYPES } from '../../di/TYPES';
 import { Route } from '../../structs/Scheduling/Route';
 import { Station } from '../../structs/Scheduling/Station';
 import { RouteStop } from '../../structs/Scheduling/RouteStop';
+import AddTrip from './AddTrip.vue';
 
 export class VueBigscreen {
   private vmBigScreen: any;
@@ -91,6 +92,8 @@ export class VueBigscreen {
         }
       }
     });
+
+    Vue.component('add-trip', AddTrip);
   }
 
   toggleShow() {
