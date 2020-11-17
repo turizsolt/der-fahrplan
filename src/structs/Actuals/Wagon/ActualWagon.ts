@@ -456,8 +456,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       type: 'Wagon',
       speed: this.getSpeed(),
       train: this.getTrain().persistDeep(),
-      // will delete from here
-      trip: this.getTrip() && this.getTrip().persistDeep()
+      trip: this.getTrip()?.persistDeep()
     };
   }
 

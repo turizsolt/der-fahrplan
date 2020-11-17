@@ -6,35 +6,30 @@
 
       <!-- train -->
       <div class="train">
-          <div @click="selectWagon(wagon.id)" :key="wagon.id+selectedWagons[wagon.id]?'-0':'-1'" v-for="wagon in obj.train.wagons" :class="'wagon-box '+wagon.appearanceId">
+          <div 
+            @click="selectWagon(wagon.id)"
+            v-for="wagon in obj.train.wagons"
+            :key="wagon.id+(selectedWagons[wagon.id]?'-0':'-1')"
+            :class="'wagon-box '+wagon.appearanceId"
+            :title="(wagon.trip && wagon.trip.route) ? (wagon.trip.route.name+' '+wagon.trip.route.detailedName):'nope'"
+          >
               <div :class="'wagon-inner '+wagon.appearanceId+' side-'+(wagon.side == 'A'?'a':'b')">
-                  {{selectedWagons[wagon.id]?'*':''}}
+                  {{selectedWagons[wagon.id]?'*':''}}{{wagon.tripNo}}
               </div>
           </div> 
       </div>
 
-      <!-- trips -->
-      <div v-if="obj.trip">
-        <div class="trip">
-          <div class="trip-name">{{obj.trip.name}}</div>
-          <div class="trip-destination">▶ {{obj.trip.destination}}</div>
-        </div>
-        <div :key="stop.id" v-for="(stop, index) in obj.trip.stops">
-          <route-stop :route="obj.trip" :stop="stop" :index="index">
-          </route-stop>
-        </div>
-        <div class="trip-buttons">
-          <div class="trip-buttons-inner">
-            <div class="xbutton trip-cancel" @click="removeRoute(obj)">❌ Útirány törlése</div>
-          </div>
-        </div>
+      <div>Kiválasztott útirányok</div>
+      <trip-title :key="trip.id" v-for="trip in obj.train.trips" :route="trip.route" :trip="trip" @click="assignTrip(trip.id)" />
+      <div v-if="selectedCount > 0">
+        <button @click="showTrips">Új hozzáadás</button>
+        <button @click="clearTrip">Törlés</button>
       </div>
-
-      <!-- no trips -->
-      <div v-else>
-        <div v-if="opts && opts.length > 0">
+      
+      <div>
+        <div v-if="showTripList && opts && opts.length > 0">
           <div>Útirány kiválasztása...</div>
-          <trip-title :key="trip.id" v-for="trip in opts" :route="trip.route" :trip="trip" @click="assignTrip(obj, trip.id)" />
+          <trip-title :key="trip.id" v-for="trip in opts" :route="trip.route" :trip="trip" @click="assignTrip(trip.id)" />
         </div>
         <div v-if="!opts || opts.length === 0">
         <select class="route-select" size="1" disabled>
@@ -47,6 +42,12 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
+import { Wagon } from "../../structs/Interfaces/Wagon";
+import { productionContainer } from "../../di/production.config";
+import { Store } from "../../structs/Interfaces/Store";
+import { TYPES } from "../../di/TYPES";
+import { Train } from "../../structs/Scheduling/Train";
+import { Trip } from "../../structs/Scheduling/Trip";
 
 @Component
 export default class VueWagon extends Vue {
@@ -55,15 +56,63 @@ export default class VueWagon extends Vue {
   @Prop() opts: any[];
 
   selectedWagons: Record<string, boolean> = {};
+  selectedCount: number = 0;
+  showTripList: boolean = false;
+
+  private store:Store;
+
+  constructor() {
+    super();
+    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
+  }
 
   selectWagon(wagonId) {
+      if(this.selectedWagons[wagonId]) {
+          this.selectedCount--;
+      } else {
+          this.selectedCount++;
+      }
       Vue.set(this.selectedWagons, wagonId, !this.selectedWagons[wagonId]);
   }
 
-  assignTrip(vWagon, vTripId) {
+  assignTrip(vTripId) {
     if (!vTripId) return;
-    console.log('assignTrip', vTripId);
+    
+    const wagons:Wagon[] = [];
+    for(let wagonId of Object.keys(this.selectedWagons)) {
+      if(this.selectedWagons[wagonId]) {
+        const wagon = this.store.get(wagonId) as Wagon;
+        wagons.push(wagon);
+        this.selectedWagons[wagonId] = false;
+      }
+    }
+    this.selectedCount = 0;
+
+    const train = this.store.get(this.obj.train.id) as Train;
+    const trip = this.store.get(vTripId) as Trip;
+    train.assignTrip(trip, wagons);
+
+    this.showTripList = false;
   };
+
+  clearTrip() {
+    const wagons:Wagon[] = [];
+    for(let wagonId of Object.keys(this.selectedWagons)) {
+      if(this.selectedWagons[wagonId]) {
+        const wagon = this.store.get(wagonId) as Wagon;
+        wagons.push(wagon);
+        this.selectedWagons[wagonId] = false;
+      }
+    }
+    const train = this.store.get(this.obj.train.id) as Train;
+    train.assignTrip(null, wagons);
+    
+    this.showTripList = false;
+  }
+
+  showTrips() {
+    this.showTripList = true;
+  }
 }
 </script>
 

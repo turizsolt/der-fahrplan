@@ -138,9 +138,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         this.wagonsWithSides[i].trip = trip;
       }
     }
-
-    if(!this.trips.includes(trip)) {
-        this.trips.push(trip);
+    
+    if(!this.trips.includes(trip) && trip) {
+      this.trips.push(trip);
     }
   }
 
@@ -239,7 +239,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       wagons: this.wagonsWithSides.map(x => ({
         id: x.wagon.getId(),
         appearanceId: x.wagon.getAppearanceId(),
-        trip: x.trip?.getId(),
+        tripId: x.trip?.getId(),
+        tripNo: this.trips.findIndex(y => x.trip === y) + 1,
+        trip: x.trip?.persistDeep(),
         side: x.side,
       })),
       trips: this.trips.map(t => t.persistDeep())
