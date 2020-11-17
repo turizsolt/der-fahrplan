@@ -14,14 +14,23 @@ const TripFactory: () => Trip = () => store.create<Trip>(TYPES.Trip);
 
 describe('TrainTrips', () => {
   let route: Route, trip: Trip;
+  let route2: Route, trip2: Trip;
+  let route3: Route, trip3: Trip;
 
   before(() => {
     store.clear();
 
     route = RouteFactory().init();
-    route.setName('S12');
-
+    route.setName('S11');
     trip = TripFactory().init(route, 10);
+
+    route2 = RouteFactory().init();
+    route2.setName('S12');
+    trip2 = TripFactory().init(route2, 10);
+
+    route3 = RouteFactory().init();
+    route3.setName('S13');
+    trip3 = TripFactory().init(route3, 10);
   });
 
   it('train trips get a new element', () => {
@@ -56,5 +65,31 @@ describe('TrainTrips', () => {
     expect(loco.getTrip()).equals(undefined);
     expect(pass.getTrip()).equals(undefined);
     expect(cont.getTrip()).equals(undefined);
+  });
+
+  it('merges trips, and updates', () => {
+    const [loco, pass, cont] = buildTrain(W.Loco, W.Pass, W.Cont);
+    const [loco2, pass2, cont2] = buildTrain(W.Loco, W.Pass, W.Cont);
+    const train = loco.getTrain();
+    const train2 = loco2.getTrain();
+
+    train.assignTrip(trip, [pass]);
+    train.assignTrip(trip2, []);
+
+    expect(train.getTrips().map(x => x.getId())).deep.equals([
+      trip.getId(),
+      trip2.getId()
+    ]);
+
+    train2.assignTrip(trip, [pass2]);
+    train2.assignTrip(trip3, [cont2]);
+
+    cont.getB().connect(loco2.getA());
+    const connectedTrain = loco2.getTrain();
+
+    expect(connectedTrain.getTrips().map(x => x.getId())).deep.equals([
+      trip.getId(),
+      trip3.getId()
+    ]);
   });
 });
