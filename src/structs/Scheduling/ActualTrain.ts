@@ -14,6 +14,7 @@ import { Trip } from './Trip';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private wagonsWithSides: WagonWithSide[] = [];
+  private trips: Trip[] = [];
   private controlingWagon: Wagon = null;
   private removed: boolean = false;
 
@@ -120,6 +121,14 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         this.wagonsWithSides[i].trip = trip;
       }
     }
+
+    if(!this.trips.includes(trip)) {
+        this.trips.push(trip);
+    }
+  }
+
+  getTrips(): Trip[] {
+      return this.trips;
   }
 
   setWagonsWithSides(wagonsWithSides: WagonWithSide[]) {
@@ -206,7 +215,8 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         appearanceId: x.wagon.getAppearanceId(),
         trip: x.trip?.getId(),
         side: x.side,
-      }))
+      })),
+      trips: this.trips.map(t => t.persistDeep())
     };
   }
 
