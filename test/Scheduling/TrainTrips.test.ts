@@ -25,10 +25,21 @@ describe('TrainTrips', () => {
   });
 
   it('train trips get a new element', () => {
-    const [loco, pass, cont] = buildTrain(W.Loco, W.Pass, W.Cont);
+    const [loco] = buildTrain(W.Loco, W.Pass, W.Cont);
     const train = loco.getTrain();
 
     expect(train.getTrips().map(x => x.getId())).deep.equals([]);
+    train.assignTrip(trip);
+
+    expect(train.getTrips().map(x => x.getId())).deep.equals([trip.getId()]);
+  });
+
+  it("train trips don't get new element, when already present", () => {
+    const [loco] = buildTrain(W.Loco, W.Pass, W.Cont);
+    const train = loco.getTrain();
+
+    expect(train.getTrips().map(x => x.getId())).deep.equals([]);
+    train.assignTrip(trip);
     train.assignTrip(trip);
 
     expect(train.getTrips().map(x => x.getId())).deep.equals([trip.getId()]);
