@@ -8,6 +8,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
   private name: string;
   private stops: RouteStop[];
   private reverse: Route;
+  private color: string;
 
   init(): Route {
     super.initStore(TYPES.Route);
@@ -29,6 +30,14 @@ export class ActualRoute extends ActualBaseStorable implements Route {
 
   remove(): void {
     this.store.unregister(this);
+  }
+
+  getColor(): string {
+      return this.color ?? '#fff';
+  }
+
+  setColor(color: string):void {
+      this.color = color;
   }
 
   getName(): string {
@@ -79,7 +88,8 @@ export class ActualRoute extends ActualBaseStorable implements Route {
       name: this.name,
       detailedName: this.getDetailedName(),
       stops: this.stops.map(x => x.getId()),
-      reverse: this.getReverse() && this.getReverse().getId()
+      reverse: this.getReverse() && this.getReverse().getId(),
+      color: this.color
     };
   }
 
@@ -94,7 +104,8 @@ export class ActualRoute extends ActualBaseStorable implements Route {
           : 'Unknown',
       detailedName: this.getDetailedName(),
       stops: this.stops.map(x => x.persistDeep()),
-      reverse: this.getReverse() && this.getReverse().getId()
+      reverse: this.getReverse() && this.getReverse().getId(),
+      color: this.color
     };
   }
 
@@ -108,6 +119,9 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     }
     if (obj.reverse && store.get(obj.reverse)) {
       this.setReverse(store.get(obj.reverse) as Route);
+    }
+    if(obj.color) {
+      this.setColor(obj.color);
     }
   }
 }

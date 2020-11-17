@@ -266,6 +266,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.update();
   }
 
+  setTrip(trip: Trip): void {
+      this.announcement.setTrip(trip);
+  }
+
   cancelTrip(): void {
     this.announcement.cancelTrip();
   }
@@ -476,6 +480,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       this.worm = new TrackWorm([track], this);
     } else {
       this.worm = new TrackWorm([track, bTrack], this);
+    }
+
+    if(obj.trip) {
+        this.assignTrip(store.get(obj.trip) as Trip);
     }
 
     this.renderer.init(this);

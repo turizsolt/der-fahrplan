@@ -256,8 +256,13 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         trip: store.get(x.trip) as Trip,
         wagon: store.get(x.wagon) as Wagon
     }));
-    for (let wagon of this.getWagons()) {
-        wagon.setTrain(this);
+    for (let wagonWithSide of this.wagonsWithSides) {
+        wagonWithSide.wagon.setTrain(this);
+        wagonWithSide.wagon.setTrip(wagonWithSide.trip);
+
+        if(wagonWithSide.trip && !this.trips.includes(wagonWithSide.trip)) {
+            this.trips.push(wagonWithSide.trip);
+        }
     }
   }
 }

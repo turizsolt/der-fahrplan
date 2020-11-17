@@ -1,6 +1,5 @@
 import { injectable } from 'inversify';
 import { Wagon } from '../../Interfaces/Wagon';
-import { Route } from '../../Scheduling/Route';
 import { Train } from '../../Scheduling/Train';
 import { TYPES } from '../../../di/TYPES';
 import { Store } from '../../Interfaces/Store';
@@ -9,7 +8,7 @@ import { Trip } from '../../Scheduling/Trip';
 
 @injectable()
 export class WagonAnnouncement {
-  protected trip: Route;
+  protected trip: Trip;
   protected train: Train;
 
   constructor(private parent: Wagon, private store: Store) {
@@ -17,33 +16,18 @@ export class WagonAnnouncement {
   }
 
   assignTrip(trip: Trip): void {
-    // const oldTrip = this.getTrip();
-    // if (oldTrip) {
-    //   for (let stop of oldTrip.getStops()) {
-    //     stop.getStation().deannounce(oldTrip);
-    //   }
-    // }
-    // this.trip = route;
-    // if (route) {
-    //   this.train.setSchedulingWagon(this.parent);
-    // }
-    // const newTrip = this.getTrip();
-    // if (newTrip) {
-    //   for (let stop of newTrip.getStops()) {
-    //     stop.getStation().announce(newTrip);
-    //   }
-    // }
+    this.train.assignTrip(trip, [this.parent]);
   }
 
   cancelTrip(): void {
-    // this.train.cancelTrip();
+    this.train.assignTrip(null, [this.parent]);
+  }
+
+  setTrip(trip: Trip) {
+    this.trip = trip;
   }
 
   getTrip(): Trip {
-    // if (this.trip) return this.trip;
-    // if (this.getTrain().getSchedulingWagon() !== this.parent)
-    //   return this.getTrain().getTrip();
-    // return null;
     const wagonWithTrip = this.train
       .getWagonsWithSides()
       .find(x => x.wagon === this.parent);
@@ -96,7 +80,7 @@ export class WagonAnnouncement {
           station,
           platform,
           this.train,
-          this.trip
+          this.trip.getRoute()
         );
       }
     });
