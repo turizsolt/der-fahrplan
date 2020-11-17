@@ -30,6 +30,7 @@ import { Vector3 } from 'babylonjs';
 import { VueSidebar } from './VueSidebar';
 import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
+import { Trip } from '../../structs/Scheduling/Trip';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -285,7 +286,10 @@ export class InputController {
     if (storedObj.getType() === Symbol.for('Wagon')) {
       this.vueSidebar.setData(
         'opts',
-        this.store.getAllOf<Route>(TYPES.Route).map(x => x.persistDeep())
+        this.store
+          .getAllOf<Trip>(TYPES.Trip)
+          .map(x => x.persistDeep())
+          .sort((a: any, b: any) => a.departureTime - b.departureTime)
       );
     }
   }

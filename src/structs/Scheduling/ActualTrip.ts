@@ -91,7 +91,8 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return {
       id: this.id,
       type: 'Trip',
-      route: this.route.getId(),
+      routeId: this.route.getId(),
+      route: this.route.persistDeep(),
       departureTime: this.departureTime,
       departureTimeString: this.timeToStr(this.departureTime)
     };

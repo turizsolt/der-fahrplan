@@ -28,7 +28,7 @@ export default class RouteTitle extends Vue {
   time: number = 0;
   tripList: any[] = [];
   get filteredTripList() {
-    return this.tripList.filter(t => t.route === this.route.id);
+    return this.tripList.filter(t => t.routeId === this.route.id);
   }
   
   private store:Store;

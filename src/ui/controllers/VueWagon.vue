@@ -34,7 +34,7 @@
       <div v-else>
         <div v-if="opts && opts.length > 0">
           <div>Útirány kiválasztása...</div>
-          <route-title :key="route.id" v-for="route in opts" :route="route" @click="assignRoute(obj, route.id)" />
+          <trip-title :key="trip.id" v-for="trip in opts" :route="trip.route" :trip="trip" @click="assignTrip(obj, trip.id)" />
         </div>
         <div v-if="!opts || opts.length === 0">
         <select class="route-select" size="1" disabled>
@@ -60,17 +60,9 @@ export default class VueWagon extends Vue {
       Vue.set(this.selectedWagons, wagonId, !this.selectedWagons[wagonId]);
   }
 
-  assignRoute(vWagon, vRouteId) {
-    if (!vRouteId) return;
-    console.log('assignRoute');
-    //const wagon = this.store.get(vWagon.id) as Wagon;
-    //const route = this.store.get(vRouteId) as Route;
-  };
-
-  removeRoute(vWagon) {
-    console.log('removeRoute');
-    // const wagon = this.store.get(vWagon.id) as Wagon;
-    // wagon.cancelTrip();
+  assignTrip(vWagon, vTripId) {
+    if (!vTripId) return;
+    console.log('assignTrip', vTripId);
   };
 }
 </script>
