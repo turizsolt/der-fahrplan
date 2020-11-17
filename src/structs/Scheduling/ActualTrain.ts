@@ -100,8 +100,12 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     other.getWagons().map(wagon => wagon.setTrain(this));
     other.remove();
 
-    this.trips = this.trips.filter(t => this.wagonsWithSides.findIndex(w => w.trip === t) > -1);
-  }
+    this.updateTrips();
+    }
+
+    private updateTrips(): void {
+        this.trips = this.trips.filter(t => this.wagonsWithSides.findIndex(w => w.trip === t) > -1);
+    }
 
   separateThese(wagons: Wagon[]): void {
     const newWagonsWithSides = this.wagonsWithSides.filter(x =>
@@ -109,7 +113,12 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     );
     const newTrain = this.store.create<Train>(TYPES.Train).init(wagons[0]);
     newTrain.setWagonsWithSides(newWagonsWithSides);
-    newWagonsWithSides.map(x => x.wagon.setTrain(newTrain));
+    newWagonsWithSides.map(x => {
+        x.wagon.setTrain(newTrain);
+        if(x.trip) {
+            newTrain.assignTrip(x.trip, []);
+        }
+    });
 
     this.wagonsWithSides = this.wagonsWithSides.filter(
       x => !wagons.includes(x.wagon)

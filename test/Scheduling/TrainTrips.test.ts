@@ -92,4 +92,26 @@ describe('TrainTrips', () => {
       trip3.getId()
     ]);
   });
+
+  it('separate trips, and updates', () => {
+    const [loco, pass, cont, loco2, pass2] = buildTrain(
+      W.Loco,
+      W.Pass,
+      W.Cont,
+      W.Loco,
+      W.Pass
+    );
+    const train = loco.getTrain();
+
+    train.assignTrip(trip, [pass, cont]);
+    train.assignTrip(trip2, []);
+    train.assignTrip(trip3, [pass2]);
+
+    cont.getB().disconnect();
+    const train1 = loco.getTrain();
+    const train2 = loco2.getTrain();
+
+    expect(train1.getTrips().map(x => x.getId())).deep.equals([trip.getId()]);
+    expect(train2.getTrips().map(x => x.getId())).deep.equals([trip3.getId()]);
+  });
 });
