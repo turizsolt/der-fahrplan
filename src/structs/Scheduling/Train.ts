@@ -26,6 +26,7 @@ export interface Train extends BaseStorable {
 
   assignTrip(trip: Trip, wagons?: Wagon[]): void;
   getTrips(): Trip[];
+  removeTrip(trip: Trip): void;
 
   getWagonsWithSides(): WagonWithSide[];
   getWagonIdsWithSides(): WagonIdWithSide[];

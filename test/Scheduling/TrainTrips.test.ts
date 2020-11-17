@@ -33,4 +33,17 @@ describe('TrainTrips', () => {
 
     expect(train.getTrips().map(x => x.getId())).deep.equals([trip.getId()]);
   });
+
+  it('train trips remove a trip', () => {
+    const [loco, pass, cont] = buildTrain(W.Loco, W.Pass, W.Cont);
+    const train = loco.getTrain();
+
+    train.assignTrip(trip);
+    train.removeTrip(trip);
+
+    expect(train.getTrips().map(x => x.getId())).deep.equals([]);
+    expect(loco.getTrip()).equals(undefined);
+    expect(pass.getTrip()).equals(undefined);
+    expect(cont.getTrip()).equals(undefined);
+  });
 });
