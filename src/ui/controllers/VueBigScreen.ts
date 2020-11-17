@@ -89,6 +89,11 @@ export class VueBigscreen {
           const route = _this.store.get(this.selectedRoute.id) as Route;
           route.setName(event.target.value);
           this.load();
+        },
+        colorChange: function(event) {
+          const route = _this.store.get(this.selectedRoute.id) as Route;
+          route.setColor(event.target.value);
+          this.load();
         }
       }
     });

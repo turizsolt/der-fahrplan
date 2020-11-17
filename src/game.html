@@ -287,6 +287,10 @@
                     Name:
                     <input class="route-input-name" type="text" v-model="selectedRoute.name" @keyup.stop="nameChange" /><br />
                 </div>
+                <div class="route-details">
+                    Color:
+                    <input class="route-input-name" type="text" v-model="selectedRoute.color" @keyup.stop="colorChange" /><br />
+                </div>
                 <div class="route-details-stops">
                     Stops:<br />
                     <route-stop 

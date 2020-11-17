@@ -10,17 +10,22 @@
             @click="selectWagon(wagon.id)"
             v-for="wagon in obj.train.wagons"
             :key="wagon.id+(selectedWagons[wagon.id]?'-0':'-1')"
-            :class="'wagon-box '+wagon.appearanceId"
+            :class="'wagon-box '+wagon.appearanceId+' pattern-'+wagon.tripNo"
             :title="(wagon.trip && wagon.trip.route) ? (wagon.trip.route.name+' '+wagon.trip.route.detailedName):'nope'"
           >
-              <div :class="'wagon-inner '+wagon.appearanceId+' side-'+(wagon.side == 'A'?'a':'b')">
-                  {{selectedWagons[wagon.id]?'*':''}}{{wagon.tripNo}}
+              <div :class="'wagon-inner '+wagon.appearanceId+' side-'+(wagon.side == 'A'?'a':'b')+' pattern-'+wagon.tripNo">
+                  {{selectedWagons[wagon.id]?'*':''}}
               </div>
           </div> 
       </div>
 
+      <!-- routes -->
       <div>Kiválasztott útirányok</div>
-      <trip-title :key="trip.id" v-for="trip in obj.train.trips" :route="trip.route" :trip="trip" @click="assignTrip(trip.id)" />
+      <div class="trip" :key="trip.id" v-for="(trip, index) in obj.train.trips" @click="assignTrip(trip.id)">
+        <div :style="'background-color: '+trip.route.color+';'" :class="'trip-name pattern-'+(index+1)">{{trip.route.name}}</div>
+        <div class="trip-destination">▶ {{trip.route.destination}}</div> 
+      </div>
+      
       <div v-if="selectedCount > 0">
         <button @click="showTrips">Új hozzáadás</button>
         <button @click="clearTrip">Törlés</button>
@@ -195,5 +200,40 @@ export default class VueWagon extends Vue {
     margin-right: -1px;
     border-top-right-radius: 2px;
     border-bottom-right-radius: 2px;
+}
+
+
+.pattern-0 {
+    --stripe:  rgba(255,255,255,.5);
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, var(--stripe) 5px, var(--stripe) 10px);
+}
+
+.pattern-1 {
+    --bg:  rgba(255,255,255,.5);
+
+    background: linear-gradient(135deg, var(--bg) 25%, transparent 25%) -5px 0,
+        linear-gradient(225deg, var(--bg) 25%, transparent 25%) -5px 0,
+        linear-gradient(315deg, var(--bg) 25%, transparent 25%),
+        linear-gradient(45deg, var(--bg) 25%, transparent 25%);
+    background-size: 10px 10px;
+}
+
+.pattern-2 {
+    --stripe:  rgba(255,255,255,.5);
+    background-image: radial-gradient(var(--stripe) 20%, transparent 20%),
+        radial-gradient(var(--stripe) 20%, transparent 20%);
+    background-position: 15px 15px, 5px 15px;
+    background-size: 20px 20px;
+}
+
+.trip-name.pattern-2 {
+    background-position: 15px 15px, 5px 5px;
+}
+
+.pattern-3 {
+    --stripe:  rgba(255,255,255,.5);
+    background-image: linear-gradient(45deg,var(--stripe) 25%, transparent 25%), linear-gradient(-45deg, var(--stripe) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, var(--stripe) 75%), linear-gradient(-45deg, transparent 75%, var(--stripe) 75%);
+    background-size: 10px 10px;
+    background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
 }
 </style>
