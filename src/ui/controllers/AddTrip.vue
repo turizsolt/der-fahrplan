@@ -1,18 +1,24 @@
 <template>
   <div>
-    Time:
-    <br />
-    <input style="width: 80px;" @keyup.stop="handleTime" type="text" v-model="timeStr" />
-    <br />
-    <button style="width: 80px;" @click="addTrip">Add&nbsp;trip</button>
-    <hr />
-    <button style="width: 80px;" @click="update">Update list</button>
-    <div>Trip departure times:</div>
-    <div :key="trip.id" v-for="trip in filteredTripList">
-        <!-- {{trip.departureTimeString}} -->
-        <div :key="stop.id" v-for="stop in trip.stops">
-            {{stop.arrivalTimeString}} / {{stop.departureTimeString}}
+    <div>
+      Time:
+      <input style="width: 80px;" @keyup.stop="handleTime" type="text" v-model="timeStr" />
+      <button style="width: 80px;" @click="addTrip">Add&nbsp;trip</button>
+      <button style="width: 80px;" @click="update">Update list</button>
+    </div>
+    <div>
+      <div class="trip-list">
+        <div class="trip" :key="trip.id" v-for="trip in filteredTripList">
+          <div class="trip-stop">
+            <div class="trip-stop-time-header trip-stop-arrival">arr</div>
+            <div class="trip-stop-time-header trip-stop-departure">dep</div>
+          </div>
+          <div class="trip-stop" :key="stop.id" v-for="stop in trip.stops">
+            <div class="trip-stop-time trip-stop-arrival">{{stop.arrivalTimeString}}</div>
+            <div class="trip-stop-time trip-stop-departure">{{stop.departureTimeString}}</div>
+          </div>
         </div>
+      </div>
     </div>
   </div>
 </template>
@@ -76,50 +82,40 @@ export default class RouteTitle extends Vue {
 }
 </script>
 
-<style>
-.stop:hover {
-    background-color: #aaccaa;
+<style scoped>
+
+.trip-list {
+  display: flex;
+  margin-top: 14px;
+  overflow-x: scroll;
 }
 
-.stop-button-holder {
-    flex-grow: 1;
-    text-align: right;
-    display: flex;
-    justify-content: flex-end;
+.trip {
+  display: flex;
+  flex-direction: column;
+  margin: 0 5px;
 }
 
-.stop-button {
-    border-radius: 50%;
-    background-color: #1a7829;
-    color: #aaccaa;
-    width: 16px;
-    height: 16px;
-    line-height: 14px;
-    text-align: center;
-    margin: -1px 1px 1px 1px;
+.trip-stop {
+  display: flex;
+  margin-bottom: 10px;
 }
 
-.stop-button:hover {
-    border-radius: 50%;
-    background-color: #aaccaa;
-    color: #1a7829;
-    cursor: pointer;
+.trip-stop-time, .trip-stop-time-header {
+  border-radius: 2px;
+  border: 1px solid #070;
+  padding: 0 3px 0 3px;
+  width: 35px;
+  text-align: right;
+  font: 400 13.3333px Arial;
+  height: 13px;
 }
 
-.stop-input-time {
-    border-radius: 2px;
-    border: 1px solid #070;
-    padding: 0 3px 0 3px;
-    width: 35px;
-    text-align: right;
-}
-
-.stop-select-platform {
-    border-radius: 2px;
-    border: 1px solid #070;
-    padding: 0 3px 0 3px;
-    width: 50px;
-    font-size: 10px;
+.trip-stop-time-header {
+  background-color: #070;
+  border: 1px solid #cec;
+  color: #cec;
+  text-align: center;
 }
 
 </style>

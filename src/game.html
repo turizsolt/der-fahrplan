@@ -69,6 +69,16 @@
             margin-right: 10px;
         }
 
+        .column-add-trips {
+            flex-grow: 1;
+            width: 1px;
+            margin-right: 10px
+        }
+
+        .column-add-stops {
+            width: 160px;
+        }
+
         /******************************************/
 
         #info-box {
@@ -311,19 +321,19 @@
                 </div>
             </div>
         </div>
-        <div class="column" id="route-station-options">
+        <div class="column-add-trips">
+            <div class="column-title">Add trips</div>
+            <div  v-if="selectedRoute">
+                <add-trip :route="selectedRoute">
+                </add-trip>
+            </div>
+        </div>
+        <div class="column-add-stops" id="route-station-options">
             <div class="column-title">Add stops</div>
             <div  v-if="selectedRoute">
                 <div v-for="station in stations">
                     <button v-on:click="addStop(station)">Add</button> {{station.name}}
                 </div>
-            </div>
-        </div>
-        <div class="column">
-            <div class="column-title">Add trips</div>
-            <div  v-if="selectedRoute">
-                <add-trip :route="selectedRoute">
-                </add-trip>
             </div>
         </div>
     </div>
