@@ -8,6 +8,8 @@ export interface TripStop {
   platformNo: string;
   arrivalTime: number;
   departureTime: number;
+  arrivalTimeString: string;
+  departureTimeString: string;
 }
 
 export interface OptionalTripStop {

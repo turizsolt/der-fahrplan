@@ -8,7 +8,12 @@
     <hr />
     <button style="width: 80px;" @click="update">Update list</button>
     <div>Trip departure times:</div>
-    <div :key="trip.id" v-for="trip in filteredTripList">{{trip.departureTimeString}}</div>
+    <div :key="trip.id" v-for="trip in filteredTripList">
+        <!-- {{trip.departureTimeString}} -->
+        <div :key="stop.id" v-for="stop in trip.stops">
+            {{stop.arrivalTimeString}} / {{stop.departureTimeString}}
+        </div>
+    </div>
   </div>
 </template>
 

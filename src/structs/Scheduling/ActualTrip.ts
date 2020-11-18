@@ -49,20 +49,29 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   }
 
   getStops(): TripStop[] {
-    return this.route.getStops().map(stop => ({
-      station: stop.getStation(),
-      platform: stop.getPlatform(),
-      stationName: stop.getStationName(),
-      platformNo: 
-        (this.redefinedProps[stop.getId()]?.platform?.getNo()) ??
-        stop.getPlatform()?.getNo(),
-      arrivalTime:
-        (this.redefinedProps[stop.getId()]?.arrivalTime) ??
-        this.departureTime + stop.getArrivalTime(),
-      departureTime:
-        (this.redefinedProps[stop.getId()]?.departureTime) ??
-        this.departureTime + stop.getDepartureTime()
-    }));
+    return this.route.getStops().map(stop => {
+      const sto:TripStop = {
+        station: stop.getStation(),
+        platform: stop.getPlatform(),
+        stationName: stop.getStationName(),
+        platformNo: 
+          (this.redefinedProps[stop.getId()]?.platform?.getNo()) ??
+          stop.getPlatform()?.getNo(),
+        arrivalTime:
+          (this.redefinedProps[stop.getId()]?.arrivalTime) ??
+          this.departureTime + stop.getArrivalTime(),
+        departureTime:
+          (this.redefinedProps[stop.getId()]?.departureTime) ??
+          this.departureTime + stop.getDepartureTime(),
+        arrivalTimeString: '',
+        departureTimeString: ''
+      };
+
+      sto.arrivalTimeString = this.timeToStr(sto.arrivalTime);
+      sto.departureTimeString = this.timeToStr(sto.departureTime);
+
+      return sto;
+    });
   }
 
   getRoute(): Route {
@@ -94,7 +103,8 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       routeId: this.route.getId(),
       route: this.route.persistDeep(),
       departureTime: this.departureTime,
-      departureTimeString: this.timeToStr(this.departureTime)
+      departureTimeString: this.timeToStr(this.departureTime),
+      stops: this.getStops()
     };
   }
 
