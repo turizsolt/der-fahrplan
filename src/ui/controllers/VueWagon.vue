@@ -19,7 +19,7 @@
           </div> 
       </div>
 
-      <!-- routes -->
+      <!-- trips -->
       <div>Kiválasztott útirányok</div>
       <div class="trip" :key="trip.id" v-for="(trip, index) in obj.train.trips" @click="assignTrip(trip.id)">
         <div :style="'background-color: '+trip.route.color+';'" :class="'trip-name pattern-'+(index+1)">{{trip.route.name}}</div>
@@ -41,6 +41,18 @@
             <option>Nincs kiválsztható útirány</option>
           </select>
         </div>
+      </div>
+
+      <div v-if="obj.train.trips.length > 0">
+        <route-stop 
+          v-for="(stop, index) in obj.train.trips[0].stops"
+          :key="stop.id"
+          :route="obj.train.trips[0].route"
+          :stop="stop"
+          :index="index"
+          isTrip
+        >
+        </route-stop>
       </div>
     </div>
 </template>

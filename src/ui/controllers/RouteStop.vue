@@ -6,21 +6,25 @@
     <div class="stop-name">{{stop.stationName}}</div>
     
     <!-- buttons -->
-    <div class="stop-button-holder" v-if="candelete || canmove">
+    <div class="stop-button-holder">
       <div v-if="canmove" class="stop-button stop-move" @click.stop="$emit('move')">▲</div>
       <div v-if="candelete" class="stop-button stop-delete" @click.stop="$emit('delete')">x</div>
     </div>
 
     <!-- platform -->
-    <select size="1" class="stop-select-platform">
+    <select v-if="!isTrip" size="1" class="stop-select-platform">
       <option value="1">?</option>
     </select>
 
     <!-- arrival departure -->
-    <input class="stop-input-time" type="text" v-model="stop.arrivalTimeString" 
+    <input v-if="!isTrip" class="stop-input-time" type="text" v-model="stop.arrivalTimeString" 
       @keyup.stop="handleTime('arrivalTime', $event)" />
-    <input class="stop-input-time" type="text" v-model="stop.departureTimeString"
+    <input v-if="!isTrip" class="stop-input-time" type="text" v-model="stop.departureTimeString"
       @keyup.stop="handleTime('departureTime', $event)" />
+
+    <div v-if="isTrip" class="trip-stop-time">{{stop.arrivalTimeString}}</div>
+    <div v-if="isTrip" class="trip-stop-time">{{stop.departureTimeString}}</div>
+
   </div>
 </template>
 
@@ -38,6 +42,7 @@ export default class RouteTitle extends Vue {
   @Prop() index: number;
   @Prop() candelete?: boolean;
   @Prop() canmove?: boolean;
+  @Prop() isTrip?: boolean;
 
   private store:Store;
 
@@ -72,7 +77,7 @@ export default class RouteTitle extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .stop:hover {
     background-color: #aaccaa;
 }
@@ -116,6 +121,16 @@ export default class RouteTitle extends Vue {
     padding: 0 3px 0 3px;
     width: 50px;
     font-size: 10px;
+}
+
+.trip-stop-time {
+  border-radius: 2px;
+  border: 1px solid #070;
+  padding: 0 3px 0 3px;
+  width: 35px;
+  text-align: right;
+  font: 400 13.3333px Arial;
+  height: 13px;
 }
 
 </style>
