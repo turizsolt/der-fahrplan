@@ -18,6 +18,10 @@ export abstract class ActualBaseStorable implements BaseStorable {
     return this.persist();
   }
 
+  public persistShallow(): Object {
+    return this.persist();
+  }
+
   protected initStore(type: symbol) {
     this.type = type;
     this.store = this.StoreFactory();
@@ -68,5 +72,5 @@ export abstract class ActualBaseStorable implements BaseStorable {
     this.onSelectChanged(false);
   }
 
-  onSelectChanged(selected: boolean): void {}
+  onSelectChanged(selected: boolean): void { }
 }

@@ -16,6 +16,11 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     super.initStore(TYPES.Trip);
     this.route = route;
     this.departureTime = departureTime;
+
+    this.route.getStops().map((routeStop: RouteStop) => {
+      const station = routeStop.getStation();
+      station.addTripToSchedule(this);
+    });
     return this;
   }
 
@@ -41,8 +46,8 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
   undefine(stop: RouteStop, props: OptionalTripStop): void {
     const id = stop.getId();
-    for(let prop of Object.keys(props)) {
-      if(this.redefinedProps[id]?.[prop]) {
+    for (let prop of Object.keys(props)) {
+      if (this.redefinedProps[id]?.[prop]) {
         delete this.redefinedProps[id][prop];
       }
     }
@@ -50,11 +55,11 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
   getStops(): TripStop[] {
     return this.route.getStops().map(stop => {
-      const sto:TripStop = {
+      const sto: TripStop = {
         station: stop.getStation(),
         platform: stop.getPlatform(),
         stationName: stop.getStationName(),
-        platformNo: 
+        platformNo:
           (this.redefinedProps[stop.getId()]?.platform?.getNo()) ??
           stop.getPlatform()?.getNo(),
         arrivalTime:
@@ -80,11 +85,11 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
   persist(): Object {
     const redefinedProps = {};
-    for(let stopId in this.redefinedProps) {
-        redefinedProps[stopId] = {
-            ...this.redefinedProps[stopId],
-            platform:  this.redefinedProps[stopId].platform?.getId()
-        };
+    for (let stopId in this.redefinedProps) {
+      redefinedProps[stopId] = {
+        ...this.redefinedProps[stopId],
+        platform: this.redefinedProps[stopId].platform?.getId()
+      };
     }
 
     return {
@@ -111,7 +116,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(store.get(obj.route) as Route, obj.departureTime);
-    for(let stopId in obj.redefinedProps) {
+    for (let stopId in obj.redefinedProps) {
       const stop = store.get(stopId) as RouteStop;
       const all = store.getAll();
       this.redefine(stop, {

@@ -14,6 +14,7 @@ import { Route } from './Route';
 import { Passenger } from '../Interfaces/Passenger';
 import { ActualBoardable } from '../../mixins/ActualBoardable';
 import { Train } from './Train';
+import { Trip } from './Trip';
 
 export class ActualStation extends ActualBaseBrick implements Station {
   private name: string;
@@ -25,6 +26,16 @@ export class ActualStation extends ActualBaseBrick implements Station {
   @inject(TYPES.StationRenderer) private renderer: StationRenderer;
 
   private announcedTrips: Route[] = [];
+
+  // neu
+
+  private scheduledTrips: Trip[] = [];
+  addTripToSchedule(trip: Trip): void {
+    this.scheduledTrips.push(trip);
+  }
+
+  // end of neu
+
 
   private boardable: ActualBoardable = new ActualBoardable();
 
@@ -196,6 +207,23 @@ export class ActualStation extends ActualBaseBrick implements Station {
         z: this.circle.a.z,
         r: this.circle.r
       },
+      type: 'Station',
+      name: this.name
+    };
+  }
+
+  persistDeep(): Object {
+    return {
+      id: this.id,
+      type: 'Station',
+      name: this.name,
+      schedule: this.scheduledTrips.map((trip: Trip) => trip.persistDeep())
+    };
+  }
+
+  persistFlat(): Object {
+    return {
+      id: this.id,
       type: 'Station',
       name: this.name
     };
