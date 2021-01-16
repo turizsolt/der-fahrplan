@@ -6,6 +6,7 @@
       v-for="trip in obj.schedule"
       :route="trip.route"
       :trip="trip"
+      :station="obj"
     />
   </div>
 </template>
