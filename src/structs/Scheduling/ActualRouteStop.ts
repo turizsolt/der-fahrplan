@@ -58,7 +58,9 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       id: this.id,
       type: 'RouteStop',
       station: this.station.getId(),
-      platform: this.platform && this.platform.getId()
+      platform: this.platform && this.platform.getId(),
+      arrivalTime: this.arrivalTime,
+      departureTime: this.departureTime,
     };
   }
 
@@ -95,5 +97,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       store.get(obj.station) as Station,
       obj.platform ? (store.get(obj.platform) as Platform) : undefined
     );
+    this.setArrivalTime(obj.arrivalTime);
+    this.setDepartureTime(obj.departureTime);
   }
 }

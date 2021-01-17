@@ -152,18 +152,6 @@ export const TEST_LEVEL = {
             ]
         },
         {
-            "id": "evdpZzkvu",
-            "type": "RouteStop",
-            "station": "zwvnZuGF*",
-            "platform": "YXFxj9kA9"
-        },
-        {
-            "id": "jWcHTzVnZ_",
-            "type": "RouteStop",
-            "station": "Kdt91oqpJ",
-            "platform": "9K*j_01KS"
-        },
-        {
             "id": "EK9rsX4mt",
             "type": "Route",
             "name": "1V",
@@ -174,17 +162,79 @@ export const TEST_LEVEL = {
             ]
         },
         {
+            "id": "evdpZzkvu",
+            "type": "RouteStop",
+            "station": "zwvnZuGF*",
+            "platform": "YXFxj9kA9",
+            "arrivalTime": 60,
+            "departureTime": 120
+        },
+        {
+            "id": "jWcHTzVnZ_",
+            "type": "RouteStop",
+            "station": "Kdt91oqpJ",
+            "platform": "9K*j_01KS",
+            "arrivalTime": 180,
+            "departureTime": 240
+        },
+        {
             "id": "k50k*NT0_P",
             "type": "RouteStop",
             "station": "Kdt91oqpJ",
-            "platform": "9K*j_01KS"
+            "platform": "9K*j_01KS",
+            "arrivalTime": 300,
+            "departureTime": 360
         },
         {
             "id": "uNrXY7kcG1",
             "type": "RouteStop",
             "station": "zwvnZuGF*",
-            "platform": "YXFxj9kA9"
+            "platform": "YXFxj9kA9",
+            "arrivalTime": 420,
+            "departureTime": 480
         },
+        {
+            "id": "aWp_Fe3*J",
+            "type": "Trip",
+            "route": "dEvgDRX2s",
+            "departureTime": 4500,
+            "redefinedProps": {}
+        },
+        {
+            "id": "mTsKjb4NP",
+            "type": "Trip",
+            "route": "dEvgDRX2s",
+            "departureTime": 9000,
+            "redefinedProps": {}
+        },
+        {
+            "id": "4uOxnJ85Ox",
+            "type": "Trip",
+            "route": "EK9rsX4mt",
+            "departureTime": 900,
+            "redefinedProps": {}
+        },
+        {
+            "id": "gEuIuyhUPh",
+            "type": "Trip",
+            "route": "EK9rsX4mt",
+            "departureTime": 15600,
+            "redefinedProps": {}
+        },
+        {
+            "id": "27yKSf8ZGj",
+            "type": "Trip",
+            "route": "EK9rsX4mt",
+            "departureTime": 23400,
+            "redefinedProps": {}
+        },
+        {
+            "id": "DJjl9yZHz",
+            "type": "Trip",
+            "route": "EK9rsX4mt",
+            "departureTime": 7800,
+            "redefinedProps": {}
+        }
     ],
     "camera": {
         "alpha": 0,
