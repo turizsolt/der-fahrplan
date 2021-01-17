@@ -6,6 +6,7 @@ import { Trip } from './Trip';
 import { TripStop, OptionalTripStop } from './TripStop';
 import { RouteStop } from './RouteStop';
 import { Platform } from '../Interfaces/Platform';
+import { Station } from './Station';
 
 export class ActualTrip extends ActualBaseStorable implements Trip {
   private route: Route = null;
@@ -24,6 +25,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return this;
   }
 
+  // todo move to a util something
   private timeToStr(time: number): string {
     if (time === undefined) return '';
 
@@ -77,6 +79,16 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
       return sto;
     });
+  }
+
+  getStationDepartureTime(station: Station) {
+    const list = this.route.getStops().filter(stop => stop.getStation() === station);
+    if (list.length === 0) return null;
+    const stop = list[0];
+
+    // copied from above
+    return (this.redefinedProps[stop.getId()]?.departureTime) ??
+      this.departureTime + stop.getDepartureTime();
   }
 
   getRoute(): Route {

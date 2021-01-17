@@ -15,6 +15,7 @@ import { Passenger } from '../Interfaces/Passenger';
 import { ActualBoardable } from '../../mixins/ActualBoardable';
 import { Train } from './Train';
 import { Trip } from './Trip';
+import { TripInSchedule } from './TripInSchedule';
 
 export class ActualStation extends ActualBaseBrick implements Station {
   private name: string;
@@ -29,9 +30,15 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
   // neu
 
-  private scheduledTrips: Trip[] = [];
+  private scheduledTrips: TripInSchedule[] = [];
   addTripToSchedule(trip: Trip): void {
-    this.scheduledTrips.push(trip);
+    const departureTime = trip.getStationDepartureTime(this);
+    this.scheduledTrips.push({
+      trip,
+      departureTime
+    });
+    this.scheduledTrips.sort((a, b) => (a.departureTime - b.departureTime));
+    // this.findShortestPathToEveryStation();
   }
 
   // end of neu
@@ -217,7 +224,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
       id: this.id,
       type: 'Station',
       name: this.name,
-      schedule: this.scheduledTrips.map((trip: Trip) => trip.persistDeep())
+      schedule: this.scheduledTrips.map((tripIS: TripInSchedule) => tripIS.trip.persistDeep())
     };
   }
 
