@@ -16,6 +16,7 @@ import { ActualBoardable } from '../../mixins/ActualBoardable';
 import { Train } from './Train';
 import { Trip } from './Trip';
 import { TripInSchedule } from './TripInSchedule';
+import { ShortestPath } from './ShortestPath';
 
 export class ActualStation extends ActualBaseBrick implements Station {
   private name: string;
@@ -31,6 +32,8 @@ export class ActualStation extends ActualBaseBrick implements Station {
   // neu
 
   private scheduledTrips: TripInSchedule[] = [];
+  private scheduledShortestPathes: Record<string, ShortestPath> = {};
+
   addTripToSchedule(trip: Trip): void {
     const departureTime = trip.getStationDepartureTime(this);
     this.scheduledTrips.push({
@@ -38,7 +41,30 @@ export class ActualStation extends ActualBaseBrick implements Station {
       departureTime
     });
     this.scheduledTrips.sort((a, b) => (a.departureTime - b.departureTime));
-    // this.findShortestPathToEveryStation();
+    this.findShortestPathToEveryStation();
+  }
+
+  findShortestPathToEveryStation(): void {
+    this.scheduledTrips.map(tripIS => {
+      const trip = tripIS.trip;
+      trip.getStops().map(stop => {
+        if (!this.scheduledShortestPathes[stop.station.getId()]) {
+          this.scheduledShortestPathes[stop.station.getId()] = {
+            station: stop.station,
+            departureTime: Number.MAX_VALUE,
+            path: []
+          }
+        }
+        //if (this.scheduledShortestPathes[stop.station.getId()].departureTime > stop.departureTime) {
+        this.scheduledShortestPathes[stop.station.getId()] = {
+          station: stop.station,
+          departureTime: stop.departureTime,
+          path: [{ trip, station: stop.station }]
+        }
+        //}
+      });
+    });
+    console.log('ablak', this.scheduledShortestPathes);
   }
 
   // end of neu
@@ -219,12 +245,38 @@ export class ActualStation extends ActualBaseBrick implements Station {
     };
   }
 
+  // todo move to a util something
+  private timeToStr(time: number): string {
+    if (time === undefined) return '';
+
+
+    const sec = time % 60;
+    const minutes = (time - sec) / 60;
+    const min = minutes % 60;
+    const hour = (minutes - min) / 60;
+    return hour
+      ? hour.toString() + (min < 10 ? ':0' : ':') + min.toString()
+      : min.toString();
+  }
+
   persistDeep(): Object {
+    console.log('keys', Object.keys(this.scheduledShortestPathes));
     return {
       id: this.id,
       type: 'Station',
       name: this.name,
-      schedule: this.scheduledTrips.map((tripIS: TripInSchedule) => tripIS.trip.persistDeep())
+      schedule: this.scheduledTrips.map((tripIS: TripInSchedule) => tripIS.trip.persistDeep()),
+      shortestPathes: Object.keys(this.scheduledShortestPathes).map(key => {
+        const path = this.scheduledShortestPathes[key];
+        console.log('path', path);
+        return {
+          stationId: path.station.getId(),
+          stationName: path.station.getName(),
+          departureTime: path.departureTime,
+          departureTimeString: this.timeToStr(path.departureTime),
+          firstTripName: (path.path.length > 0) ? path.path[0].trip.getRoute().getName() : '<Error>'
+        }
+      })
     };
   }
 

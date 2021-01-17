@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>{{ idt }} Station</div>
+    <div>{{ obj.name }} #{{ idt }}</div>
     <trip-title
       :key="trip.id"
       v-for="trip in obj.schedule"
@@ -8,6 +8,12 @@
       :trip="trip"
       :station="obj"
     />
+    <hr />
+    <div>Next startings</div>
+    <div :key="path.stationId" v-for="path in obj.shortestPathes">
+      {{ path.departureTimeString }} - {{ path.firstTripName }} -
+      {{ path.stationName }}
+    </div>
   </div>
 </template>
 
