@@ -35,35 +35,66 @@ export class ActualStation extends ActualBaseBrick implements Station {
   private scheduledTrips: TripInSchedule[] = [];
   private scheduledShortestPathes: Record<string, ShortestPath> = {};
 
+  getScheduledTrips(): TripInSchedule[] {
+    return this.scheduledTrips;
+  }
+
   addTripToSchedule(trip: Trip): void {
-    const departureTime = trip.getStationDepartureTime(this);
-    this.scheduledTrips.push({
-      trip,
-      departureTime
-    });
-    this.scheduledTrips.sort((a, b) => (a.departureTime - b.departureTime));
+    if (trip) {
+      const departureTime = trip.getStationDepartureTime(this);
+      this.scheduledTrips.push({
+        trip,
+        departureTime
+      });
+      this.scheduledTrips.sort((a, b) => (a.departureTime - b.departureTime));
+    }
     this.findShortestPathToEveryStation();
   }
 
   findShortestPathToEveryStation(): void {
+    this.scheduledShortestPathes = {};
     const pq = new PriorityQueue([], (a, b) => a.arrivalTime - b.arrivalTime);
 
     this.scheduledTrips.map(tripIS => {
       const trip = tripIS.trip;
       trip.getStationFollowingStops(this).map(stop => {
-        pq.enqueue({ initialDepartureTime: trip.getStationDepartureTime(this), arrivalTime: stop.arrivalTime, station: stop.station, trip });
+        pq.enqueue({
+          initialDepartureTime: trip.getStationDepartureTime(this),
+          arrivalTime: stop.arrivalTime,
+          station: stop.station,
+          trip,
+          path: []
+        });
       });
     });
 
     while (!pq.isEmpty()) {
-      const element: { initialDepartureTime: number, arrivalTime: number, station: Station, trip: Trip } = pq.dequeue();
+      const element: { initialDepartureTime: number, arrivalTime: number, station: Station, trip: Trip, path: any } = pq.dequeue();
 
       if (!this.scheduledShortestPathes[element.station.getId()]) {
+        const newPath = element.path.concat([{ trip: element.trip, station: element.station }]);
+
         this.scheduledShortestPathes[element.station.getId()] = {
           station: element.station,
           departureTime: element.initialDepartureTime,
-          path: [{ trip: element.trip, station: element.station }]
+          path: newPath
         }
+
+        element.station.getScheduledTrips()
+          //.filter(t => t.trip.getStationDepartureTime(element.station) < element.arrivalTime)
+          .map(tripIS => {
+            const trip = tripIS.trip;
+            trip.getStationFollowingStops(element.station).map(stop => {
+              pq.enqueue({
+                initialDepartureTime: element.initialDepartureTime,
+                arrivalTime: stop.arrivalTime,
+                station: stop.station,
+                trip,
+                path: newPath
+              });
+            });
+          });
+
       }
     }
   }
@@ -261,7 +292,6 @@ export class ActualStation extends ActualBaseBrick implements Station {
   }
 
   persistDeep(): Object {
-    console.log('keys', Object.keys(this.scheduledShortestPathes));
     return {
       id: this.id,
       type: 'Station',
@@ -269,13 +299,13 @@ export class ActualStation extends ActualBaseBrick implements Station {
       schedule: this.scheduledTrips.map((tripIS: TripInSchedule) => tripIS.trip.persistDeep()),
       shortestPathes: Object.keys(this.scheduledShortestPathes).map(key => {
         const path = this.scheduledShortestPathes[key];
-        console.log('path', path);
         return {
           stationId: path.station.getId(),
           stationName: path.station.getName(),
           departureTime: path.departureTime,
           departureTimeString: this.timeToStr(path.departureTime),
-          firstTripName: (path.path.length > 0) ? path.path[0].trip.getRoute().getName() : '<Error>'
+          firstTripName: (path.path.length > 0) ? path.path[0].trip.getRoute().getName() : '<Error>',
+          path: path.path.map(p => ({ trip: p.trip.persistDeep(), station: p.station.persistShallow() }))
         }
       })
     };

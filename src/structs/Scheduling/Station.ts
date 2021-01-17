@@ -6,6 +6,7 @@ import { BaseBrick } from '../Interfaces/BaseBrick';
 import { Train } from './Train';
 import { Boardable } from '../../mixins/Boardable';
 import { Trip } from './Trip';
+import { TripInSchedule } from './TripInSchedule';
 
 export interface Station extends BaseBrick, Boardable {
   init(circle: Circle): Station;
@@ -27,4 +28,5 @@ export interface Station extends BaseBrick, Boardable {
   deannounce(trip: Route);
 
   addTripToSchedule(trip: Trip);
+  getScheduledTrips(): TripInSchedule[];
 }

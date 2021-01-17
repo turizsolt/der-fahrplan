@@ -31,6 +31,7 @@ import { VueSidebar } from './VueSidebar';
 import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
 import { Trip } from '../../structs/Scheduling/Trip';
+import { Station } from '../../structs/Scheduling/Station';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -277,6 +278,10 @@ export class InputController {
         this.vueSidebar.setData('selected', obj);
       };
       (this.getSelected() as Wagon).subscribeToUpdates(this.selectCallback);
+    }
+    // todo should remove
+    if (storedObj.getType() === Symbol.for('Station')) {
+      (this.getSelected() as Station).addTripToSchedule(null);
     }
     this.vueSidebar.setData('selected', storedObj.persistDeep());
     this.vueSidebar.setData(
