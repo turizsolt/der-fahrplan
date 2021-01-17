@@ -10,5 +10,6 @@ export interface Trip extends BaseStorable {
   getStops(): TripStop[];
   redefine(stop: RouteStop, props: OptionalTripStop): void;
   undefine(stop: RouteStop, props: OptionalTripStop): void;
-  getStationDepartureTime(station: Station);
+  getStationDepartureTime(station: Station): number;
+  getStationFollowingStops(station: Station): TripStop[];
 }

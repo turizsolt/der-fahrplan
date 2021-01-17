@@ -17,6 +17,7 @@ import { Train } from './Train';
 import { Trip } from './Trip';
 import { TripInSchedule } from './TripInSchedule';
 import { ShortestPath } from './ShortestPath';
+const PriorityQueue = require("@darkblue_azurite/priority-queue");
 
 export class ActualStation extends ActualBaseBrick implements Station {
   private name: string;
@@ -45,26 +46,26 @@ export class ActualStation extends ActualBaseBrick implements Station {
   }
 
   findShortestPathToEveryStation(): void {
+    const pq = new PriorityQueue([], (a, b) => a.arrivalTime - b.arrivalTime);
+
     this.scheduledTrips.map(tripIS => {
       const trip = tripIS.trip;
-      trip.getStops().map(stop => {
-        if (!this.scheduledShortestPathes[stop.station.getId()]) {
-          this.scheduledShortestPathes[stop.station.getId()] = {
-            station: stop.station,
-            departureTime: Number.MAX_VALUE,
-            path: []
-          }
-        }
-        //if (this.scheduledShortestPathes[stop.station.getId()].departureTime > stop.departureTime) {
-        this.scheduledShortestPathes[stop.station.getId()] = {
-          station: stop.station,
-          departureTime: stop.departureTime,
-          path: [{ trip, station: stop.station }]
-        }
-        //}
+      trip.getStationFollowingStops(this).map(stop => {
+        pq.enqueue({ initialDepartureTime: trip.getStationDepartureTime(this), arrivalTime: stop.arrivalTime, station: stop.station, trip });
       });
     });
-    console.log('ablak', this.scheduledShortestPathes);
+
+    while (!pq.isEmpty()) {
+      const element: { initialDepartureTime: number, arrivalTime: number, station: Station, trip: Trip } = pq.dequeue();
+
+      if (!this.scheduledShortestPathes[element.station.getId()]) {
+        this.scheduledShortestPathes[element.station.getId()] = {
+          station: element.station,
+          departureTime: element.initialDepartureTime,
+          path: [{ trip: element.trip, station: element.station }]
+        }
+      }
+    }
   }
 
   // end of neu

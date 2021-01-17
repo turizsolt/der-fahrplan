@@ -81,7 +81,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     });
   }
 
-  getStationDepartureTime(station: Station) {
+  getStationDepartureTime(station: Station): number {
     const list = this.route.getStops().filter(stop => stop.getStation() === station);
     if (list.length === 0) return null;
     const stop = list[0];
@@ -89,6 +89,13 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     // copied from above
     return (this.redefinedProps[stop.getId()]?.departureTime) ??
       this.departureTime + stop.getDepartureTime();
+  }
+
+  getStationFollowingStops(station: Station): TripStop[] {
+    const stops = this.getStops();
+    const index = stops.findIndex(s => s.station === station);
+    if (index === -1) return [];
+    return stops.slice(index + 1);
   }
 
   getRoute(): Route {
