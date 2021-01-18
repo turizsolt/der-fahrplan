@@ -91,21 +91,21 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       ];
     }
 
-    for(let trip of other.getTrips()) {
-        if(!this.trips.includes(trip)) {
-            this.trips.push(trip);
-        }
+    for (let trip of other.getTrips()) {
+      if (!this.trips.includes(trip)) {
+        this.trips.push(trip);
+      }
     }
 
     other.getWagons().map(wagon => wagon.setTrain(this));
     other.remove();
 
     this.updateTrips();
-    }
+  }
 
-    private updateTrips(): void {
-        this.trips = this.trips.filter(t => this.wagonsWithSides.findIndex(w => w.trip === t) > -1);
-    }
+  private updateTrips(): void {
+    this.trips = this.trips.filter(t => this.wagonsWithSides.findIndex(w => w.trip === t) > -1);
+  }
 
   separateThese(wagons: Wagon[]): void {
     const newWagonsWithSides = this.wagonsWithSides.filter(x =>
@@ -114,10 +114,10 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     const newTrain = this.store.create<Train>(TYPES.Train).init(wagons[0]);
     newTrain.setWagonsWithSides(newWagonsWithSides);
     newWagonsWithSides.map(x => {
-        x.wagon.setTrain(newTrain);
-        if(x.trip) {
-            newTrain.assignTrip(x.trip, []);
-        }
+      x.wagon.setTrain(newTrain);
+      if (x.trip) {
+        newTrain.assignTrip(x.trip, []);
+      }
     });
 
     this.wagonsWithSides = this.wagonsWithSides.filter(
@@ -133,28 +133,28 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       if (
         (!wagons || wagons.includes(this.wagonsWithSides[i].wagon)) &&
         this.wagonsWithSides[i].wagon.getControlType() !==
-          WagonControlType.Locomotive
+        WagonControlType.Locomotive
       ) {
         this.wagonsWithSides[i].trip = trip;
       }
     }
-    
-    if(!this.trips.includes(trip) && trip) {
+
+    if (!this.trips.includes(trip) && trip) {
       this.trips.push(trip);
     }
   }
 
   getTrips(): Trip[] {
-      return this.trips;
+    return this.trips;
   }
 
   removeTrip(trip: Trip): void {
-      this.trips = this.trips.filter(t => t != trip);
-      for (let i = 0; i < this.wagonsWithSides.length; i++) {
-          if(this.wagonsWithSides[i].trip === trip) {
-            this.wagonsWithSides[i].trip = undefined;
-          }
+    this.trips = this.trips.filter(t => t != trip);
+    for (let i = 0; i < this.wagonsWithSides.length; i++) {
+      if (this.wagonsWithSides[i].trip === trip) {
+        this.wagonsWithSides[i].trip = undefined;
       }
+    }
   }
 
   setWagonsWithSides(wagonsWithSides: WagonWithSide[]) {
@@ -164,17 +164,19 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   // boarding and announcements
 
   stoppedAt(station: Station, platform: Platform) {
-    // this.callOnPassengers((p: Passenger) => {
-    //   p.listenWagonStoppedAtAnnouncement(
-    //     station,
-    //     platform,
-    //     this,
-    //     this.getTrip().getRoute()
-    //   );
-    // });
-    // if (station) {
-    //   station.announceArrived(this, platform, this.getTrip().getRoute());
-    // }
+    this.getTrips().map(trip => {
+      this.callOnPassengers((p: Passenger) => {
+        p.listenWagonStoppedAtAnnouncement(
+          station,
+          platform,
+          this,
+          trip.getRoute()
+        );
+      });
+      if (station) {
+        station.announceArrived(this, platform, trip.getRoute());
+      }
+    });
   }
 
   moveBoardedPassengers(): void {
@@ -228,7 +230,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return {
       id: this.id,
       type: 'Train',
-      wagons: this.getWagonsWithSides().map(x => ({trip: x.trip?.getId(), side: x.side, wagon: x.wagon.getId()}))
+      wagons: this.getWagonsWithSides().map(x => ({ trip: x.trip?.getId(), side: x.side, wagon: x.wagon.getId() }))
     };
   }
 
@@ -252,17 +254,17 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.presetId(obj.id);
     this.init(store.get(obj.schedulingWagon) as Wagon);
     this.wagonsWithSides = obj.wagons.map(x => ({
-        side: x.side,
-        trip: store.get(x.trip) as Trip,
-        wagon: store.get(x.wagon) as Wagon
+      side: x.side,
+      trip: store.get(x.trip) as Trip,
+      wagon: store.get(x.wagon) as Wagon
     }));
     for (let wagonWithSide of this.wagonsWithSides) {
-        wagonWithSide.wagon.setTrain(this);
-        wagonWithSide.wagon.setTrip(wagonWithSide.trip);
+      wagonWithSide.wagon.setTrain(this);
+      wagonWithSide.wagon.setTrip(wagonWithSide.trip);
 
-        if(wagonWithSide.trip && !this.trips.includes(wagonWithSide.trip)) {
-            this.trips.push(wagonWithSide.trip);
-        }
+      if (wagonWithSide.trip && !this.trips.includes(wagonWithSide.trip)) {
+        this.trips.push(wagonWithSide.trip);
+      }
     }
   }
 }
