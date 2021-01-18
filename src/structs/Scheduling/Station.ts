@@ -7,6 +7,7 @@ import { Train } from './Train';
 import { Boardable } from '../../mixins/Boardable';
 import { Trip } from './Trip';
 import { TripInSchedule } from './TripInSchedule';
+import { ShortestPath } from './ShortestPath';
 
 export interface Station extends BaseBrick, Boardable {
   init(circle: Circle): Station;
@@ -29,4 +30,5 @@ export interface Station extends BaseBrick, Boardable {
 
   addTripToSchedule(trip: Trip);
   getScheduledTrips(): TripInSchedule[];
+  getShortestPath(to: Station): ShortestPath;
 }

@@ -30,8 +30,6 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
   private announcedTrips: Route[] = [];
 
-  // neu
-
   private scheduledTrips: TripInSchedule[] = [];
   private scheduledShortestPathes: Record<string, ShortestPath> = {};
 
@@ -81,7 +79,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
         }
 
         element.station.getScheduledTrips()
-          //.filter(t => t.trip.getStationDepartureTime(element.station) < element.arrivalTime)
+          //todo .filter(t => t.trip.getStationDepartureTime(element.station) < element.arrivalTime)
           .map(tripIS => {
             const trip = tripIS.trip;
             trip.getStationFollowingStops(element.station).map(stop => {
@@ -97,6 +95,10 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
       }
     }
+  }
+
+  getShortestPath(to: Station): ShortestPath {
+    return this.scheduledShortestPathes[to.getId()];
   }
 
   // end of neu

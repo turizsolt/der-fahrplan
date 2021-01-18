@@ -11,11 +11,17 @@ import { Route } from '../Scheduling/Route';
 import { Color } from '../Color';
 import { Train } from '../Scheduling/Train';
 import { Store } from '../Interfaces/Store';
+import { ShortestPath } from '../Scheduling/ShortestPath';
+import { RouteStop } from '../Scheduling/RouteStop';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
   private to: Station;
   private from: Station;
+  private nextStation: Station;
+  private nextIdx: number;
+  private path: ShortestPath;
+
   private place: Place;
   private pos: Coordinate = Coordinate.Origo();
 
@@ -25,17 +31,21 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     this.from = from;
 
     this.renderer.init(this);
+    this.setPath();
     this.listenStationAnnouncement(this.from);
-
     return this;
   }
 
+  // called from outside, announcements
+
   listenStationAnnouncement(station: Station): void {
+    // todo (reason: it has to be commented, so not clear) moving to the platform, if necessary
     const nextPlace: Place = station.getPlatformTo(this.to) || station;
     if (nextPlace !== this.place) {
       this.setPlace(nextPlace);
-      this.renderer.update();
     }
+
+    this.setPath();
   }
 
   listenStationArrivingAnnouncement(
@@ -46,7 +56,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   ) {
     if (!trip) return;
 
-    const toIndex = trip.getStops().findIndex(s => s.getStation() === this.to);
+    const toIndex = trip.getStops().findIndex(s => s.getStation() === this.nextStation);
     const stationIndex = trip
       .getStops()
       .findIndex(s => s.getStation() === station);
@@ -55,7 +65,6 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
       const wagon = train.getFreeWagon();
       if (wagon) {
         this.setPlace(wagon);
-        this.renderer.update();
       }
     }
   }
@@ -64,24 +73,56 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     station: Station,
     platform: Platform,
     train: Train,
-    trip: Route
+    route: Route
   ) {
-    if (this.to === station) {
-      this.setPlace(null);
-      this.renderer.update();
-    } else if (!trip) {
+    if (this.isStationInPath(station)) {
+      if (this.isStationFinal(station)) {
+        this.setPlace(null);
+      } else {
+        this.setNextOnPath();
+        this.setPlace(station);
+      }
+    } else if (!route) {
       this.setPlace(station);
-      this.renderer.update();
-    } else if (
-      !trip
-        .getStops()
-        .map(x => x.getStation())
-        .includes(this.to)
-    ) {
+    } else if (!this.isNextStationInTheTrip(route)) {
       this.setPlace(station);
-      this.renderer.update();
     }
   }
+
+  // private helpers
+
+  private setPath() {
+    this.from.addTripToSchedule(null); // todo - clarify - update shortest pathes with this
+
+    this.path = this.from.getShortestPath(this.to);
+
+    this.nextIdx = 0;
+    if (this.path && this.path.path.length > 0) {
+      this.nextStation = this.path.path[this.nextIdx].station;
+    }
+  }
+
+  private setNextOnPath() {
+    this.nextIdx++;
+    this.nextStation = this.path.path[this.nextIdx].station;
+  }
+
+  private isStationInPath(station: Station): boolean {
+    return this.to === station;
+  }
+
+  private isStationFinal(station: Station): boolean {
+    return this.nextStation === this.to;
+  }
+
+  private isNextStationInTheTrip(route: Route): boolean {
+    return route
+      .getStops()
+      .map((x: RouteStop) => x.getStation())
+      .includes(this.nextStation);
+  }
+
+  // getters, setters
 
   getPlace(): Place {
     return this.place;
@@ -98,6 +139,9 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   private setPlace(place: Place) {
     if (this.place) {
       this.place.unboard(this);
+      if (!place) {
+        this.renderer.update();
+      }
     }
     this.place = place;
     if (this.place) {
@@ -111,11 +155,15 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     this.renderer.update();
   }
 
-  /************/
+  // todo should remove and use eventing
+  @inject(TYPES.PassengerRenderer) private renderer: PassengerRenderer;
 
   getRenderer(): BaseRenderer {
     return this.renderer;
   }
+
+  // persistance
+
   persist(): Object {
     return {
       id: this.getId(),
@@ -127,25 +175,10 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
       place: this.place.getId()
     };
   }
+
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(store.get(obj.from) as Station, store.get(obj.to) as Station);
     this.setPlace(store.get(obj.place) as Place);
   }
-
-  public position: Coordinate;
-  public offset: Coordinate;
-  @inject(TYPES.PassengerRenderer) private renderer: PassengerRenderer;
-
-  //   getPosition(): Coordinate {
-  //     return this.position;
-  //   }
-
-  //   getTo(): Platform {
-  //     return null; //this.to;
-  //   }
-
-  //   isOnPlatformOrEngine(): boolean {
-  //     return true;
-  //   }
 }
