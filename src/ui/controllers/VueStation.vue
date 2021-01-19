@@ -30,7 +30,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 
 @Component
-export default class VueIdStation extends Vue {
+export default class VueStation extends Vue {
   @Prop() idt: string;
   @Prop() obj: any;
 }
