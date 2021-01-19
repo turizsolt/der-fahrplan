@@ -187,11 +187,13 @@ export class ActualStation extends ActualBaseBrick implements Station {
     return this.platformTo[station.getId()];
   }
 
-  announceArrived(train: Train, platform: Platform, trip: Route) {
+  announceArrived(train: Train, platform: Platform, trip: Trip) {
     this.callOnPassengers(p => {
-      p.listenStationArrivingAnnouncement(this, platform, train, trip);
+      p.listenStationArrivingAnnouncement(this, platform, train, trip.getRoute());
     });
+    trip.setStopServed(this);
     //this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
+
   }
 
   board(passenger: Passenger): Coordinate {

@@ -10,6 +10,8 @@ export interface TripStop {
   departureTime: number;
   arrivalTimeString: string;
   departureTimeString: string;
+  isServed: boolean;
+  isThere: boolean;
 }
 
 export interface OptionalTripStop {

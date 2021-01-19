@@ -174,7 +174,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         );
       });
       if (station) {
-        station.announceArrived(this, platform, trip.getRoute());
+        station.announceArrived(this, platform, trip);
       }
     });
   }

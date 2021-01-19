@@ -12,6 +12,8 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   private route: Route = null;
   private departureTime: number;
   private redefinedProps: Record<string, OptionalTripStop> = {};
+  private lastStationServed: Station = null;
+  // private atStop: boolean = false;
 
   init(route: Route, departureTime: number): Trip {
     super.initStore(TYPES.Trip);
@@ -56,7 +58,9 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   }
 
   getStops(): TripStop[] {
-    return this.route.getStops().map(stop => {
+    const stops = this.route.getStops();
+    const index = stops.findIndex((s: RouteStop) => s.getStation() === this.lastStationServed);
+    return stops.map((stop, ind) => {
       const sto: TripStop = {
         station: stop.getStation(),
         platform: stop.getPlatform(),
@@ -71,7 +75,9 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
           (this.redefinedProps[stop.getId()]?.departureTime) ??
           this.departureTime + stop.getDepartureTime(),
         arrivalTimeString: '',
-        departureTimeString: ''
+        departureTimeString: '',
+        isServed: (ind <= index),
+        isThere: false // (ind === index) && this.atStop
       };
 
       sto.arrivalTimeString = this.timeToStr(sto.arrivalTime);
@@ -96,6 +102,14 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     const index = stops.findIndex(s => s.station === station);
     if (index === -1) return [];
     return stops.slice(index + 1);
+  }
+
+  setStopServed(station: Station) {
+    this.lastStationServed = station;
+  }
+
+  getRemainingStops(): TripStop[] {
+    return this.getStationFollowingStops(this.lastStationServed);
   }
 
   getRoute(): Route {

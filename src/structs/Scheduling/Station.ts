@@ -24,7 +24,7 @@ export interface Station extends BaseBrick, Boardable {
   remove(): boolean;
   isRemoved(): boolean;
 
-  announceArrived(train: Train, platform: Platform, trip: Route);
+  announceArrived(train: Train, platform: Platform, trip: Trip);
   announce(trip: Route);
   deannounce(trip: Route);
 
