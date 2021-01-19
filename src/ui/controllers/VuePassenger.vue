@@ -2,6 +2,8 @@
   <div>
     <div>Passenger #{{ idt }}</div>
     <hr />
+    <div>HasPath: {{ obj.hasPath ? "true" : "false" }}</div>
+    <hr />
     <div>From: {{ obj.fromName }}</div>
     <div>Via: {{ obj.via }}</div>
     <div>To: {{ obj.toName }}</div>

@@ -53,18 +53,20 @@ export class ActualStation extends ActualBaseBrick implements Station {
     this.scheduledShortestPathes = {};
     const pq = new PriorityQueue([], (a, b) => a.arrivalTime - b.arrivalTime);
 
-    this.scheduledTrips.map(tripIS => {
-      const trip = tripIS.trip;
-      trip.getStationFollowingStops(this).map(stop => {
-        pq.enqueue({
-          initialDepartureTime: trip.getStationDepartureTime(this),
-          arrivalTime: stop.arrivalTime,
-          station: stop.station,
-          trip,
-          path: []
+    this.scheduledTrips
+      .filter(t => t.trip.isStillInFuture(this))
+      .map(tripIS => {
+        const trip = tripIS.trip;
+        trip.getStationFollowingStops(this).map(stop => {
+          pq.enqueue({
+            initialDepartureTime: trip.getStationDepartureTime(this),
+            arrivalTime: stop.arrivalTime,
+            station: stop.station,
+            trip,
+            path: []
+          });
         });
       });
-    });
 
     while (!pq.isEmpty()) {
       const element: { initialDepartureTime: number, arrivalTime: number, station: Station, trip: Trip, path: any } = pq.dequeue();
@@ -79,7 +81,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
         }
 
         element.station.getScheduledTrips()
-          //todo .filter(t => t.trip.getStationDepartureTime(element.station) < element.arrivalTime)
+          .filter(t => t.trip.isStillInFuture(element.station))
           .map(tripIS => {
             const trip = tripIS.trip;
             trip.getStationFollowingStops(element.station).map(stop => {

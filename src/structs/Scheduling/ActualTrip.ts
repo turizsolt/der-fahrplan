@@ -110,6 +110,16 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return stops.slice(index + 1);
   }
 
+  isStillInFuture(station: Station): boolean {
+    const stops = this.getStops();
+    const indexStation = stops.findIndex(s => s.station === station);
+    if (indexStation === -1) return false;
+    const indexTrain = stops.findIndex(s => s.station === this.lastStationServed);
+    if (indexTrain < indexStation) return true;
+    if (indexTrain === indexStation) return (this.atStation === station);
+    return false;
+  }
+
   setStationServed(station: Station): void {
     this.lastStationServed = station;
     this.atStation = station;

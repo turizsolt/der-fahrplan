@@ -15,4 +15,5 @@ export interface Trip extends BaseStorable {
   setStationServed(station: Station): void;
   setAtStation(atStation: Station): void;
   getRemainingStops(): TripStop[];
+  isStillInFuture(station: Station): boolean;
 }

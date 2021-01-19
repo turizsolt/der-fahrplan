@@ -186,7 +186,8 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
 
       fromName: this.from.getName(),
       toName: this.to.getName(),
-      nextName: this.nextStation.getName(),
+      hasPath: !!this.path,
+      nextName: this.nextStation && this.nextStation.getName(),
       via: (this.path && this.path.path.length > 1) ? this.path.path.slice(0, -1).map(x => x.station.getName()).join('/') : '-'
     };
   }
