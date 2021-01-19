@@ -86,6 +86,8 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   disconnect(whichEnd: WhichEnd): void;
   getMovingState(): WagonMovingState;
   halt(): void;
+
+  platformsBeside(): Platform[];
 }
 
 export interface NearestWagon {

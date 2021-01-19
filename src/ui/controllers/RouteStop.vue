@@ -7,7 +7,7 @@
       class="stop-after nocolor"
     ></div>
     <div class="stop-name" :style="{ color: stop.isServed ? 'grey' : 'black' }">
-      {{ stop.stationName }}
+      {{ stop.atStation ? "* " : "" }} {{ stop.stationName }}
     </div>
 
     <!-- buttons -->

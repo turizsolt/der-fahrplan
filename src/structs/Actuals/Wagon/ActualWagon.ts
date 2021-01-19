@@ -36,7 +36,7 @@ import WagonSpeedPassenger from './WagonSpeedPassenger';
 import { WagonMovingState } from './WagonMovingState';
 import { Trip } from '../../Scheduling/Trip';
 
-export interface ActualWagon extends Updatable {}
+export interface ActualWagon extends Updatable { }
 const doApply = () => applyMixins(ActualWagon, [Updatable]);
 @injectable()
 export class ActualWagon extends ActualBaseBrick implements Wagon {
@@ -267,7 +267,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   setTrip(trip: Trip): void {
-      this.announcement.setTrip(trip);
+    this.announcement.setTrip(trip);
   }
 
   cancelTrip(): void {
@@ -288,6 +288,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   announceStoppedAt(platform: Platform): void {
     this.announcement.announceStoppedAt(platform);
+  }
+
+  platformsBeside(): Platform[] {
+    return this.announcement.platformsBeside();
   }
 
   ///////////////////////////
@@ -482,8 +486,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       this.worm = new TrackWorm([track, bTrack], this);
     }
 
-    if(obj.trip) {
-        this.assignTrip(store.get(obj.trip) as Trip);
+    if (obj.trip) {
+      this.assignTrip(store.get(obj.trip) as Trip);
     }
 
     this.renderer.init(this);

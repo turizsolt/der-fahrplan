@@ -48,6 +48,11 @@ export class WagonAnnouncement {
 
   stop(): void {
     // todo use the worm
+    const platformsInvolved: Platform[] = this.platformsBeside();
+    platformsInvolved.map(p => this.stoppedAt(p));
+  }
+
+  platformsBeside(): Platform[] {
     const platformsInvolved: Platform[] = [];
     const trackA = this.parent.getA().positionOnTrack.getTrack();
     platformsInvolved.push(
@@ -64,8 +69,7 @@ export class WagonAnnouncement {
           platformsInvolved.push(p);
         }
       });
-
-    platformsInvolved.map(p => this.stoppedAt(p));
+    return platformsInvolved;
   }
 
   stoppedAt(platform: Platform): void {

@@ -161,6 +161,24 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.wagonsWithSides = wagonsWithSides;
   }
 
+  setMovingness(movingness: boolean): void {
+    let atStation: Station = null;
+
+    if (!movingness) {
+      this.getWagons().map(wagon => {
+        const beside: Platform[] = wagon.platformsBeside();
+        if (beside.length > 0) {
+          atStation = beside[0].getStation();
+        }
+      });
+    }
+
+    console.log('atStation', atStation);
+    this.trips.map(trip => {
+      trip.setAtStation(atStation);
+    });
+  }
+
   // boarding and announcements
 
   stoppedAt(station: Station, platform: Platform) {

@@ -13,7 +13,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   private departureTime: number;
   private redefinedProps: Record<string, OptionalTripStop> = {};
   private lastStationServed: Station = null;
-  // private atStop: boolean = false;
+  private atStation: Station = null;
 
   init(route: Route, departureTime: number): Trip {
     super.initStore(TYPES.Trip);
@@ -77,7 +77,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         arrivalTimeString: '',
         departureTimeString: '',
         isServed: (ind <= index),
-        isThere: false // (ind === index) && this.atStop
+        atStation: (ind === index) && (this.atStation === stop.getStation())
       };
 
       sto.arrivalTimeString = this.timeToStr(sto.arrivalTime);
@@ -104,8 +104,13 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return stops.slice(index + 1);
   }
 
-  setStopServed(station: Station) {
+  setStationServed(station: Station): void {
     this.lastStationServed = station;
+    this.atStation = station;
+  }
+
+  setAtStation(atStation: Station): void {
+    this.atStation = atStation;
   }
 
   getRemainingStops(): TripStop[] {
