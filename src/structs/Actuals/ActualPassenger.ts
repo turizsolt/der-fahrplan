@@ -43,6 +43,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     const nextPlace: Place = station.getPlatformTo(this.to) || station;
     if (nextPlace !== this.place) {
       this.setPlace(nextPlace);
+      this.renderer.update();
     }
 
     this.setPath();
@@ -65,6 +66,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
       const wagon = train.getFreeWagon();
       if (wagon) {
         this.setPlace(wagon);
+        this.renderer.update();
       }
     }
   }
@@ -78,14 +80,18 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     if (this.isStationInPath(station)) {
       if (this.isStationFinal(station)) {
         this.setPlace(null);
+        this.renderer.update();
       } else {
         this.setNextOnPath();
         this.setPlace(station);
+        this.renderer.update();
       }
     } else if (!route) {
       this.setPlace(station);
+      this.renderer.update();
     } else if (!this.isNextStationInTheTrip(route)) {
       this.setPlace(station);
+      this.renderer.update();
     }
   }
 
@@ -139,9 +145,6 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   private setPlace(place: Place) {
     if (this.place) {
       this.place.unboard(this);
-      if (!place) {
-        this.renderer.update();
-      }
     }
     this.place = place;
     if (this.place) {
