@@ -179,6 +179,18 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     };
   }
 
+  persistDeep(): Object {
+    return {
+      id: this.getId(),
+      type: 'Passenger',
+
+      fromName: this.from.getName(),
+      toName: this.to.getName(),
+      nextName: this.nextStation.getName(),
+      via: (this.path && this.path.path.length > 1) ? this.path.path.slice(0, -1).map(x => x.station.getName()).join('/') : '-'
+    };
+  }
+
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(store.get(obj.from) as Station, store.get(obj.to) as Station);

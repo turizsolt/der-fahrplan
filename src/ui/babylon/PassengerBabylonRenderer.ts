@@ -18,7 +18,7 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
     this.passenger = passenger;
 
     this.mesh = BABYLON.MeshBuilder.CreateSphere(
-      'box',
+      'clickable-passenger-' + this.passenger.getId(),
       { diameter: 1 }, //{ height: 1, width: 1, depth: 1 },
       this.scene
     );
@@ -42,8 +42,8 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
         this.passenger.getPlace().getType() === Symbol.for('Platform')
           ? 2
           : this.passenger.getPlace().getType() === Symbol.for('Wagon')
-          ? 6
-          : 12;
+            ? 6
+            : 12;
       //   console.log(
       //     `pass #${this.passenger.getId()} on ${this.passenger.getPlace() &&
       //       this.passenger

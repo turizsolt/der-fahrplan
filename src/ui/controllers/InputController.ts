@@ -286,7 +286,7 @@ export class InputController {
     this.vueSidebar.setData('selected', storedObj.persistDeep());
     this.vueSidebar.setData(
       'type',
-      storedObj.getType() === Symbol.for('Wagon') ? 'wagon' : (storedObj.getType() === Symbol.for('Station') ? 'station' : 'idtext')
+      storedObj.getType() === Symbol.for('Passenger') ? 'passenger' : storedObj.getType() === Symbol.for('Wagon') ? 'wagon' : (storedObj.getType() === Symbol.for('Station') ? 'station' : 'idtext')
     );
     if (storedObj.getType() === Symbol.for('Wagon')) {
       this.vueSidebar.setData(

@@ -3,6 +3,7 @@ import { Store } from '../../structs/Interfaces/Store';
 import VueIdtext from './VueIdtext.vue';
 import VueWagon from './VueWagon.vue';
 import VueStation from './VueStation.vue';
+import VuePassenger from './VuePassenger.vue';
 import RouteTitle from './RouteTitle.vue';
 import TripTitle from './TripTitle.vue';
 import RouteStop from './RouteStop.vue';
@@ -24,6 +25,7 @@ export class VueSidebar {
     Vue.component('idtext', VueIdtext);
     Vue.component('wagon', VueWagon);
     Vue.component('station', VueStation);
+    Vue.component('passenger', VuePassenger);
   }
 
   setData(name: string, value: any) {
