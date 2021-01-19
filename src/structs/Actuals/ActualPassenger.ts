@@ -114,11 +114,11 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   }
 
   private isStationInPath(station: Station): boolean {
-    return this.to === station;
+    return this.nextStation === station;
   }
 
   private isStationFinal(station: Station): boolean {
-    return this.nextStation === this.to;
+    return this.to === station;
   }
 
   private isNextStationInTheTrip(route: Route): boolean {
