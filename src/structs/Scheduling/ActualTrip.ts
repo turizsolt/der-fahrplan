@@ -74,14 +74,20 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         departureTime:
           (this.redefinedProps[stop.getId()]?.departureTime) ??
           this.departureTime + stop.getDepartureTime(),
+        realArrivalTime: (this.redefinedProps[stop.getId()]?.realArrivalTime) ?? -1,
+        realDepartureTime: (this.redefinedProps[stop.getId()]?.realDepartureTime) ?? -1,
         arrivalTimeString: '',
         departureTimeString: '',
+        realArrivalTimeString: '',
+        realDepartureTimeString: '',
         isServed: (ind <= index),
         atStation: (ind === index) && (this.atStation === stop.getStation())
       };
 
       sto.arrivalTimeString = this.timeToStr(sto.arrivalTime);
       sto.departureTimeString = this.timeToStr(sto.departureTime);
+      sto.realArrivalTimeString = this.timeToStr(sto.realArrivalTime);
+      sto.realDepartureTimeString = this.timeToStr(sto.realDepartureTime);
 
       return sto;
     });
@@ -107,6 +113,14 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   setStationServed(station: Station): void {
     this.lastStationServed = station;
     this.atStation = station;
+
+    const stop = this.route.getStops().find((s: RouteStop) => s.getStation() === station);
+    const time = this.store.getTickCount();
+
+    if (!this.redefinedProps[stop.getId()] || !this.redefinedProps[stop.getId()].realArrivalTime) {
+      this.redefine(stop, { realArrivalTime: time });
+    }
+    this.redefine(stop, { realDepartureTime: time });
   }
 
   setAtStation(atStation: Station): void {

@@ -49,9 +49,11 @@
       @keyup.stop="handleTime('departureTime', $event)"
     />
 
-    <div v-if="isTrip" class="trip-stop-time">{{ stop.arrivalTimeString }}</div>
     <div v-if="isTrip" class="trip-stop-time">
-      {{ stop.departureTimeString }}
+      {{ stop.arrivalTimeString }}<br />{{ stop.departureTimeString }}
+    </div>
+    <div v-if="isTrip" class="trip-stop-time">
+      {{ stop.realArrivalTimeString }}<br />{{ stop.realDepartureTimeString }}
     </div>
   </div>
 </template>

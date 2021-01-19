@@ -10,6 +10,10 @@ export interface TripStop {
   departureTime: number;
   arrivalTimeString: string;
   departureTimeString: string;
+  realArrivalTime: number;
+  realDepartureTime: number;
+  realArrivalTimeString: string;
+  realDepartureTimeString: string;
   isServed: boolean;
   atStation: boolean;
 }
@@ -18,4 +22,6 @@ export interface OptionalTripStop {
   platform?: Platform;
   arrivalTime?: number;
   departureTime?: number;
+  realArrivalTime?: number;
+  realDepartureTime?: number;
 }
