@@ -34,15 +34,15 @@ export class CameraInputHandler implements InputHandler {
     this.mesh.position = new Vector3(props.targetX, 0, props.targetZ);
   }
 
-  roam(props: InputProps, event: PointerEvent): void {}
+  roam(props: InputProps, event: PointerEvent): void { }
 
   move(downProps: InputProps, props: InputProps, event: PointerEvent): void {
-    if (event.shiftKey) {
+    if (event.shiftKey || this.mouseButton[1]) {
       this.camera.alpha =
         downProps.cameraAlpha + (props.pointerX - downProps.pointerX) / 100;
 
       this.camera.beta =
-        downProps.cameraBeta + (props.pointerY - downProps.pointerY) / 100;
+        downProps.cameraBeta + (props.pointerY - downProps.pointerY) / 300;
       if (this.camera.beta > Math.PI * 0.45) {
         this.camera.beta = Math.PI * 0.45;
       }
@@ -52,34 +52,10 @@ export class CameraInputHandler implements InputHandler {
     } else if (event.ctrlKey) {
       this.camera.radius =
         downProps.cameraRadius + (props.pointerY - downProps.pointerY);
-    } else {
-      downProps = this.lastProps;
-      if (props.point && downProps.point) {
-        const dx = +(props.point.coord.x - downProps.point.coord.x);
-        const dz = +(props.point.coord.z - downProps.point.coord.z);
-        this.camera.setPosition(
-          new Vector3(
-            downProps.fromX + dx,
-            downProps.fromY,
-            downProps.fromZ + dz
-          )
-        );
-        this.camera.setTarget(
-          new Vector3(downProps.targetX + dx, 0, downProps.targetZ + dz)
-        );
-        this.mesh.position = new Vector3(
-          downProps.targetX + dx,
-          0,
-          downProps.targetZ + dz
-        );
-      } else {
-        this.cancel();
-      }
-      this.lastProps = props;
     }
   }
 
-  click(downProps: InputProps, event: PointerEvent): void {}
+  click(downProps: InputProps, event: PointerEvent): void { }
 
   up(downProps: InputProps, props: InputProps, event: PointerEvent): void {
     this.mouseButton[event.button] = false;
