@@ -20,10 +20,9 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     this.route = route;
     this.departureTime = departureTime;
 
-    this.route.getStops().map((routeStop: RouteStop) => {
-      const station = routeStop.getStation();
-      station.addTripToSchedule(this);
-    });
+    const stationsInvolved = this.route.getStops().map((routeStop: RouteStop) => routeStop.getStation());
+    stationsInvolved.map((station: Station) => station.addTripToSchedule(this));
+    this.updateScheduleOnAllStations(stationsInvolved);
     return this;
   }
 
@@ -131,17 +130,19 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       this.redefine(stop, { realArrivalTime: time });
     }
     this.redefine(stop, { realDepartureTime: time });
-
-    this.route.getStops().map(stop => {
-      stop.getStation().addTripToSchedule(null);
-    });
+    this.updateScheduleOnAllStations();
   }
 
   setAtStation(atStation: Station): void {
     this.atStation = atStation;
+    this.updateScheduleOnAllStations();
+  }
 
-    this.route.getStops().map(stop => {
-      stop.getStation().addTripToSchedule(null);
+  private updateScheduleOnAllStations(excludeStations: Station[] = []) {
+    this.store.getAllOf(Symbol.for("Station")).map((station: Station) => {
+      if (!excludeStations.includes(station)) {
+        station.addTripToSchedule(null);
+      }
     });
   }
 
