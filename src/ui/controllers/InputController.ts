@@ -296,16 +296,10 @@ export class InputController {
   }
 
   wheel(event: WheelEvent) {
-    if (this.mouseButtons[1]) {
-      this.camera.radius += 5 * Math.sign(event.deltaY);
+    if (Math.sign(event.deltaY) > 0) {
+      this.camera.radius *= 1.2;
     } else {
-      const changeBy = 45 * Math.sign(event.deltaY);
-      this.wheelRotation += changeBy;
-      if (this.wheelRotation < -180) this.wheelRotation += 360;
-      if (this.wheelRotation > 180) this.wheelRotation -= 360;
-
-      const props = this.convert(null);
-      if (props.point) this.move(null);
+      this.camera.radius /= 1.2;
     }
   }
 
@@ -317,6 +311,15 @@ export class InputController {
   }
 
   keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    switch (key) {
+      case 'X':
+        this.wheelRotation += 45;
+        if (this.wheelRotation > 180) this.wheelRotation -= 360;
+        const props = this.convert(null);
+        if (props.point) this.move(null);
+        break;
+    }
+
     if (!this.getSelected()) return;
 
     switch (key) {
