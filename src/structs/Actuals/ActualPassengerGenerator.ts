@@ -8,15 +8,12 @@ import { Station } from '../Scheduling/Station';
 
 @injectable()
 export class ActualPassengerGenerator implements PassengerGenerator {
-  private interval: number;
   @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
   @inject(TYPES.FactoryOfStore) private StoreFactory: () => Store;
   private store: Store;
 
   init() {
     this.store = this.StoreFactory();
-    this.interval = (setInterval(() => this.tick(), 1000) as unknown) as number;
-    this.tick();
   }
 
   tick() {

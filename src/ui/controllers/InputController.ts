@@ -31,6 +31,7 @@ import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
 import { Trip } from '../../structs/Scheduling/Trip';
 import { TickInputProps } from './TickInputProps';
+import { PassengerGenerator } from '../../structs/Actuals/PassengerGenerator';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -58,7 +59,8 @@ export class InputController {
 
   constructor(
     private scene: BABYLON.Scene,
-    private camera: BABYLON.ArcRotateCamera
+    private camera: BABYLON.ArcRotateCamera,
+    private passengerGenerator: PassengerGenerator
   ) {
     this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
     this.vueSidebar = new VueSidebar(this.store);
@@ -476,6 +478,10 @@ export class InputController {
       this.store.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {
         wagon.tick();
       });
+
+      if ((this.store.getTickCount() + i) % 120 === 0) {
+        this.passengerGenerator.tick();
+      }
     }
     this.store.tick();
     const count = Math.floor(this.store.getTickCount() / 60);
