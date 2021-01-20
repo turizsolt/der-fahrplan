@@ -23,7 +23,6 @@ import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
 import { CreateEngineInputHandler } from './CreateEngineInputHandler';
 import { Store } from '../../structs/Interfaces/Store';
 import { CreateStationInputHandler } from './CreateStationInputHandler';
-import { Route } from '../../structs/Scheduling/Route';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
 import { Vector3 } from 'babylonjs';
@@ -31,7 +30,7 @@ import { VueSidebar } from './VueSidebar';
 import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
 import { Trip } from '../../structs/Scheduling/Trip';
-import { Station } from '../../structs/Scheduling/Station';
+import { TickInputProps } from './TickInputProps';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -101,7 +100,7 @@ export class InputController {
     );
 
     if (!pickedPoint) {
-      const ret = {
+      const ret: InputProps = {
         point: null,
         mesh: pickedMesh,
         snappedPoint: null,
@@ -143,7 +142,7 @@ export class InputController {
       }
     }
 
-    const ret = {
+    const ret: InputProps = {
       point: point,
       mesh: pickedMesh,
       snappedPoint: snapXZ(point),
@@ -484,6 +483,21 @@ export class InputController {
       'tickCount',
       Math.floor(count / 60) + ':' + (count % 60 < 10 ? '0' : '') + (count % 60)
     );
+
+    if (this.inputHandler.tick) {
+      const ize: TickInputProps = {
+        pointerX: this.scene.pointerX,
+        pointerY: this.scene.pointerY,
+        canvasWidth: (document.getElementById('renderCanvas') as HTMLCanvasElement).width,
+        canvasHeight: (document.getElementById('renderCanvas') as HTMLCanvasElement).height,
+        targetX: this.camera.target.x,
+        targetZ: this.camera.target.z,
+        fromX: this.camera.position.x,
+        fromY: this.camera.position.y,
+        fromZ: this.camera.position.z,
+      }
+      this.inputHandler.tick(ize);
+    }
   }
 
   load(data: any) {
