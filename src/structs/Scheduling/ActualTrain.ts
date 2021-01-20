@@ -173,7 +173,6 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       });
     }
 
-    console.log('atStation', atStation);
     this.trips.map(trip => {
       trip.setAtStation(atStation);
     });
