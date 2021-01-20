@@ -85,7 +85,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
         }
 
         element.station.getScheduledTrips()
-          .filter(t => t.trip.isStillInFuture(element.station))
+          .filter(t => t.trip.isStillInFuture(element.station) && element.arrivalTime < t.trip.getStationDepartureTime(element.station))
           .map(tripIS => {
             const trip = tripIS.trip;
             trip.getStationFollowingStops(element.station).map(stop => {
