@@ -45,7 +45,6 @@ export class CameraInputHandler implements InputHandler {
 
     const percX = (props.pointerX - 260) / (props.canvasWidth - 260);
     const percY = props.pointerY / props.canvasHeight;
-    console.log(percX, percY);
 
     if (props.canvasWidth - props.pointerX < 20) {
       const offset = props.canvasWidth - props.pointerX;
