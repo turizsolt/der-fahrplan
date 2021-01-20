@@ -98,8 +98,6 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   // private helpers
 
   private setPath() {
-    this.from.addTripToSchedule(null); // todo - clarify - update shortest pathes with this
-
     this.path = this.from.getShortestPath(this.to);
 
     this.nextIdx = 0;

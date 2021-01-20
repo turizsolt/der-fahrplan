@@ -279,10 +279,6 @@ export class InputController {
       };
       (this.getSelected() as Wagon).subscribeToUpdates(this.selectCallback);
     }
-    // todo should remove
-    if (storedObj.getType() === Symbol.for('Station')) {
-      (this.getSelected() as Station).addTripToSchedule(null);
-    }
     this.vueSidebar.setData('selected', storedObj.persistDeep());
     this.vueSidebar.setData(
       'type',

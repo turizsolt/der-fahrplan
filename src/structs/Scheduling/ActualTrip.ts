@@ -131,10 +131,18 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       this.redefine(stop, { realArrivalTime: time });
     }
     this.redefine(stop, { realDepartureTime: time });
+
+    this.route.getStops().map(stop => {
+      stop.getStation().addTripToSchedule(null);
+    });
   }
 
   setAtStation(atStation: Station): void {
     this.atStation = atStation;
+
+    this.route.getStops().map(stop => {
+      stop.getStation().addTripToSchedule(null);
+    });
   }
 
   getRemainingStops(): TripStop[] {

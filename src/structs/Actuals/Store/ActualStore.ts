@@ -149,6 +149,11 @@ export class ActualStore implements Store {
         brick.load(elem, this);
       }
     });
+
+    // to init schedules with a blank nothing
+    this.getAllOf(Symbol.for('Station')).map((station: Station) => {
+      station.addTripToSchedule(null);
+    })
   }
 
   private selected: BaseStorable = null;

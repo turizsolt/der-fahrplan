@@ -47,6 +47,10 @@ export class ActualStation extends ActualBaseBrick implements Station {
       this.scheduledTrips.sort((a, b) => (a.departureTime - b.departureTime));
     }
     this.findShortestPathToEveryStation();
+
+    this.callOnPassengers(p => {
+      p.listenStationAnnouncement(this);
+    });
   }
 
   findShortestPathToEveryStation(): void {
