@@ -215,6 +215,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.boardable.getPassengerArrangement();
   }
 
+  getPassengerCount(): number {
+    return this.boardable.getPassengerCount();
+  }
+
   getAppearanceId(): string {
     return this.appearanceId;
   }

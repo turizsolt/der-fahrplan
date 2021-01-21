@@ -40,6 +40,7 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   getAccelerateBy(): number;
   getControlType(): WagonControlType;
   getPassengerArrangement(): PassengerArrangement;
+  getPassengerCount(): number;
   getAppearanceId(): string;
   getConnectable(A: WhichEnd): WagonConnectable;
 
