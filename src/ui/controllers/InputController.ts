@@ -57,6 +57,8 @@ export class InputController {
   private vueBigScreen: VueBigscreen;
   private vueSidebar: VueSidebar;
 
+  private followCam: boolean = false;
+
   constructor(
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera,
@@ -377,8 +379,6 @@ export class InputController {
         this.downTime = 0;
         break;
 
-
-
       case 'K':
         const download = (content, fileName, contentType) => {
           var a = document.createElement('a');
@@ -455,6 +455,10 @@ export class InputController {
         this.getSelectedBrick()
           .getRenderer()
           .process('switch');
+        break;
+
+      case 'Home':
+        this.followCam = !this.followCam;
         break;
     }
   }
@@ -535,8 +539,26 @@ export class InputController {
         fromX: this.camera.position.x,
         fromY: this.camera.position.y,
         fromZ: this.camera.position.z,
+        setFollowCamOff: this.followCam ? () => { this.followCam = false; } : () => { }
       }
       this.inputHandler.tick(ize);
+    }
+
+    if (this.followCam && this.getSelectedBrick() && this.getSelectedBrick().getType() === Symbol.for('Wagon')) {
+      const wagon = this.getSelectedBrick() as Wagon;
+      const dx = wagon.getRay().coord.x - this.camera.target.x;
+      const dz = wagon.getRay().coord.z - this.camera.target.z;
+
+      this.camera.setPosition(
+        new Vector3(
+          this.camera.position.x + dx,
+          this.camera.position.y,
+          this.camera.position.z + dz
+        )
+      );
+      this.camera.setTarget(
+        new Vector3(this.camera.target.x + dx, 0, this.camera.target.z + dz)
+      );
     }
   }
 

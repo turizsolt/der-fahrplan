@@ -81,6 +81,7 @@ export class CameraInputHandler implements InputHandler {
       this.camera.setTarget(
         new Vector3(props.targetX + dx, 0, props.targetZ + dz)
       );
+      props.setFollowCamOff();
     }
   }
 

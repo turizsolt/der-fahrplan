@@ -8,4 +8,5 @@ export interface TickInputProps {
   fromX: number;
   fromY: number;
   fromZ: number;
+  setFollowCamOff: () => void;
 }
