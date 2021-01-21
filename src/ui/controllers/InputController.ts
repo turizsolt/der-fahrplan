@@ -324,6 +324,7 @@ export class InputController {
     if (!this.getSelected()) return;
 
     switch (key) {
+
       case 'ArrowUp':
         this.getSelectedBrick()
           .getRenderer()
@@ -367,6 +368,16 @@ export class InputController {
       case '9':
         this.selectMode(InputMode.CREATE_STATION);
         break;
+
+      case 'ArrowUp':
+        this.upTime = 0;
+        break;
+
+      case 'ArrowDown':
+        this.downTime = 0;
+        break;
+
+
 
       case 'K':
         const download = (content, fileName, contentType) => {
@@ -448,6 +459,9 @@ export class InputController {
     }
   }
 
+  private upTime: number = 0;
+  private downTime: number = 0;
+
   keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     if (!this.getSelected()) return;
 
@@ -468,6 +482,26 @@ export class InputController {
         this.getSelectedBrick()
           .getRenderer()
           .process('shuntBackward');
+        break;
+
+      case 'ArrowUp':
+        this.upTime += this.store.getTickSpeed();
+        if (this.upTime > 14) {
+          this.getSelectedBrick()
+            .getRenderer()
+            .process('forward');
+          this.upTime -= 15;
+        }
+        break;
+
+      case 'ArrowDown':
+        this.downTime += this.store.getTickSpeed();
+        if (this.downTime > 14) {
+          this.getSelectedBrick()
+            .getRenderer()
+            .process('backward');
+          this.downTime -= 15;
+        }
         break;
     }
   }
