@@ -414,6 +414,18 @@ export class InputController {
       case '2':
         this.store.setTickSpeed(2);
         break;
+
+      case '3':
+        this.store.setTickSpeed(3);
+        break;
+
+      case '4':
+        this.store.setTickSpeed(4);
+        break;
+
+      case '5':
+        this.store.setTickSpeed(5);
+        break;
     }
 
     if (!this.getSelected()) return;
