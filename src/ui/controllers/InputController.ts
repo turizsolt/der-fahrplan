@@ -527,6 +527,8 @@ export class InputController {
       'tickCount',
       Math.floor(count / 60) + ':' + (count % 60 < 10 ? '0' : '') + (count % 60)
     );
+    this.vueSidebar.setData('tickSpeed', speed);
+    this.vueSidebar.setData('fps', this.camera.getEngine().getFps().toFixed());
 
     if (this.inputHandler.tick) {
       const ize: TickInputProps = {

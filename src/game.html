@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <title>Der Fahrplan</title>
     <style>
-        html, body {
+        html,
+        body {
             overflow: hidden;
-            width   : 100%;
-            height  : 100%;
-            margin  : 0;
-            padding : 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
         }
+
         #renderCanvas {
-            width   : 100%;
-            height  : 100%;
+            width: 100%;
+            height: 100%;
             touch-action: none;
         }
+
         #button-holder {
             position: fixed;
             right: 20px;
@@ -25,12 +29,14 @@
             height: 40px;*/
             z-index: 1;
         }
+
         button {
             width: 40px;
             height: 40px;
             padding: 0;
             margin: 0;
         }
+
         .selected {
             background-color: rebeccapurple;
         }
@@ -38,20 +44,20 @@
 
 
         #big-screen {
-        position: fixed;
-        left: 20px;
-        top: 20px;
-        bottom: 20px;
-        right: 20px;
-        background-color:#cec;
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            bottom: 20px;
+            right: 20px;
+            background-color: #cec;
 
-        border: 2px solid #070;
-        border-radius: 0.5em;
+            border: 2px solid #070;
+            border-radius: 0.5em;
 
-        padding: 10px;
+            padding: 10px;
 
-        display: flex;
-        z-index: 1;
+            display: flex;
+            z-index: 1;
         }
 
         .column {
@@ -82,210 +88,200 @@
         /******************************************/
 
         #info-box {
-    position: fixed;
-    left: 20px;
-    top: 20px;
-    bottom: 20px;
-    width: 200px;
-    background-color:#cec;
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            bottom: 20px;
+            width: 200px;
+            background-color: #cec;
 
-    border: 2px solid #070;
-    border-radius: 0.5em;
+            border: 2px solid #070;
+            border-radius: 0.5em;
 
-    padding: 10px;
+            padding: 10px;
 
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-}
+            display: flex;
+            justify-content: space-between;
+            flex-direction: column;
+        }
 
-.to-menu {
-    height: 40px;
-    text-align: center;
-}
+        .to-menu {
+            height: 40px;
+            text-align: center;
+        }
 
-.item-type {
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 0px;
-}
+        .item-type {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 0px;
+        }
 
-.item-id {
-    text-align: center;
-    font-style: italic;
-    font-size: 10px;
-    margin-bottom: 20px;
-}
+        .item-id {
+            text-align: center;
+            font-style: italic;
+            font-size: 10px;
+            margin-bottom: 20px;
+        }
 
-.route-select {
-    width: 100%;
-    border: 1px solid #070;
-    border-radius: 0.25em;
-    background-color: #aca;
-}
+        .route-select {
+            width: 100%;
+            border: 1px solid #070;
+            border-radius: 0.25em;
+            background-color: #aca;
+        }
 
-.trip {
-    display: flex;
-    margin-bottom: 10px;
-}
+        .trip {
+            display: flex;
+            margin-bottom: 10px;
+        }
 
-.trip-name {
-    background-color: #9a9;
-    border: 1px solid #070;
-    border-radius: 0.25em;
-    padding: 3px 0 3px 3px;
-    min-width: 3em;
-    font-weight: bold;
-    text-align: center;
-}
+        .trip-name {
+            background-color: #9a9;
+            border: 1px solid #070;
+            border-radius: 0.25em;
+            padding: 3px 0 3px 3px;
+            min-width: 3em;
+            font-weight: bold;
+            text-align: center;
+        }
 
-.trip-destination {
-    padding: 3px;
-    font-weight: bold;
-}
+        .trip-destination {
+            padding: 3px;
+            font-weight: bold;
+        }
 
-.trip-buttons {
-    display: flex;
-    justify-content: flex-end;
-}
+        .trip-buttons {
+            display: flex;
+            justify-content: flex-end;
+        }
 
-.trip-buttons-inner {
-    text-align: right;
-}
+        .trip-buttons-inner {
+            text-align: right;
+        }
 
 
-.xbutton {
-    border: 1px solid #a18d6f;
-    border-radius: 0.25em;
-    background-color: khaki;
-    margin: 0.25em;
-    padding: 0.5em;
-    display: inline-block;
-    cursor: pointer;
-}
+        .xbutton {
+            border: 1px solid #a18d6f;
+            border-radius: 0.25em;
+            background-color: khaki;
+            margin: 0.25em;
+            padding: 0.5em;
+            display: inline-block;
+            cursor: pointer;
+        }
 
-.xbutton:hover {
-    background-color: #a18d6f;
-}
+        .xbutton:hover {
+            background-color: #a18d6f;
+        }
 
-.stop {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    height: 15px;
-}
+        .stop {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            height: 15px;
+        }
 
-.stop-circle {
-    width: 10px;
-    height: 10px;
-    border: 2px solid #070;
-    border-radius: 50%;
-}
+        .stop-circle {
+            width: 10px;
+            height: 10px;
+            border: 2px solid #070;
+            border-radius: 50%;
+        }
 
-.stop-name {
-    margin-left: 5px;
-    margin-top: -2.5px;
-}
+        .stop-name {
+            margin-left: 5px;
+            margin-top: -2.5px;
+        }
 
-.stop-after {
-    position: relative;
-    width: 4px;
-    height: 15px;
-    top: 12px;
-    left: -9px;
-}
+        .stop-after {
+            position: relative;
+            width: 4px;
+            height: 15px;
+            top: 12px;
+            left: -9px;
+        }
 
-.color {
-    background-color: #070;
-}
+        .color {
+            background-color: #070;
+        }
 
-.nocolor {
-    background-color: none;
-}
+        .nocolor {
+            background-color: none;
+        }
 
-.route-create-holder {
-    margin-top: 5px;
-}
+        .route-create-holder {
+            margin-top: 5px;
+        }
 
-.route-create {
-    border: 1px solid #070;
-    border-radius: 0.25em;
-    background-color: #aca;
+        .route-create {
+            border: 1px solid #070;
+            border-radius: 0.25em;
+            background-color: #aca;
 
-    padding-left: 10px;
-    padding-right: 10px;
+            padding-left: 10px;
+            padding-right: 10px;
 
-    cursor: pointer;
+            cursor: pointer;
 
-    white-space: nowrap;
-}
+            white-space: nowrap;
+        }
 
-.route-create:hover {
-    background-color: #dfd;
-}
+        .route-create:hover {
+            background-color: #dfd;
+        }
 
-.route-details {
-    margin-top: 5px;
-}
+        .route-details {
+            margin-top: 5px;
+        }
 
-.route-details-stops {
-    margin-top: 10px;
-}
+        .route-details-stops {
+            margin-top: 10px;
+        }
 
-.route-input-name {
-    border-radius: 2px;
-    border: 1px solid #070;
-    padding: 0 3px 0 3px;
-    width: 96px;
-}
+        .route-input-name {
+            border-radius: 2px;
+            border: 1px solid #070;
+            padding: 0 3px 0 3px;
+            width: 96px;
+        }
 
-.column-title {
-    font-weight: bold;
-    margin-bottom: 20px;
-}
+        .column-title {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
 
-[v-cloak] { display: none; }
-
+        [v-cloak] {
+            display: none;
+        }
     </style>
 </head>
+
 <body>
     <div id="button-holder">
-            <select size="1" v-if="selected === 'CREATE_ENGINE'"
-            v-model="wagon"
-            v-on:click="handleWagonClick">
-                    <option value="wagon">Mozdony</option>
-                    <option value="mot">Motorvonat</option>
-                    <option value="vez">Vezérlőkocsi</option>
-                    <option value="utas">Utaskocsi</option>
-                </select>
-            <button 
-                v-for="button in buttons"
-                v-bind:id="button.id"
-                v-on:click="handleClick"
-                v-bind:class="{ selected: selected === button.id }"
-            >{{button.text}}</button>
+        <select size="1" v-if="selected === 'CREATE_ENGINE'" v-model="wagon" v-on:click="handleWagonClick">
+            <option value="wagon">Mozdony</option>
+            <option value="mot">Motorvonat</option>
+            <option value="vez">Vezérlőkocsi</option>
+            <option value="utas">Utaskocsi</option>
+        </select>
+        <button v-for="button in buttons" v-bind:id="button.id" v-on:click="handleClick"
+            v-bind:class="{ selected: selected === button.id }">{{button.text}}</button>
     </div>
     <div id="info-box">
         <component v-if="selected" :is="type" :idt="selected.id" :obj="selected" :opts="opts"></component>
         <div v-if="!selected"></div>
         <div class="to-menu">
-            Time: <span>{{tickCount}}</span><br />
+            Time: <span>{{tickCount}}</span> ({{tickSpeed}}x) (fps:{{fps}})<br />
             <a href="index.html">Vissza a menübe</a>
         </div>
     </div>
     <div v-cloak id="big-screen" v-if="show">
         <div class="column-routes" id="route-list">
             <div class="column-title">Route list</div>
-            <route-title 
-                :key="route.id"
-                v-for="route in routes"
-                :route="route"
-                :selected="selectedRoute && selectedRoute.id === route.id"
-                candelete
-                @click="selectRoute(route)"
-                @delete="removeRoute(route)"
-            ></route-title>
+            <route-title :key="route.id" v-for="route in routes" :route="route"
+                :selected="selectedRoute && selectedRoute.id === route.id" candelete @click="selectRoute(route)"
+                @delete="removeRoute(route)"></route-title>
             <div class="route-create-holder">
                 <span class="route-create" v-on:click="createRoute()">Create route</span>
             </div>
@@ -295,52 +291,48 @@
             <div v-if="selectedRoute">
                 <div class="route-details">
                     Name:
-                    <input class="route-input-name" type="text" v-model="selectedRoute.name" @keyup.stop="nameChange" /><br />
+                    <input class="route-input-name" type="text" v-model="selectedRoute.name"
+                        @keyup.stop="nameChange" /><br />
                 </div>
                 <div class="route-details">
                     Color:
-                    <input class="route-input-name" type="text" v-model="selectedRoute.color" @keyup.stop="colorChange" /><br />
+                    <input class="route-input-name" type="text" v-model="selectedRoute.color"
+                        @keyup.stop="colorChange" /><br />
                 </div>
                 <div class="route-details-stops">
                     Stops:<br />
-                    <route-stop 
-                    v-for="(stop, index) in selectedRoute.stops"
-                    :key="stop.id"
-                    :route="selectedRoute"
-                    :stop="stop"
-                    :index="index"
-                    candelete
-                    :canmove="index !== 0"
-                    @delete="deleteStop(stop)"
-                    @move="swapStop(stop)"
-                    >
+                    <route-stop v-for="(stop, index) in selectedRoute.stops" :key="stop.id" :route="selectedRoute"
+                        :stop="stop" :index="index" candelete :canmove="index !== 0" @delete="deleteStop(stop)"
+                        @move="swapStop(stop)">
                     </route-stop>
                 </div>
                 <div class="route-details route-create-holder">
-                    <span class="route-create" v-on:click="createReverseRoute(selectedRoute)">Create reverse route</span>
+                    <span class="route-create" v-on:click="createReverseRoute(selectedRoute)">Create reverse
+                        route</span>
                 </div>
             </div>
         </div>
         <div class="column-add-trips">
             <div class="column-title">Add trips</div>
-            <div  v-if="selectedRoute">
+            <div v-if="selectedRoute">
                 <add-trip :route="selectedRoute">
                 </add-trip>
             </div>
         </div>
         <div class="column-add-stops" id="route-station-options">
             <div class="column-title">Add stops</div>
-            <div  v-if="selectedRoute">
+            <div v-if="selectedRoute">
                 <div v-for="station in stations">
                     <button v-on:click="addStop(station)">Add</button> {{station.name}}
                 </div>
             </div>
         </div>
     </div>
-<canvas id="renderCanvas">
-</canvas>
-<script>
-    
+    <canvas id="renderCanvas">
+    </canvas>
+    <script>
+
     </script>
 </body>
+
 </html>

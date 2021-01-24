@@ -14,7 +14,7 @@ export class VueSidebar {
   constructor(private store: Store) {
     this.vmInfoBox = new Vue({
       el: '#info-box',
-      data: { selected: null, type: null, opts: [], tickCount: '0:00' }
+      data: { selected: null, type: null, opts: [], tickCount: '0:00', tickSpeed: 0, fps: -1 }
     });
 
     Vue.component('route-title', RouteTitle);
