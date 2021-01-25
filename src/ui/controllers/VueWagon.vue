@@ -89,9 +89,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { Wagon } from "../../structs/Interfaces/Wagon";
-import { productionContainer } from "../../di/production.config";
-import { Store } from "../../structs/Interfaces/Store";
-import { TYPES } from "../../di/TYPES";
+import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
 import { Train } from "../../structs/Scheduling/Train";
 import { Trip } from "../../structs/Scheduling/Trip";
 
@@ -104,13 +102,6 @@ export default class VueWagon extends Vue {
   selectedWagons: Record<string, boolean> = {};
   selectedCount: number = 0;
   showTripList: boolean = false;
-
-  private store: Store;
-
-  constructor() {
-    super();
-    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
-  }
 
   selectWagon(wagonId) {
     if (this.selectedWagons[wagonId]) {
@@ -125,8 +116,8 @@ export default class VueWagon extends Vue {
     if (!vTripId) return;
 
     if (this.selectedCount === 0) {
-      const train = this.store.get(this.obj.train.id) as Train;
-      const trip = this.store.get(vTripId) as Trip;
+      const train = getStorable(this.obj.train.id) as Train;
+      const trip = getStorable(vTripId) as Trip;
       train.assignTrip(null);
       train.assignTrip(trip);
 
@@ -135,15 +126,15 @@ export default class VueWagon extends Vue {
       const wagons: Wagon[] = [];
       for (let wagonId of Object.keys(this.selectedWagons)) {
         if (this.selectedWagons[wagonId]) {
-          const wagon = this.store.get(wagonId) as Wagon;
+          const wagon = getStorable(wagonId) as Wagon;
           wagons.push(wagon);
           this.selectedWagons[wagonId] = false;
         }
       }
       this.selectedCount = 0;
 
-      const train = this.store.get(this.obj.train.id) as Train;
-      const trip = this.store.get(vTripId) as Trip;
+      const train = getStorable(this.obj.train.id) as Train;
+      const trip = getStorable(vTripId) as Trip;
       train.assignTrip(trip, wagons);
 
       this.showTripList = false;
@@ -151,9 +142,8 @@ export default class VueWagon extends Vue {
   }
 
   clearTrip() {
-    console.log("clear");
     if (this.selectedCount === 0) {
-      const train = this.store.get(this.obj.train.id) as Train;
+      const train = getStorable(this.obj.train.id) as Train;
       train.assignTrip(null);
 
       this.showTripList = false;
@@ -161,12 +151,12 @@ export default class VueWagon extends Vue {
       const wagons: Wagon[] = [];
       for (let wagonId of Object.keys(this.selectedWagons)) {
         if (this.selectedWagons[wagonId]) {
-          const wagon = this.store.get(wagonId) as Wagon;
+          const wagon = getStorable(wagonId) as Wagon;
           wagons.push(wagon);
           this.selectedWagons[wagonId] = false;
         }
       }
-      const train = this.store.get(this.obj.train.id) as Train;
+      const train = getStorable(this.obj.train.id) as Train;
       train.assignTrip(null, wagons);
 
       this.showTripList = false;

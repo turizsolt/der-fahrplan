@@ -250,7 +250,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.renderer.update();
 
     const deep = this.persistDeep();
-    this.notify(deep);
+    this.notify(Object.freeze(deep));
   }
 
   ///////////////////////////

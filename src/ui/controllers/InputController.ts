@@ -282,7 +282,7 @@ export class InputController {
       };
       (this.getSelected() as Wagon).subscribeToUpdates(this.selectCallback);
     }
-    this.vueSidebar.setData('selected', storedObj.persistDeep());
+    this.vueSidebar.setData('selected', Object.freeze(storedObj.persistDeep()));
     this.vueSidebar.setData(
       'type',
       storedObj.getType() === Symbol.for('Passenger') ? 'passenger' : storedObj.getType() === Symbol.for('Wagon') ? 'wagon' : (storedObj.getType() === Symbol.for('Station') ? 'station' : 'idtext')
@@ -290,11 +290,11 @@ export class InputController {
     if (storedObj.getType() === Symbol.for('Wagon')) {
       this.vueSidebar.setData(
         'opts',
-        this.store
+        Object.freeze(this.store
           .getAllOf<Trip>(TYPES.Trip)
           .map(x => x.persistDeep())
           .sort((a: any, b: any) => a.departureTime - b.departureTime)
-      );
+        ));
     }
   }
 
