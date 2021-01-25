@@ -2,9 +2,14 @@
   <div>
     <div>
       Time:
-      <input style="width: 80px;" @keyup.stop="handleTime" type="text" v-model="timeStr" />
-      <button style="width: 80px;" @click="addTrip">Add&nbsp;trip</button>
-      <button style="width: 80px;" @click="update">Update list</button>
+      <input
+        style="width: 80px"
+        @keyup.stop="handleTime"
+        type="text"
+        v-model="timeStr"
+      />
+      <button style="width: 80px" @click="addTrip">Add&nbsp;trip</button>
+      <button style="width: 80px" @click="update">Update list</button>
     </div>
     <div>
       <div class="trip-list">
@@ -14,8 +19,12 @@
             <div class="trip-stop-time-header trip-stop-departure">dep</div>
           </div>
           <div class="trip-stop" :key="stop.id" v-for="stop in trip.stops">
-            <div class="trip-stop-time trip-stop-arrival">{{stop.arrivalTimeString}}</div>
-            <div class="trip-stop-time trip-stop-departure">{{stop.departureTimeString}}</div>
+            <div class="trip-stop-time trip-stop-arrival">
+              {{ stop.arrivalTimeString }}
+            </div>
+            <div class="trip-stop-time trip-stop-departure">
+              {{ stop.departureTimeString }}
+            </div>
           </div>
         </div>
       </div>
@@ -25,65 +34,67 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import { Store } from "../../structs/Interfaces/Store";
-import { productionContainer } from "../../di/production.config";
 import { TYPES } from "../../di/TYPES";
-import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { Route } from "../../structs/Scheduling/Route";
 import { Trip } from "../../structs/Scheduling/Trip";
+import {
+  getStorable,
+  getAllOfStorable,
+  createStorable,
+} from "../../structs/Actuals/Store/StoreForVue";
 
 @Component
 export default class RouteTitle extends Vue {
   @Prop() route: any;
-  timeStr: string = '';
+  timeStr: string = "";
   time: number = 0;
   tripList: any[] = [];
   get filteredTripList() {
-    return this.tripList.filter(t => t.routeId === this.route.id);
+    return this.tripList.filter((t) => t.routeId === this.route.id);
   }
-  
-  private store:Store;
 
   constructor() {
     super();
-    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
     setTimeout(() => this.update(), 0);
   }
 
   update(): void {
-      this.tripList = this.store.getAllOf(TYPES.Trip)
-        .map(x => x.persistDeep());
+    this.tripList = getAllOfStorable(TYPES.Trip).map((x) =>
+      Object.freeze(x.persistDeep())
+    );
   }
 
   addTrip(): void {
-    const route = this.store.get(this.route.id) as Route;
-    const trip = this.store.create<Trip>(TYPES.Trip).init(route, this.time);
-    this.timeStr = '';
+    const route = getStorable(this.route.id) as Route;
+    const trip = createStorable<Trip>(TYPES.Trip).init(route, this.time);
+    this.timeStr = "";
     this.update();
   }
 
-  handleTime(event:any): void {
-      let value = event.currentTarget.value;
-      value = value.split('').filter(x => '0' <= x && x <= '9').join('');
-      if(value.length > 4) {
-          value = value.substr(0,4);
-      }
-      let time = parseInt(value, 10);
-      if(value.length > 2) {
-          value = value.substr(0, value.length-2)+":"+value.substr(-2);
-          time = parseInt(value.substr(0, value.length-2), 10)*60 + 
-            parseInt(value.substr(-2), 10);
-      }
-      //event.currentTarget.value = value;
-      this.timeStr = value;
-      this.time = value === '' ? undefined : time * 60;
-
+  handleTime(event: any): void {
+    let value = event.currentTarget.value;
+    value = value
+      .split("")
+      .filter((x) => "0" <= x && x <= "9")
+      .join("");
+    if (value.length > 4) {
+      value = value.substr(0, 4);
+    }
+    let time = parseInt(value, 10);
+    if (value.length > 2) {
+      value = value.substr(0, value.length - 2) + ":" + value.substr(-2);
+      time =
+        parseInt(value.substr(0, value.length - 2), 10) * 60 +
+        parseInt(value.substr(-2), 10);
+    }
+    //event.currentTarget.value = value;
+    this.timeStr = value;
+    this.time = value === "" ? undefined : time * 60;
   }
 }
 </script>
 
 <style scoped>
-
 .trip-list {
   display: flex;
   margin-top: 14px;
@@ -101,7 +112,8 @@ export default class RouteTitle extends Vue {
   margin-bottom: 10px;
 }
 
-.trip-stop-time, .trip-stop-time-header {
+.trip-stop-time,
+.trip-stop-time-header {
   border-radius: 2px;
   border: 1px solid #070;
   padding: 0 3px 0 3px;
@@ -117,5 +129,4 @@ export default class RouteTitle extends Vue {
   color: #cec;
   text-align: center;
 }
-
 </style>

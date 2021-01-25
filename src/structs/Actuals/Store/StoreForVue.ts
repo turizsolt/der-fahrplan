@@ -8,3 +8,11 @@ const store: Store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)(
 export const getStorable = (id: string): BaseStorable => {
     return store.get(id);
 };
+
+export const getAllOfStorable = <T extends BaseStorable>(type: symbol): T[] => {
+    return store.getAllOf(type);
+};
+
+export const createStorable = <T>(type: symbol): T => {
+    return store.create(type);
+}

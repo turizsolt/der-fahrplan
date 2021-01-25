@@ -20,31 +20,31 @@ export class VueBigscreen {
         stations: []
       },
       methods: {
-        load: function() {
-          this.routes = _this.store
+        load: function () {
+          this.routes = Object.freeze(_this.store
             .getAllOf<Route>(TYPES.Route)
-            .map(x => x.persistDeep());
-          this.stations = _this.store
+            .map(x => x.persistDeep()));
+          this.stations = Object.freeze(_this.store
             .getAllOf<Station>(TYPES.Station)
-            .map(x => x.persistDeep());
+            .map(x => x.persistDeep()));
           if (this.selectedRoute) {
-            this.selectedRoute = (_this.store.get(
+            this.selectedRoute = Object.freeze((_this.store.get(
               this.selectedRoute.id
-            ) as Route).persistDeep();
+            ) as Route).persistDeep());
           }
         },
-        removeRoute: function(vRoute) {
+        removeRoute: function (vRoute) {
           const route = _this.store.get(vRoute.id) as Route;
           route.remove();
           this.selectedRoute = null;
           this.load();
         },
-        createRoute: function() {
+        createRoute: function () {
           const route = _this.store.create<Route>(TYPES.Route);
           route.init();
           this.load();
         },
-        createReverseRoute: function(vRouteFrom) {
+        createReverseRoute: function (vRouteFrom) {
           const routeFrom = _this.store.get(vRouteFrom.id) as Route;
           const route = _this.store.create<Route>(TYPES.Route);
           route.init();
@@ -56,23 +56,23 @@ export class VueBigscreen {
           }
           this.load();
         },
-        selectRoute: function(route) {
-          this.selectedRoute = route;
+        selectRoute: function (route) {
+          this.selectedRoute = Object.freeze(route);
           this.load();
         },
-        deleteStop: function(vStop) {
+        deleteStop: function (vStop) {
           const stop = _this.store.get(vStop.id) as RouteStop;
           const route = _this.store.get(this.selectedRoute.id) as Route;
           route.removeStop(stop);
           this.load();
         },
-        swapStop: function(vStop) {
+        swapStop: function (vStop) {
           const stop = _this.store.get(vStop.id) as RouteStop;
           const route = _this.store.get(this.selectedRoute.id) as Route;
           route.swapStopWithPrev(stop);
           this.load();
         },
-        addStop: function(vStation) {
+        addStop: function (vStation) {
           if (this.selectedRoute) {
             const route = _this.store.get(this.selectedRoute.id) as Route;
             const station = _this.store.get(vStation.id) as Station;
@@ -85,12 +85,12 @@ export class VueBigscreen {
             this.load();
           }
         },
-        nameChange: function(event) {
+        nameChange: function (event) {
           const route = _this.store.get(this.selectedRoute.id) as Route;
           route.setName(event.target.value);
           this.load();
         },
-        colorChange: function(event) {
+        colorChange: function (event) {
           const route = _this.store.get(this.selectedRoute.id) as Route;
           route.setColor(event.target.value);
           this.load();

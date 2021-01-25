@@ -60,10 +60,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import { Store } from "../../structs/Interfaces/Store";
-import { productionContainer } from "../../di/production.config";
-import { TYPES } from "../../di/TYPES";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
+import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
 
 @Component
 export default class RouteTitle extends Vue {
@@ -73,13 +71,6 @@ export default class RouteTitle extends Vue {
   @Prop() candelete?: boolean;
   @Prop() canmove?: boolean;
   @Prop() isTrip?: boolean;
-
-  private store: Store;
-
-  constructor() {
-    super();
-    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
-  }
 
   handleTime(column: string, event: any): void {
     let value = event.currentTarget.value;
@@ -99,7 +90,7 @@ export default class RouteTitle extends Vue {
     }
     event.currentTarget.value = value;
 
-    const stop = this.store.get(this.stop.id) as RouteStop;
+    const stop = getStorable(this.stop.id) as RouteStop;
     if (column === "arrivalTime") {
       stop.setArrivalTime(value === "" ? undefined : time * 60);
     }
