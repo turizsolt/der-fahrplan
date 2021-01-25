@@ -290,11 +290,11 @@ export class InputController {
     if (storedObj.getType() === Symbol.for('Wagon')) {
       this.vueSidebar.setData(
         'opts',
-        Object.freeze(this.store
+        this.store
           .getAllOf<Trip>(TYPES.Trip)
-          .map(x => x.persistDeep())
+          .map(x => Object.freeze(x.persistDeep()))
           .sort((a: any, b: any) => a.departureTime - b.departureTime)
-        ));
+      );
     }
   }
 

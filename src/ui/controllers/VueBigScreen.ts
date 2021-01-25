@@ -21,16 +21,16 @@ export class VueBigscreen {
       },
       methods: {
         load: function () {
-          this.routes = Object.freeze(_this.store
+          this.routes = _this.store
             .getAllOf<Route>(TYPES.Route)
-            .map(x => x.persistDeep()));
-          this.stations = Object.freeze(_this.store
+            .map(x => x.persistDeep());
+          this.stations = _this.store
             .getAllOf<Station>(TYPES.Station)
-            .map(x => x.persistDeep()));
+            .map(x => Object.freeze(x.persistDeep()));
           if (this.selectedRoute) {
-            this.selectedRoute = Object.freeze((_this.store.get(
+            this.selectedRoute = (_this.store.get(
               this.selectedRoute.id
-            ) as Route).persistDeep());
+            ) as Route).persistDeep()
           }
         },
         removeRoute: function (vRoute) {
@@ -57,7 +57,7 @@ export class VueBigscreen {
           this.load();
         },
         selectRoute: function (route) {
-          this.selectedRoute = Object.freeze(route);
+          this.selectedRoute = route;
           this.load();
         },
         deleteStop: function (vStop) {
