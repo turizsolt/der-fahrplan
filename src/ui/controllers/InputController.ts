@@ -177,9 +177,13 @@ export class InputController {
     const props = this.convert(event);
     this.downProps = props;
     this.inputHandler.down(props, event);
+    this.downAt = (new Date()).getTime();
   }
 
   move(event: PointerEvent) {
+    const now = (new Date()).getTime();
+    if (now - this.downAt < 100) return;
+
     const props = this.convert(event);
     if (this.downProps) {
       this.inputHandler.move(this.downProps, props, event);
@@ -192,11 +196,12 @@ export class InputController {
     if (!this.downProps) return;
 
     let props = this.convert(event);
+    const now = (new Date()).getTime();
 
     if (
-      this.downProps.point &&
-      props.point &&
-      this.downProps.point.coord.equalsTo(props.point.coord)
+      this.downProps.point && (now - this.downAt < 100 ||
+        (props.point &&
+          this.downProps.point.coord.equalsTo(props.point.coord)))
     ) {
       let ready = this.selectIfPossible(event);
       if (ready) {
@@ -481,6 +486,7 @@ export class InputController {
 
   private upTime: number = 0;
   private downTime: number = 0;
+  private downAt: number = 0;
 
   keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     if (!this.getSelected()) return;
@@ -506,21 +512,21 @@ export class InputController {
 
       case 'ArrowUp':
         this.upTime += this.store.getTickSpeed();
-        if (this.upTime > 14) {
+        if (this.upTime > 5) {
           this.getSelectedBrick()
             .getRenderer()
             .process('forward');
-          this.upTime -= 15;
+          this.upTime -= 6;
         }
         break;
 
       case 'ArrowDown':
         this.downTime += this.store.getTickSpeed();
-        if (this.downTime > 14) {
+        if (this.downTime > 5) {
           this.getSelectedBrick()
             .getRenderer()
             .process('backward');
-          this.downTime -= 15;
+          this.downTime -= 6;
         }
         break;
     }
