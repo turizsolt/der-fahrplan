@@ -58,6 +58,9 @@ export class InputController {
   private vueSidebar: VueSidebar;
 
   private followCam: boolean = false;
+  private timeLimit: number = 12;
+  private originalTimeLimit: number = 12;
+  private shortTimeLimit: number = 6;
 
   constructor(
     private scene: BABYLON.Scene,
@@ -382,10 +385,12 @@ export class InputController {
 
       case 'ArrowUp':
         this.upTime = 0;
+        this.timeLimit = this.originalTimeLimit;
         break;
 
       case 'ArrowDown':
         this.downTime = 0;
+        this.timeLimit = this.originalTimeLimit;
         break;
 
       case 'K':
@@ -512,21 +517,23 @@ export class InputController {
 
       case 'ArrowUp':
         this.upTime += this.store.getTickSpeed();
-        if (this.upTime > 5) {
+        if (this.upTime > (this.timeLimit - 1)) {
           this.getSelectedBrick()
             .getRenderer()
             .process('forward');
-          this.upTime -= 6;
+          this.upTime -= this.timeLimit;
+          this.timeLimit = this.shortTimeLimit;
         }
         break;
 
       case 'ArrowDown':
         this.downTime += this.store.getTickSpeed();
-        if (this.downTime > 5) {
+        if (this.downTime > (this.timeLimit - 1)) {
           this.getSelectedBrick()
             .getRenderer()
             .process('backward');
-          this.downTime -= 6;
+          this.downTime -= this.timeLimit;
+          this.timeLimit = this.shortTimeLimit;
         }
         break;
     }
