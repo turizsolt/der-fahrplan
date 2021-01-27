@@ -129,16 +129,18 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   assignTrip(trip: Trip, wagons?: Wagon[]): void {
+    let addedCount = 0;
     for (let i = 0; i < this.wagonsWithSides.length; i++) {
       if (
         (!wagons || wagons.includes(this.wagonsWithSides[i].wagon)) &&
         (this.wagonsWithSides[i].wagon.getPassengerCount())
       ) {
+        addedCount++;
         this.wagonsWithSides[i].trip = trip;
       }
     }
 
-    if (trip && !this.trips.includes(trip)) {
+    if (addedCount && trip && !this.trips.includes(trip)) {
       this.trips.push(trip);
     }
 
