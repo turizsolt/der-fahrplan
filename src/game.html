@@ -323,7 +323,8 @@
             <div class="column-title">Add stops</div>
             <div v-if="selectedRoute">
                 <div v-for="station in stations">
-                    <button v-on:click="addStop(station)">Add</button> {{station.name}}
+                    <button v-on:click="addStop(station)" :style="{backgroundColor: station.rgbColor}">Add</button>
+                    {{station.name}}
                 </div>
             </div>
         </div>

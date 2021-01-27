@@ -18,6 +18,7 @@ import { Trip } from './Trip';
 import { TripInSchedule } from './TripInSchedule';
 import { ShortestPath } from './ShortestPath';
 import { Util } from '../Util';
+import { _IDoNeedToBeInTheBuild } from 'babylonjs';
 const PriorityQueue = require("@darkblue_azurite/priority-queue");
 
 export class ActualStation extends ActualBaseBrick implements Station {
@@ -293,6 +294,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
       id: this.id,
       type: 'Station',
       name: this.name,
+      rgbColor: this.color.getRgbString(),
       schedule: this.scheduledTrips.map((tripIS: TripInSchedule) => tripIS.trip.persistDeep()),
       shortestPathes: Object.keys(this.scheduledShortestPathes).map(key => {
         const path = this.scheduledShortestPathes[key];
