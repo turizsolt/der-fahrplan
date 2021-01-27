@@ -6,7 +6,7 @@ import { WagonControlType } from './WagonControlType';
 export class WagonControlLocomotive implements WagonControl {
   protected selectedSide: WhichEnd | null = null;
 
-  constructor(protected wagon: Wagon) {}
+  constructor(protected wagon: Wagon) { }
 
   getControlType(): WagonControlType {
     return WagonControlType.Locomotive;
@@ -26,6 +26,7 @@ export class WagonControlLocomotive implements WagonControl {
         this.selectedSide = null;
       }
     }
+    this.wagon.update();
   }
 
   swapSelectedSide(): void {
