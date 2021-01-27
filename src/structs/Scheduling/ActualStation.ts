@@ -17,6 +17,7 @@ import { Train } from './Train';
 import { Trip } from './Trip';
 import { TripInSchedule } from './TripInSchedule';
 import { ShortestPath } from './ShortestPath';
+import { Util } from '../Util';
 const PriorityQueue = require("@darkblue_azurite/priority-queue");
 
 export class ActualStation extends ActualBaseBrick implements Station {
@@ -287,20 +288,6 @@ export class ActualStation extends ActualBaseBrick implements Station {
     };
   }
 
-  // todo move to a util something
-  private timeToStr(time: number): string {
-    if (time === undefined) return '';
-
-
-    const sec = time % 60;
-    const minutes = (time - sec) / 60;
-    const min = minutes % 60;
-    const hour = (minutes - min) / 60;
-    return hour
-      ? hour.toString() + (min < 10 ? ':0' : ':') + min.toString()
-      : min.toString();
-  }
-
   persistDeep(): Object {
     return {
       id: this.id,
@@ -313,7 +300,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
           stationId: path.station.getId(),
           stationName: path.station.getName(),
           departureTime: path.departureTime,
-          departureTimeString: this.timeToStr(path.departureTime),
+          departureTimeString: Util.timeToStr(path.departureTime),
           firstTripName: (path.path.length > 0) ? path.path[0].trip.getRoute().getName() : '<Error>',
           path: path.path.map(p => ({ trip: p.trip.persistDeep(), station: p.station.persistShallow() }))
         }

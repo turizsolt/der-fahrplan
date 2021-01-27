@@ -7,6 +7,7 @@ import { TripStop, OptionalTripStop } from './TripStop';
 import { RouteStop } from './RouteStop';
 import { Platform } from '../Interfaces/Platform';
 import { Station } from './Station';
+import { Util } from '../Util';
 
 export class ActualTrip extends ActualBaseStorable implements Trip {
   private route: Route = null;
@@ -24,19 +25,6 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     stationsInvolved.map((station: Station) => station.addTripToSchedule(this));
     this.updateScheduleOnAllStations(stationsInvolved);
     return this;
-  }
-
-  // todo move to a util something
-  private timeToStr(time: number): string {
-    if (time === undefined) return '';
-
-    const sec = time % 60;
-    const minutes = (time - sec) / 60;
-    const min = minutes % 60;
-    const hour = (minutes - min) / 60;
-    return hour
-      ? hour.toString() + (min < 10 ? ':0' : ':') + min.toString()
-      : min.toString();
   }
 
   redefine(stop: RouteStop, props: OptionalTripStop): void {
@@ -83,10 +71,10 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         atStation: (ind === index) && (this.atStation === stop.getStation())
       };
 
-      sto.arrivalTimeString = this.timeToStr(sto.arrivalTime);
-      sto.departureTimeString = this.timeToStr(sto.departureTime);
-      sto.realArrivalTimeString = this.timeToStr(sto.realArrivalTime);
-      sto.realDepartureTimeString = this.timeToStr(sto.realDepartureTime);
+      sto.arrivalTimeString = Util.timeToStr(sto.arrivalTime);
+      sto.departureTimeString = Util.timeToStr(sto.departureTime);
+      sto.realArrivalTimeString = Util.timeToStr(sto.realArrivalTime);
+      sto.realDepartureTimeString = Util.timeToStr(sto.realDepartureTime);
 
       return sto;
     });
@@ -179,7 +167,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       routeId: this.route.getId(),
       route: this.route.persistDeep(),
       departureTime: this.departureTime,
-      departureTimeString: this.timeToStr(this.departureTime),
+      departureTimeString: Util.timeToStr(this.departureTime),
       stops: this.getStops()
     };
   }
