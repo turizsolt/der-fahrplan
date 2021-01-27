@@ -107,6 +107,11 @@ export default class VueWagon extends Vue {
     Vue.set(this.selectedWagons, wagonId, !this.selectedWagons[wagonId]);
   }
 
+  update() {
+    const wagon = getStorable(this.obj.id) as Wagon;
+    wagon.update();
+  }
+
   assignTrip(vTripId, isPreDefinedTrip) {
     if (!vTripId) return;
 
@@ -134,6 +139,7 @@ export default class VueWagon extends Vue {
 
       this.showTripList = false;
     }
+    this.update();
   }
 
   clearTrip() {
@@ -156,6 +162,7 @@ export default class VueWagon extends Vue {
 
       this.showTripList = false;
     }
+    this.update();
   }
 
   showTrips() {
