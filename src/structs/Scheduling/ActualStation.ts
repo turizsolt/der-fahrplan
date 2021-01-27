@@ -207,16 +207,21 @@ export class ActualStation extends ActualBaseBrick implements Station {
   board(passenger: Passenger): Coordinate {
     this.boardable.board(passenger);
 
-    if (!this.circle) return null;
+    if (this.platforms.length === 0) {
+      if (!this.circle) return null;
 
-    const rand = Math.random() * Math.PI * 2 - Math.PI;
-    const dist = Math.random() * 5;
-    const offset = new Coordinate(
-      Math.sin(rand) * dist,
-      0,
-      Math.cos(rand) * dist
-    );
-    return this.circle.a.add(offset);
+      const rand = Math.random() * Math.PI * 2 - Math.PI;
+      const dist = Math.random() * 5;
+      const offset = new Coordinate(
+        Math.sin(rand) * dist,
+        0,
+        Math.cos(rand) * dist
+      );
+      return this.circle.a.add(offset);
+    }
+    else {
+      return this.platforms[0].pseudoBoard();
+    }
   }
 
   unboard(passenger: Passenger): void {

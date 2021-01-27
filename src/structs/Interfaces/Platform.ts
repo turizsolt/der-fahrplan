@@ -10,6 +10,8 @@ import { Boardable } from '../../mixins/Boardable';
 export interface Platform extends BaseBrick, Boardable {
   isBeside(position: number): boolean;
 
+  pseudoBoard(): Coordinate;
+
   getLineSegmentChain(): LineSegmentChain;
   isPartOfStation(station: Station): boolean;
   setStation(station: Station): void;
