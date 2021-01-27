@@ -27,6 +27,12 @@ export class CameraInputHandler implements InputHandler {
     this.mesh.isPickable = false;
   }
 
+  private panLock: boolean = false;
+
+  setPanLock() {
+    this.panLock = !this.panLock;
+  }
+
   down(props: InputProps, event: PointerEvent): void {
     this.mouseButton[event.button] = true;
     this.lastProps = props;
@@ -38,6 +44,8 @@ export class CameraInputHandler implements InputHandler {
   roam(props: InputProps, event: PointerEvent): void { }
 
   tick(props: TickInputProps): void {
+    if (this.panLock) return;
+
     const alpha = this.camera.alpha;
     const scale = this.camera.radius / 70;
     let dx = 0;

@@ -8,5 +8,6 @@ export interface InputHandler {
   click(props: InputProps, event: PointerEvent): void;
   roam(props: InputProps, event: PointerEvent): void;
   tick?(props: TickInputProps): void;
+  setPanLock?(): void;
   cancel(): void;
 }

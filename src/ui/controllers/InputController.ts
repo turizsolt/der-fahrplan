@@ -321,6 +321,10 @@ export class InputController {
         const props = this.convert(null);
         if (props.point) this.move(null);
         break;
+
+      case 'ScrollLock':
+        this.inputHandlers.CAMERA.setPanLock();
+        break;
     }
 
     if (!this.getSelected()) return;
