@@ -33,11 +33,11 @@ export class ActualRoute extends ActualBaseStorable implements Route {
   }
 
   getColor(): string {
-      return this.color ?? '#fff';
+    return this.color ?? '#fff';
   }
 
-  setColor(color: string):void {
-      this.color = color;
+  setColor(color: string): void {
+    this.color = color;
   }
 
   getName(): string {
@@ -103,7 +103,11 @@ export class ActualRoute extends ActualBaseStorable implements Route {
           ? this.stops[this.stops.length - 1].getStationName()
           : 'Unknown',
       detailedName: this.getDetailedName(),
-      stops: this.stops.map(x => x.persistDeep()),
+      stops: this.stops.map((x, ind) => ({
+        ...x.persistDeep(),
+        isDepartureStation: ind === 0,
+        isArrivalStation: ind === this.stops.length - 1
+      })),
       reverse: this.getReverse() && this.getReverse().getId(),
       color: this.color
     };
@@ -120,7 +124,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     if (obj.reverse && store.get(obj.reverse)) {
       this.setReverse(store.get(obj.reverse) as Route);
     }
-    if(obj.color) {
+    if (obj.color) {
       this.setColor(obj.color);
     }
   }

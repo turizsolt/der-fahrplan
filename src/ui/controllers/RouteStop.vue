@@ -11,6 +11,7 @@
     ></div>
     <div class="stop-name" :style="{ color: stop.isServed ? 'grey' : 'black' }">
       {{ stop.atStation ? "* " : "" }} {{ stop.stationName }}
+      {{ stop.isArrivalStation ? "é." : "" }}
     </div>
 
     <!-- buttons -->
@@ -38,25 +39,41 @@
 
     <!-- arrival departure -->
     <input
-      v-if="!isTrip"
+      v-if="!isTrip && !stop.isDepartureStation"
       class="stop-input-time"
       type="text"
       v-model="stop.arrivalTimeString"
       @keyup.stop="handleTime('arrivalTime', $event)"
     />
+    <div v-if="!isTrip && stop.isDepartureStation" class="stop-input-time">
+      -
+    </div>
     <input
-      v-if="!isTrip"
+      v-if="!isTrip && !stop.isArrivalStation"
       class="stop-input-time"
       type="text"
       v-model="stop.departureTimeString"
       @keyup.stop="handleTime('departureTime', $event)"
     />
+    <div v-if="!isTrip && stop.isArrivalStation" class="stop-input-time">-</div>
 
     <div v-if="isTrip" class="trip-stop-time">
-      {{ stop.arrivalTimeString }}<br />{{ stop.departureTimeString }}
+      {{
+        stop.isArrivalStation
+          ? stop.arrivalTimeString
+          : stop.departureTimeString
+      }}
     </div>
     <div v-if="isTrip" class="trip-stop-time">
-      {{ stop.realArrivalTimeString }}<br />{{ stop.realDepartureTimeString }}
+      {{
+        (stop.isArrivalStation
+          ? stop.realArrivalTime
+          : stop.realDepartureTime) === -1
+          ? "?"
+          : stop.isArrivalStation
+          ? stop.realArrivalTimeString
+          : stop.realDepartureTimeString
+      }}
     </div>
   </div>
 </template>

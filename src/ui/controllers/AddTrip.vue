@@ -20,10 +20,10 @@
           </div>
           <div class="trip-stop" :key="stop.id" v-for="stop in trip.stops">
             <div class="trip-stop-time trip-stop-arrival">
-              {{ stop.arrivalTimeString }}
+              {{ stop.isDepartureStation ? "-" : stop.arrivalTimeString }}
             </div>
             <div class="trip-stop-time trip-stop-departure">
-              {{ stop.departureTimeString }}
+              {{ stop.isArrivalStation ? "-" : stop.departureTimeString }}
             </div>
           </div>
         </div>

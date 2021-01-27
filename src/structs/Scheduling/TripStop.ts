@@ -17,6 +17,8 @@ export interface TripStop {
   realDepartureTimeString: string;
   isServed: boolean;
   atStation: boolean;
+  isDepartureStation: boolean;
+  isArrivalStation: boolean;
 }
 
 export interface OptionalTripStop {
