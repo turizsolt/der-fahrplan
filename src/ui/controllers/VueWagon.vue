@@ -32,26 +32,9 @@
       </div>
     </div>
 
-    <!-- trips -->
-    <div>Kiválasztott útirányok</div>
-    <div
-      class="trip"
-      :key="trip.id"
-      v-for="(trip, index) in obj.train.trips"
-      @click="assignTrip(trip.id)"
-    >
-      <div
-        :style="'background-color: ' + trip.route.color + ';'"
-        :class="'trip-name pattern-' + (index + 1)"
-      >
-        {{ trip.route.name }}
-      </div>
-      <div class="trip-destination">▶ {{ trip.route.destination }}</div>
-    </div>
-
     <div>
-      <button @click="showTrips">Új hozzáadás</button>
-      <button @click="clearTrip">Törlés</button>
+      <button @click="showTrips">Új</button>
+      <button @click="clearTrip">Töröl</button>
     </div>
 
     <div>
@@ -72,11 +55,23 @@
       </div>
     </div>
 
-    <div v-if="obj.train.trips.length > 0">
+    <!-- trips -->
+    <div>Kiválasztott útirányok</div>
+    <div :key="trip.id" v-for="(trip, index) in obj.train.trips">
+      <div class="trip" @click="assignTrip(trip.id, true)">
+        <div
+          :style="'background-color: ' + trip.route.color + ';'"
+          :class="'trip-name pattern-' + (index + 1)"
+        >
+          {{ trip.route.name }}
+        </div>
+        <div class="trip-destination">▶ {{ trip.route.destination }}</div>
+      </div>
+
       <route-stop
-        v-for="(stop, index) in obj.train.trips[0].stops"
+        v-for="(stop, index) in trip.stops"
         :key="stop.id"
-        :route="obj.train.trips[0].route"
+        :route="trip.route"
         :stop="stop"
         :index="index"
         isTrip
@@ -112,10 +107,10 @@ export default class VueWagon extends Vue {
     Vue.set(this.selectedWagons, wagonId, !this.selectedWagons[wagonId]);
   }
 
-  assignTrip(vTripId) {
+  assignTrip(vTripId, isPreDefinedTrip) {
     if (!vTripId) return;
 
-    if (this.selectedCount === 0) {
+    if (this.selectedCount === 0 && !isPreDefinedTrip) {
       const train = getStorable(this.obj.train.id) as Train;
       const trip = getStorable(vTripId) as Trip;
       train.assignTrip(null);
