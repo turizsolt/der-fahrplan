@@ -64,7 +64,7 @@
           : stop.departureTimeString
       }}
     </div>
-    <div v-if="isTrip" class="trip-stop-time">
+    <div v-if="isTrip" class="trip-stop-time" :style="{ color: realColor }">
       {{
         (stop.isArrivalStation
           ? stop.realArrivalTime
@@ -91,6 +91,23 @@ export default class RouteTitle extends Vue {
   @Prop() candelete?: boolean;
   @Prop() canmove?: boolean;
   @Prop() isTrip?: boolean;
+
+  get realColor(): string {
+    const defVal = this.stop.isArrivalStation
+      ? this.stop.arrivalTime
+      : this.stop.departureTime;
+    const val = Math.floor(defVal / 60);
+    const defRealVal = this.stop.isArrivalStation
+      ? this.stop.realArrivalTime
+      : this.stop.realDepartureTime;
+    const realVal = Math.floor(defRealVal / 60);
+    if (defRealVal === -1) return "black";
+    if (realVal < val) return "purple";
+    if (realVal === val) return "green";
+    if (realVal < val + 6) return "orange";
+    if (realVal < val + 60) return "red";
+    return "darkred";
+  }
 
   handleTime(column: string, event: any): void {
     let value = event.currentTarget.value;
