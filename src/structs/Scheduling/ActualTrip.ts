@@ -50,6 +50,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return stops.map((stop, ind) => {
       const sto: TripStop = {
         station: stop.getStation(),
+        stationRgbColor: stop.getStation().getColor().getRgbString(),
         platform: stop.getPlatform(),
         stationName: stop.getStationName(),
         platformNo:

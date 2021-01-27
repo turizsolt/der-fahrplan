@@ -1,6 +1,9 @@
 <template>
   <div class="stop">
-    <div class="stop-circle" :style="{ backgroundColor: stop.rgbColor }"></div>
+    <div
+      class="stop-circle"
+      :style="{ backgroundColor: stop.stationRgbColor }"
+    ></div>
     <div v-if="index !== route.stops.length - 1" class="stop-after color"></div>
     <div
       v-if="index === route.stops.length - 1"

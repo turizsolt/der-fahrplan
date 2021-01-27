@@ -71,7 +71,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       type: 'RouteStop',
       station: this.station.persistShallow(),
       stationName: this.getStationName(),
-      rgbColor: this.station.getColor().getRgbString(),
+      stationRgbColor: this.station.getColor().getRgbString(),
       platform: this.platform && this.platform.getId(),
       arrivalTime: this.arrivalTime,
       arrivalTimeString: Util.timeToStr(this.arrivalTime, true),

@@ -9,13 +9,15 @@
     <div class="route-sign">{{ route.name }}</div>
     <div
       class="route-circle route-circle-left"
-      :style="{ backgroundColor: route.stops[0] && route.stops[0].rgbColor }"
+      :style="{
+        backgroundColor: route.stops[0] && route.stops[0].stationRgbColor,
+      }"
     ></div>
     <div
       class="route-circle route-circle-right"
       :style="{
         backgroundColor:
-          route.stops[0] && route.stops[route.stops.length - 1].rgbColor,
+          route.stops[0] && route.stops[route.stops.length - 1].stationRgbColor,
       }"
     ></div>
     <div class="route-name-shrink">

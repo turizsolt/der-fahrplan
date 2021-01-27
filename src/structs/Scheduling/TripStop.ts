@@ -4,6 +4,7 @@ import { Platform } from '../Interfaces/Platform';
 export interface TripStop {
   stationName: string;
   station: Station;
+  stationRgbColor: string;
   platform: Platform;
   platformNo: string;
   arrivalTime: number;
