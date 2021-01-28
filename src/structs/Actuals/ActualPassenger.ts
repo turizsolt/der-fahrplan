@@ -108,7 +108,9 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
 
   private setNextOnPath() {
     this.nextIdx++;
-    this.nextStation = this.path.path[this.nextIdx].station;
+    if (this.path && this.path.path && this.path.path[this.nextIdx]) {
+      this.nextStation = this.path.path[this.nextIdx].station;
+    }
   }
 
   private isStationInPath(station: Station): boolean {
