@@ -373,6 +373,17 @@ export class InputController {
 
       case '7':
         this.vueBigScreen.toggleShow();
+
+        // copied from
+        if (this.getSelectedBrick() && this.getSelectedBrick().getType() === Symbol.for('Wagon')) {
+          this.vueSidebar.setData(
+            'opts',
+            this.store
+              .getAllOf<Trip>(TYPES.Trip)
+              .map(x => Object.freeze(x.persistDeep()))
+              .sort((a: any, b: any) => a.departureTime - b.departureTime)
+          );
+        }
         break;
 
       case '8':
