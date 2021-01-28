@@ -186,6 +186,8 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   // boarding and announcements
 
   stoppedAt(station: Station, platform: Platform) {
+    if (this.controlingWagon) return;
+
     this.getTrips().map(trip => {
       this.callOnPassengers((p: Passenger) => {
         p.listenWagonStoppedAtAnnouncement(
