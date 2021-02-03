@@ -25,6 +25,11 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   private place: Place;
   private pos: Coordinate = Coordinate.Origo();
 
+  private startTime: number = -1;
+  private endTime: number = -1;
+  private travelTime: number = -1;
+  private travelDistance: number = -1;
+
   init(from: Station, to: Station) {
     super.initStore(TYPES.Passenger);
     this.to = to;
@@ -33,7 +38,16 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     this.renderer.init(this);
     this.setPath();
     this.listenStationAnnouncement(this.from);
+
+    this.startTime = this.store.getTickCount();
     return this;
+  }
+
+  justArrived(): void {
+    this.endTime = this.store.getTickCount();
+    this.travelTime = this.endTime - this.startTime;
+    this.travelDistance = this.from.getCircle().a.distance2d(this.to.getCircle().a);
+    this.store.addArrivedPassengerStats({ time: this.travelTime, distance: this.travelDistance });
   }
 
   // called from outside, announcements
@@ -81,6 +95,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
       if (this.isStationFinal(station)) {
         this.setPlace(null);
         this.renderer.update();
+        this.justArrived();
       } else {
         this.setNextOnPath();
         this.setPlace(station);

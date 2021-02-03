@@ -593,6 +593,10 @@ export class InputController {
     );
     this.vueSidebar.setData('tickSpeed', speed);
     this.vueSidebar.setData('fps', this.camera.getEngine().getFps().toFixed());
+    const passengerStats = this.store.getPassengerStats();
+    this.vueSidebar.setData('passengerCount', passengerStats.count);
+    this.vueSidebar.setData('passengerArrivedCount', passengerStats.arrivedCount);
+    this.vueSidebar.setData('passengerAverageArriveSpeed', Math.round(passengerStats.averageArriveSpeed * 100) / 100);
 
     if (this.inputHandler.tick) {
       const ize: TickInputProps = {
