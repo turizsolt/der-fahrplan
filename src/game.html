@@ -23,10 +23,15 @@
 
         #button-holder {
             position: fixed;
+            right: 100px;
+            top: 20px;
+            z-index: 1;
+        }
+
+        #view-holder {
+            position: fixed;
             right: 20px;
             top: 20px;
-            /*width: 200px;
-            height: 40px;*/
             z-index: 1;
         }
 
@@ -35,6 +40,14 @@
             height: 40px;
             padding: 0;
             margin: 0;
+        }
+
+        #view-holder button {
+            width: 60px;
+            height: 40px;
+            padding: 0;
+            margin: 0;
+            display: block;
         }
 
         .selected {
@@ -48,7 +61,7 @@
             left: 20px;
             top: 20px;
             bottom: 20px;
-            right: 20px;
+            right: 100px;
             background-color: #cec;
 
             border: 2px solid #070;
@@ -258,7 +271,11 @@
 </head>
 
 <body>
-    <div id="button-holder">
+    <div id="view-holder">
+        <button v-for="button in buttons" v-bind:id="button.id" v-on:click="handleClick"
+            v-bind:class="{ selected: selected === button.id }">{{button.text}}</button>
+    </div>
+    <div id="button-holder" v-if="show">
         <select size="1" v-if="selected === 'CREATE_ENGINE'" v-model="wagon" v-on:click="handleWagonClick">
             <option value="wagon">Mozdony</option>
             <option value="mot">Motorvonat</option>

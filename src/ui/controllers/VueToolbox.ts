@@ -1,24 +1,24 @@
 import Vue from 'vue';
-import { Store } from '../../structs/Interfaces/Store';
 import { InputController, InputMode } from './InputController';
 
 export class VueToolbox {
   private vm: any;
 
-  constructor(private store: Store, private inputController: InputController) {
+  constructor(private inputController: InputController) {
     const _this = this;
     this.vm = new Vue({
       el: '#button-holder',
       data: {
         selected: '',
         buttons: [],
-        wagon: 'wagon'
+        wagon: 'wagon',
+        show: false
       },
       methods: {
-        handleClick: function(event) {
+        handleClick: function (event) {
           _this.inputController.selectMode(event.target.id);
         },
-        handleWagonClick: function(event) {
+        handleWagonClick: function (event) {
           this.wagon = event.target.value;
         }
       }
@@ -35,5 +35,9 @@ export class VueToolbox {
 
   setSelected(mode: InputMode): void {
     this.vm.selected = mode;
+  }
+
+  setShow(show: boolean): void {
+    this.vm.show = show;
   }
 }

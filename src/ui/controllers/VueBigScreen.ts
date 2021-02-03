@@ -107,4 +107,11 @@ export class VueBigscreen {
       this.vmBigScreen.load();
     }
   }
+
+  setShow(show: boolean) {
+    this.vmBigScreen.show = show;
+    if (this.vmBigScreen.show) {
+      this.vmBigScreen.load();
+    }
+  }
 }

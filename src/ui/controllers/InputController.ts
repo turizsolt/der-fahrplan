@@ -32,6 +32,7 @@ import { VueToolbox } from './VueToolbox';
 import { Trip } from '../../structs/Scheduling/Trip';
 import { TickInputProps } from './TickInputProps';
 import { PassengerGenerator } from '../../structs/Actuals/PassengerGenerator';
+import { VueViewbox } from './VueViewbox';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -44,6 +45,7 @@ export enum InputMode {
 
 export class InputController {
   private mode: InputMode = InputMode.CAMERA;
+  private viewMode: string = 'terrain';
   private store: Store;
 
   private inputHandler: InputHandler;
@@ -54,6 +56,7 @@ export class InputController {
   private mouseButtons: boolean[] = [];
 
   private vueToolbox: VueToolbox;
+  private vueViewbox: VueViewbox;
   private vueBigScreen: VueBigscreen;
   private vueSidebar: VueSidebar;
 
@@ -70,7 +73,8 @@ export class InputController {
     this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
     this.vueSidebar = new VueSidebar(this.store);
     this.vueBigScreen = new VueBigscreen(this.store);
-    this.vueToolbox = new VueToolbox(this.store, this);
+    this.vueToolbox = new VueToolbox(this);
+    this.vueViewbox = new VueViewbox(this);
 
     this.inputHandlers = {
       [InputMode.CAMERA]: new CameraInputHandler(camera),
@@ -96,6 +100,11 @@ export class InputController {
     this.vueToolbox.setSelected(this.mode);
 
     this.inputHandler = this.inputHandlers[this.mode];
+
+    this.vueViewbox.addButton({ id: 'terrain', text: 'Terrain' });
+    this.vueViewbox.addButton({ id: 'schedule', text: 'Schedule' });
+    this.vueViewbox.addButton({ id: 'builder', text: 'Builder' });
+    this.vueViewbox.setSelected('terrain');
 
     this.downProps = null;
   }
@@ -321,6 +330,36 @@ export class InputController {
     this.vueToolbox.setSelected(mode);
   }
 
+  selectView(mode: string) {
+    this.viewMode = mode;
+    this.vueViewbox.setSelected(mode);
+
+    if (mode === 'schedule') {
+      this.selectMode(InputMode.SELECT);
+      this.vueBigScreen.setShow(true);
+    } else {
+      this.selectMode(InputMode.CAMERA);
+      this.vueBigScreen.setShow(false);
+
+      // copied from
+      if (this.getSelectedBrick() && this.getSelectedBrick().getType() === Symbol.for('Wagon')) {
+        this.vueSidebar.setData(
+          'opts',
+          this.store
+            .getAllOf<Trip>(TYPES.Trip)
+            .map(x => Object.freeze(x.persistDeep()))
+            .sort((a: any, b: any) => a.departureTime - b.departureTime)
+        );
+      }
+    }
+
+    if (mode === 'builder') {
+      this.vueToolbox.setShow(true);
+    } else {
+      this.vueToolbox.setShow(false);
+    }
+  }
+
   keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     switch (key) {
       case 'X':
@@ -369,21 +408,6 @@ export class InputController {
 
       case 'P':
         this.selectMode(InputMode.CREATE_PLATFORM);
-        break;
-
-      case '7':
-        this.vueBigScreen.toggleShow();
-
-        // copied from
-        if (this.getSelectedBrick() && this.getSelectedBrick().getType() === Symbol.for('Wagon')) {
-          this.vueSidebar.setData(
-            'opts',
-            this.store
-              .getAllOf<Trip>(TYPES.Trip)
-              .map(x => Object.freeze(x.persistDeep()))
-              .sort((a: any, b: any) => a.departureTime - b.departureTime)
-          );
-        }
         break;
 
       case '8':
