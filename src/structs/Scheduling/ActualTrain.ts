@@ -116,7 +116,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     newWagonsWithSides.map(x => {
       x.wagon.setTrain(newTrain);
       if (x.trip) {
-        newTrain.assignTrip(x.trip, []);
+        newTrain.assignTrip(x.trip, null);
       }
     });
 
