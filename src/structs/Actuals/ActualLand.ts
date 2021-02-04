@@ -40,6 +40,9 @@ export class ActualLand implements Land {
         if (levels[levelId].camera) {
           inputController.setCamera(levels[levelId].camera);
         }
+        if (levels[levelId].target_passenger) {
+          inputController.setTargetPassenger(levels[levelId].target_passenger);
+        }
       }, 1000);
 
     }

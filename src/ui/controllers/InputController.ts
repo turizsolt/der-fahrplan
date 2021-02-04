@@ -65,6 +65,8 @@ export class InputController {
   private originalTimeLimit: number = 12;
   private shortTimeLimit: number = 6;
 
+  private targetPassengerCount: number = 9999999;
+
   constructor(
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera,
@@ -107,6 +109,10 @@ export class InputController {
     this.vueViewbox.setSelected('terrain');
 
     this.downProps = null;
+  }
+
+  setTargetPassenger(count: number): void {
+    this.targetPassengerCount = count;
   }
 
   convert(event: PointerEvent): InputProps {
@@ -597,6 +603,11 @@ export class InputController {
     this.vueSidebar.setData('passengerCount', passengerStats.count);
     this.vueSidebar.setData('passengerArrivedCount', passengerStats.arrivedCount);
     this.vueSidebar.setData('passengerAverageArriveSpeed', Math.round(passengerStats.averageArriveSpeed * 100) / 100);
+
+    if (passengerStats.arrivedCount >= this.targetPassengerCount) {
+      alert('Nyertél! Elvittél ' + this.targetPassengerCount + ' utast.');
+      this.targetPassengerCount = 9999999;
+    }
 
     if (this.inputHandler.tick) {
       const ize: TickInputProps = {
