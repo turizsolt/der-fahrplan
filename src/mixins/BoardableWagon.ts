@@ -28,6 +28,10 @@ export class BoardableWagon extends ActualBoardable {
     };
   }
 
+  getPassengerCount(): number {
+    return this.seatColumns * this.seatCount;
+  }
+
   board(passenger: Passenger): Coordinate {
     if (this.passengerCount >= this.seatCount) {
       return null;

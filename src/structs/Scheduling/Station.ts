@@ -5,6 +5,9 @@ import { Route } from './Route';
 import { BaseBrick } from '../Interfaces/BaseBrick';
 import { Train } from './Train';
 import { Boardable } from '../../mixins/Boardable';
+import { Trip } from './Trip';
+import { TripInSchedule } from './TripInSchedule';
+import { ShortestPath } from './ShortestPath';
 
 export interface Station extends BaseBrick, Boardable {
   init(circle: Circle): Station;
@@ -21,7 +24,11 @@ export interface Station extends BaseBrick, Boardable {
   remove(): boolean;
   isRemoved(): boolean;
 
-  announceArrived(train: Train, platform: Platform, trip: Route);
+  announceArrived(train: Train, platform: Platform, trip: Trip);
   announce(trip: Route);
   deannounce(trip: Route);
+
+  addTripToSchedule(trip: Trip);
+  getScheduledTrips(): TripInSchedule[];
+  getShortestPath(to: Station): ShortestPath;
 }

@@ -13,4 +13,6 @@ export interface Route extends BaseStorable {
   remove(): void;
   setReverse(route: Route): void;
   getReverse(): Route;
+  getColor(): string;
+  setColor(color: string): void;
 }

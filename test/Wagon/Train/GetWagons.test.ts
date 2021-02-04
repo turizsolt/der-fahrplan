@@ -29,11 +29,11 @@ describe('Train - getWagons', () => {
 
     w1.getB().connect(w2.getA());
 
-    expect(store.get(t1.getId())).equals(undefined);
-    expect(store.get(t2.getId())).not.equals(undefined);
-    expect(t1.isRemoved()).equals(true);
-    expect(t2.isRemoved()).equals(false);
-    expect(hashed(t2.getWagons())).deep.equals(hashed([w1, w2]));
+    expect(store.get(t2.getId())).equals(undefined);
+    expect(store.get(t1.getId())).not.equals(undefined);
+    expect(t1.isRemoved()).equals(false);
+    expect(t2.isRemoved()).equals(true);
+    expect(hashed(t1.getWagons())).deep.equals(hashed([w1, w2]));
   });
 
   it('has more wagons', () => {

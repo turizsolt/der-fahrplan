@@ -14,6 +14,12 @@ import { Route } from './Route';
 import { Passenger } from '../Interfaces/Passenger';
 import { ActualBoardable } from '../../mixins/ActualBoardable';
 import { Train } from './Train';
+import { Trip } from './Trip';
+import { TripInSchedule } from './TripInSchedule';
+import { ShortestPath } from './ShortestPath';
+import { Util } from '../Util';
+import { _IDoNeedToBeInTheBuild } from 'babylonjs';
+const PriorityQueue = require("@darkblue_azurite/priority-queue");
 
 export class ActualStation extends ActualBaseBrick implements Station {
   private name: string;
@@ -25,6 +31,86 @@ export class ActualStation extends ActualBaseBrick implements Station {
   @inject(TYPES.StationRenderer) private renderer: StationRenderer;
 
   private announcedTrips: Route[] = [];
+
+  private scheduledTrips: TripInSchedule[] = [];
+  private scheduledShortestPathes: Record<string, ShortestPath> = {};
+
+  getScheduledTrips(): TripInSchedule[] {
+    return this.scheduledTrips;
+  }
+
+  addTripToSchedule(trip: Trip): void {
+    if (trip) {
+      const departureTime = trip.getStationDepartureTime(this);
+      this.scheduledTrips.push({
+        trip,
+        departureTime
+      });
+      this.scheduledTrips.sort((a, b) => (a.departureTime - b.departureTime));
+    }
+    this.findShortestPathToEveryStation();
+
+    this.callOnPassengers(p => {
+      p.listenStationAnnouncement(this);
+    });
+  }
+
+  findShortestPathToEveryStation(): void {
+    this.scheduledShortestPathes = {};
+    const pq = new PriorityQueue([], (a, b) => a.arrivalTime - b.arrivalTime);
+
+    this.scheduledTrips
+      .filter(t => t.trip.isStillInFuture(this))
+      .map(tripIS => {
+        const trip = tripIS.trip;
+        trip.getStationFollowingStops(this).map(stop => {
+          pq.enqueue({
+            initialDepartureTime: trip.getStationDepartureTime(this),
+            arrivalTime: stop.arrivalTime,
+            station: stop.station,
+            trip,
+            path: []
+          });
+        });
+      });
+
+    while (!pq.isEmpty()) {
+      const element: { initialDepartureTime: number, arrivalTime: number, station: Station, trip: Trip, path: any } = pq.dequeue();
+
+      if (!this.scheduledShortestPathes[element.station.getId()]) {
+        const newPath = element.path.concat([{ trip: element.trip, station: element.station }]);
+
+        this.scheduledShortestPathes[element.station.getId()] = {
+          station: element.station,
+          departureTime: element.initialDepartureTime,
+          path: newPath
+        }
+
+        element.station.getScheduledTrips()
+          .filter(t => t.trip.isStillInFuture(element.station) && element.arrivalTime < t.trip.getStationDepartureTime(element.station))
+          .map(tripIS => {
+            const trip = tripIS.trip;
+            trip.getStationFollowingStops(element.station).map(stop => {
+              pq.enqueue({
+                initialDepartureTime: element.initialDepartureTime,
+                arrivalTime: stop.arrivalTime,
+                station: stop.station,
+                trip,
+                path: newPath
+              });
+            });
+          });
+
+      }
+    }
+  }
+
+  getShortestPath(to: Station): ShortestPath {
+    return this.scheduledShortestPathes[to.getId()];
+  }
+
+  // end of neu
+
 
   private boardable: ActualBoardable = new ActualBoardable();
 
@@ -109,26 +195,33 @@ export class ActualStation extends ActualBaseBrick implements Station {
     return this.platformTo[station.getId()];
   }
 
-  announceArrived(train: Train, platform: Platform, trip: Route) {
+  announceArrived(train: Train, platform: Platform, trip: Trip) {
     this.callOnPassengers(p => {
-      p.listenStationArrivingAnnouncement(this, platform, train, trip);
+      p.listenStationArrivingAnnouncement(this, platform, train, trip.getRoute());
     });
+    trip.setStationServed(this);
     //this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
+
   }
 
   board(passenger: Passenger): Coordinate {
     this.boardable.board(passenger);
 
-    if (!this.circle) return null;
+    if (this.platforms.length === 0) {
+      if (!this.circle) return null;
 
-    const rand = Math.random() * Math.PI * 2 - Math.PI;
-    const dist = Math.random() * 5;
-    const offset = new Coordinate(
-      Math.sin(rand) * dist,
-      0,
-      Math.cos(rand) * dist
-    );
-    return this.circle.a.add(offset);
+      const rand = Math.random() * Math.PI * 2 - Math.PI;
+      const dist = Math.random() * 5;
+      const offset = new Coordinate(
+        Math.sin(rand) * dist,
+        0,
+        Math.cos(rand) * dist
+      );
+      return this.circle.a.add(offset);
+    }
+    else {
+      return this.platforms[0].pseudoBoard();
+    }
   }
 
   unboard(passenger: Passenger): void {
@@ -196,6 +289,35 @@ export class ActualStation extends ActualBaseBrick implements Station {
         z: this.circle.a.z,
         r: this.circle.r
       },
+      type: 'Station',
+      name: this.name
+    };
+  }
+
+  persistDeep(): Object {
+    return {
+      id: this.id,
+      type: 'Station',
+      name: this.name,
+      rgbColor: this.color.getRgbString(),
+      schedule: this.scheduledTrips.map((tripIS: TripInSchedule) => tripIS.trip.persistDeep()),
+      shortestPathes: Object.keys(this.scheduledShortestPathes).map(key => {
+        const path = this.scheduledShortestPathes[key];
+        return {
+          stationId: path.station.getId(),
+          stationName: path.station.getName(),
+          departureTime: path.departureTime,
+          departureTimeString: Util.timeToStr(path.departureTime),
+          firstTripName: (path.path.length > 0) ? path.path[0].trip.getRoute().getName() : '<Error>',
+          path: path.path.map(p => ({ trip: p.trip.persistDeep(), station: p.station.persistShallow() }))
+        }
+      })
+    };
+  }
+
+  persistFlat(): Object {
+    return {
+      id: this.id,
       type: 'Station',
       name: this.name
     };

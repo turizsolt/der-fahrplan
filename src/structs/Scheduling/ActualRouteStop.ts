@@ -4,6 +4,7 @@ import { RouteStop } from './RouteStop';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
 import { Platform } from '../Interfaces/Platform';
+import { Util } from '../Util';
 
 export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
   private station: Station;
@@ -45,12 +46,22 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     return this.departureTime;
   }
 
+  setArrivalTime(time: number): void {
+    this.arrivalTime = time;
+  }
+
+  setDepartureTime(time: number): void {
+    this.departureTime = time;
+  }
+
   persist(): Object {
     return {
       id: this.id,
       type: 'RouteStop',
       station: this.station.getId(),
-      platform: this.platform && this.platform.getId()
+      platform: this.platform && this.platform.getId(),
+      arrivalTime: this.arrivalTime,
+      departureTime: this.departureTime,
     };
   }
 
@@ -58,12 +69,18 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     return {
       id: this.id,
       type: 'RouteStop',
-      station: this.station.persistDeep(),
+      station: this.station.persistShallow(),
       stationName: this.getStationName(),
-      rgbColor: this.station.getColor().getRgbString(),
-      platform: this.platform && this.platform.getId()
+      stationRgbColor: this.station.getColor().getRgbString(),
+      platform: this.platform && this.platform.getId(),
+      arrivalTime: this.arrivalTime,
+      arrivalTimeString: Util.timeToStr(this.arrivalTime, true),
+      departureTime: this.departureTime,
+      departureTimeString: Util.timeToStr(this.departureTime, true)
     };
   }
+
+
 
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
@@ -71,5 +88,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       store.get(obj.station) as Station,
       obj.platform ? (store.get(obj.platform) as Platform) : undefined
     );
+    this.setArrivalTime(obj.arrivalTime);
+    this.setDepartureTime(obj.departureTime);
   }
 }

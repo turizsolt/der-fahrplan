@@ -16,7 +16,7 @@ export class CreateTrackInputHandler implements InputHandler {
 
   constructor() {
     this.fromMesh = BABYLON.MeshBuilder.CreateBox(
-      name,
+      'name',
       { height: 1.5, width: 1, depth: 2 },
       null
     );
@@ -24,7 +24,7 @@ export class CreateTrackInputHandler implements InputHandler {
     this.fromMesh.isPickable = false;
 
     this.toMesh = BABYLON.MeshBuilder.CreateBox(
-      name,
+      'name',
       { height: 1.5, width: 1, depth: 2 },
       null
     );

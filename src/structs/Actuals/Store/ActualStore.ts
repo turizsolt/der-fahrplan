@@ -75,6 +75,9 @@ export class ActualStore implements Store {
 
   create<T>(type: symbol): T {
     if (!this.factoryMethods[type]) return null;
+    if (type === Symbol.for('Passenger')) {
+      this.passengerCount++;
+    }
     return this.factoryMethods[type]() as T;
   }
 
@@ -149,6 +152,11 @@ export class ActualStore implements Store {
         brick.load(elem, this);
       }
     });
+
+    // to init schedules with a blank nothing
+    this.getAllOf(Symbol.for('Station')).map((station: Station) => {
+      station.addTripToSchedule(null);
+    })
   }
 
   private selected: BaseStorable = null;
@@ -188,5 +196,26 @@ export class ActualStore implements Store {
 
   getTickCount(): number {
     return this.tickCount;
+  }
+
+  private passengerCount: number = 0;
+  private passengerArrivedCount: number = 0;
+  private passengerCummulatedTime: number = 0;
+  private passengerCummulatedDistance: number = 0;
+  private passengerAverageArriveSpeed: number = -1;
+
+  addArrivedPassengerStats(stats: { time: number, distance: number }): void {
+    this.passengerArrivedCount++;
+    this.passengerCummulatedDistance += stats.distance;
+    this.passengerCummulatedTime += stats.time;
+    this.passengerAverageArriveSpeed = this.passengerCummulatedDistance / this.passengerCummulatedTime;
+  }
+
+  getPassengerStats(): any {
+    return {
+      count: this.passengerCount,
+      arrivedCount: this.passengerArrivedCount,
+      averageArriveSpeed: this.passengerAverageArriveSpeed
+    }
   }
 }

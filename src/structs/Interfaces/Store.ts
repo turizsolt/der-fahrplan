@@ -21,4 +21,7 @@ export interface Store {
   setTickSpeed(speed: number): void;
   getTickSpeed(): number;
   getTickCount(): number;
+
+  addArrivedPassengerStats(stats: { time: number, distance: number }): void;
+  getPassengerStats(): any;
 }

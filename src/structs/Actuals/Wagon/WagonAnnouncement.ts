@@ -1,49 +1,37 @@
 import { injectable } from 'inversify';
-import { PositionOnTrack } from '../Track/PositionOnTrack';
-import { WhichEnd } from '../../Interfaces/WhichEnd';
-import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
-import { Ray } from '../../Geometry/Ray';
-import { TrackBase } from '../../Interfaces/TrackBase';
-import { LineSegment } from '../../Geometry/LineSegment';
-import { TrackWorm } from '../Track/TrackWorm';
-import { WagonEnd } from './WagonEnd';
-import { Coordinate } from '../../Geometry/Coordinate';
-import { Route } from '../../Scheduling/Route';
+import { Wagon } from '../../Interfaces/Wagon';
 import { Train } from '../../Scheduling/Train';
 import { TYPES } from '../../../di/TYPES';
 import { Store } from '../../Interfaces/Store';
 import { Platform } from '../../Interfaces/Platform';
+import { Trip } from '../../Scheduling/Trip';
 
 @injectable()
 export class WagonAnnouncement {
-  protected trip: Route;
+  protected trip: Trip;
   protected train: Train;
 
   constructor(private parent: Wagon, private store: Store) {
     this.train = this.store.create<Train>(TYPES.Train).init(this.parent);
   }
 
-  assignTrip(route: Route): void {
-    const oldTrip = this.getTrip();
-    if (oldTrip) {
-      for (let stop of oldTrip.getStops()) {
-        stop.getStation().deannounce(oldTrip);
-      }
-    }
-    this.trip = route;
-    if (route) {
-      this.train.setSchedulingWagon(this.parent);
-    }
-    const newTrip = this.getTrip();
-    if (newTrip) {
-      for (let stop of newTrip.getStops()) {
-        stop.getStation().announce(newTrip);
-      }
-    }
+  assignTrip(trip: Trip): void {
+    this.train.assignTrip(trip, [this.parent]);
   }
 
   cancelTrip(): void {
-    this.train.cancelTrip();
+    this.train.assignTrip(null, [this.parent]);
+  }
+
+  setTrip(trip: Trip) {
+    this.trip = trip;
+  }
+
+  getTrip(): Trip {
+    const wagonWithTrip = this.train
+      .getWagonsWithSides()
+      .find(x => x.wagon === this.parent);
+    return wagonWithTrip?.trip;
   }
 
   getTrain(): Train {
@@ -58,15 +46,13 @@ export class WagonAnnouncement {
     }
   }
 
-  getTrip(): Route {
-    if (this.trip) return this.trip;
-    if (this.getTrain().getSchedulingWagon() !== this.parent)
-      return this.getTrain().getTrip();
-    return null;
-  }
-
   stop(): void {
     // todo use the worm
+    const platformsInvolved: Platform[] = this.platformsBeside();
+    platformsInvolved.map(p => this.stoppedAt(p));
+  }
+
+  platformsBeside(): Platform[] {
     const platformsInvolved: Platform[] = [];
     const trackA = this.parent.getA().positionOnTrack.getTrack();
     platformsInvolved.push(
@@ -83,8 +69,7 @@ export class WagonAnnouncement {
           platformsInvolved.push(p);
         }
       });
-
-    platformsInvolved.map(p => this.stoppedAt(p));
+    return platformsInvolved;
   }
 
   stoppedAt(platform: Platform): void {
@@ -99,7 +84,7 @@ export class WagonAnnouncement {
           station,
           platform,
           this.train,
-          this.trip
+          this.trip.getRoute()
         );
       }
     });
