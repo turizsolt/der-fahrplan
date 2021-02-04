@@ -43,6 +43,8 @@ export class VueBigscreen {
           const route = _this.store.create<Route>(TYPES.Route);
           route.init();
           this.load();
+          const routeData = this.routes.find(x => x.id === route.getId());
+          this.selectRoute(routeData);
         },
         createReverseRoute: function (vRouteFrom) {
           const routeFrom = _this.store.get(vRouteFrom.id) as Route;
@@ -55,6 +57,8 @@ export class VueBigscreen {
             route.addStop(stop);
           }
           this.load();
+          const routeData = this.routes.find(x => x.id === route.getId());
+          this.selectRoute(routeData);
         },
         selectRoute: function (route) {
           this.selectedRoute = route;
