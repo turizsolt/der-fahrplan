@@ -1,3 +1,5 @@
+import { InputController } from "../../ui/controllers/InputController";
+
 export interface Land {
-  init(): void;
+  init(inputController: InputController): void;
 }

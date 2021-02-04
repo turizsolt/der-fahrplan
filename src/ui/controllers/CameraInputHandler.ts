@@ -27,7 +27,7 @@ export class CameraInputHandler implements InputHandler {
     this.mesh.isPickable = false;
   }
 
-  private panLock: boolean = false;
+  private panLock: boolean = true;
 
   setPanLock() {
     this.panLock = !this.panLock;
