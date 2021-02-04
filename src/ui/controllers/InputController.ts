@@ -457,6 +457,15 @@ export class InputController {
         download(JSON.stringify(data), fileName, 'application/json');
         break;
 
+      case ' ':
+        if (this.store.getTickSpeed() === 0) {
+          this.store.setTickSpeed(1);
+        } else {
+          this.store.setTickSpeed(0);
+        }
+        break;
+
+
       case '`':
       case '0':
         this.store.setTickSpeed(0);

@@ -21,6 +21,13 @@
             touch-action: none;
         }
 
+        #renderCanvas.stopped {
+            width: calc(100% - 10px);
+            height: calc(100% - 10px);
+            touch-action: none;
+            border: 5px solid red;
+        }
+
         #button-holder {
             position: fixed;
             right: 100px;
@@ -348,7 +355,7 @@
             </div>
         </div>
     </div>
-    <canvas id="renderCanvas">
+    <canvas id="renderCanvas" class="stopped">
     </canvas>
     <script>
 
