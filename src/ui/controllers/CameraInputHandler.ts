@@ -6,26 +6,8 @@ import { TickInputProps } from './TickInputProps';
 
 export class CameraInputHandler implements InputHandler {
   private mouseButton: boolean[] = [];
-  private lastProps: InputProps;
-  private mesh: BABYLON.AbstractMesh;
 
-  constructor(private camera: BABYLON.ArcRotateCamera) {
-    this.mesh = BABYLON.MeshBuilder.CreateCylinder(
-      'placeholder-1',
-      {
-        diameter: 3,
-        tessellation: 24,
-        height: 2,
-        updatable: true
-      },
-      null
-    );
-    const mat = new BABYLON.StandardMaterial('boxMat', null);
-    mat.diffuseColor = new BABYLON.Color3(1, 1, 0);
-    this.mesh.material = mat;
-    this.mesh.setEnabled(false);
-    this.mesh.isPickable = false;
-  }
+  constructor(private camera: BABYLON.ArcRotateCamera) { }
 
   private panLock: boolean = true;
 
@@ -35,10 +17,6 @@ export class CameraInputHandler implements InputHandler {
 
   down(props: InputProps, event: PointerEvent): void {
     this.mouseButton[event.button] = true;
-    this.lastProps = props;
-
-    this.mesh.setEnabled(true);
-    this.mesh.position = new Vector3(props.targetX, 0, props.targetZ);
   }
 
   roam(props: InputProps, event: PointerEvent): void { }
@@ -114,12 +92,7 @@ export class CameraInputHandler implements InputHandler {
 
   click(downProps: InputProps, event: PointerEvent): void { }
 
-  up(downProps: InputProps, props: InputProps, event: PointerEvent): void {
-    this.mouseButton[event.button] = false;
-    this.mesh.setEnabled(false);
-  }
+  up(downProps: InputProps, props: InputProps, event: PointerEvent): void { }
 
-  cancel(): void {
-    this.mesh.setEnabled(false);
-  }
+  cancel(): void { }
 }

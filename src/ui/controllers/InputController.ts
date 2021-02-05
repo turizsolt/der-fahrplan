@@ -201,7 +201,7 @@ export class InputController {
 
   move(event: PointerEvent) {
     const now = (new Date()).getTime();
-    if (now - this.downAt < 100) return;
+    if (now - this.downAt < 500) return;
 
     const props = this.convert(event);
     if (this.downProps) {
@@ -218,9 +218,11 @@ export class InputController {
     const now = (new Date()).getTime();
 
     if (
-      this.downProps.point && (now - this.downAt < 100 ||
-        (props.point &&
-          this.downProps.point.coord.equalsTo(props.point.coord)))
+      //this.downProps.point && (
+      now - this.downAt < 500
+      // ||
+      //(props.point &&
+      //  this.downProps.point.coord.equalsTo(props.point.coord)))
     ) {
       let ready = this.selectIfPossible(event);
       if (ready) {
