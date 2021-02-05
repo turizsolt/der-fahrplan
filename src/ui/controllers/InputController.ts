@@ -33,6 +33,7 @@ import { Trip } from '../../structs/Scheduling/Trip';
 import { TickInputProps } from './TickInputProps';
 import { PassengerGenerator } from '../../structs/Actuals/PassengerGenerator';
 import { VueViewbox } from './VueViewbox';
+import { Train } from '../../structs/Scheduling/Train';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -377,6 +378,28 @@ export class InputController {
 
       case 'ScrollLock':
         this.inputHandlers.CAMERA.setPanLock();
+        break;
+
+      case 'PageUp':
+        {
+          const list = this.store.getAllOf<Train>(Symbol.for('Train'));
+          const wagon = this.getSelectedBrick()?.getType() === Symbol.for('Wagon') ? (this.getSelectedBrick() as Wagon) : null;
+          const pivot = wagon?.getTrain()?.getId();
+          const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
+          const newIndex = (index + 1) % list.length;
+          this.select(list[newIndex].getLastControlingWagon());
+        }
+        break;
+
+      case 'PageDown':
+        {
+          const list = this.store.getAllOf<Train>(Symbol.for('Train'));
+          const wagon = this.getSelectedBrick()?.getType() === Symbol.for('Wagon') ? (this.getSelectedBrick() as Wagon) : null;
+          const pivot = wagon?.getTrain()?.getId();
+          const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
+          const newIndex = (index - 1) < 0 ? list.length + index - 1 : index - 1;
+          this.select(list[newIndex].getLastControlingWagon());
+        }
         break;
     }
 
