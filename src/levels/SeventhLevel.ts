@@ -483,16 +483,6 @@ export const SEVENTH_LEVEL = {
             "train": "Fel7F8*wz9"
         },
         {
-            "id": "8fERfH7Du",
-            "type": "Train",
-            "wagons": [
-                {
-                    "side": "A",
-                    "wagon": "7tfbSyy8B"
-                }
-            ]
-        },
-        {
             "id": "NzLG6cPeh",
             "type": "Wagon",
             "seatCount": 21,
@@ -540,16 +530,6 @@ export const SEVENTH_LEVEL = {
             "train": "Ek*xWa_ND"
         },
         {
-            "id": "VeYcH2Dk5d",
-            "type": "Train",
-            "wagons": [
-                {
-                    "side": "A",
-                    "wagon": "NzLG6cPeh"
-                }
-            ]
-        },
-        {
             "id": "*T4TwY8BK",
             "type": "Wagon",
             "seatCount": 21,
@@ -595,46 +575,6 @@ export const SEVENTH_LEVEL = {
                 "otherEnd": false
             },
             "train": "hnzMV89PjL"
-        },
-        {
-            "id": "awlVtlA4r_",
-            "type": "Train",
-            "wagons": [
-                {
-                    "side": "A",
-                    "wagon": "*T4TwY8BK"
-                }
-            ]
-        },
-        {
-            "id": "hnzMV89PjL",
-            "type": "Train",
-            "wagons": [
-                {
-                    "side": "A",
-                    "wagon": "*T4TwY8BK"
-                }
-            ]
-        },
-        {
-            "id": "Ek*xWa_ND",
-            "type": "Train",
-            "wagons": [
-                {
-                    "side": "A",
-                    "wagon": "NzLG6cPeh"
-                }
-            ]
-        },
-        {
-            "id": "Fel7F8*wz9",
-            "type": "Train",
-            "wagons": [
-                {
-                    "side": "A",
-                    "wagon": "7tfbSyy8B"
-                }
-            ]
         },
         {
             "id": "q_rdexGd8",
