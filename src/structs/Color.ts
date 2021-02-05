@@ -25,7 +25,6 @@ export class Color {
   static CreateRandom(): Color {
     const color = new Color(this.colors[this.nextIndex].r / 255, this.colors[this.nextIndex].g / 255, this.colors[this.nextIndex].b / 255);
     this.nextIndex = (this.nextIndex + 1) % 16;
-    console.log(this.nextIndex);
     return color;
     // return new Color(Math.random(), Math.random(), Math.random());
   }
