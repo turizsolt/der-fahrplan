@@ -16,6 +16,7 @@ import { RouteStop } from '../Scheduling/RouteStop';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
+  private history: Station[] = [];
   private to: Station;
   private from: Station;
   private nextStation: Station;
@@ -122,8 +123,11 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
   }
 
   private setNextOnPath() {
+    this.history.push(this.from);
+    this.from = this.nextStation;
+
     this.nextIdx++;
-    if (this.path && this.path.path && this.path.path[this.nextIdx]) {
+    if (this?.path?.path?.[this.nextIdx]) {
       this.nextStation = this.path.path[this.nextIdx].station;
     }
   }
@@ -203,7 +207,8 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
       toName: this.to.getName(),
       hasPath: !!this.path,
       nextName: this.nextStation && this.nextStation.getName(),
-      via: (this.path && this.path.path.length > 1) ? this.path.path.slice(0, -1).map(x => x.station.getName()).join('/') : '-'
+      via: (this.path && this.path.path.length > 1) ? this.path.path.slice(0, -1).map(x => x.station.getName()).join('/') : '-',
+      past: this.history.length > 0 ? this.history.map(x => x.getName()).join('/') : '-'
     };
   }
 
