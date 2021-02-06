@@ -38,6 +38,10 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
   board(passenger: Passenger): Coordinate {
     this.boardable.board(passenger);
 
+    return this.pseudoBoard();
+  }
+
+  pseudoBoard(): Coordinate {
     if (!this.position) return null;
 
     const chain = this.getLineSegmentChain();

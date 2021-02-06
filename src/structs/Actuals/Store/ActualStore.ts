@@ -13,6 +13,7 @@ import { Store } from '../../Interfaces/Store';
 import { Wagon } from '../../Interfaces/Wagon';
 import { Passenger } from '../../Interfaces/Passenger';
 import { Train } from '../../Scheduling/Train';
+import { Trip } from '../../Scheduling/Trip';
 
 @injectable()
 export class ActualStore implements Store {
@@ -23,6 +24,7 @@ export class ActualStore implements Store {
 
   @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
   @inject(TYPES.FactoryOfRouteStop) private RouteStopFactory: () => RouteStop;
+  @inject(TYPES.FactoryOfTrip) private TripFactory: () => Trip;
   @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
   @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
 
@@ -40,6 +42,7 @@ export class ActualStore implements Store {
     this.typedElements = {};
     this.factoryMethods = {
       [TYPES.Route]: this.RouteFactory,
+      [TYPES.Trip]: this.TripFactory,
       [TYPES.RouteStop]: this.RouteStopFactory,
       [TYPES.Station]: this.StationFactory,
       [TYPES.Passenger]: this.PassengerFactory,
@@ -54,6 +57,7 @@ export class ActualStore implements Store {
       [TYPES.Station]: 12,
       [TYPES.RouteStop]: 11,
       [TYPES.Route]: 10,
+      [TYPES.Trip]: 8,
       [TYPES.Track]: 4,
       [TYPES.TrackSwitch]: 3,
       [TYPES.TrackJoint]: 2,
@@ -71,11 +75,15 @@ export class ActualStore implements Store {
 
   create<T>(type: symbol): T {
     if (!this.factoryMethods[type]) return null;
+    if (type === Symbol.for('Passenger')) {
+      this.passengerCount++;
+    }
     return this.factoryMethods[type]() as T;
   }
 
   clear() {
     this.elements = {};
+    this.typedElements = {};
   }
 
   register(object: BaseStorable, presetId: string = null): string {
@@ -144,6 +152,11 @@ export class ActualStore implements Store {
         brick.load(elem, this);
       }
     });
+
+    // to init schedules with a blank nothing
+    this.getAllOf(Symbol.for('Station')).map((station: Station) => {
+      station.addTripToSchedule(null);
+    })
   }
 
   private selected: BaseStorable = null;
@@ -162,5 +175,53 @@ export class ActualStore implements Store {
 
   getSelected(): BaseStorable {
     return this.selected;
+  }
+
+  private tickSpeed: number = 0;
+  private tickCount: number = 0;
+
+  tick(): void {
+    if (this.tickSpeed) {
+      this.tickCount += this.tickSpeed;
+    }
+  }
+
+  setTickSpeed(speed: number): void {
+    this.tickSpeed = speed;
+    // todo this is not the right place for this
+    if (speed === 0) {
+      document.getElementById('canvasBorder').classList.add('stopped');
+    } else {
+      document.getElementById('canvasBorder').classList.remove('stopped');
+    }
+  }
+
+  getTickSpeed(): number {
+    return this.tickSpeed;
+  }
+
+  getTickCount(): number {
+    return this.tickCount;
+  }
+
+  private passengerCount: number = 0;
+  private passengerArrivedCount: number = 0;
+  private passengerCummulatedTime: number = 0;
+  private passengerCummulatedDistance: number = 0;
+  private passengerAverageArriveSpeed: number = -1;
+
+  addArrivedPassengerStats(stats: { time: number, distance: number }): void {
+    this.passengerArrivedCount++;
+    this.passengerCummulatedDistance += stats.distance;
+    this.passengerCummulatedTime += stats.time;
+    this.passengerAverageArriveSpeed = this.passengerCummulatedDistance / this.passengerCummulatedTime;
+  }
+
+  getPassengerStats(): any {
+    return {
+      count: this.passengerCount,
+      arrivedCount: this.passengerArrivedCount,
+      averageArriveSpeed: this.passengerAverageArriveSpeed
+    }
   }
 }

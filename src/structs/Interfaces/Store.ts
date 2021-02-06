@@ -16,4 +16,12 @@ export interface Store {
   setSelected(selected: BaseStorable): void;
   getSelected(): BaseStorable;
   clearSelected(): void;
+
+  tick(): void;
+  setTickSpeed(speed: number): void;
+  getTickSpeed(): number;
+  getTickCount(): number;
+
+  addArrivedPassengerStats(stats: { time: number, distance: number }): void;
+  getPassengerStats(): any;
 }

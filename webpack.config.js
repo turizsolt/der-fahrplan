@@ -9,6 +9,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 // output folder location
 const distFolder = './build';
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = {
   mode: 'development',
@@ -20,7 +21,10 @@ module.exports = {
       filename: 'game.html'
     }),
     new CopyWebpackPlugin([{ from: 'src/assets', to: 'assets' }]),
-    new CopyWebpackPlugin([{ from: 'src/html/*.html', to: '.', flatten: true }])
+    new CopyWebpackPlugin([
+      { from: 'src/html/*.*', to: '.', flatten: true }
+    ]),
+    new VueLoaderPlugin()
   ],
   devtool: 'inline-source-map',
   devServer: {
@@ -32,9 +36,20 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.vue$/,
+        loader: 'vue-loader'
+      },
+      {
         test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              appendTsSuffixTo: [/\.vue$/]
+            }
+          }
+        ]
       },
       {
         test: /\.css$/,
@@ -54,7 +69,10 @@ module.exports = {
     }
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js', '.vue'],
+    alias: {
+      vue$: 'vue/dist/vue.esm.js'
+    }
   },
   output: {
     filename: '[name].bundle.js',

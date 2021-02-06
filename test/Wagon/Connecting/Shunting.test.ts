@@ -33,8 +33,6 @@ describe('WagonShunting', () => {
   pass4.putOnTrack(track, 0.55);
   loco5.putOnTrack(track, 0.7);
 
-  console.log(cont1);
-
   step('initial config', () => {
     expect(perc(cont1.getA())).almost(0.1);
     expect(perc(cont1.getB())).almost(0.24);

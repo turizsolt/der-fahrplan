@@ -11,7 +11,7 @@ export default class WagonSpeed {
     private wagon: Wagon,
     private maxSpeed: number = 3,
     private accelerateBy: number = 0.25
-  ) {}
+  ) { }
 
   halt(): void {
     this.speed = 0;
@@ -33,8 +33,13 @@ export default class WagonSpeed {
 
   accelerate(): void {
     if (this.canAccelerate() && this.speed < this.maxSpeed) {
+      if (this.speed === 0) {
+        // todo these seems duplicate entries for the same purpose
+        this.wagon.getTrain().setMovingness(true);
+        this.wagon.setControlingWagon(this.wagon);
+      }
+
       this.speed += this.accelerateBy;
-      this.wagon.setControlingWagon(this.wagon);
     }
   }
 
@@ -43,6 +48,7 @@ export default class WagonSpeed {
       this.speed -= this.accelerateBy;
     } else {
       this.speed = 0;
+      this.wagon.getTrain().setMovingness(false);
       this.wagon.clearControlingWagon();
     }
     this.shunting = false;
@@ -50,6 +56,11 @@ export default class WagonSpeed {
 
   shountForward(): void {
     if (this.canShunt()) {
+      if (this.speed === 0) {
+        this.wagon.getTrain().setMovingness(true);
+        this.wagon.setControlingWagon(this.wagon);
+      }
+
       this.speed = this.accelerateBy;
       this.shunting = true;
     }
@@ -57,6 +68,11 @@ export default class WagonSpeed {
 
   shountBackward(): void {
     if (this.canShunt()) {
+      if (this.speed === 0) {
+        this.wagon.getTrain().setMovingness(true);
+        this.wagon.setControlingWagon(this.wagon);
+      }
+
       this.speed = -this.accelerateBy;
       this.shunting = true;
     }
@@ -99,7 +115,7 @@ export default class WagonSpeed {
     return this.shunting
       ? WagonMovingState.Shunting
       : this.speed > 0
-      ? WagonMovingState.Moving
-      : WagonMovingState.Standing;
+        ? WagonMovingState.Moving
+        : WagonMovingState.Standing;
   }
 }

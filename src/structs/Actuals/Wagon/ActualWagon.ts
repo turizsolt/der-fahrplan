@@ -18,7 +18,6 @@ import { Updatable } from '../../../mixins/Updatable';
 import { applyMixins } from '../../../mixins/ApplyMixins';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { Train } from '../../Scheduling/Train';
-import { Trip } from '../../Scheduling/Trip';
 import { WagonPosition } from './WagonPosition';
 import {
   BoardableWagon,
@@ -35,8 +34,9 @@ import { WagonControlControlCar } from './WagonControl/WagonControlControlCar';
 import { WagonControlNothing } from './WagonControl/WagonControlNothing';
 import WagonSpeedPassenger from './WagonSpeedPassenger';
 import { WagonMovingState } from './WagonMovingState';
+import { Trip } from '../../Scheduling/Trip';
 
-export interface ActualWagon extends Updatable {}
+export interface ActualWagon extends Updatable { }
 const doApply = () => applyMixins(ActualWagon, [Updatable]);
 @injectable()
 export class ActualWagon extends ActualBaseBrick implements Wagon {
@@ -146,13 +146,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return !controlingWagon || controlingWagon === this;
   }
 
-  reverseTrip(): void {
-    const trip = this.getTrip();
-    if (trip && trip.getReverse()) {
-      this.assignTrip(trip.getReverse());
-    }
-  }
-
   getSpeed(): number {
     return this.speed.getSpeed();
   }
@@ -222,6 +215,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.boardable.getPassengerArrangement();
   }
 
+  getPassengerCount(): number {
+    return this.boardable.getPassengerCount();
+  }
+
   getAppearanceId(): string {
     return this.appearanceId;
   }
@@ -253,7 +250,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.renderer.update();
 
     const deep = this.persistDeep();
-    this.notify(deep);
+    this.notify(Object.freeze(deep));
   }
 
   ///////////////////////////
@@ -268,16 +265,20 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.announcement.setTrain(train);
   }
 
-  assignTrip(route: Route): void {
-    this.announcement.assignTrip(route);
+  assignTrip(trip: Trip): void {
+    this.announcement.assignTrip(trip);
     this.update();
+  }
+
+  setTrip(trip: Trip): void {
+    this.announcement.setTrip(trip);
   }
 
   cancelTrip(): void {
     this.announcement.cancelTrip();
   }
 
-  getTrip(): Route {
+  getTrip(): Trip {
     return this.announcement.getTrip();
   }
 
@@ -291,6 +292,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   announceStoppedAt(platform: Platform): void {
     this.announcement.announceStoppedAt(platform);
+  }
+
+  platformsBeside(): Platform[] {
+    return this.announcement.platformsBeside();
   }
 
   ///////////////////////////
@@ -462,8 +467,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       id: this.id,
       type: 'Wagon',
       speed: this.getSpeed(),
-
-      trip: this.getTrip() && this.getTrip().persistDeep()
+      train: this.getTrain().persistDeep(),
+      trip: this.getTrip()?.persistDeep()
     };
   }
 
@@ -485,7 +490,9 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       this.worm = new TrackWorm([track, bTrack], this);
     }
 
-    if (obj.trip) this.assignTrip(store.get(obj.trip) as Trip);
+    if (obj.trip) {
+      this.assignTrip(store.get(obj.trip) as Trip);
+    }
 
     this.renderer.init(this);
   }

@@ -15,6 +15,7 @@ export class WagonControlControlCar extends WagonControlLocomotive {
         this.selectedSide = null;
       }
     }
+    this.wagon.update();
   }
 
   swapSelectedSide(): void {

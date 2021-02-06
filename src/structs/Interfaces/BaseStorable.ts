@@ -6,6 +6,7 @@ export interface BaseStorable extends Selectable {
   getType(): symbol;
   persist(): Object;
   persistDeep(): Object;
+  persistShallow(): Object;
   load(obj: Object, store: Store): void;
   presetId(id: string): void;
 }

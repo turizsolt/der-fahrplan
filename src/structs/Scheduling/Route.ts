@@ -6,11 +6,13 @@ export interface Route extends BaseStorable {
   getName(): string;
   getDetailedName(): string;
   setName(name: string): void;
-  getStops(): any[];
+  getStops(): RouteStop[];
   addStop(stop: RouteStop): void;
   removeStop(stop: RouteStop): void;
   swapStopWithPrev(stop: RouteStop): void;
   remove(): void;
   setReverse(route: Route): void;
   getReverse(): Route;
+  getColor(): string;
+  setColor(color: string): void;
 }

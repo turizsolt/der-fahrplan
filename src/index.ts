@@ -6,6 +6,7 @@ import { TYPES } from './di/TYPES';
 import { GridDrawer } from './ui/controllers/GridDrawer';
 import { InputController } from './ui/controllers/InputController';
 import { MeshProvider } from './ui/babylon/MeshProvider';
+import { PassengerGenerator } from './structs/Actuals/PassengerGenerator';
 
 window.addEventListener('DOMContentLoaded', () => {
   const canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
@@ -39,8 +40,6 @@ window.addEventListener('DOMContentLoaded', () => {
     );
 
     (window as any).switches = [];
-    const land = productionContainer.get<Land>(TYPES.Land);
-    land.init();
 
     const gridDrawer = new GridDrawer();
     gridDrawer.setScene(scene);
@@ -99,7 +98,12 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   const { scene, camera } = createScene();
 
-  const inputController = new InputController(scene, camera);
+  const passengerGenerator = productionContainer.get<PassengerGenerator>(TYPES.PassengerGenerator);
+  passengerGenerator.init();
+
+  const inputController = new InputController(scene, camera, passengerGenerator);
+  const land = productionContainer.get<Land>(TYPES.Land);
+  land.init(inputController);
 
   renderEngine.runRenderLoop(() => {
     scene.render();
@@ -125,15 +129,15 @@ window.addEventListener('DOMContentLoaded', () => {
     inputController.move(e);
   });
 
-  canvas.addEventListener('pointerenter', () => {});
+  canvas.addEventListener('pointerenter', () => { });
 
   canvas.addEventListener('pointerleave', e => {
     inputController.up(e);
   });
 
-  canvas.addEventListener('focus', () => {});
+  canvas.addEventListener('focus', () => { });
 
-  canvas.addEventListener('blur', () => {});
+  canvas.addEventListener('blur', () => { });
 
   window.addEventListener('wheel', e => {
     inputController.wheel(e);
@@ -145,7 +149,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   document.addEventListener(
     'dragover',
-    function(event) {
+    function (event) {
       event.preventDefault();
     },
     false
@@ -153,7 +157,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener(
     'drop',
-    function(event) {
+    function (event) {
       // cancel default actions
       event.preventDefault();
 
@@ -163,7 +167,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
       for (; i < len; i++) {
         var reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = function (event) {
           var contents = (event.target as any).result;
 
           try {
@@ -172,12 +176,15 @@ window.addEventListener('DOMContentLoaded', () => {
             if (!obj._version) throw new Error();
             if (!obj._format || obj._format !== 'fahrplan') throw new Error();
             inputController.load(obj.data);
+            if (obj.camera) {
+              inputController.setCamera(obj.camera);
+            }
           } catch {
             console.error('Not proper JSON, hey!');
           }
         };
 
-        reader.onerror = function(event) {
+        reader.onerror = function (event) {
           console.error(
             'File could not be read! Code ' + (event.target as any).error.code
           );

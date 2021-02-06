@@ -20,17 +20,13 @@ describe('Wagon moving', () => {
     const wagon = WagonFactory().init(getPredefinedWagonConfig('wagon'));
     wagon.putOnTrack(track, 0.5, 1);
 
-    console.log(wagon.getRay().coord.x, wagon.getSpeed());
     wagon.select();
     wagon.accelerate();
     wagon.tick();
-    console.log(wagon.getRay().coord.x, wagon.getSpeed());
     wagon.accelerate();
     wagon.tick();
-    console.log(wagon.getRay().coord.x, wagon.getSpeed());
     wagon.accelerate();
     wagon.tick();
-    console.log(wagon.getRay().coord.x, wagon.getSpeed());
 
     expect(wagon.getRay().coord.x).almost.equals(5.5);
   });

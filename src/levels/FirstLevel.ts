@@ -1,130 +1,188 @@
 export const FIRST_LEVEL = {
-  data: [
-    {
-      id: 'nlqnQxayP',
-      type: 'TrackJoint',
-      ray: { x: -10, y: 0, z: 5, dirXZ: 0 },
-      A: null,
-      B: { track: 'I*_HisyxV_', whichEnd: 'B' }
-    },
-    {
-      id: 'x_V6aidT53',
-      type: 'TrackJoint',
-      ray: { x: -10, y: 0, z: 75, dirXZ: 0 },
-      A: { track: 'I*_HisyxV_', whichEnd: 'A' },
-      B: null
-    },
-    {
-      id: 'I*_HisyxV_',
-      type: 'Track',
-      segment: [{ x: -10, y: 0, z: 75 }, { x: -10, y: 0, z: 5 }]
-    },
-    {
-      id: 'W23_0EtKL',
-      circle: { x: -15, y: 0, z: 20, r: 15 },
-      type: 'Station',
-      name: 'Aelcoast'
-    },
-    {
-      id: '*ap0xjNun',
-      circle: { x: -15, y: 0, z: 60, r: 15 },
-      type: 'Station',
-      name: 'Oakbarrow'
-    },
-    {
-      id: 'Mglj_usJe',
-      type: 'Platform',
-      track: 'I*_HisyxV_',
-      start: 0.625,
-      end: 0.875,
-      side: 'Right',
-      width: 7.5
-    },
-    {
-      id: 'XRByNvr43',
-      type: 'Platform',
-      track: 'I*_HisyxV_',
-      start: 0.125,
-      end: 0.375,
-      side: 'Right',
-      width: 7.5
-    },
-    {
-      id: 'A2nPdwsy8',
-      type: 'Wagon',
-      seatCount: 21,
-      seatColumns: 3,
-      seats: [],
-      A: {
-        whichEnd: 'A',
-        endOf: 'A2nPdwsy8',
-        positionOnTrack: {
-          track: 'I*_HisyxV_',
-          position: 45,
-          percentage: 0.6428571428571429,
-          direction: 1
+    "data": [
+        {
+            "id": "rOHwT3GaP",
+            "type": "TrackJoint",
+            "ray": {
+                "x": 0,
+                "y": 0,
+                "z": -90,
+                "dirXZ": 0
+            },
+            "A": null,
+            "B": {
+                "track": "XNLZQqohCJ",
+                "whichEnd": "B"
+            }
         },
-        otherEnd: false
-      },
-      B: {
-        whichEnd: 'B',
-        endOf: 'A2nPdwsy8',
-        positionOnTrack: {
-          track: 'I*_HisyxV_',
-          position: 59,
-          percentage: 0.8428571428571429,
-          direction: 1
+        {
+            "id": "L8uiyZu3Bg",
+            "type": "TrackJoint",
+            "ray": {
+                "x": 0,
+                "y": 0,
+                "z": 90,
+                "dirXZ": 0
+            },
+            "A": {
+                "track": "XNLZQqohCJ",
+                "whichEnd": "A"
+            },
+            "B": null
         },
-        otherEnd: false
-      },
-      trip: null,
-      train: 'RRaeHFfiMH'
+        {
+            "id": "XNLZQqohCJ",
+            "type": "Track",
+            "segment": [
+                {
+                    "x": 0,
+                    "y": 0,
+                    "z": 90
+                },
+                {
+                    "x": 0,
+                    "y": 0,
+                    "z": -90
+                }
+            ]
+        },
+        {
+            "id": "7fvUb1erL",
+            "type": "Platform",
+            "track": "XNLZQqohCJ",
+            "start": 0.875,
+            "end": 1,
+            "side": "Right",
+            "width": 7.5
+        },
+        {
+            "id": "IZDHoLy2u",
+            "type": "Platform",
+            "track": "XNLZQqohCJ",
+            "start": 0,
+            "end": 0.125,
+            "side": "Right",
+            "width": 7.5
+        },
+        {
+            "id": "2WUuRT8EO",
+            "type": "Wagon",
+            "seatCount": 21,
+            "seatColumns": 3,
+            "seats": [
+
+            ],
+            "config": {
+                "maxSpeed": 3,
+                "accelerateBy": 0.25,
+                "controlType": 0,
+                "passengerArrangement": {
+                    "seats": 3,
+                    "rows": 7
+                },
+                "appearanceId": "mot",
+                "length": 14,
+                "connectable": {
+                    "A": 0,
+                    "B": 0
+                }
+            },
+            "A": {
+                "whichEnd": "A",
+                "endOf": "2WUuRT8EO",
+                "positionOnTrack": {
+                    "track": "XNLZQqohCJ",
+                    "position": 157.5,
+                    "percentage": 0.875,
+                    "direction": 1
+                },
+                "otherEnd": false
+            },
+            "B": {
+                "whichEnd": "B",
+                "endOf": "2WUuRT8EO",
+                "positionOnTrack": {
+                    "track": "XNLZQqohCJ",
+                    "position": 171.5,
+                    "percentage": 0.9527777777777777,
+                    "direction": 1
+                },
+                "otherEnd": false
+            },
+            "train": "0JseDNqbID"
+        },
+        {
+            "id": "_211FvBTf",
+            "circle": {
+                "x": -5,
+                "y": 0,
+                "z": 80,
+                "r": 18.027756377319946
+            },
+            "type": "Station",
+            "name": "Marblemoor"
+        },
+        {
+            "id": "HuYTyuyPO",
+            "circle": {
+                "x": -5,
+                "y": 0,
+                "z": -80,
+                "r": 18.027756377319946
+            },
+            "type": "Station",
+            "name": "Oakbarrow"
+        },
+        {
+            "id": "J76t_GwNQ",
+            "type": "Route",
+            "name": "S1",
+            "detailedName": "Oakbarrow>>Marblemoor",
+            "stops": [
+                "bYYmkmu*q",
+                "XUMZh02gd"
+            ]
+        },
+        {
+            "id": "XUMZh02gd",
+            "type": "RouteStop",
+            "station": "_211FvBTf",
+            "platform": "IZDHoLy2u",
+            "arrivalTime": 1800
+        },
+        {
+            "id": "bYYmkmu*q",
+            "type": "RouteStop",
+            "station": "HuYTyuyPO",
+            "platform": "7fvUb1erL",
+            "departureTime": 0
+        },
+        {
+            "id": "x9_zF0kKc",
+            "type": "Trip",
+            "route": "J76t_GwNQ",
+            "departureTime": 0,
+            "redefinedProps": {
+
+            }
+        }
+    ],
+    "camera": {
+        "alpha": 0,
+        "beta": 0.8000000000000002,
+        "radius": 250.82265599999997,
+        "target": {
+            "x": -6.4724930737922135e-15,
+            "y": 0,
+            "z": -22.851916799999984
+        },
+        "position": {
+            "x": 179.92916001719573,
+            "y": 174.749827291476,
+            "z": -22.851916799999984
+        }
     },
-    {
-      id: 'RRaeHFfiMH',
-      type: 'Train',
-      wagons: ['A2nPdwsy8'],
-      schedulingWagon: 'A2nPdwsy8'
-    },
-    {
-      id: 'mFEeGSi7D',
-      type: 'Route',
-      name: '1',
-      stops: ['lIF4xyOGE', 'jcXLbpcdJ'],
-      reverse: 'kTZFipKmw'
-    },
-    {
-      id: 'lIF4xyOGE',
-      type: 'RouteStop',
-      station: 'W23_0EtKL',
-      platform: 'Mglj_usJe'
-    },
-    {
-      id: 'jcXLbpcdJ',
-      type: 'RouteStop',
-      station: '*ap0xjNun',
-      platform: 'XRByNvr43'
-    },
-    {
-      id: 'kTZFipKmw',
-      type: 'Route',
-      name: '1',
-      stops: ['KmIltK66Cv', '9O3lK9M*gN'],
-      reverse: 'mFEeGSi7D'
-    },
-    {
-      id: 'KmIltK66Cv',
-      type: 'RouteStop',
-      station: '*ap0xjNun',
-      platform: 'XRByNvr43'
-    },
-    {
-      id: '9O3lK9M*gN',
-      type: 'RouteStop',
-      station: 'W23_0EtKL',
-      platform: 'Mglj_usJe'
-    }
-  ],
-  _version: 1,
-  _format: 'fahrplan'
+    "_version": 1,
+    "_format": "fahrplan",
+    "target_passenger": 10
 };
