@@ -21,6 +21,52 @@
             touch-action: none;
         }
 
+        #canvasBorder {
+            touch-action: none;
+            display: none;
+            z-index: 5;
+        }
+
+        #canvasBorder.stopped {
+            display: block;
+        }
+
+        #canvasBorderLeft {
+            position: fixed;
+            background-color: red;
+            left: 0;
+            width: 5px;
+            top: 0;
+            bottom: 0;
+        }
+
+        #canvasBorderRight {
+            position: fixed;
+            background-color: red;
+            right: 0;
+            width: 5px;
+            top: 0;
+            bottom: 0;
+        }
+
+        #canvasBorderTop {
+            position: fixed;
+            background-color: red;
+            right: 0;
+            left: 0;
+            height: 5px;
+            top: 0;
+        }
+
+        #canvasBorderBottom {
+            position: fixed;
+            background-color: red;
+            right: 0;
+            left: 0;
+            height: 5px;
+            bottom: 0;
+        }
+
         #button-holder {
             position: fixed;
             right: 100px;
@@ -350,6 +396,12 @@
     </div>
     <canvas id="renderCanvas">
     </canvas>
+    <div id="canvasBorder" class="stopped">
+        <div id="canvasBorderLeft"></div>
+        <div id="canvasBorderRight"></div>
+        <div id="canvasBorderTop"></div>
+        <div id="canvasBorderBottom"></div>
+    </div>
     <script>
 
     </script>

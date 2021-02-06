@@ -40,8 +40,6 @@ window.addEventListener('DOMContentLoaded', () => {
     );
 
     (window as any).switches = [];
-    const land = productionContainer.get<Land>(TYPES.Land);
-    land.init();
 
     const gridDrawer = new GridDrawer();
     gridDrawer.setScene(scene);
@@ -104,6 +102,8 @@ window.addEventListener('DOMContentLoaded', () => {
   passengerGenerator.init();
 
   const inputController = new InputController(scene, camera, passengerGenerator);
+  const land = productionContainer.get<Land>(TYPES.Land);
+  land.init(inputController);
 
   renderEngine.runRenderLoop(() => {
     scene.render();

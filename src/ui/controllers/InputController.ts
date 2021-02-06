@@ -33,6 +33,7 @@ import { Trip } from '../../structs/Scheduling/Trip';
 import { TickInputProps } from './TickInputProps';
 import { PassengerGenerator } from '../../structs/Actuals/PassengerGenerator';
 import { VueViewbox } from './VueViewbox';
+import { Train } from '../../structs/Scheduling/Train';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -64,6 +65,8 @@ export class InputController {
   private timeLimit: number = 12;
   private originalTimeLimit: number = 12;
   private shortTimeLimit: number = 6;
+
+  private targetPassengerCount: number = 9999999;
 
   constructor(
     private scene: BABYLON.Scene,
@@ -107,6 +110,10 @@ export class InputController {
     this.vueViewbox.setSelected('terrain');
 
     this.downProps = null;
+  }
+
+  setTargetPassenger(count: number): void {
+    this.targetPassengerCount = count;
   }
 
   convert(event: PointerEvent): InputProps {
@@ -194,7 +201,7 @@ export class InputController {
 
   move(event: PointerEvent) {
     const now = (new Date()).getTime();
-    if (now - this.downAt < 100) return;
+    if (now - this.downAt < 500) return;
 
     const props = this.convert(event);
     if (this.downProps) {
@@ -211,9 +218,11 @@ export class InputController {
     const now = (new Date()).getTime();
 
     if (
-      this.downProps.point && (now - this.downAt < 100 ||
-        (props.point &&
-          this.downProps.point.coord.equalsTo(props.point.coord)))
+      //this.downProps.point && (
+      now - this.downAt < 500
+      // ||
+      //(props.point &&
+      //  this.downProps.point.coord.equalsTo(props.point.coord)))
     ) {
       let ready = this.selectIfPossible(event);
       if (ready) {
@@ -372,6 +381,28 @@ export class InputController {
       case 'ScrollLock':
         this.inputHandlers.CAMERA.setPanLock();
         break;
+
+      case 'PageUp':
+        {
+          const list = this.store.getAllOf<Train>(Symbol.for('Train'));
+          const wagon = this.getSelectedBrick()?.getType() === Symbol.for('Wagon') ? (this.getSelectedBrick() as Wagon) : null;
+          const pivot = wagon?.getTrain()?.getId();
+          const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
+          const newIndex = (index + 1) % list.length;
+          this.select(list[newIndex].getLastControlingWagon());
+        }
+        break;
+
+      case 'PageDown':
+        {
+          const list = this.store.getAllOf<Train>(Symbol.for('Train'));
+          const wagon = this.getSelectedBrick()?.getType() === Symbol.for('Wagon') ? (this.getSelectedBrick() as Wagon) : null;
+          const pivot = wagon?.getTrain()?.getId();
+          const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
+          const newIndex = (index - 1) < 0 ? list.length + index - 1 : index - 1;
+          this.select(list[newIndex].getLastControlingWagon());
+        }
+        break;
     }
 
     if (!this.getSelected()) return;
@@ -450,6 +481,15 @@ export class InputController {
 
         download(JSON.stringify(data), fileName, 'application/json');
         break;
+
+      case ' ':
+        if (this.store.getTickSpeed() === 0) {
+          this.store.setTickSpeed(1);
+        } else {
+          this.store.setTickSpeed(0);
+        }
+        break;
+
 
       case '`':
       case '0':
@@ -597,6 +637,11 @@ export class InputController {
     this.vueSidebar.setData('passengerCount', passengerStats.count);
     this.vueSidebar.setData('passengerArrivedCount', passengerStats.arrivedCount);
     this.vueSidebar.setData('passengerAverageArriveSpeed', Math.round(passengerStats.averageArriveSpeed * 100) / 100);
+
+    if (passengerStats.arrivedCount >= this.targetPassengerCount) {
+      alert('Nyertél! Elvittél ' + this.targetPassengerCount + ' utast.');
+      this.targetPassengerCount = 9999999;
+    }
 
     if (this.inputHandler.tick) {
       const ize: TickInputProps = {

@@ -16,6 +16,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private wagonsWithSides: WagonWithSide[] = [];
   private trips: Trip[] = [];
   private controlingWagon: Wagon = null;
+  private lastControlingWagon: Wagon = null;
   private removed: boolean = false;
 
   init(first: Wagon): Train {
@@ -238,9 +239,18 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return this.controlingWagon;
   }
 
+  getLastControlingWagon(): Wagon {
+    if (this.lastControlingWagon) {
+      return this.lastControlingWagon;
+    } else {
+      return this.wagonsWithSides.find(x => x.wagon.getControlType() !== WagonControlType.Nothing)?.wagon;
+    }
+  }
+
   setControlingWagon(wagon: Wagon): void {
     if (!this.controlingWagon) {
       this.controlingWagon = wagon;
+      this.lastControlingWagon = wagon;
     }
   }
 

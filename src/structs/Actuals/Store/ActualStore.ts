@@ -188,6 +188,12 @@ export class ActualStore implements Store {
 
   setTickSpeed(speed: number): void {
     this.tickSpeed = speed;
+    // todo this is not the right place for this
+    if (speed === 0) {
+      document.getElementById('canvasBorder').classList.add('stopped');
+    } else {
+      document.getElementById('canvasBorder').classList.remove('stopped');
+    }
   }
 
   getTickSpeed(): number {

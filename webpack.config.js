@@ -22,7 +22,7 @@ module.exports = {
     }),
     new CopyWebpackPlugin([{ from: 'src/assets', to: 'assets' }]),
     new CopyWebpackPlugin([
-      { from: 'src/html/*.html', to: '.', flatten: true }
+      { from: 'src/html/*.*', to: '.', flatten: true }
     ]),
     new VueLoaderPlugin()
   ],
