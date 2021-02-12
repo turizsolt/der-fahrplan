@@ -30,3 +30,9 @@
 - (2.5D, not started)
 - 3D, implemented with babylon.js
 - information overlay, implemented with Vue.js
+
+## Tech:
+
+- try c# or c++ instead of Ts?
+- visual test framework
+
