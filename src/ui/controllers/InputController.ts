@@ -425,6 +425,10 @@ export class InputController {
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     switch (key) {
+      case 'T':
+        this.store.getActionStore().runAction(0);
+        break;
+
       case 'U':
         this.selectMode(InputMode.CAMERA);
         break;

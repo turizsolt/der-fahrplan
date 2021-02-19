@@ -14,6 +14,7 @@ import { Wagon } from '../../Interfaces/Wagon';
 import { Passenger } from '../../Interfaces/Passenger';
 import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
+import { ActualActionStore } from './ActualActionStore';
 
 @injectable()
 export class ActualStore implements Store {
@@ -37,7 +38,11 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfPlatform) private PlatformFactory: () => Platform;
   @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
 
+  private actionStore: ActualActionStore;
+
   init() {
+    this.actionStore = new ActualActionStore(this);
+
     this.elements = {};
     this.typedElements = {};
     this.factoryMethods = {
@@ -223,5 +228,9 @@ export class ActualStore implements Store {
       arrivedCount: this.passengerArrivedCount,
       averageArriveSpeed: this.passengerAverageArriveSpeed
     }
+  }
+
+  getActionStore(): ActualActionStore {
+    return this.actionStore;
   }
 }
