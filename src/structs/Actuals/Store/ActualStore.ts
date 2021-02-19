@@ -161,7 +161,7 @@ export class ActualStore implements Store {
     // to init schedules with a blank nothing
     this.getAllOf(Symbol.for('Station')).map((station: Station) => {
       station.addTripToSchedule(null);
-    })
+    });
   }
 
   private selected: BaseStorable = null;
@@ -215,11 +215,12 @@ export class ActualStore implements Store {
   private passengerCummulatedDistance: number = 0;
   private passengerAverageArriveSpeed: number = -1;
 
-  addArrivedPassengerStats(stats: { time: number, distance: number }): void {
+  addArrivedPassengerStats(stats: { time: number; distance: number }): void {
     this.passengerArrivedCount++;
     this.passengerCummulatedDistance += stats.distance;
     this.passengerCummulatedTime += stats.time;
-    this.passengerAverageArriveSpeed = this.passengerCummulatedDistance / this.passengerCummulatedTime;
+    this.passengerAverageArriveSpeed =
+      this.passengerCummulatedDistance / this.passengerCummulatedTime;
   }
 
   getPassengerStats(): any {
@@ -227,7 +228,7 @@ export class ActualStore implements Store {
       count: this.passengerCount,
       arrivedCount: this.passengerArrivedCount,
       averageArriveSpeed: this.passengerAverageArriveSpeed
-    }
+    };
   }
 
   getActionStore(): ActualActionStore {

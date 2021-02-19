@@ -19,7 +19,7 @@ export class ActualLand implements Land {
   @inject(TYPES.FactoryOfStore) storeFactory: () => Store;
 
   init(inputController: InputController): void {
-    const store: Store = this.storeFactory().init();
+    const store: Store = this.storeFactory();
 
     const levelId = window.location.search.slice(1);
     const levels = {
@@ -49,7 +49,6 @@ export class ActualLand implements Land {
           store.getActionStore().setActions(levels[levelId].actions);
         }
       }, 1000);
-
     }
   }
 }

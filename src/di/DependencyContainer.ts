@@ -47,6 +47,7 @@ export class DependencyContainer {
           if (!instance) {
             this.map<T>(t, t2);
             instance = context.container.get<T>(t).init();
+            this.instances[ft] = instance;
           }
           return instance;
         };

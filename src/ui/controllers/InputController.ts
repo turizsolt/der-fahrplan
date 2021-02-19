@@ -34,6 +34,7 @@ import { TickInputProps } from './TickInputProps';
 import { PassengerGenerator } from '../../structs/Actuals/PassengerGenerator';
 import { VueViewbox } from './VueViewbox';
 import { Train } from '../../structs/Scheduling/Train';
+import { VueTestPanel } from './VueTestPanel';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -60,6 +61,7 @@ export class InputController {
   private vueViewbox: VueViewbox;
   private vueBigScreen: VueBigscreen;
   private vueSidebar: VueSidebar;
+  private vueTestPanel: VueTestPanel;
 
   private followCam: boolean = false;
   private timeLimit: number = 12;
@@ -78,6 +80,8 @@ export class InputController {
     this.vueBigScreen = new VueBigscreen(this.store);
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
+
+    this.vueTestPanel = new VueTestPanel(this.store);
 
     this.inputHandlers = {
       [InputMode.CAMERA]: new CameraInputHandler(camera),

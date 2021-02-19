@@ -310,6 +310,26 @@
             margin-bottom: 20px;
         }
 
+        /******************************************/
+
+        #test-panel {
+            position: fixed;
+            right: 20px;
+            top: 160px;
+            bottom: 20px;
+            width: 200px;
+            background-color: #cec;
+
+            border: 2px solid #070;
+            border-radius: 0.5em;
+
+            padding: 10px;
+
+            display: flex;
+            justify-content: space-between;
+            flex-direction: column;
+        }
+
         [v-cloak] {
             display: none;
         }
@@ -392,6 +412,14 @@
                     {{station.name}}
                 </div>
             </div>
+        </div>
+    </div>
+    <div v-cloak id="test-panel" v-if="show">
+        <div>
+            Test panel <button @click="load()">Update</button>
+        </div>
+        <div v-for="(action, index) in actions" :key="index">
+            {{action.object}}.{{action.function}}({{action.params.join(", ")}}) = {{action.equalTo}} [{{action.result}}]
         </div>
     </div>
     <canvas id="renderCanvas">
