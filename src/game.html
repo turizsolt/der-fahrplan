@@ -419,7 +419,12 @@
             Test panel <button @click="load()">Update</button>
         </div>
         <div v-for="(action, index) in actions" :key="index">
-            {{action.object}}.{{action.function}}({{action.params.join(", ")}}) = {{action.equalTo}} [{{action.result}}]
+            <div v-if="action.type === 'tick'">
+                {{action.length}}x tick [{{action.result}}]
+            </div>
+            <div v-else>
+                {{action.object}}.{{action.function}}({{action.params.join(", ")}}) = {{action.equalTo}} [{{action.result}}]
+            </div>
         </div>
     </div>
     <canvas id="renderCanvas">

@@ -82,6 +82,7 @@ export class InputController {
     this.vueViewbox = new VueViewbox(this);
 
     this.vueTestPanel = new VueTestPanel(this.store);
+    this.store.getActionStore().setInputController(this);
 
     this.inputHandlers = {
       [InputMode.CAMERA]: new CameraInputHandler(camera),

@@ -49,6 +49,10 @@ export const TestFw = {
       params: []
     },
     {
+      type: 'tick',
+      length: 60
+    },
+    {
       type: 'statement',
       object: 'yKIEnpoofM',
       function: 'switch',
