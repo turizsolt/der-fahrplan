@@ -430,7 +430,7 @@ export class InputController {
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     switch (key) {
       case 'T':
-        this.store.getActionStore().runAction(0);
+        this.store.getActionStore().runNext();
         break;
 
       case 'U':

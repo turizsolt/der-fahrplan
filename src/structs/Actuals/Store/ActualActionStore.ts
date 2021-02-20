@@ -5,7 +5,7 @@ import { applyMixins } from '../../../mixins/ApplyMixins';
 export type ActionResult = 'failed' | 'succeded' | 'exception-raised';
 
 export interface Action {
-  type: 'assertion';
+  type: 'assertion' | 'statement';
   object: string;
   function: string;
   params: any[];
@@ -33,6 +33,13 @@ export class ActualActionStore {
     return Object.freeze([...this.actions]);
   }
 
+  private nextAction: number = 0;
+
+  runNext() {
+    this.runAction(this.nextAction);
+    this.nextAction++;
+  }
+
   runAction(index: number): ActionResult | null {
     if (this.actions[index]) {
       try {
@@ -42,7 +49,9 @@ export class ActualActionStore {
 
         // todo this is just a value comparison, deep equals needed later on
         const result: ActionResult =
-          returnValue === action.equalsTo ? 'succeded' : 'failed';
+          action.type === 'statement' || returnValue === action.equalsTo
+            ? 'succeded'
+            : 'failed';
         this.actions[index].result = result;
 
         this.emit('updated', this.getActions());
