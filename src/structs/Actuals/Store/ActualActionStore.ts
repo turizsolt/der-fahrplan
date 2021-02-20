@@ -1,4 +1,6 @@
 import { Store } from '../../Interfaces/Store';
+import { Emitable } from '../../../mixins/Emitable';
+import { applyMixins } from '../../../mixins/ApplyMixins';
 
 export type ActionResult = 'failed' | 'succeded' | 'exception-raised';
 
@@ -11,13 +13,20 @@ export interface Action {
   result?: ActionResult;
 }
 
+export interface ActualActionStore extends Emitable {}
+const doApply = () => applyMixins(ActualActionStore, [Emitable]);
 export class ActualActionStore {
   private actions: Action[] = [];
 
-  constructor(private store: Store) {}
+  constructor(private store: Store) {
+    this.init();
+  }
+
+  init() {}
 
   setActions(actions: Action[]): void {
     this.actions = actions;
+    this.emit('updated', this.getActions());
   }
 
   getActions(): readonly Action[] {
@@ -36,16 +45,15 @@ export class ActualActionStore {
           returnValue === action.equalsTo ? 'succeded' : 'failed';
         this.actions[index].result = result;
 
-        console.log(returnValue, result);
-
+        this.emit('updated', this.getActions());
         return result;
       } catch (e) {
-        console.log(e, 'exception-raised');
+        this.emit('updated', this.getActions());
         return 'exception-raised';
       }
     } else {
-      console.log(null);
       return null;
     }
   }
 }
+doApply();

@@ -18,6 +18,9 @@ export class VueTestPanel {
         }
       }
     });
+    _actionStore.on('updated', actions => {
+      this.vmTestPanel.actions = actions;
+    });
   }
 
   toggleShow() {
