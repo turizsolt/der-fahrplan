@@ -1,4 +1,4 @@
 export interface PassengerGenerator {
-  init();
-  tick();
+  init(): PassengerGenerator;
+  tick(): void;
 }

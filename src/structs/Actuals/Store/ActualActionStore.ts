@@ -34,6 +34,7 @@ export class ActualActionStore {
   setActions(actions: Action[]): void {
     this.actions = actions;
     this.emit('updated', this.getActions());
+    this.nextAction = 0;
   }
 
   getActions(): readonly Action[] {
@@ -54,6 +55,7 @@ export class ActualActionStore {
       this.nextAction++;
     }
     while (returned === 'succeded' && this.nextAction < this.actions.length);
+    return returned;
   }
 
   runAction(index: number): ActionResult | null {
@@ -62,15 +64,17 @@ export class ActualActionStore {
         const action = this.actions[index];
 
         if (action.type === 'tick') {
+          this.store.setTickSpeed(action.length);
           if (this.inputController) {
-            this.store.setTickSpeed(action.length);
             this.inputController.tick();
-            this.store.setTickSpeed(0);
-
-            this.actions[index].result = 'succeded';
-            this.emit('updated', this.getActions());
-            return 'succeded';
+          } else {
+            this.store.tick();
           }
+          this.store.setTickSpeed(0);
+
+          this.actions[index].result = 'succeded';
+          this.emit('updated', this.getActions());
+          return 'succeded';
         } else {
           const obj = this.store.get(action.object);
           const returnValue = obj[action.function](...action.params);
@@ -86,6 +90,7 @@ export class ActualActionStore {
           return result;
         }
       } catch (e) {
+        console.log(e);
         this.actions[index].result = 'exception-raised';
         this.emit('updated', this.getActions());
         return 'exception-raised';

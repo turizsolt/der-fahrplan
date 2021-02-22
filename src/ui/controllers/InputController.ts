@@ -73,7 +73,6 @@ export class InputController {
   constructor(
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera,
-    private passengerGenerator: PassengerGenerator
   ) {
     this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
     this.vueSidebar = new VueSidebar(this.store);
@@ -625,15 +624,6 @@ export class InputController {
 
   tick() {
     const speed = this.store.getTickSpeed();
-    for (let i = 0; i < speed; i++) {
-      this.store.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {
-        wagon.tick();
-      });
-
-      if ((this.store.getTickCount() + i) % 120 === 0) {
-        this.passengerGenerator.tick();
-      }
-    }
     this.store.tick();
     const count = Math.floor(this.store.getTickCount() / 60);
     this.vueSidebar.setData(

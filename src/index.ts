@@ -6,7 +6,6 @@ import { TYPES } from './di/TYPES';
 import { GridDrawer } from './ui/controllers/GridDrawer';
 import { InputController } from './ui/controllers/InputController';
 import { MeshProvider } from './ui/babylon/MeshProvider';
-import { PassengerGenerator } from './structs/Actuals/PassengerGenerator';
 
 window.addEventListener('DOMContentLoaded', () => {
   const canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
@@ -98,10 +97,7 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   const { scene, camera } = createScene();
 
-  const passengerGenerator = productionContainer.get<PassengerGenerator>(TYPES.PassengerGenerator);
-  passengerGenerator.init();
-
-  const inputController = new InputController(scene, camera, passengerGenerator);
+  const inputController = new InputController(scene, camera);
   const land = productionContainer.get<Land>(TYPES.Land);
   land.init(inputController);
 

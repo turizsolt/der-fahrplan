@@ -15,6 +15,7 @@ import { Passenger } from '../../Interfaces/Passenger';
 import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
 import { ActualActionStore } from './ActualActionStore';
+import { PassengerGenerator } from '../PassengerGenerator';
 
 @injectable()
 export class ActualStore implements Store {
@@ -37,6 +38,9 @@ export class ActualStore implements Store {
   private TrackJointFactory: () => TrackJoint;
   @inject(TYPES.FactoryOfPlatform) private PlatformFactory: () => Platform;
   @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
+
+  @inject(TYPES.FactoryOfPassengerGenerator) private PassengerGeneratorFactory: () => PassengerGenerator;
+  private passengerGenerator: PassengerGenerator;
 
   private actionStore: ActualActionStore;
 
@@ -189,15 +193,30 @@ export class ActualStore implements Store {
     if (this.tickSpeed) {
       this.tickCount += this.tickSpeed;
     }
+
+    for (let i = 0; i < this.tickSpeed; i++) {
+      this.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {
+        wagon.tick();
+      });
+
+      if ((this.getTickCount() + i) % 120 === 0) {
+        if (!this.passengerGenerator) {
+          this.passengerGenerator = this.PassengerGeneratorFactory().init();
+        }
+        this.passengerGenerator.tick();
+      }
+    }
   }
 
   setTickSpeed(speed: number): void {
     this.tickSpeed = speed;
     // todo this is not the right place for this
-    if (speed === 0) {
-      document.getElementById('canvasBorder').classList.add('stopped');
-    } else {
-      document.getElementById('canvasBorder').classList.remove('stopped');
+    if (typeof document !== 'undefined') {
+      if (speed === 0) {
+        document.getElementById('canvasBorder').classList.add('stopped');
+      } else {
+        document.getElementById('canvasBorder').classList.remove('stopped');
+      }
     }
   }
 

@@ -24,6 +24,7 @@ export const TYPES = {
   FactoryOfPassenger: Symbol.for('Factory<Passenger>'),
 
   PassengerGenerator: Symbol.for('PassengerGenerator'),
+  FactoryOfPassengerGenerator: Symbol.for('Factory<PassengerGenerator>'),
 
   Platform: Symbol.for('Platform'),
   PlatformRenderer: Symbol.for('PlatformRenderer'),

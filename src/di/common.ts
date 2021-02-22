@@ -36,8 +36,7 @@ export const addCommonMaps = (ioc: DependencyContainer): void => {
     TrackJointConnector
   );
 
-  ioc.map<PassengerGenerator>(T.PassengerGenerator, ActualPassengerGenerator);
-
+  ioc.fm<PassengerGenerator>(T.FactoryOfPassengerGenerator, T.PassengerGenerator, ActualPassengerGenerator);
   ioc.fm<Train>(T.FactoryOfTrain, T.Train, ActualTrain);
   ioc.fm<Wagon>(T.FactoryOfWagon, T.Wagon, ActualWagon);
   ioc.fm<Track>(T.FactoryOfTrack, T.Track, ActualTrack);
