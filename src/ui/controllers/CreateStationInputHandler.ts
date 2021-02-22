@@ -1,12 +1,8 @@
 import * as BABYLON from 'babylonjs';
 import { InputHandler } from './InputHandler';
-import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { InputProps } from './InputProps';
 import { productionContainer } from '../../di/production.config';
-import { TrackJoint } from '../../structs/Interfaces/TrackJoint';
 import { TYPES } from '../../di/TYPES';
-import { curveToTube } from '../babylon/TrackBabylonRenderer';
-import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../babylon/converters/CoordinateToBabylonVector3';
 import { Station } from '../../structs/Scheduling/Station';
 import { Circle } from '../../structs/Geometry/Circle';
@@ -17,7 +13,7 @@ export class CreateStationInputHandler implements InputHandler {
 
   constructor() {
     this.fromMesh = BABYLON.MeshBuilder.CreateBox(
-      name,
+      'name',
       { height: 1, width: 1, depth: 1 },
       null
     );
@@ -25,7 +21,7 @@ export class CreateStationInputHandler implements InputHandler {
     this.fromMesh.isPickable = false;
 
     this.toMesh = BABYLON.MeshBuilder.CreateBox(
-      name,
+      'name',
       { height: 1, width: 1, depth: 1 },
       null
     );
@@ -77,7 +73,7 @@ export class CreateStationInputHandler implements InputHandler {
     }
   }
 
-  click(downProps: InputProps, event: PointerEvent): void {}
+  click(downProps: InputProps, event: PointerEvent): void { }
 
   up(downProps: InputProps, props: InputProps, event: PointerEvent): void {
     if (
@@ -97,7 +93,6 @@ export class CreateStationInputHandler implements InputHandler {
         props.snappedPoint.coord
       );
       station.init(new Circle(pt, diam / 2));
-      //   console.log('station', station);
     }
     this.fromMesh.setEnabled(false);
     this.toMesh.setEnabled(false);
