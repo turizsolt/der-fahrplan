@@ -326,8 +326,31 @@
             padding: 10px;
 
             display: flex;
-            justify-content: space-between;
+            justify-content: start;
             flex-direction: column;
+        }
+
+        .succeded {
+            background-color: #0A0;
+        }
+
+        .failed {
+            background-color: red;
+            color: white;
+        }
+
+        .exception-raised {
+            background-color: purple;
+            color: white;
+        }
+
+        .action {
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+            padding: 1px;
         }
 
         [v-cloak] {
@@ -421,12 +444,12 @@
             <button @click="run()">Run</button>
         </div>
         <div v-for="(action, index) in actions" :key="index">
-            <div v-if="action.type === 'tick'">
-                {{action.length}}x tick [{{action.result}}]
+            <div v-if="action.type === 'tick'" :class="['action', action.result]">
+                {{action.length}}x tick
             </div>
-            <div v-else>
-                {{action.object}}.{{action.function}}({{action.params.join(", ")}}) = {{action.equalTo}}
-                [{{action.result}}]
+            <div v-else :class="['action', action.result]">
+                {{action.object}}.{{action.function}}({{action.params.join(", ")}})
+                <span v-if="action.type==='assertion'"> = {{action.equalsTo}}</span>
             </div>
         </div>
     </div>

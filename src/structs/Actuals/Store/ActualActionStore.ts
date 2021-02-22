@@ -86,6 +86,7 @@ export class ActualActionStore {
           return result;
         }
       } catch (e) {
+        this.actions[index].result = 'exception-raised';
         this.emit('updated', this.getActions());
         return 'exception-raised';
       }
