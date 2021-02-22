@@ -16,6 +16,7 @@ import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
 import { ActualActionStore } from './ActualActionStore';
 import { PassengerGenerator } from '../PassengerGenerator';
+import { ActualLogStore } from './ActualLogStore';
 
 @injectable()
 export class ActualStore implements Store {
@@ -43,9 +44,11 @@ export class ActualStore implements Store {
   private passengerGenerator: PassengerGenerator;
 
   private actionStore: ActualActionStore;
+  private logStore: ActualLogStore;
 
   init() {
     this.actionStore = new ActualActionStore(this);
+    this.logStore = new ActualLogStore(this);
 
     this.elements = {};
     this.typedElements = {};
@@ -252,5 +255,9 @@ export class ActualStore implements Store {
 
   getActionStore(): ActualActionStore {
     return this.actionStore;
+  }
+
+  getLogStore(): ActualLogStore {
+    return this.logStore;
   }
 }

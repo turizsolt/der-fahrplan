@@ -6,12 +6,13 @@ import { InputController } from '../../../ui/controllers/InputController';
 export type ActionResult = 'failed' | 'succeded' | 'exception-raised';
 
 export interface Action {
-  type: 'assertion' | 'statement' | 'tick';
+  type: 'assertion' | 'statement' | 'tick' | 'creation';
   length?: number;
   object: string;
+  objectType?: string;
   function: string;
-  params: any[];
-  equalsTo: any;
+  params?: any[];
+  equalsTo?: any;
   result?: ActionResult;
 }
 

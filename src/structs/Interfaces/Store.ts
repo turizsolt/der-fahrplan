@@ -1,4 +1,5 @@
 import { ActualActionStore } from '../Actuals/Store/ActualActionStore';
+import { ActualLogStore } from '../Actuals/Store/ActualLogStore';
 import { BaseStorable } from './BaseStorable';
 
 export interface Store {
@@ -27,4 +28,5 @@ export interface Store {
   getPassengerStats(): any;
 
   getActionStore(): ActualActionStore;
+  getLogStore(): ActualLogStore;
 }
