@@ -86,7 +86,7 @@ export class InputController {
     this.inputHandlers = {
       [InputMode.CAMERA]: new CameraInputHandler(camera),
       [InputMode.SELECT]: new SelectInputHandler(),
-      [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(),
+      [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(this.store),
       [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(),
       [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(),
       [InputMode.CREATE_STATION]: new CreateStationInputHandler()

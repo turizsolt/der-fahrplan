@@ -8,13 +8,14 @@ import { TYPES } from '../../di/TYPES';
 import { curveToTube } from '../../ui/babylon/TrackBabylonRenderer';
 import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/CoordinateToBabylonVector3';
+import { Store } from '../../structs/Interfaces/Store';
 
 export class CreateTrackInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
   private toMesh: BABYLON.Mesh;
   private pathMesh: BABYLON.Mesh;
 
-  constructor() {
+  constructor(private store: Store) {
     this.fromMesh = BABYLON.MeshBuilder.CreateBox(
       'name',
       { height: 1.5, width: 1, depth: 2 },
@@ -128,6 +129,17 @@ export class CreateTrackInputHandler implements InputHandler {
         downProps.snappedPoint.coord.z,
         downProps.wheelRad
       );
+      this.store.getLogStore().addAction({
+        type: 'creation',
+        object: tj.getId(),
+        function: 'init',
+        params: [
+          downProps.snappedPoint.coord.x,
+          downProps.snappedPoint.coord.z,
+          downProps.wheelRad
+        ],
+        objectType: 'TrackJoint'
+      });
     }
   }
 
@@ -152,6 +164,17 @@ export class CreateTrackInputHandler implements InputHandler {
           downProps.snappedPoint.coord.z,
           downProps.wheelRad
         );
+        this.store.getLogStore().addAction({
+          type: 'creation',
+          object: j1.getId(),
+          function: 'init',
+          params: [
+            downProps.snappedPoint.coord.x,
+            downProps.snappedPoint.coord.z,
+            downProps.wheelRad
+          ],
+          objectType: 'TrackJoint'
+        });
         deletable.push(j1);
       }
 
@@ -164,6 +187,17 @@ export class CreateTrackInputHandler implements InputHandler {
           props.snappedPoint.coord.z,
           props.wheelRad
         );
+        this.store.getLogStore().addAction({
+          type: 'creation',
+          object: j2.getId(),
+          function: 'init',
+          params: [
+            props.snappedPoint.coord.x,
+            props.snappedPoint.coord.z,
+            props.wheelRad
+          ],
+          objectType: 'TrackJoint'
+        });
         deletable.push(j2);
       }
 
