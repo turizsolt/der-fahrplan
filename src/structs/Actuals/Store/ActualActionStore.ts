@@ -15,7 +15,7 @@ export interface Action {
   result?: ActionResult;
 }
 
-export interface ActualActionStore extends Emitable {}
+export interface ActualActionStore extends Emitable { }
 const doApply = () => applyMixins(ActualActionStore, [Emitable]);
 export class ActualActionStore {
   private actions: Action[] = [];
@@ -25,7 +25,7 @@ export class ActualActionStore {
     this.init();
   }
 
-  init() {}
+  init() { }
 
   setInputController(ic: InputController) {
     this.inputController = ic;
@@ -47,6 +47,15 @@ export class ActualActionStore {
     this.nextAction++;
   }
 
+  runAll() {
+    let returned: ActionResult;
+    do {
+      returned = this.runAction(this.nextAction);
+      this.nextAction++;
+    }
+    while (returned === 'succeded' && this.nextAction < this.actions.length);
+  }
+
   runAction(index: number): ActionResult | null {
     if (this.actions[index]) {
       try {
@@ -60,6 +69,7 @@ export class ActualActionStore {
 
             this.actions[index].result = 'succeded';
             this.emit('updated', this.getActions());
+            return 'succeded';
           }
         } else {
           const obj = this.store.get(action.object);

@@ -13,8 +13,14 @@ export class VueTestPanel {
         actions: []
       },
       methods: {
-        load: function() {
+        load: function () {
           this.actions = _actionStore.getActions();
+        },
+        next: function () {
+          _actionStore.runNext();
+        },
+        run: function () {
+          _actionStore.runAll();
         }
       }
     });

@@ -416,14 +416,17 @@
     </div>
     <div v-cloak id="test-panel" v-if="show">
         <div>
-            Test panel <button @click="load()">Update</button>
+            Test panel
+            <button @click="next()">Next</button>
+            <button @click="run()">Run</button>
         </div>
         <div v-for="(action, index) in actions" :key="index">
             <div v-if="action.type === 'tick'">
                 {{action.length}}x tick [{{action.result}}]
             </div>
             <div v-else>
-                {{action.object}}.{{action.function}}({{action.params.join(", ")}}) = {{action.equalTo}} [{{action.result}}]
+                {{action.object}}.{{action.function}}({{action.params.join(", ")}}) = {{action.equalTo}}
+                [{{action.result}}]
             </div>
         </div>
     </div>
