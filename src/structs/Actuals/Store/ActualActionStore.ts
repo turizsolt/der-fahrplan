@@ -14,6 +14,7 @@ export interface Action {
   params?: any[];
   equalsTo?: any;
   result?: ActionResult;
+  tick?: number;
 }
 
 export interface ActualActionStore extends Emitable { }

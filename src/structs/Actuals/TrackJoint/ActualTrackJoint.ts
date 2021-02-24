@@ -28,6 +28,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     super.initStore(TYPES.TrackJoint);
 
     this.connector = this.TrackJointConnectorFactory();
+    this.connector.setStore(this.store);
 
     this.ends = {
       A: new TrackJointEnd(),
@@ -154,15 +155,15 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
       ray: this.ray.persist(),
       A: this.ends.A.isSet()
         ? {
-            track: this.ends.A.track.getId(),
-            whichEnd: this.ends.A.end.getWhichTrackEnd()
-          }
+          track: this.ends.A.track.getId(),
+          whichEnd: this.ends.A.end.getWhichTrackEnd()
+        }
         : null,
       B: this.ends.B.isSet()
         ? {
-            track: this.ends.B.track.getId(),
-            whichEnd: this.ends.B.end.getWhichTrackEnd()
-          }
+          track: this.ends.B.track.getId(),
+          whichEnd: this.ends.B.end.getWhichTrackEnd()
+        }
         : null
     };
   }

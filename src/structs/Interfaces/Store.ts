@@ -1,5 +1,6 @@
 import { ActualActionStore } from '../Actuals/Store/ActualActionStore';
 import { ActualLogStore } from '../Actuals/Store/ActualLogStore';
+import { Commander } from '../Actuals/Store/Commander';
 import { BaseStorable } from './BaseStorable';
 
 export interface Store {
@@ -29,4 +30,5 @@ export interface Store {
 
   getActionStore(): ActualActionStore;
   getLogStore(): ActualLogStore;
+  getCommander(): Commander;
 }

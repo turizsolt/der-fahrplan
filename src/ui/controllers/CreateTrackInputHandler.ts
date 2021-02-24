@@ -9,13 +9,17 @@ import { curveToTube } from '../../ui/babylon/TrackBabylonRenderer';
 import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/CoordinateToBabylonVector3';
 import { Store } from '../../structs/Interfaces/Store';
+import { Commander } from '../../structs/Actuals/Store/Commander';
 
 export class CreateTrackInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
   private toMesh: BABYLON.Mesh;
   private pathMesh: BABYLON.Mesh;
+  private commander: Commander;
 
   constructor(private store: Store) {
+    this.commander = store.getCommander();
+
     this.fromMesh = BABYLON.MeshBuilder.CreateBox(
       'name',
       { height: 1.5, width: 1, depth: 2 },
@@ -123,23 +127,11 @@ export class CreateTrackInputHandler implements InputHandler {
 
   click(downProps: InputProps, event: PointerEvent): void {
     if (!downProps.snappedJoint && !downProps.snappedPositionOnTrack) {
-      const tj = productionContainer.get<TrackJoint>(TYPES.TrackJoint);
-      tj.init(
+      const tj = this.commander.createTrackJoint(
         downProps.snappedPoint.coord.x,
         downProps.snappedPoint.coord.z,
         downProps.wheelRad
       );
-      this.store.getLogStore().addAction({
-        type: 'creation',
-        object: tj.getId(),
-        function: 'init',
-        params: [
-          downProps.snappedPoint.coord.x,
-          downProps.snappedPoint.coord.z,
-          downProps.wheelRad
-        ],
-        objectType: 'TrackJoint'
-      });
     }
   }
 
@@ -153,51 +145,27 @@ export class CreateTrackInputHandler implements InputHandler {
         downProps.snappedJointOnTrack.position === 0 ||
         downProps.snappedJointOnTrack.position === 1)
     ) {
-      let j1, j2;
+      let j1, j2: TrackJoint;
       let deletable: TrackJoint[] = [];
       if (downProps.snappedJoint) {
         j1 = downProps.snappedJoint;
       } else {
-        j1 = productionContainer.get<TrackJoint>(TYPES.TrackJoint);
-        j1.init(
+        j1 = this.commander.createTrackJoint(
           downProps.snappedPoint.coord.x,
           downProps.snappedPoint.coord.z,
           downProps.wheelRad
         );
-        this.store.getLogStore().addAction({
-          type: 'creation',
-          object: j1.getId(),
-          function: 'init',
-          params: [
-            downProps.snappedPoint.coord.x,
-            downProps.snappedPoint.coord.z,
-            downProps.wheelRad
-          ],
-          objectType: 'TrackJoint'
-        });
         deletable.push(j1);
       }
 
       if (props.snappedJoint) {
         j2 = props.snappedJoint;
       } else {
-        j2 = productionContainer.get<TrackJoint>(TYPES.TrackJoint);
-        j2.init(
+        j2 = this.commander.createTrackJoint(
           props.snappedPoint.coord.x,
           props.snappedPoint.coord.z,
           props.wheelRad
         );
-        this.store.getLogStore().addAction({
-          type: 'creation',
-          object: j2.getId(),
-          function: 'init',
-          params: [
-            props.snappedPoint.coord.x,
-            props.snappedPoint.coord.z,
-            props.wheelRad
-          ],
-          objectType: 'TrackJoint'
-        });
         deletable.push(j2);
       }
 

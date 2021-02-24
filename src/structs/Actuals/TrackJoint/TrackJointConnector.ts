@@ -5,6 +5,7 @@ import { TYPES } from '../../../di/TYPES';
 import { Track } from '../../Interfaces/Track';
 import { TrackSwitch } from '../../Interfaces/TrackSwitch';
 import { ActualTrackSwitch } from '../Track/ActualTrackSwitch';
+import { Store } from '../../Interfaces/Store';
 
 @injectable()
 export class TrackJointConnector {
@@ -13,6 +14,12 @@ export class TrackJointConnector {
 
   init(): TrackJointConnector {
     return this;
+  }
+
+  private store: Store;
+
+  setStore(store: Store) {
+    this.store = store;
   }
 
   connect(one: TrackJoint, other: TrackJoint) {
@@ -33,7 +40,7 @@ export class TrackJointConnector {
     const otherEnd = other.getEnds()[otherEndLetter];
 
     if (one.areBothEndsEmpty(oneEnd, otherEnd)) {
-      const t = this.TrackFactory().init(coordinates);
+      const t = this.store.getCommander().createTrack(coordinates);
 
       one.setOneEnd(oneEndLetter, t.getA());
       other.setOneEnd(otherEndLetter, t.getB());
