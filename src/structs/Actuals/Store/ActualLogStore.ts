@@ -4,7 +4,6 @@ import { applyMixins } from '../../../mixins/ApplyMixins';
 import { Action, ActionResult } from './ActualActionStore';
 import { CommandMode } from './Commander';
 import { InputController } from '../../../ui/controllers/InputController';
-import { BaseStorable } from '../../Interfaces/BaseStorable';
 
 export interface ActualLogStore extends Emitable { }
 const doApply = () => applyMixins(ActualLogStore, [Emitable]);
@@ -66,22 +65,57 @@ export class ActualLogStore {
     }
   }
 
+  private processParam(param: any): any {
+    if (typeof param === 'object' && param.id) {
+      return this.store.get(param.id);
+    }
+    return param;
+  }
+
+  getPresetId(type: string): string {
+    if (this.replayIndex >= this.actions.length) {
+      return;
+    }
+
+    const nextTickCount = this.actions[this.replayIndex].tick;
+
+    let i = this.replayIndex;
+    while (i < this.actions.length && this.actions[i].tick === nextTickCount) {
+      if (this.actions[i].type === 'id' && this.actions[i].objectType === type) {
+        return this.actions[i].object;
+      }
+      i++;
+    }
+    i = this.replayIndex - 1;
+    while (i > -1 && this.actions[i].tick === nextTickCount) {
+      if (this.actions[i].type === 'id' && this.actions[i].objectType === type) {
+        return this.actions[i].object;
+      }
+      i--;
+    }
+    return null;
+  }
 
   runAction(index: number): ActionResult | null {
     if (this.actions[index]) {
       try {
         const action = this.actions[index];
 
-        if (action.type === 'creation') {
+        if (action.type === 'id') {
+          this.actions[index].result = 'succeded';
+          this.emit('updated', this.getActions());
+          return 'succeded';
+        } else if (action.type === 'creation') {
           const obj: any = this.store.create(Symbol.for(action.objectType));
-          obj.init(...action.params);
+          obj.presetId(action.object);
+          obj.init(...action.params.map(p => this.processParam(p)));
 
           this.actions[index].result = 'succeded';
           this.emit('updated', this.getActions());
           return 'succeded';
         } else {
           const obj = this.store.get(action.object);
-          const returnValue = obj[action.function](...action.params);
+          const returnValue = obj[action.function](...action.params.map(p => this.processParam(p)));
 
           // todo this is just a value comparison, deep equals needed later on
           const result: ActionResult =

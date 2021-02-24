@@ -2,7 +2,6 @@ import { TYPES } from "../../../di/TYPES";
 import { Coordinate } from "../../Geometry/Coordinate";
 import { Store } from "../../Interfaces/Store";
 import { Track } from "../../Interfaces/Track";
-import { TrackBase } from "../../Interfaces/TrackBase";
 import { TrackJoint } from "../../Interfaces/TrackJoint";
 import { ActualLogStore } from "./ActualLogStore";
 
@@ -37,14 +36,21 @@ export class Commander {
     }
 
     createTrack(coordinates: Coordinate[]): Track {
-        const t = this.store.create<Track>(TYPES.Track).init(coordinates);
-        this.store.getLogStore().addAction({
-            type: 'creation',
-            object: t.getId(),
-            function: 'init',
-            params: coordinates,
-            objectType: 'Track'
-        });
+        const t = this.store.create<Track>(TYPES.Track);
+        if (this.mode === CommandMode.Replay) {
+            const id = this.logStore.getPresetId('Track');
+            t.presetId(id);
+            t.init(coordinates);
+        } else {
+            t.init(coordinates);
+            this.store.getLogStore().addAction({
+                type: 'id',
+                object: t.getId(),
+                function: 'init',
+                params: [],
+                objectType: 'Track'
+            });
+        }
         return t;
     }
 }

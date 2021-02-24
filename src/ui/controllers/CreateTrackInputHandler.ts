@@ -170,6 +170,13 @@ export class CreateTrackInputHandler implements InputHandler {
       }
 
       const ret = j2.connect(j1);
+      this.store.getLogStore().addAction({
+        type: 'statement',
+        object: j2.getId(),
+        function: 'connect',
+        params: [{ id: j1.getId() }]
+      });
+
       if (!ret) {
         deletable.map(j => j.remove());
       }

@@ -6,7 +6,7 @@ import { InputController } from '../../../ui/controllers/InputController';
 export type ActionResult = 'failed' | 'succeded' | 'exception-raised';
 
 export interface Action {
-  type: 'assertion' | 'statement' | 'tick' | 'creation';
+  type: 'assertion' | 'statement' | 'tick' | 'creation' | 'id';
   length?: number;
   object: string;
   objectType?: string;
