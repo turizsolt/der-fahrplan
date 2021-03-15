@@ -81,7 +81,6 @@ export class InputController {
     this.vueViewbox = new VueViewbox(this);
 
     this.vueTestPanel = new VueTestPanel(this.store);
-    this.store.getActionStore().setInputController(this);
     this.store.getLogStore().setInputController(this);
 
     this.inputHandlers = {
@@ -431,7 +430,7 @@ export class InputController {
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     switch (key) {
       case 'T':
-        this.store.getActionStore().runNext();
+        this.store.getLogStore().runNext();
         break;
 
       case 'U':

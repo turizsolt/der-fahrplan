@@ -1,7 +1,7 @@
 import { Store } from '../../Interfaces/Store';
 import { Emitable } from '../../../mixins/Emitable';
 import { applyMixins } from '../../../mixins/ApplyMixins';
-import { Action, ActionResult } from './ActualActionStore';
+import { Action, ActionResult } from './ActualAction';
 import { CommandMode } from './Commander';
 import { InputController } from '../../../ui/controllers/InputController';
 
@@ -12,6 +12,7 @@ export class ActualLogStore {
   private replayTick: number = 0;
   private replayIndex: number = 0;
   private inputController: InputController;
+  private nextAction: number = 0;
 
   constructor(private store: Store) {
     this.init();
@@ -21,6 +22,12 @@ export class ActualLogStore {
 
   setInputController(ic: InputController) {
     this.inputController = ic;
+  }
+
+  setActions(actions: Action[]): void {
+    this.actions = actions;
+    this.emit('updated', this.getActions());
+    this.nextAction = 0;
   }
 
   getActions(): readonly Action[] {
@@ -94,6 +101,21 @@ export class ActualLogStore {
       i--;
     }
     return null;
+  }
+
+  runNext() {
+    this.runAction(this.nextAction);
+    this.nextAction++;
+  }
+
+  runAll() {
+    let returned: ActionResult;
+    do {
+      returned = this.runAction(this.nextAction);
+      this.nextAction++;
+    }
+    while (returned === 'succeded' && this.nextAction < this.actions.length);
+    return returned;
   }
 
   runAction(index: number): ActionResult | null {

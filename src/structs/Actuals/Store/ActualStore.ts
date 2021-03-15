@@ -14,7 +14,6 @@ import { Wagon } from '../../Interfaces/Wagon';
 import { Passenger } from '../../Interfaces/Passenger';
 import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
-import { ActualActionStore } from './ActualActionStore';
 import { PassengerGenerator } from '../PassengerGenerator';
 import { ActualLogStore } from './ActualLogStore';
 import { Commander } from './Commander';
@@ -44,12 +43,10 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfPassengerGenerator) private PassengerGeneratorFactory: () => PassengerGenerator;
   private passengerGenerator: PassengerGenerator;
 
-  private actionStore: ActualActionStore;
   private logStore: ActualLogStore;
   private commander: Commander;
 
   init() {
-    this.actionStore = new ActualActionStore(this);
     this.logStore = new ActualLogStore(this);
     this.commander = new Commander(this, this.logStore);
 
@@ -257,10 +254,6 @@ export class ActualStore implements Store {
       arrivedCount: this.passengerArrivedCount,
       averageArriveSpeed: this.passengerAverageArriveSpeed
     };
-  }
-
-  getActionStore(): ActualActionStore {
-    return this.actionStore;
   }
 
   getLogStore(): ActualLogStore {
