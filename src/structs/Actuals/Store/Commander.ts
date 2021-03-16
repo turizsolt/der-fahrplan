@@ -22,8 +22,9 @@ export class Commander {
         this.mode = mode;
     }
 
-    createTrackJoint(x: number, z: number, angle: number): TrackJoint {
+    createTrackJoint(id: string, x: number, z: number, angle: number): TrackJoint {
         const j2: TrackJoint = this.store.create<TrackJoint>(TYPES.TrackJoint);
+        j2.presetId(id);
         j2.init(x, z, angle);
         this.store.getLogStore().addAction({
             type: 'creation',

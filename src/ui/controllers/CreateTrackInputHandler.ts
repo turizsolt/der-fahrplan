@@ -128,6 +128,7 @@ export class CreateTrackInputHandler implements InputHandler {
   click(downProps: InputProps, event: PointerEvent): void {
     if (!downProps.snappedJoint && !downProps.snappedPositionOnTrack) {
       const tj = this.commander.createTrackJoint(
+        null,
         downProps.snappedPoint.coord.x,
         downProps.snappedPoint.coord.z,
         downProps.wheelRad
@@ -151,6 +152,7 @@ export class CreateTrackInputHandler implements InputHandler {
         j1 = downProps.snappedJoint;
       } else {
         j1 = this.commander.createTrackJoint(
+          null,
           downProps.snappedPoint.coord.x,
           downProps.snappedPoint.coord.z,
           downProps.wheelRad
@@ -162,6 +164,7 @@ export class CreateTrackInputHandler implements InputHandler {
         j2 = props.snappedJoint;
       } else {
         j2 = this.commander.createTrackJoint(
+          null,
           props.snappedPoint.coord.x,
           props.snappedPoint.coord.z,
           props.wheelRad
