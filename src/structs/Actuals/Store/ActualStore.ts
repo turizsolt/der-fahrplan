@@ -15,8 +15,7 @@ import { Passenger } from '../../Interfaces/Passenger';
 import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
 import { PassengerGenerator } from '../PassengerGenerator';
-import { ActualLogStore } from './ActualLogStore';
-import { Commander } from './Commander';
+import { CommandLog } from './Command/CommandLog';
 
 @injectable()
 export class ActualStore implements Store {
@@ -43,12 +42,10 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfPassengerGenerator) private PassengerGeneratorFactory: () => PassengerGenerator;
   private passengerGenerator: PassengerGenerator;
 
-  private logStore: ActualLogStore;
-  private commander: Commander;
+  private logStore: CommandLog;
 
   init() {
-    this.logStore = new ActualLogStore(this);
-    this.commander = new Commander(this, this.logStore);
+    this.logStore = new CommandLog(this);
 
     this.elements = {};
     this.typedElements = {};
@@ -256,11 +253,7 @@ export class ActualStore implements Store {
     };
   }
 
-  getLogStore(): ActualLogStore {
+  getCommandLog(): CommandLog {
     return this.logStore;
-  }
-
-  getCommander(): Commander {
-    return this.commander;
   }
 }

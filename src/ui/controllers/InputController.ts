@@ -81,7 +81,7 @@ export class InputController {
     this.vueViewbox = new VueViewbox(this);
 
     this.vueTestPanel = new VueTestPanel(this.store);
-    this.store.getLogStore().setInputController(this);
+    this.store.getCommandLog().setInputController(this);
 
     this.inputHandlers = {
       [InputMode.CAMERA]: new CameraInputHandler(camera),
@@ -430,7 +430,7 @@ export class InputController {
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     switch (key) {
       case 'T':
-        this.store.getLogStore().runNext();
+        this.store.getCommandLog().runNext();
         break;
 
       case 'U':

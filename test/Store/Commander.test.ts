@@ -2,7 +2,9 @@ import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import { testContainer } from '../../src/di/test.config';
 import { TYPES } from '../../src/di/TYPES';
-import { Commander } from '../../src/structs/Actuals/Store/Commander';
+import { CommandCreator } from '../../src/structs/Actuals/Store/Command/CommandCreator';
+import { CommandMode } from '../../src/structs/Actuals/Store/Command/CommandLog';
+import { CommandProcessor } from '../../src/structs/Actuals/Store/Command/CommandProcessor';
 import { Store } from '../../src/structs/Interfaces/Store';
 import { TrackJoint } from '../../src/structs/Interfaces/TrackJoint';
 chai.use(chaiAlmost());
@@ -12,18 +14,22 @@ export const store: Store = testContainer
     .init();
 
 describe('Commander', () => {
-    it('createTrackJoint', () => {
-        const id = 'tj1';
-        const commander = new Commander(store, store.getLogStore());
-        const tj: TrackJoint = commander.createTrackJoint(id, 0, 0, 0);
-        expect(tj.getId()).equals(id);
+    const commandLog = store.getCommandLog();
+
+    before(() => {
+        commandLog.setMode(CommandMode.Master);
     });
 
-    it('removeTrackJoint', () => {
+    beforeEach(() => {
+        store.clear();
+    });
+
+    it('createTrackJoint', () => {
         const id = 'tj1';
-        const commander = new Commander(store, store.getLogStore());
-        const tj: TrackJoint = commander.createTrackJoint(id, 0, 0, 0);
-        commander.removeTrackJoint(id);
+        // const command = ;
+        commandLog.addAction(CommandCreator.createTrackJoint(id, 0, 0, 0));
+
+        const tj = store.get(id) as TrackJoint;
         expect(tj.getId()).equals(id);
     });
 });

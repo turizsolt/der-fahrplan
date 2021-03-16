@@ -40,7 +40,8 @@ export class TrackJointConnector {
     const otherEnd = other.getEnds()[otherEndLetter];
 
     if (one.areBothEndsEmpty(oneEnd, otherEnd)) {
-      const t = this.store.getCommander().createTrack(coordinates);
+      const t = this.TrackFactory().init(coordinates);
+      // todo const t = this.store.getCommander().createTrack(coordinates);
 
       one.setOneEnd(oneEndLetter, t.getA());
       other.setOneEnd(otherEndLetter, t.getB());

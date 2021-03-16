@@ -1,5 +1,4 @@
-import { ActualLogStore } from '../Actuals/Store/ActualLogStore';
-import { Commander } from '../Actuals/Store/Commander';
+import { CommandLog } from '../Actuals/Store/Command/CommandLog';
 import { BaseStorable } from './BaseStorable';
 
 export interface Store {
@@ -27,6 +26,5 @@ export interface Store {
   addArrivedPassengerStats(stats: { time: number, distance: number }): void;
   getPassengerStats(): any;
 
-  getLogStore(): ActualLogStore;
-  getCommander(): Commander;
+  getCommandLog(): CommandLog;
 }

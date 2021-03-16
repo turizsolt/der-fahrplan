@@ -5,7 +5,7 @@ export class VueTestPanel {
   private vmTestPanel: any;
 
   constructor(private store: Store) {
-    const _actionStore = this.store.getLogStore();//.getActionStore();
+    const _actionStore = this.store.getCommandLog();
     this.vmTestPanel = new Vue({
       el: '#test-panel',
       data: {
@@ -20,8 +20,8 @@ export class VueTestPanel {
           _actionStore.turnReplayOn();
         },
         next: function () {
-          _actionStore.nextTick();
-          // _actionStore.runNext();
+          // _actionStore.nextTick();
+          _actionStore.runNext();
         },
         run: function () {
           // _actionStore.runAll();

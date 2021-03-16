@@ -46,7 +46,7 @@ export class ActualLand implements Land {
           inputController.setTargetPassenger(levels[levelId].target_passenger);
         }
         if (levels[levelId].actions) {
-          store.getLogStore().setActions(levels[levelId].actions);
+          store.getCommandLog().setActions(levels[levelId].actions);
         }
       }, 1000);
     }
