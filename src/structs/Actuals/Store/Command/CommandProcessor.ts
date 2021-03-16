@@ -2,44 +2,32 @@ import { TYPES } from "../../../../di/TYPES";
 import { Coordinate } from "../../../Geometry/Coordinate";
 import { Store } from "../../../Interfaces/Store";
 import { Track } from "../../../Interfaces/Track";
+import { TrackBase } from "../../../Interfaces/TrackBase";
 import { TrackJoint } from "../../../Interfaces/TrackJoint";
+import { WhichEnd } from "../../../Interfaces/WhichEnd";
 import { CommandLog } from "./CommandLog";
 
 export class CommandProcessor {
     constructor(private store: Store, private logStore: CommandLog) { }
 
     createTrackJoint(id: string, x: number, z: number, angle: number): TrackJoint {
-        const j2: TrackJoint = this.store.create<TrackJoint>(TYPES.TrackJoint);
+        const j2 = this.store.create<TrackJoint>(TYPES.TrackJoint);
         j2.presetId(id);
         j2.init(x, z, angle);
-        /*this.store.getCommandLog().addAction({
-            type: 'creation',
-            object: j2.getId(),
-            function: 'init',
-            params: [x, z, angle],
-            objectType: 'TrackJoint'
-        });*/
         return j2;
     }
 
-    /*
-    createTrack(coordinates: Coordinate[]): Track {
-        const t = this.store.create<Track>(TYPES.Track);
-        if (false) { // this.mode === CommandMode.Replay) {
-            const id = this.logStore.getPresetId('Track');
-            t.presetId(id);
-            t.init(coordinates);
-        } else {
-            t.init(coordinates);
-            this.store.getCommandLog().addAction({
-                type: 'id',
-                object: t.getId(),
-                function: 'init',
-                params: [],
-                objectType: 'Track'
-            });
-        }
-        return t;
+    joinTrackJoints(trackId: string, coordinates: Coordinate[], jointId1: string, whichEnd1: WhichEnd, jointId2, whichEnd2: WhichEnd): TrackBase {
+        const track = this.store.create<Track>(TYPES.Track);
+        track.presetId(trackId);
+        track.init(coordinates);
+
+        const one = this.store.get(jointId1) as TrackJoint;
+        const other = this.store.get(jointId2) as TrackJoint;
+
+        one.setOneEnd(whichEnd1, track.getA());
+        other.setOneEnd(whichEnd2, track.getB());
+
+        return track;
     }
-    */
 }

@@ -42,7 +42,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   }
 
   rotate(rot: number) {
-    if (this.areBothEndsEmpty(this.ends.A, this.ends.B)) {
+    if (ActualTrackJoint.areBothEndsEmpty(this.ends.A, this.ends.B)) {
       this.ray.dirXZ = rot;
       this.renderer.update();
     }
@@ -88,7 +88,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     }
   }
 
-  isEndEmpty(end: TrackJointEnd): boolean {
+  static isEndEmpty(end: TrackJointEnd): boolean {
     return !end.isSet();
   }
 
@@ -96,7 +96,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     return this.connector.connect(this, other);
   }
 
-  areBothEndsEmpty(oneEnd, otherEnd: TrackJointEnd): boolean {
+  static areBothEndsEmpty(oneEnd, otherEnd: TrackJointEnd): boolean {
     return this.isEndEmpty(oneEnd) && this.isEndEmpty(otherEnd);
   }
 

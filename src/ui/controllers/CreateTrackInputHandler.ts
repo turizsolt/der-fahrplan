@@ -9,6 +9,8 @@ import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/Coordina
 import { Store } from '../../structs/Interfaces/Store';
 import { CommandLog } from '../../structs/Actuals/Store/Command/CommandLog';
 import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
+import { Command } from '../../structs/Actuals/Store/Command/Command';
+import { TYPES } from '../../di/TYPES';
 
 export class CreateTrackInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
@@ -146,12 +148,17 @@ export class CreateTrackInputHandler implements InputHandler {
         downProps.snappedJointOnTrack.position === 1)
     ) {
       let j1, j2: TrackJoint;
-      let deletable: TrackJoint[] = [];
+      const deletable: TrackJoint[] = [];
+      const actions: Command[] = [];
       if (downProps.snappedJoint) {
         j1 = downProps.snappedJoint;
       } else {
-        //j1 = 
-        this.commandLog.addAction(CommandCreator.createTrackJoint(
+        j1 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
+          downProps.snappedPoint.coord.x,
+          downProps.snappedPoint.coord.z,
+          downProps.wheelRad
+        );
+        actions.push(CommandCreator.createTrackJoint(
           null,
           downProps.snappedPoint.coord.x,
           downProps.snappedPoint.coord.z,
@@ -163,8 +170,12 @@ export class CreateTrackInputHandler implements InputHandler {
       if (props.snappedJoint) {
         j2 = props.snappedJoint;
       } else {
-        //j2 = 
-        this.commandLog.addAction(CommandCreator.createTrackJoint(
+        j2 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
+          props.snappedPoint.coord.x,
+          props.snappedPoint.coord.z,
+          props.wheelRad
+        );
+        actions.push(CommandCreator.createTrackJoint(
           null,
           props.snappedPoint.coord.x,
           props.snappedPoint.coord.z,
@@ -173,17 +184,24 @@ export class CreateTrackInputHandler implements InputHandler {
         deletable.push(j2);
       }
 
-      //const ret = j2.connect(j1);
-      /*this.store.getCommandLog().addAction({
-        type: 'statement',
-        object: j2.getId(),
-        function: 'connect',
-        params: [{ id: j1.getId() }]
-      });*/
+      const ret = j2.connect(j1);
 
-      //if (!ret) {
-      //  deletable.map(j => j.remove());
-      //}
+      deletable.map(j => j.remove());
+
+      if (ret) {
+        const [a1, a2] = actions.map(a => this.commandLog.addAction(a));
+        ret.map(a => {
+          const b = { ...a };
+          if (a1 && a2) {
+            b.params[2] = a1?.returnValue?.getId() ?? j1.getId();
+            b.params[4] = a2?.returnValue?.getId() ?? j2.getId();
+          } else if (a1) {
+            b.params[2] = j1.getId();
+            b.params[4] = a1?.returnValue?.getId() ?? j2.getId();
+          }
+          this.commandLog.addAction(b)
+        });
+      }
     }
     this.fromMesh.setEnabled(false);
     this.toMesh.setEnabled(false);

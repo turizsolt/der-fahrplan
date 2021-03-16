@@ -3,8 +3,8 @@ import { Emitable } from '../../../../mixins/Emitable';
 import { applyMixins } from '../../../../mixins/ApplyMixins';
 import { AssertionCommand, Command, ProcessableCommand, StatementCommand } from './Command';
 import { InputController } from '../../../../ui/controllers/InputController';
-import { CommandResult } from './CommandResult';
 import { CommandProcessor } from './CommandProcessor';
+import { CommandResultWithValue } from './CommandResultWithValue';
 
 export enum CommandMode {
   Master,
@@ -49,15 +49,19 @@ export class CommandLog {
     return Object.freeze([...this.actions]);
   }
 
-  addAction(action: Command): void {
+  addAction(action: Command): CommandResultWithValue {
     const tick = this.store.getTickCount();
     this.actions.push({ ...action, tick });
 
+    let result = { result: null };
+
     if (this.mode === CommandMode.Master) {
-      this.runAction(this.actions.length - 1);
+      result = this.runAction(this.actions.length - 1);
     }
 
     this.emit('updated', this.getActions());
+
+    return result;
   }
 
   turnReplayOn(): void {
@@ -80,22 +84,23 @@ export class CommandLog {
   }
 
   runAll() {
-    let returned: CommandResult;
+    let returned: CommandResultWithValue;
     do {
       returned = this.runAction(this.nextAction);
       this.nextAction++;
     }
-    while (returned === 'succeded' && this.nextAction < this.actions.length);
+    while (returned.result === 'succeded' && this.nextAction < this.actions.length);
     return returned;
   }
 
-  runAction(index: number): CommandResult | null {
+  runAction(index: number): CommandResultWithValue {
     if (this.actions[index]) {
       // try {
       const action = this.actions[index];
-      const result = this.runner[action.type](action);
+      const { result, returnValue } = this.runner[action.type](action);
       this.actions[index].result = result;
       this.emit('updated', this.getActions());
+      return { result, returnValue };
       //} catch (e) {
       //  console.log(e);
       //  this.actions[index].result = 'exception-raised';
@@ -103,32 +108,37 @@ export class CommandLog {
       //  return 'exception-raised';
       //}
     } else {
-      return null;
+      return { result: null };
     }
   }
 
-  private runStatement = (commandToRun: Command): CommandResult => {
+  private runStatement = (commandToRun: Command): CommandResultWithValue => {
     const action = commandToRun as StatementCommand;
     const obj = this.store.get(action.object);
-    obj[action.function](...action.params.map(p => this.processParam(p)));
-    return 'succeded';
+    const returnValue = obj[action.function](...action.params.map(p => this.processParam(p)));
+    return { result: 'succeded', returnValue };
   }
 
-  private runAssertion = (commandToRun: Command): CommandResult => {
+  private runAssertion = (commandToRun: Command): CommandResultWithValue => {
     const action = commandToRun as AssertionCommand;
     const obj = this.store.get(action.object);
     const returnValue = obj[action.function](...action.params.map(p => this.processParam(p)));
 
     // todo this is just a value comparison, deep equals needed later on
-    return returnValue === action.equalsTo
-      ? 'succeded'
-      : 'failed';
+    return {
+      result: (
+        returnValue === action.equalsTo
+          ? 'succeded'
+          : 'failed'
+      ),
+      returnValue
+    };
   }
 
-  private runProcessable = (commandToRun: Command): CommandResult => {
+  private runProcessable = (commandToRun: Command): CommandResultWithValue => {
     const action = commandToRun as ProcessableCommand;
-    this.processor[action.function](...action.params.map(p => this.processParam(p)));
-    return 'succeded';
+    const returnValue = this.processor[action.function](...action.params.map(p => this.processParam(p)));
+    return { result: 'succeded', returnValue };
   }
 
   private runner = {
