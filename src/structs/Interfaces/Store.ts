@@ -27,4 +27,6 @@ export interface Store {
   getPassengerStats(): any;
 
   getCommandLog(): CommandLog;
+
+  generateId(): string;
 }

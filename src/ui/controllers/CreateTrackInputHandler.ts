@@ -7,7 +7,7 @@ import { curveToTube } from '../../ui/babylon/TrackBabylonRenderer';
 import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/CoordinateToBabylonVector3';
 import { Store } from '../../structs/Interfaces/Store';
-import { CommandLog } from '../../structs/Actuals/Store/Command/CommandLog';
+import { CommandLog, GENERATE_ID } from '../../structs/Actuals/Store/Command/CommandLog';
 import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
 import { Command } from '../../structs/Actuals/Store/Command/Command';
 import { TYPES } from '../../di/TYPES';
@@ -129,7 +129,7 @@ export class CreateTrackInputHandler implements InputHandler {
   click(downProps: InputProps, event: PointerEvent): void {
     if (!downProps.snappedJoint && !downProps.snappedPositionOnTrack) {
       const tj = this.commandLog.addAction(CommandCreator.createTrackJoint(
-        null,
+        GENERATE_ID,
         downProps.snappedPoint.coord.x,
         downProps.snappedPoint.coord.z,
         downProps.wheelRad
@@ -162,7 +162,7 @@ export class CreateTrackInputHandler implements InputHandler {
           downProps.wheelRad
         );
         actions.push(CommandCreator.createTrackJoint(
-          null,
+          GENERATE_ID,
           downProps.snappedPoint.coord.x,
           downProps.snappedPoint.coord.z,
           downProps.wheelRad
@@ -180,7 +180,7 @@ export class CreateTrackInputHandler implements InputHandler {
           props.wheelRad
         );
         actions.push(CommandCreator.createTrackJoint(
-          null,
+          GENERATE_ID,
           props.snappedPoint.coord.x,
           props.snappedPoint.coord.z,
           props.wheelRad

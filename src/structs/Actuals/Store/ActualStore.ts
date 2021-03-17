@@ -98,6 +98,10 @@ export class ActualStore implements Store {
     this.typedElements = {};
   }
 
+  generateId(): string {
+    return shortid.generate();
+  }
+
   register(object: BaseStorable, presetId: string = null): string {
     let id = presetId || shortid.generate();
     this.elements[id] = object;

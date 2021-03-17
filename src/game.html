@@ -330,6 +330,10 @@
             flex-direction: column;
         }
 
+        #test-panel-commands {
+            overflow-y: scroll;
+        }
+
         .succeded {
             background-color: #0A0;
         }
@@ -345,7 +349,7 @@
         }
 
         .action {
-            width: 100%;
+            width: 99%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -439,18 +443,23 @@
     </div>
     <div v-cloak id="test-panel" v-if="show">
         <div>
-            Test panel
-            <button @click="replay()">Replay</button>
+            Test panel ({{mode}})
+        </div>
+        <div>
+            <button @click="rewind()">Rwnd</button>
+            <button @click="prev()">Prev</button>
             <button @click="next()">Next</button>
             <button @click="run()">Run</button>
         </div>
-        <div v-for="(action, index) in actions" :key="index">
-            <div v-if="action.type === 'tick'" :class="['action', action.result]">
-                {{action.length}}x tick
-            </div>
-            <div v-else :class="['action', action.result]">
-                {{action.object}}.{{action.function}}({{action.params.join(", ")}})
-                <span v-if="action.type==='assertion'"> = {{action.equalsTo}}</span>
+        <div id="test-panel-commands">
+            <div v-for="(action, index) in actions" :key="index">
+                <div v-if="action.type === 'tick'" :class="['action', action.result]">
+                    {{action.length}}x tick
+                </div>
+                <div v-else :class="['action', action.result]">
+                    {{action.object}}.{{action.function}}({{action.params.join(", ")}})
+                    <span v-if="action.type==='assertion'"> = {{action.equalsTo}}</span>
+                </div>
             </div>
         </div>
     </div>

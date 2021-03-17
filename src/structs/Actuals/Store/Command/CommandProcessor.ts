@@ -18,6 +18,11 @@ export class CommandProcessor {
         return j2;
     }
 
+    uncreateTrackJoint(id: string, x: number, z: number, angle: number): void {
+        const j2 = this.store.get(id) as TrackJoint;
+        j2.remove();
+    }
+
     joinTrackJoints(trackId: string, coordinates: Coordinate[], jointId1: string, whichEnd1: WhichEnd, jointId2, whichEnd2: WhichEnd): TrackBase {
         const track = this.store.create<Track>(TYPES.Track);
         track.presetId(trackId);
@@ -39,7 +44,6 @@ export class CommandProcessor {
 
         one.removeEnd(track.getA());
         other.removeEnd(track.getB());
-
         track.remove();
     }
 
@@ -59,5 +63,19 @@ export class CommandProcessor {
         third.setOneEnd(whichEnd3, trackSwitch.getF());
 
         return trackSwitch;
+    }
+
+    unjoinTrackJoints3(trackId: string, oldCoordinates: Coordinate[], coordinates: Coordinate[],
+        jointId1: string, whichEnd1: WhichEnd, jointId2: string, whichEnd2: WhichEnd, jointId3: string, whichEnd3: WhichEnd
+    ): void {
+        const trackSwitch = this.store.get(trackId) as TrackSwitch;
+        const one = this.store.get(jointId1) as TrackJoint;
+        const other = this.store.get(jointId2) as TrackJoint;
+        const third = this.store.get(jointId3) as TrackJoint;
+
+        one.removeEnd(trackSwitch.getA());
+        other.removeEnd(trackSwitch.getE());
+        third.removeEnd(trackSwitch.getF());
+        trackSwitch.remove();
     }
 }

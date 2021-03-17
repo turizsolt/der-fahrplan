@@ -5,12 +5,9 @@ import { AssertionCommand, Command, ProcessableCommand, StatementCommand } from 
 import { InputController } from '../../../../ui/controllers/InputController';
 import { CommandProcessor } from './CommandProcessor';
 import { CommandResultWithValue } from './CommandResultWithValue';
+import { CommandMode } from './CommandMode';
 
-export enum CommandMode {
-  Master,
-  Network,
-  Replay
-}
+export const GENERATE_ID = 'GENERATE_ID';
 
 export interface CommandLog extends Emitable { }
 const doApply = () => applyMixins(CommandLog, [Emitable]);
@@ -41,7 +38,7 @@ export class CommandLog {
 
   setActions(actions: Command[]): void {
     this.actions = actions;
-    this.emit('updated', this.getActions());
+    this.emit('updated', this.persist());
     this.nextAction = 0;
   }
 
@@ -49,17 +46,32 @@ export class CommandLog {
     return Object.freeze([...this.actions]);
   }
 
+  persist(): { mode: CommandMode, actions: readonly Command[] } {
+    return {
+      mode: this.mode,
+      actions: this.getActions()
+    }
+  }
+
+  private generateIds(command: Command): Command {
+    if ((command as any).params) {
+      (command as any).params = (command as any).params.map(x => x === GENERATE_ID ? this.store.generateId() : x);
+    }
+    return command;
+  }
+
   addAction(action: Command): CommandResultWithValue {
     const tick = this.store.getTickCount();
-    this.actions.push({ ...action, tick });
+    this.actions.push({ ...this.generateIds(action), tick });
 
     let result = { result: null };
 
     if (this.mode === CommandMode.Master) {
       result = this.runAction(this.actions.length - 1);
+      this.nextAction = this.actions.length;
     }
 
-    this.emit('updated', this.getActions());
+    this.emit('updated', this.persist());
 
     return result;
   }
@@ -79,8 +91,17 @@ export class CommandLog {
   }
 
   runNext() {
+    if (this.nextAction >= this.actions.length) return;
+
     this.runAction(this.nextAction);
     this.nextAction++;
+  }
+
+  runPrev() {
+    if (this.nextAction === 0) return;
+
+    this.nextAction--;
+    this.unrunAction(this.nextAction);
   }
 
   runAll() {
@@ -93,22 +114,63 @@ export class CommandLog {
     return returned;
   }
 
+  runAllBack() {
+    let returned: CommandResultWithValue;
+    do {
+      this.nextAction--;
+      returned = this.unrunAction(this.nextAction);
+    }
+    while (returned.result === 'succeded' && this.nextAction > 0);
+    return returned;
+  }
+
   runAction(index: number): CommandResultWithValue {
     if (this.actions[index]) {
-      // try {
-      const action = this.actions[index];
-      const { result, returnValue } = this.runner[action.type](action);
-      this.actions[index].result = result;
-      this.emit('updated', this.getActions());
-      return { result, returnValue };
-      //} catch (e) {
-      //  console.log(e);
-      //  this.actions[index].result = 'exception-raised';
-      //  this.emit('updated', this.getActions());
-      //  return 'exception-raised';
-      //}
+      try {
+        const action = this.actions[index];
+        const { result, returnValue } = this.runner[action.type](action);
+        this.actions[index].result = result;
+        this.emit('updated', this.persist());
+        return { result, returnValue };
+      } catch (e) {
+        console.log(e);
+        this.actions[index].result = 'exception-raised';
+        this.emit('updated', this.persist());
+        return { result: 'exception-raised' };
+      }
     } else {
       return { result: null };
+    }
+  }
+
+  unrunAction(index: number): CommandResultWithValue {
+    if (this.actions[index]) {
+      try {
+        const action = this.actions[index];
+        const { result, returnValue } = this.runner[action.type](this.undo(action));
+        this.actions[index].result = undefined;
+        this.emit('updated', this.persist());
+        return { result, returnValue };
+      } catch (e) {
+        console.log(e);
+        this.actions[index].result = 'exception-raised';
+        this.emit('updated', this.persist());
+        return { result: 'exception-raised' };
+      }
+    } else {
+      return { result: null };
+    }
+  }
+
+  private undo(command: Command): Command {
+    if (command.type === 'processable') {
+      const procCommand = { ...command } as ProcessableCommand;
+      procCommand.function = procCommand.function.startsWith('un')
+        ? procCommand.function.slice(2)
+        : 'un' + procCommand.function
+      return procCommand;
+    } else {
+      return command;
     }
   }
 

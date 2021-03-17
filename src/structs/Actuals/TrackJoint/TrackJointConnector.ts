@@ -8,6 +8,7 @@ import { ActualTrackSwitch } from '../Track/ActualTrackSwitch';
 import { Store } from '../../Interfaces/Store';
 import { ActualTrackJoint } from './ActualTrackJoint';
 import { CommandCreator } from '../Store/Command/CommandCreator';
+import { GENERATE_ID } from '../Store/Command/CommandLog';
 
 @injectable()
 export class TrackJointConnector {
@@ -43,7 +44,7 @@ export class TrackJointConnector {
 
     if (ActualTrackJoint.areBothEndsEmpty(oneEnd, otherEnd)) {
       return [
-        CommandCreator.joinTrackJoints(null, coordinates, one.getId(), oneEndLetter, other.getId(), otherEndLetter)
+        CommandCreator.joinTrackJoints(GENERATE_ID, coordinates, one.getId(), oneEndLetter, other.getId(), otherEndLetter)
       ];
     }
 
@@ -110,7 +111,7 @@ export class TrackJointConnector {
           j2.getTracksEnd(oldTrack)
         ),
         CommandCreator.joinTrackJoints3(
-          null,
+          GENERATE_ID,
           oldCoordinates,
           coordinates,
           peak.getId(),
