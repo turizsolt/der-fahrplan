@@ -13,6 +13,6 @@ export function runVisualTest(testName: string): void {
     store.loadAll(json.data);
     const actionStore = store.getCommandLog();
     actionStore.setActions(json.actions);
-    const verdict = actionStore.runAll();
+    const { result: verdict } = actionStore.runAll();
     expect(verdict).equals('succeded');
 }

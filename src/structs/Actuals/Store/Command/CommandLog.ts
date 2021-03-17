@@ -203,10 +203,16 @@ export class CommandLog {
     return { result: 'succeded', returnValue };
   }
 
+  private runTick = (commandToRun: Command): CommandResultWithValue => {
+    // todo
+    return { result: 'succeded' };
+  }
+
   private runner = {
     'assertion': this.runAssertion,
     'statement': this.runStatement,
-    'processable': this.runProcessable
+    'processable': this.runProcessable,
+    'tick': this.runTick
   };
 }
 doApply();
