@@ -190,17 +190,29 @@ export class CreateTrackInputHandler implements InputHandler {
 
       const ret = j1.connect(j2);
 
+      const replacementIds = deletable.map(j => j.getId());
+
       deletable.map(j => j.remove());
 
       if (ret) {
-        const [a1, a2] = actions.map(a => this.commandLog.addAction(a));
+        const actionIds = actions.map(a => this.commandLog.addAction(a));
+        const idMapping = replacementIds.reduce(function (result, field, index) {
+          result[field] = actionIds[index].returnValue.getId();
+          return result;
+        }, {});
 
         ret.map(a => {
           const b = { ...a };
 
           if (b.function === 'joinTrackJoints') {
-            b.params[2] = s1 ? a1?.returnValue?.getId() : j1.getId();
-            b.params[4] = s2 ? (s1 ? a2 : a1)?.returnValue?.getId() : j2.getId();
+            b.params[2] = idMapping[b.params[2]] ?? b.params[2];
+            b.params[4] = idMapping[b.params[4]] ?? b.params[4];
+          }
+
+          if (b.function === 'joinTrackJoints3') {
+            b.params[3] = idMapping[b.params[3]] ?? b.params[3];
+            b.params[5] = idMapping[b.params[5]] ?? b.params[5];
+            b.params[7] = idMapping[b.params[7]] ?? b.params[7];
           }
 
           this.commandLog.addAction(b)

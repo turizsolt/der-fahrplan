@@ -97,21 +97,6 @@ export class TrackJointConnector {
           .getTracksEnd(oldTrack);
       }
 
-      // oldTrack.remove();
-
-      // itt kéne valahol feldarabolni
-      // sw.splitNatural();
-
-      // const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
-
-      // peak.setOneEnd(peakLetter, sw.getA());
-      // second.setOneEnd(secondLetter, sw.getE());
-      // third.setOneEnd(thirdLetter, sw.getF());
-
-      // return { track: sw, removed: oldTrack };
-
-      console.log('ts');
-
       const j1 = oldTrack.getA().getJointTo();
       const j2 = oldTrack.getB().getJointTo();
 
@@ -124,7 +109,7 @@ export class TrackJointConnector {
           j2.getId(),
           j2.getTracksEnd(oldTrack)
         ),
-        /*CommandCreator.joinTrackJoints3(
+        CommandCreator.joinTrackJoints3(
           null,
           oldCoordinates,
           coordinates,
@@ -134,7 +119,7 @@ export class TrackJointConnector {
           secondLetter,
           third.getId(),
           thirdLetter
-        )*/
+        )
       ];
     }
 
