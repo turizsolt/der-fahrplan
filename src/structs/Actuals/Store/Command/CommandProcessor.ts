@@ -4,6 +4,7 @@ import { Store } from "../../../Interfaces/Store";
 import { Track } from "../../../Interfaces/Track";
 import { TrackBase } from "../../../Interfaces/TrackBase";
 import { TrackJoint } from "../../../Interfaces/TrackJoint";
+import { TrackSwitch } from "../../../Interfaces/TrackSwitch";
 import { WhichEnd } from "../../../Interfaces/WhichEnd";
 import { CommandLog } from "./CommandLog";
 
@@ -29,5 +30,34 @@ export class CommandProcessor {
         other.setOneEnd(whichEnd2, track.getB());
 
         return track;
+    }
+
+    unjoinTrackJoints(trackId: string, coordinates: Coordinate[], jointId1: string, whichEnd1: WhichEnd, jointId2, whichEnd2: WhichEnd): void {
+        const track = this.store.get(trackId) as Track;
+        const one = this.store.get(jointId1) as TrackJoint;
+        const other = this.store.get(jointId2) as TrackJoint;
+
+        one.removeEnd(track.getA());
+        other.removeEnd(track.getB());
+
+        track.remove();
+    }
+
+    joinTrackJoints3(trackId: string, oldCoordinates: Coordinate[], coordinates: Coordinate[],
+        jointId1: string, whichEnd1: WhichEnd, jointId2: string, whichEnd2: WhichEnd, jointId3: string, whichEnd3: WhichEnd
+    ): TrackBase {
+        const trackSwitch = this.store.create<TrackSwitch>(TYPES.TrackSwitch);
+        trackSwitch.presetId(trackId);
+        trackSwitch.init(oldCoordinates, coordinates);
+
+        const one = this.store.get(jointId1) as TrackJoint;
+        const other = this.store.get(jointId2) as TrackJoint;
+        const third = this.store.get(jointId3) as TrackJoint;
+
+        one.setOneEnd(whichEnd1, trackSwitch.getA());
+        other.setOneEnd(whichEnd2, trackSwitch.getE());
+        third.setOneEnd(whichEnd3, trackSwitch.getF());
+
+        return trackSwitch;
     }
 }

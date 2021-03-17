@@ -148,11 +148,14 @@ export class CreateTrackInputHandler implements InputHandler {
         downProps.snappedJointOnTrack.position === 1)
     ) {
       let j1, j2: TrackJoint;
+      let s1: boolean = false;
+      let s2: boolean = false;
       const deletable: TrackJoint[] = [];
       const actions: Command[] = [];
       if (downProps.snappedJoint) {
         j1 = downProps.snappedJoint;
       } else {
+        s1 = true;
         j1 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
           downProps.snappedPoint.coord.x,
           downProps.snappedPoint.coord.z,
@@ -170,6 +173,7 @@ export class CreateTrackInputHandler implements InputHandler {
       if (props.snappedJoint) {
         j2 = props.snappedJoint;
       } else {
+        s2 = true;
         j2 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
           props.snappedPoint.coord.x,
           props.snappedPoint.coord.z,
@@ -184,21 +188,21 @@ export class CreateTrackInputHandler implements InputHandler {
         deletable.push(j2);
       }
 
-      const ret = j2.connect(j1);
+      const ret = j1.connect(j2);
 
       deletable.map(j => j.remove());
 
       if (ret) {
         const [a1, a2] = actions.map(a => this.commandLog.addAction(a));
+
         ret.map(a => {
           const b = { ...a };
-          if (a1 && a2) {
-            b.params[2] = a1?.returnValue?.getId() ?? j1.getId();
-            b.params[4] = a2?.returnValue?.getId() ?? j2.getId();
-          } else if (a1) {
-            b.params[2] = j1.getId();
-            b.params[4] = a1?.returnValue?.getId() ?? j2.getId();
+
+          if (b.function === 'joinTrackJoints') {
+            b.params[2] = s1 ? a1?.returnValue?.getId() : j1.getId();
+            b.params[4] = s2 ? (s1 ? a2 : a1)?.returnValue?.getId() : j2.getId();
           }
+
           this.commandLog.addAction(b)
         });
       }

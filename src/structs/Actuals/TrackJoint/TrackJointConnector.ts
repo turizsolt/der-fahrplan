@@ -53,8 +53,6 @@ export class TrackJointConnector {
 
       const oldCoordinates = oldTrack.getSegment().getCoordinates();
 
-      const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
-
       const thirdA = oldTrack.getA().getJointTo();
       const thirdB = oldTrack.getB().getJointTo();
 
@@ -99,16 +97,45 @@ export class TrackJointConnector {
           .getTracksEnd(oldTrack);
       }
 
-      oldTrack.remove();
+      // oldTrack.remove();
 
       // itt kéne valahol feldarabolni
       // sw.splitNatural();
 
-      peak.setOneEnd(peakLetter, sw.getA());
-      second.setOneEnd(secondLetter, sw.getE());
-      third.setOneEnd(thirdLetter, sw.getF());
+      // const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
 
-      return { track: sw, removed: oldTrack };
+      // peak.setOneEnd(peakLetter, sw.getA());
+      // second.setOneEnd(secondLetter, sw.getE());
+      // third.setOneEnd(thirdLetter, sw.getF());
+
+      // return { track: sw, removed: oldTrack };
+
+      console.log('ts');
+
+      const j1 = oldTrack.getA().getJointTo();
+      const j2 = oldTrack.getB().getJointTo();
+
+      return [
+        CommandCreator.unjoinTrackJoints(
+          oldTrack.getId(),
+          oldCoordinates,
+          j1.getId(),
+          j1.getTracksEnd(oldTrack),
+          j2.getId(),
+          j2.getTracksEnd(oldTrack)
+        ),
+        /*CommandCreator.joinTrackJoints3(
+          null,
+          oldCoordinates,
+          coordinates,
+          peak.getId(),
+          peakLetter,
+          second.getId(),
+          secondLetter,
+          third.getId(),
+          thirdLetter
+        )*/
+      ];
     }
 
     return false;

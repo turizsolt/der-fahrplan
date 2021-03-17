@@ -97,7 +97,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   }
 
   static areBothEndsEmpty(oneEnd, otherEnd: TrackJointEnd): boolean {
-    return this.isEndEmpty(oneEnd) && this.isEndEmpty(otherEnd);
+    return ActualTrackJoint.isEndEmpty(oneEnd) && ActualTrackJoint.isEndEmpty(otherEnd);
   }
 
   setOneEnd(jointEndLetter: WhichEnd, trackEnd: TrackEnd) {
