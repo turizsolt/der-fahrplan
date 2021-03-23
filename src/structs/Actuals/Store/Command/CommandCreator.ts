@@ -45,4 +45,12 @@ export class CommandCreator {
       params: [wagonId, trainId, wagonConfig, trackId, position, direction],
     }
   }
+
+  static uncreateWagon(wagonId: string, trainId: string, wagonConfig: WagonConfig, trackId: string, position: number, direction: number): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'uncreateWagon',
+      params: [wagonId, trainId, wagonConfig, trackId, position, direction],
+    }
+  }
 }

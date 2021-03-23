@@ -89,4 +89,9 @@ export class CommandProcessor {
         wagon.putOnTrack(track, position, direction);
         return wagon;
     }
+
+    uncreateWagon(wagonId: string, trainId: string, wagonConfig: WagonConfig, trackId: string, position: number, direction: number): void {
+        const wagon = this.store.get(wagonId) as Wagon;
+        wagon.remove();
+    }
 }
