@@ -53,7 +53,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
-  init(config?: WagonConfig): Wagon {
+  init(config?: WagonConfig, trainId?: string): Wagon {
     super.initStore(TYPES.Wagon);
 
     this.position = new WagonPosition(this, config && config.length);
@@ -61,7 +61,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       this,
       config && config.passengerArrangement
     );
-    this.announcement = new WagonAnnouncement(this, this.store);
+    this.announcement = new WagonAnnouncement(this, this.store, trainId);
     if (config && config.controlType === WagonControlType.Nothing) {
       this.speed = new WagonSpeedPassenger(
         this,

@@ -1,5 +1,6 @@
 import { Coordinate } from "../../../Geometry/Coordinate";
 import { WhichEnd } from "../../../Interfaces/WhichEnd";
+import { WagonConfig } from "../../Wagon/WagonConfig";
 import { ProcessableCommand } from "./Command";
 
 export class CommandCreator {
@@ -34,6 +35,14 @@ export class CommandCreator {
       type: 'processable',
       function: 'joinTrackJoints3',
       params: [trackId, oldCoordinates, coordinates, jointId1, whichEnd1, jointId2, whichEnd2, jointId3, whichEnd3],
+    }
+  }
+
+  static createWagon(wagonId: string, trainId: string, wagonConfig: WagonConfig, trackId: string, position: number, direction: number): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'createWagon',
+      params: [wagonId, trainId, wagonConfig, trackId, position, direction],
     }
   }
 }

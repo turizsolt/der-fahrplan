@@ -18,7 +18,7 @@ import { WagonMovingState } from '../Actuals/Wagon/WagonMovingState';
 import { Trip } from '../Scheduling/Trip';
 
 export interface Wagon extends Boardable, BaseBrick, Updatable {
-  init(config?: WagonConfig): Wagon;
+  init(config?: WagonConfig, trainId?: string): Wagon;
   update(): void;
   getA(): WagonEnd;
   getB(): WagonEnd;

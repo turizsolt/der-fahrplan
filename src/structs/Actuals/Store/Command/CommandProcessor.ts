@@ -5,7 +5,9 @@ import { Track } from "../../../Interfaces/Track";
 import { TrackBase } from "../../../Interfaces/TrackBase";
 import { TrackJoint } from "../../../Interfaces/TrackJoint";
 import { TrackSwitch } from "../../../Interfaces/TrackSwitch";
+import { Wagon } from "../../../Interfaces/Wagon";
 import { WhichEnd } from "../../../Interfaces/WhichEnd";
+import { WagonConfig } from "../../Wagon/WagonConfig";
 import { CommandLog } from "./CommandLog";
 
 export class CommandProcessor {
@@ -77,5 +79,14 @@ export class CommandProcessor {
         other.removeEnd(trackSwitch.getE());
         third.removeEnd(trackSwitch.getF());
         trackSwitch.remove();
+    }
+
+    createWagon(wagonId: string, trainId: string, wagonConfig: WagonConfig, trackId: string, position: number, direction: number): Wagon {
+        const wagon = this.store.create<Wagon>(TYPES.Wagon);
+        const track = this.store.get(trackId) as Track;
+        wagon.presetId(wagonId);
+        wagon.init(wagonConfig, trainId);
+        wagon.putOnTrack(track, position, direction);
+        return wagon;
     }
 }
