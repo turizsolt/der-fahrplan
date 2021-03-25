@@ -2,7 +2,9 @@
   <div>
     <div class="item-type">🚂 Mozdony</div>
     <div class="item-id">{{ idt }}</div>
-    <div class="item-id">Speed: {{ obj.speed ? obj.speed : "???" }}</div>
+    <div class="item-id">
+      Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "???" }}
+    </div>
 
     <!-- train -->
     <div class="train">

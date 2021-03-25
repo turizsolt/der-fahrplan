@@ -70,6 +70,8 @@ export class InputController {
 
   private targetPassengerCount: number = 9999999;
 
+  private downAt: number = 0;
+
   constructor(
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera,
@@ -408,23 +410,6 @@ export class InputController {
         }
         break;
     }
-
-    if (!this.getSelected()) return;
-
-    switch (key) {
-
-      case 'ArrowUp':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('forward');
-        break;
-
-      case 'ArrowDown':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('backward');
-        break;
-    }
   }
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
@@ -455,16 +440,6 @@ export class InputController {
 
       case '9':
         this.selectMode(InputMode.CREATE_STATION);
-        break;
-
-      case 'ArrowUp':
-        this.upTime = 0;
-        this.timeLimit = this.originalTimeLimit;
-        break;
-
-      case 'ArrowDown':
-        this.downTime = 0;
-        this.timeLimit = this.originalTimeLimit;
         break;
 
       case 'K':
@@ -572,10 +547,6 @@ export class InputController {
     }
   }
 
-  private upTime: number = 0;
-  private downTime: number = 0;
-  private downAt: number = 0;
-
   keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     if (!this.getSelected()) return;
 
@@ -599,25 +570,15 @@ export class InputController {
         break;
 
       case 'ArrowUp':
-        this.upTime += this.store.getTickSpeed();
-        if (this.upTime > (this.timeLimit - 1)) {
-          this.getSelectedBrick()
-            .getRenderer()
-            .process('forward');
-          this.upTime -= this.timeLimit;
-          this.timeLimit = this.shortTimeLimit;
-        }
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('forward');
         break;
 
       case 'ArrowDown':
-        this.downTime += this.store.getTickSpeed();
-        if (this.downTime > (this.timeLimit - 1)) {
-          this.getSelectedBrick()
-            .getRenderer()
-            .process('backward');
-          this.downTime -= this.timeLimit;
-          this.timeLimit = this.shortTimeLimit;
-        }
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('backward');
         break;
     }
   }
