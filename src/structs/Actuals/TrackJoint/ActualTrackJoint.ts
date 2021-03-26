@@ -28,6 +28,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     super.initStore(TYPES.TrackJoint);
 
     this.connector = this.TrackJointConnectorFactory();
+    this.connector.setStore(this.store);
 
     this.ends = {
       A: new TrackJointEnd(),
@@ -41,7 +42,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   }
 
   rotate(rot: number) {
-    if (this.areBothEndsEmpty(this.ends.A, this.ends.B)) {
+    if (ActualTrackJoint.areBothEndsEmpty(this.ends.A, this.ends.B)) {
       this.ray.dirXZ = rot;
       this.renderer.update();
     }
@@ -87,7 +88,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     }
   }
 
-  isEndEmpty(end: TrackJointEnd): boolean {
+  static isEndEmpty(end: TrackJointEnd): boolean {
     return !end.isSet();
   }
 
@@ -95,8 +96,8 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     return this.connector.connect(this, other);
   }
 
-  areBothEndsEmpty(oneEnd, otherEnd: TrackJointEnd): boolean {
-    return this.isEndEmpty(oneEnd) && this.isEndEmpty(otherEnd);
+  static areBothEndsEmpty(oneEnd, otherEnd: TrackJointEnd): boolean {
+    return ActualTrackJoint.isEndEmpty(oneEnd) && ActualTrackJoint.isEndEmpty(otherEnd);
   }
 
   setOneEnd(jointEndLetter: WhichEnd, trackEnd: TrackEnd) {
@@ -154,15 +155,15 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
       ray: this.ray.persist(),
       A: this.ends.A.isSet()
         ? {
-            track: this.ends.A.track.getId(),
-            whichEnd: this.ends.A.end.getWhichTrackEnd()
-          }
+          track: this.ends.A.track.getId(),
+          whichEnd: this.ends.A.end.getWhichTrackEnd()
+        }
         : null,
       B: this.ends.B.isSet()
         ? {
-            track: this.ends.B.track.getId(),
-            whichEnd: this.ends.B.end.getWhichTrackEnd()
-          }
+          track: this.ends.B.track.getId(),
+          whichEnd: this.ends.B.end.getWhichTrackEnd()
+        }
         : null
     };
   }

@@ -310,6 +310,53 @@
             margin-bottom: 20px;
         }
 
+        /******************************************/
+
+        #test-panel {
+            position: fixed;
+            right: 20px;
+            top: 160px;
+            bottom: 20px;
+            width: 200px;
+            background-color: #cec;
+
+            border: 2px solid #070;
+            border-radius: 0.5em;
+
+            padding: 10px;
+
+            display: flex;
+            justify-content: start;
+            flex-direction: column;
+        }
+
+        #test-panel-commands {
+            overflow-y: scroll;
+        }
+
+        .succeded {
+            background-color: #0A0;
+        }
+
+        .failed {
+            background-color: red;
+            color: white;
+        }
+
+        .exception-raised {
+            background-color: purple;
+            color: white;
+        }
+
+        .action {
+            width: 99%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+            padding: 1px;
+        }
+
         [v-cloak] {
             display: none;
         }
@@ -390,6 +437,28 @@
                 <div v-for="station in stations">
                     <button v-on:click="addStop(station)" :style="{backgroundColor: station.rgbColor}">Add</button>
                     {{station.name}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-cloak id="test-panel" v-if="show">
+        <div>
+            Test panel ({{mode}})
+        </div>
+        <div>
+            <button @click="rewind()">Rwnd</button>
+            <button @click="prev()">Prev</button>
+            <button @click="next()">Next</button>
+            <button @click="run()">Run</button>
+        </div>
+        <div id="test-panel-commands">
+            <div v-for="(action, index) in actions" :key="index">
+                <div v-if="action.type === 'tick'" :class="['action', action.result]">
+                    {{action.length}}x tick
+                </div>
+                <div v-else :class="['action', action.result]">
+                    {{action.object}}.{{action.function}}({{action.params.join(", ")}})
+                    <span v-if="action.type==='assertion'"> = {{action.equalsTo}}</span>
                 </div>
             </div>
         </div>

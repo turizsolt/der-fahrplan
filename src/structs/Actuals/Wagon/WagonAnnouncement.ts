@@ -11,8 +11,10 @@ export class WagonAnnouncement {
   protected trip: Trip;
   protected train: Train;
 
-  constructor(private parent: Wagon, private store: Store) {
-    this.train = this.store.create<Train>(TYPES.Train).init(this.parent);
+  constructor(private parent: Wagon, private store: Store, trainId: string) {
+    this.train = this.store.create<Train>(TYPES.Train);
+    this.train.presetId(trainId);
+    this.train.init(this.parent);
   }
 
   assignTrip(trip: Trip): void {

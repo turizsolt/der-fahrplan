@@ -26,7 +26,4 @@ export interface TrackJoint extends BaseBrick {
   isSelected(): boolean;
   verbose(): void;
   getTracksEnd(track: TrackBase): WhichEnd | undefined;
-
-  isEndEmpty(end: TrackJointEnd): boolean;
-  areBothEndsEmpty(oneEnd, otherEnd: TrackJointEnd): boolean;
 }

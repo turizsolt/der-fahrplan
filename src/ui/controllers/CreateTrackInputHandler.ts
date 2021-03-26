@@ -2,19 +2,25 @@ import * as BABYLON from 'babylonjs';
 import { InputHandler } from './InputHandler';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { InputProps } from './InputProps';
-import { productionContainer } from '../../di/production.config';
 import { TrackJoint } from '../../structs/Interfaces/TrackJoint';
-import { TYPES } from '../../di/TYPES';
 import { curveToTube } from '../../ui/babylon/TrackBabylonRenderer';
 import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/CoordinateToBabylonVector3';
+import { Store } from '../../structs/Interfaces/Store';
+import { CommandLog, GENERATE_ID } from '../../structs/Actuals/Store/Command/CommandLog';
+import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
+import { Command } from '../../structs/Actuals/Store/Command/Command';
+import { TYPES } from '../../di/TYPES';
 
 export class CreateTrackInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
   private toMesh: BABYLON.Mesh;
   private pathMesh: BABYLON.Mesh;
+  private commandLog: CommandLog;
 
-  constructor() {
+  constructor(private store: Store) {
+    this.commandLog = store.getCommandLog();
+
     this.fromMesh = BABYLON.MeshBuilder.CreateBox(
       'name',
       { height: 1.5, width: 1, depth: 2 },
@@ -122,12 +128,12 @@ export class CreateTrackInputHandler implements InputHandler {
 
   click(downProps: InputProps, event: PointerEvent): void {
     if (!downProps.snappedJoint && !downProps.snappedPositionOnTrack) {
-      const tj = productionContainer.get<TrackJoint>(TYPES.TrackJoint);
-      tj.init(
+      const tj = this.commandLog.addAction(CommandCreator.createTrackJoint(
+        GENERATE_ID,
         downProps.snappedPoint.coord.x,
         downProps.snappedPoint.coord.z,
         downProps.wheelRad
-      );
+      ));
     }
   }
 
@@ -141,35 +147,76 @@ export class CreateTrackInputHandler implements InputHandler {
         downProps.snappedJointOnTrack.position === 0 ||
         downProps.snappedJointOnTrack.position === 1)
     ) {
-      let j1, j2;
-      let deletable: TrackJoint[] = [];
+      let j1, j2: TrackJoint;
+      let s1: boolean = false;
+      let s2: boolean = false;
+      const deletable: TrackJoint[] = [];
+      const actions: Command[] = [];
       if (downProps.snappedJoint) {
         j1 = downProps.snappedJoint;
       } else {
-        j1 = productionContainer.get<TrackJoint>(TYPES.TrackJoint);
-        j1.init(
+        s1 = true;
+        j1 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
           downProps.snappedPoint.coord.x,
           downProps.snappedPoint.coord.z,
           downProps.wheelRad
         );
+        actions.push(CommandCreator.createTrackJoint(
+          GENERATE_ID,
+          downProps.snappedPoint.coord.x,
+          downProps.snappedPoint.coord.z,
+          downProps.wheelRad
+        ));
         deletable.push(j1);
       }
 
       if (props.snappedJoint) {
         j2 = props.snappedJoint;
       } else {
-        j2 = productionContainer.get<TrackJoint>(TYPES.TrackJoint);
-        j2.init(
+        s2 = true;
+        j2 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
           props.snappedPoint.coord.x,
           props.snappedPoint.coord.z,
           props.wheelRad
         );
+        actions.push(CommandCreator.createTrackJoint(
+          GENERATE_ID,
+          props.snappedPoint.coord.x,
+          props.snappedPoint.coord.z,
+          props.wheelRad
+        ));
         deletable.push(j2);
       }
 
-      const ret = j2.connect(j1);
-      if (!ret) {
-        deletable.map(j => j.remove());
+      const ret = j1.connect(j2);
+
+      const replacementIds = deletable.map(j => j.getId());
+
+      deletable.map(j => j.remove());
+
+      if (ret) {
+        const actionIds = actions.map(a => this.commandLog.addAction(a));
+        const idMapping = replacementIds.reduce(function (result, field, index) {
+          result[field] = actionIds[index].returnValue.getId();
+          return result;
+        }, {});
+
+        ret.map(a => {
+          const b = { ...a };
+
+          if (b.function === 'joinTrackJoints') {
+            b.params[2] = idMapping[b.params[2]] ?? b.params[2];
+            b.params[4] = idMapping[b.params[4]] ?? b.params[4];
+          }
+
+          if (b.function === 'joinTrackJoints3') {
+            b.params[3] = idMapping[b.params[3]] ?? b.params[3];
+            b.params[5] = idMapping[b.params[5]] ?? b.params[5];
+            b.params[7] = idMapping[b.params[7]] ?? b.params[7];
+          }
+
+          this.commandLog.addAction(b)
+        });
       }
     }
     this.fromMesh.setEnabled(false);

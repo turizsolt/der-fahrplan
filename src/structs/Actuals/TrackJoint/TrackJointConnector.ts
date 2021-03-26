@@ -5,6 +5,10 @@ import { TYPES } from '../../../di/TYPES';
 import { Track } from '../../Interfaces/Track';
 import { TrackSwitch } from '../../Interfaces/TrackSwitch';
 import { ActualTrackSwitch } from '../Track/ActualTrackSwitch';
+import { Store } from '../../Interfaces/Store';
+import { ActualTrackJoint } from './ActualTrackJoint';
+import { CommandCreator } from '../Store/Command/CommandCreator';
+import { GENERATE_ID } from '../Store/Command/CommandLog';
 
 @injectable()
 export class TrackJointConnector {
@@ -13,6 +17,12 @@ export class TrackJointConnector {
 
   init(): TrackJointConnector {
     return this;
+  }
+
+  private store: Store;
+
+  setStore(store: Store) {
+    this.store = store;
   }
 
   connect(one: TrackJoint, other: TrackJoint) {
@@ -32,22 +42,17 @@ export class TrackJointConnector {
       .whichEnd(midpoint || one.getPosition());
     const otherEnd = other.getEnds()[otherEndLetter];
 
-    if (one.areBothEndsEmpty(oneEnd, otherEnd)) {
-      const t = this.TrackFactory().init(coordinates);
-
-      one.setOneEnd(oneEndLetter, t.getA());
-      other.setOneEnd(otherEndLetter, t.getB());
-
-      return { track: t };
+    if (ActualTrackJoint.areBothEndsEmpty(oneEnd, otherEnd)) {
+      return [
+        CommandCreator.joinTrackJoints(GENERATE_ID, coordinates, one.getId(), oneEndLetter, other.getId(), otherEndLetter)
+      ];
     }
 
-    if (one.isEndEmpty(oneEnd) || one.isEndEmpty(otherEnd)) {
+    if (ActualTrackJoint.isEndEmpty(oneEnd) || ActualTrackJoint.isEndEmpty(otherEnd)) {
       const oldTrack: TrackBase = oneEnd.track || otherEnd.track;
       if (oldTrack.constructor.name === ActualTrackSwitch.name) return false;
 
       const oldCoordinates = oldTrack.getSegment().getCoordinates();
-
-      const sw = this.TrackSwitchFactory().init(oldCoordinates, coordinates);
 
       const thirdA = oldTrack.getA().getJointTo();
       const thirdB = oldTrack.getB().getJointTo();
@@ -93,16 +98,30 @@ export class TrackJointConnector {
           .getTracksEnd(oldTrack);
       }
 
-      oldTrack.remove();
+      const j1 = oldTrack.getA().getJointTo();
+      const j2 = oldTrack.getB().getJointTo();
 
-      // itt kéne valahol feldarabolni
-      // sw.splitNatural();
-
-      peak.setOneEnd(peakLetter, sw.getA());
-      second.setOneEnd(secondLetter, sw.getE());
-      third.setOneEnd(thirdLetter, sw.getF());
-
-      return { track: sw, removed: oldTrack };
+      return [
+        CommandCreator.unjoinTrackJoints(
+          oldTrack.getId(),
+          oldCoordinates,
+          j1.getId(),
+          j1.getTracksEnd(oldTrack),
+          j2.getId(),
+          j2.getTracksEnd(oldTrack)
+        ),
+        CommandCreator.joinTrackJoints3(
+          GENERATE_ID,
+          oldCoordinates,
+          coordinates,
+          peak.getId(),
+          peakLetter,
+          second.getId(),
+          secondLetter,
+          third.getId(),
+          thirdLetter
+        )
+      ];
     }
 
     return false;

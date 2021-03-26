@@ -10,7 +10,7 @@ export default class WagonSpeed {
   constructor(
     private wagon: Wagon,
     private maxSpeed: number = 3,
-    private accelerateBy: number = 0.25
+    private accelerateBy: number = 0.015625
   ) { }
 
   halt(): void {

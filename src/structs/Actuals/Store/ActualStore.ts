@@ -14,6 +14,8 @@ import { Wagon } from '../../Interfaces/Wagon';
 import { Passenger } from '../../Interfaces/Passenger';
 import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
+import { PassengerGenerator } from '../PassengerGenerator';
+import { CommandLog } from './Command/CommandLog';
 
 @injectable()
 export class ActualStore implements Store {
@@ -37,7 +39,14 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfPlatform) private PlatformFactory: () => Platform;
   @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
 
+  @inject(TYPES.FactoryOfPassengerGenerator) private PassengerGeneratorFactory: () => PassengerGenerator;
+  private passengerGenerator: PassengerGenerator;
+
+  private logStore: CommandLog;
+
   init() {
+    this.logStore = new CommandLog(this);
+
     this.elements = {};
     this.typedElements = {};
     this.factoryMethods = {
@@ -82,8 +91,15 @@ export class ActualStore implements Store {
   }
 
   clear() {
+    this.getFiltered(x => x.getType() === Symbol.for('Wagon')).map(e => e.remove());
+    this.getFiltered(() => true).map(e => e.remove());
+
     this.elements = {};
     this.typedElements = {};
+  }
+
+  generateId(): string {
+    return shortid.generate();
   }
 
   register(object: BaseStorable, presetId: string = null): string {
@@ -156,7 +172,7 @@ export class ActualStore implements Store {
     // to init schedules with a blank nothing
     this.getAllOf(Symbol.for('Station')).map((station: Station) => {
       station.addTripToSchedule(null);
-    })
+    });
   }
 
   private selected: BaseStorable = null;
@@ -184,15 +200,30 @@ export class ActualStore implements Store {
     if (this.tickSpeed) {
       this.tickCount += this.tickSpeed;
     }
+
+    for (let i = 0; i < this.tickSpeed; i++) {
+      this.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {
+        wagon.tick();
+      });
+
+      if ((this.getTickCount() + i) % 120 === 0) {
+        if (!this.passengerGenerator) {
+          this.passengerGenerator = this.PassengerGeneratorFactory().init();
+        }
+        this.passengerGenerator.tick();
+      }
+    }
   }
 
   setTickSpeed(speed: number): void {
     this.tickSpeed = speed;
     // todo this is not the right place for this
-    if (speed === 0) {
-      document.getElementById('canvasBorder').classList.add('stopped');
-    } else {
-      document.getElementById('canvasBorder').classList.remove('stopped');
+    if (typeof document !== 'undefined') {
+      if (speed === 0) {
+        document.getElementById('canvasBorder').classList.add('stopped');
+      } else {
+        document.getElementById('canvasBorder').classList.remove('stopped');
+      }
     }
   }
 
@@ -210,11 +241,12 @@ export class ActualStore implements Store {
   private passengerCummulatedDistance: number = 0;
   private passengerAverageArriveSpeed: number = -1;
 
-  addArrivedPassengerStats(stats: { time: number, distance: number }): void {
+  addArrivedPassengerStats(stats: { time: number; distance: number }): void {
     this.passengerArrivedCount++;
     this.passengerCummulatedDistance += stats.distance;
     this.passengerCummulatedTime += stats.time;
-    this.passengerAverageArriveSpeed = this.passengerCummulatedDistance / this.passengerCummulatedTime;
+    this.passengerAverageArriveSpeed =
+      this.passengerCummulatedDistance / this.passengerCummulatedTime;
   }
 
   getPassengerStats(): any {
@@ -222,6 +254,10 @@ export class ActualStore implements Store {
       count: this.passengerCount,
       arrivedCount: this.passengerArrivedCount,
       averageArriveSpeed: this.passengerAverageArriveSpeed
-    }
+    };
+  }
+
+  getCommandLog(): CommandLog {
+    return this.logStore;
   }
 }

@@ -29,7 +29,7 @@ export abstract class ActualBaseStorable implements BaseStorable {
   }
 
   presetId(id: string) {
-    this.id = id;
+    if (id) this.id = id;
   }
 
   getType(): symbol {
@@ -73,4 +73,8 @@ export abstract class ActualBaseStorable implements BaseStorable {
   }
 
   onSelectChanged(selected: boolean): void { }
+
+  remove(): void {
+
+  }
 }

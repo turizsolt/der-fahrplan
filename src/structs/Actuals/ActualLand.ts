@@ -12,13 +12,14 @@ import { SEVENTH_LEVEL } from '../../levels/SeventhLevel';
 import { EIGHTH_LEVEL } from '../../levels/EighthLevel';
 import { TEST_LEVEL } from '../../levels/TestLevel';
 import { InputController } from '../../ui/controllers/InputController';
+import { TestFw } from '../../levels/TestFw';
 
 @injectable()
 export class ActualLand implements Land {
   @inject(TYPES.FactoryOfStore) storeFactory: () => Store;
 
   init(inputController: InputController): void {
-    const store: Store = this.storeFactory().init();
+    const store: Store = this.storeFactory();
 
     const levelId = window.location.search.slice(1);
     const levels = {
@@ -30,6 +31,7 @@ export class ActualLand implements Land {
       sixth: SIXTH_LEVEL,
       seventh: SEVENTH_LEVEL,
       eighth: EIGHTH_LEVEL,
+      testfw: TestFw,
 
       test: TEST_LEVEL
     };
@@ -43,8 +45,10 @@ export class ActualLand implements Land {
         if (levels[levelId].target_passenger) {
           inputController.setTargetPassenger(levels[levelId].target_passenger);
         }
+        if (levels[levelId].actions) {
+          store.getCommandLog().setActions(levels[levelId].actions);
+        }
       }, 1000);
-
     }
   }
 }

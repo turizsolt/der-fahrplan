@@ -34,6 +34,7 @@ import { TickInputProps } from './TickInputProps';
 import { PassengerGenerator } from '../../structs/Actuals/PassengerGenerator';
 import { VueViewbox } from './VueViewbox';
 import { Train } from '../../structs/Scheduling/Train';
+import { VueTestPanel } from './VueTestPanel';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -60,6 +61,7 @@ export class InputController {
   private vueViewbox: VueViewbox;
   private vueBigScreen: VueBigscreen;
   private vueSidebar: VueSidebar;
+  private vueTestPanel: VueTestPanel;
 
   private followCam: boolean = false;
   private timeLimit: number = 12;
@@ -68,10 +70,11 @@ export class InputController {
 
   private targetPassengerCount: number = 9999999;
 
+  private downAt: number = 0;
+
   constructor(
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera,
-    private passengerGenerator: PassengerGenerator
   ) {
     this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
     this.vueSidebar = new VueSidebar(this.store);
@@ -79,10 +82,13 @@ export class InputController {
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
 
+    this.vueTestPanel = new VueTestPanel(this.store);
+    this.store.getCommandLog().setInputController(this);
+
     this.inputHandlers = {
       [InputMode.CAMERA]: new CameraInputHandler(camera),
       [InputMode.SELECT]: new SelectInputHandler(),
-      [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(),
+      [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(this.store),
       [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(),
       [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(),
       [InputMode.CREATE_STATION]: new CreateStationInputHandler()
@@ -404,27 +410,14 @@ export class InputController {
         }
         break;
     }
-
-    if (!this.getSelected()) return;
-
-    switch (key) {
-
-      case 'ArrowUp':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('forward');
-        break;
-
-      case 'ArrowDown':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('backward');
-        break;
-    }
   }
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     switch (key) {
+      case 'T':
+        this.store.getCommandLog().runNext();
+        break;
+
       case 'U':
         this.selectMode(InputMode.CAMERA);
         break;
@@ -447,16 +440,6 @@ export class InputController {
 
       case '9':
         this.selectMode(InputMode.CREATE_STATION);
-        break;
-
-      case 'ArrowUp':
-        this.upTime = 0;
-        this.timeLimit = this.originalTimeLimit;
-        break;
-
-      case 'ArrowDown':
-        this.downTime = 0;
-        this.timeLimit = this.originalTimeLimit;
         break;
 
       case 'K':
@@ -564,10 +547,6 @@ export class InputController {
     }
   }
 
-  private upTime: number = 0;
-  private downTime: number = 0;
-  private downAt: number = 0;
-
   keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
     if (!this.getSelected()) return;
 
@@ -591,40 +570,21 @@ export class InputController {
         break;
 
       case 'ArrowUp':
-        this.upTime += this.store.getTickSpeed();
-        if (this.upTime > (this.timeLimit - 1)) {
-          this.getSelectedBrick()
-            .getRenderer()
-            .process('forward');
-          this.upTime -= this.timeLimit;
-          this.timeLimit = this.shortTimeLimit;
-        }
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('forward');
         break;
 
       case 'ArrowDown':
-        this.downTime += this.store.getTickSpeed();
-        if (this.downTime > (this.timeLimit - 1)) {
-          this.getSelectedBrick()
-            .getRenderer()
-            .process('backward');
-          this.downTime -= this.timeLimit;
-          this.timeLimit = this.shortTimeLimit;
-        }
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('backward');
         break;
     }
   }
 
   tick() {
     const speed = this.store.getTickSpeed();
-    for (let i = 0; i < speed; i++) {
-      this.store.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {
-        wagon.tick();
-      });
-
-      if ((this.store.getTickCount() + i) % 120 === 0) {
-        this.passengerGenerator.tick();
-      }
-    }
     this.store.tick();
     const count = Math.floor(this.store.getTickCount() / 60);
     this.vueSidebar.setData(
