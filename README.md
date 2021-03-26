@@ -1,26 +1,26 @@
-# Technical aspects
+# Der Fahrplan
 
-## Track/TrackSegment
+A game where you have to plan the train schedule ahead and adapt the continously changing travel-patterns. The more fitting schedule you make, the citizens will more happy and you earn more profit.
 
-Track is an A--->B curve. It can be a line segment (linear bezier) A--->B or a curved (quadratic bezier) A---(I)--->B.
+## Try it out (Demo)
 
-## PositionOnTrack
+Go to http://fahrplan.zsiri.eu/ and play along online. You will need a desktop computer with at least a 1024x768 resolution monitor, a full keyboard and a mouse with a wheel. Also you need a modern browser. (Suggested is Firefox or Chromium)
 
-A position on a track. percent is in [0..1] intervallum. 0 means on the A end. 1 means on the B end.
-A direction 1 means towards B, -1 means towards A.
+## Install and start locally
 
-### hop(distance: number)
+```
+yarn install
+yarn start
+```
 
-Hopping the given distance in the PoT's direction.
+## It looks like this
 
+![Image of the game](doc/preview.png)
 
-## Wagon
+## How to play
 
-Wagon is an A-->B subcurve on one or more tracks. Each Wagon has two ends (A, B), and on each end they have a PositionOnTrack property.
+todo
 
-We can move a wagon towards A, if no other wagon is connected on the A end.
-Also towards B.
+## How it has been coded
 
-A wagon can also pull other wagons, if they are connected.
-
-
+[Click here to browse developer documentation](doc/index.md)
