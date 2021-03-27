@@ -1,8 +1,8 @@
 import { TrackBase } from './TrackBase';
-import { TrackSegment } from '../Actuals/Track/TrackSegment';
-import { Coordinate } from '../Geometry/Coordinate';
-import { TrackSwitchEnd } from '../Actuals/Track/TrackSwitchEnd';
-import { Ray } from '../Geometry/Ray';
+import { TrackSegment } from './TrackSegment';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { TrackSwitchEnd } from './TrackSwitchEnd';
+import { Ray } from '../../structs/Geometry/Ray';
 
 export interface TrackSwitch extends TrackBase {
   init(coordinates1: Coordinate[], coordinates2: Coordinate[]): TrackSwitch;

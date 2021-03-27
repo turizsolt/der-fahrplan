@@ -1,9 +1,9 @@
-import { PositionOnTrack } from '../Track/PositionOnTrack';
+import { PositionOnTrack } from '../../../modules/Track/PositionOnTrack';
 import { WhichEnd, otherEnd } from '../../Interfaces/WhichEnd';
 import { End } from '../End';
 import { Wagon } from '../../Interfaces/Wagon';
 import { Store } from '../../Interfaces/Store';
-import { TrackBase } from '../../Interfaces/TrackBase';
+import { TrackBase } from '../../../modules/Track/TrackBase';
 
 export class WagonEnd extends End<Wagon> {
   public positionOnTrack: PositionOnTrack;

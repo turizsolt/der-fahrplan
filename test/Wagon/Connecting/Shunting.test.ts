@@ -3,7 +3,7 @@ import chaiAlmost from 'chai-almost';
 import { Wagon } from '../../../src/structs/Interfaces/Wagon';
 import { buildTrain, W, store } from './utils';
 import { TYPES } from '../../../src/di/TYPES';
-import { Track } from '../../../src/structs/Interfaces/Track';
+import { Track } from '../../../src/modules/Track/Track';
 import { Coordinate } from '../../../src/structs/Geometry/Coordinate';
 chai.use(chaiAlmost());
 

@@ -1,4 +1,4 @@
-import { TrackJoint } from '../../src/structs/Interfaces/TrackJoint';
+import { TrackJoint } from '../../src/modules/Track/TrackJoint/TrackJoint';
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import { testContainer } from '../../src/di/test.config';

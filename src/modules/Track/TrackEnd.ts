@@ -1,7 +1,7 @@
-import { TrackBase } from '../../Interfaces/TrackBase';
-import { TrackJoint } from '../../Interfaces/TrackJoint';
-import { End } from '../End';
-import { WhichTrackEnd } from '../../Interfaces/WhichTrackEnd';
+import { TrackBase } from './TrackBase';
+import { TrackJoint } from './TrackJoint/TrackJoint';
+import { End } from '../../structs/Actuals/End';
+import { WhichTrackEnd } from '../../structs/Interfaces/WhichTrackEnd';
 
 export class TrackEnd extends End<TrackBase> {
   protected jointTo: TrackJoint;

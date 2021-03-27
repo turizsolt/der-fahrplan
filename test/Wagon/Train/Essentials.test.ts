@@ -6,7 +6,7 @@ import { Wagon } from '../../../src/structs/Interfaces/Wagon';
 import { Store } from '../../../src/structs/Interfaces/Store';
 import { Train } from '../../../src/structs/Scheduling/Train';
 import { Coordinate } from '../../../src/structs/Geometry/Coordinate';
-import { Track } from '../../../src/structs/Interfaces/Track';
+import { Track } from '../../../src/modules/Track/Track';
 chai.use(chaiAlmost());
 
 const store: Store = testContainer

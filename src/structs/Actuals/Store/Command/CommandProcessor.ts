@@ -1,10 +1,10 @@
 import { TYPES } from "../../../../di/TYPES";
 import { Coordinate } from "../../../Geometry/Coordinate";
 import { Store } from "../../../Interfaces/Store";
-import { Track } from "../../../Interfaces/Track";
-import { TrackBase } from "../../../Interfaces/TrackBase";
-import { TrackJoint } from "../../../Interfaces/TrackJoint";
-import { TrackSwitch } from "../../../Interfaces/TrackSwitch";
+import { Track } from "../../../../modules/Track/Track";
+import { TrackBase } from "../../../../modules/Track/TrackBase";
+import { TrackJoint } from "../../../../modules/Track/TrackJoint/TrackJoint";
+import { TrackSwitch } from "../../../../modules/Track/TrackSwitch";
 import { Wagon } from "../../../Interfaces/Wagon";
 import { WhichEnd } from "../../../Interfaces/WhichEnd";
 import { WagonConfig } from "../../Wagon/WagonConfig";

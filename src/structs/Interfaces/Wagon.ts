@@ -1,13 +1,13 @@
 import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
 import { Ray } from '../Geometry/Ray';
-import { Track } from './Track';
-import { PositionOnTrack } from '../Actuals/Track/PositionOnTrack';
+import { Track } from '../../modules/Track/Track';
+import { PositionOnTrack } from '../../modules/Track/PositionOnTrack';
 import { WhichEnd } from '../Interfaces/WhichEnd';
 import { Platform } from './Platform';
 import { Updatable } from '../../mixins/Updatable';
 import { BaseBrick } from './BaseBrick';
 import { Train } from '../Scheduling/Train';
-import { TrackWorm } from '../Actuals/Track/TrackWorm';
+import { TrackWorm } from '../../modules/Track/TrackWorm';
 import { Passenger } from './Passenger';
 import { Boardable } from '../../mixins/Boardable';
 import { WagonConfig } from '../Actuals/Wagon/WagonConfig';

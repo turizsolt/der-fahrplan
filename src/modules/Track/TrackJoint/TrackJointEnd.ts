@@ -1,5 +1,5 @@
-import { TrackBase } from '../../Interfaces/TrackBase';
-import { TrackEnd } from '../Track/TrackEnd';
+import { TrackBase } from '../TrackBase';
+import { TrackEnd } from '../TrackEnd';
 
 export class TrackJointEnd {
   public track: TrackBase = null;

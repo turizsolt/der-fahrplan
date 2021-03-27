@@ -1,7 +1,7 @@
 import { TrackEnd } from './TrackEnd';
-import { WhichEnd } from '../../Interfaces/WhichEnd';
-import { TrackBase } from '../../Interfaces/TrackBase';
-import { WhichTrackEnd } from '../../Interfaces/WhichTrackEnd';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
+import { TrackBase } from './TrackBase';
+import { WhichTrackEnd } from '../../structs/Interfaces/WhichTrackEnd';
 
 export class TrackSwitchEnd extends TrackEnd {
   private active: boolean;

@@ -1,5 +1,5 @@
 import * as BABYLON from 'babylonjs';
-import { TrackJoint } from '../../structs/Interfaces/TrackJoint';
+import { TrackJoint } from '../../modules/Track/TrackJoint/TrackJoint';
 import { TrackJointRenderer } from '../../structs/Renderers/TrackJointRenderer';
 import { injectable, inject } from 'inversify';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';

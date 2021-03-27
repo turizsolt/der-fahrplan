@@ -2,9 +2,9 @@ import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import { testContainer } from '../../src/di/test.config';
 import { TYPES } from '../../src/di/TYPES';
-import { Track } from '../../src/structs/Interfaces/Track';
+import { Track } from '../../src/modules/Track/Track';
 import { Coordinate } from '../../src/structs/Geometry/Coordinate';
-import { TrackSwitch } from '../../src/structs/Interfaces/TrackSwitch';
+import { TrackSwitch } from '../../src/modules/Track/TrackSwitch';
 chai.use(chaiAlmost());
 
 const TrackFactory = testContainer.get<() => Track>(TYPES.FactoryOfTrack);

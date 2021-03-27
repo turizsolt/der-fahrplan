@@ -2,7 +2,7 @@ import * as BABYLON from 'babylonjs';
 import { InputHandler } from './InputHandler';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { InputProps } from './InputProps';
-import { TrackJoint } from '../../structs/Interfaces/TrackJoint';
+import { TrackJoint } from '../../modules/Track/TrackJoint/TrackJoint';
 import { curveToTube } from '../../ui/babylon/TrackBabylonRenderer';
 import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/CoordinateToBabylonVector3';

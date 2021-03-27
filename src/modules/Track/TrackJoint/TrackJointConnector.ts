@@ -1,14 +1,14 @@
-import { TrackJoint } from '../../Interfaces/TrackJoint';
-import { TrackBase } from '../../Interfaces/TrackBase';
+import { TrackJoint } from './TrackJoint';
+import { TrackBase } from '../TrackBase';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../../di/TYPES';
-import { Track } from '../../Interfaces/Track';
-import { TrackSwitch } from '../../Interfaces/TrackSwitch';
-import { ActualTrackSwitch } from '../Track/ActualTrackSwitch';
-import { Store } from '../../Interfaces/Store';
+import { Track } from '../Track';
+import { TrackSwitch } from '../TrackSwitch';
+import { ActualTrackSwitch } from '../ActualTrackSwitch';
+import { Store } from '../../../structs/Interfaces/Store';
 import { ActualTrackJoint } from './ActualTrackJoint';
-import { CommandCreator } from '../Store/Command/CommandCreator';
-import { GENERATE_ID } from '../Store/Command/CommandLog';
+import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
+import { GENERATE_ID } from '../../../structs/Actuals/Store/Command/CommandLog';
 
 @injectable()
 export class TrackJointConnector {

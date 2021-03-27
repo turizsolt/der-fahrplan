@@ -1,8 +1,7 @@
 import * as BABYLON from 'babylonjs';
 import { Ray } from '../../structs/Geometry/Ray';
-import { TrackJoint } from '../../structs/Interfaces/TrackJoint';
-import { TrackBase } from '../../structs/Interfaces/TrackBase';
-import { BaseBrick } from '../../structs/Interfaces/BaseBrick';
+import { TrackJoint } from '../../modules/Track/TrackJoint/TrackJoint';
+import { TrackBase } from '../../modules/Track/TrackBase';
 import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
 
 export interface InputProps {

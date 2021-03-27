@@ -1,9 +1,6 @@
 import * as BABYLON from 'babylonjs';
-import { TrackRenderer } from '../../structs/Renderers/TrackRenderer';
 import { injectable, inject } from 'inversify';
-import { Track } from '../../structs/Interfaces/Track';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
-import { Left, Right } from '../../structs/Geometry/Directions';
 import { TYPES } from '../../di/TYPES';
 import { MeshProvider } from './MeshProvider';
 import { MaterialName } from './MaterialName';
@@ -57,9 +54,9 @@ export class StationBabylonRenderer extends BaseBabylonRenderer
       if (this.selected && !this.lastSelected) {
         this.selectableMeshes.map(
           x =>
-            (x.material = this.meshProvider.getMaterial(
-              MaterialName.SelectorRed
-            ))
+          (x.material = this.meshProvider.getMaterial(
+            MaterialName.SelectorRed
+          ))
         );
       } else if (!this.selected && this.lastSelected) {
         this.selectableMeshes.map(x => (x.material = this.myMat));

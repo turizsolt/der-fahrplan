@@ -1,14 +1,14 @@
 import { TrackEnd } from './TrackEnd';
 import { TrackSegment } from './TrackSegment';
-import { TrackRenderer } from '../../Renderers/TrackRenderer';
-import { TYPES } from '../../../di/TYPES';
-import { Coordinate } from '../../Geometry/Coordinate';
-import { Track } from '../../Interfaces/Track';
+import { TrackRenderer } from '../../structs/Renderers/TrackRenderer';
+import { TYPES } from '../../di/TYPES';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { Track } from './Track';
 import { ActualTrackBase } from './ActualTrackBase';
 import { injectable, inject } from 'inversify';
-import { WhichEnd } from '../../Interfaces/WhichEnd';
-import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { Store } from '../../Interfaces/Store';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
+import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
+import { Store } from '../../structs/Interfaces/Store';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {

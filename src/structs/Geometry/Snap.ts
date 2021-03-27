@@ -1,9 +1,9 @@
 import { Ray } from './Ray';
 import { Coordinate } from './Coordinate';
-import { TrackBase } from '../Interfaces/TrackBase';
-import { TrackJoint } from '../Interfaces/TrackJoint';
-import { ActualTrack } from '../Actuals/Track/ActualTrack';
-import { TrackSwitch } from '../Interfaces/TrackSwitch';
+import { TrackBase } from '../../modules/Track/TrackBase';
+import { TrackJoint } from '../../modules/Track/TrackJoint/TrackJoint';
+import { ActualTrack } from '../../modules/Track/ActualTrack';
+import { TrackSwitch } from '../../modules/Track/TrackSwitch';
 
 export function snapXZ(p: Ray): Ray {
   return new Ray(new Coordinate(snap(p.coord.x), 0, snap(p.coord.z)), p.dirXZ);

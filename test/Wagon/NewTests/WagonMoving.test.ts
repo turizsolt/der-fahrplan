@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import { testContainer } from '../../../src/di/test.config';
-import { Track } from '../../../src/structs/Interfaces/Track';
+import { Track } from '../../../src/modules/Track/Track';
 import { Wagon } from '../../../src/structs/Interfaces/Wagon';
 import { TYPES } from '../../../src/di/TYPES';
 import { Coordinate } from '../../../src/structs/Geometry/Coordinate';

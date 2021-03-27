@@ -1,18 +1,18 @@
 import { TrackSwitchEnd } from './TrackSwitchEnd';
 import { TrackEnd } from './TrackEnd';
 import { TrackSegment } from './TrackSegment';
-import { Coordinate } from '../../Geometry/Coordinate';
-import { TrackSwitchRenderer } from '../../Renderers/TrackSwitchRenderer';
-import { TYPES } from '../../../di/TYPES';
-import { TrackSwitch } from '../../Interfaces/TrackSwitch';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { TrackSwitchRenderer } from '../../structs/Renderers/TrackSwitchRenderer';
+import { TYPES } from '../../di/TYPES';
+import { TrackSwitch } from './TrackSwitch';
 import { ActualTrackBase } from './ActualTrackBase';
 import { injectable, inject } from 'inversify';
-import { WhichEnd } from '../../Interfaces/WhichEnd';
-import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { Ray } from '../../Geometry/Ray';
-import { Left, Right } from '../../Geometry/Directions';
-import { Store } from '../../Interfaces/Store';
-import { WhichSwitchEnd } from '../../Interfaces/WhichTrackEnd';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
+import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
+import { Ray } from '../../structs/Geometry/Ray';
+import { Left, Right } from '../../structs/Geometry/Directions';
+import { Store } from '../../structs/Interfaces/Store';
+import { WhichSwitchEnd } from '../../structs/Interfaces/WhichTrackEnd';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {

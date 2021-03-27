@@ -1,5 +1,5 @@
-import { TrackBase } from '../../Interfaces/TrackBase';
-import { Wagon } from '../../Interfaces/Wagon';
+import { TrackBase } from './TrackBase';
+import { Wagon } from '../../structs/Interfaces/Wagon';
 
 export class TrackWorm {
   constructor(private list: TrackBase[], private wagon: Wagon) {

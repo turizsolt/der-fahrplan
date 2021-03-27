@@ -1,13 +1,13 @@
-import { Platform } from '../../Interfaces/Platform';
+import { Platform } from '../../structs/Interfaces/Platform';
 import { TrackEnd } from './TrackEnd';
 import { TrackSegment } from './TrackSegment';
-import { Coordinate } from '../../Geometry/Coordinate';
-import { TrackBase } from '../../Interfaces/TrackBase';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { TrackBase } from './TrackBase';
 import { injectable } from 'inversify';
-import { ActualBaseBrick } from '../ActualBaseBrick';
-import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
-import { WagonEnd } from '../Wagon/WagonEnd';
+import { ActualBaseBrick } from '../../structs/Actuals/ActualBaseBrick';
+import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
+import { Wagon, NearestWagon } from '../../structs/Interfaces/Wagon';
+import { WagonEnd } from '../../structs/Actuals/Wagon/WagonEnd';
 
 @injectable()
 export abstract class ActualTrackBase extends ActualBaseBrick
@@ -80,7 +80,7 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     return this.removed;
   }
 
-  update(): void {}
+  update(): void { }
 
   getEnd(e: string): TrackEnd {
     if (e === 'A') return this.getA();

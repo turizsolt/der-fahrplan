@@ -1,8 +1,8 @@
-import { Platform } from './Platform';
-import { TrackSegment } from '../Actuals/Track/TrackSegment';
-import { TrackEnd } from '../Actuals/Track/TrackEnd';
-import { BaseBrick } from './BaseBrick';
-import { Wagon, NearestWagon } from './Wagon';
+import { Platform } from '../../structs/Interfaces/Platform';
+import { TrackSegment } from './TrackSegment';
+import { TrackEnd } from './TrackEnd';
+import { BaseBrick } from '../../structs/Interfaces/BaseBrick';
+import { Wagon, NearestWagon } from '../../structs/Interfaces/Wagon';
 
 export interface TrackBase extends BaseBrick {
   checkin(wagon: Wagon);

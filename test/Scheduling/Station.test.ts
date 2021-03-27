@@ -6,7 +6,7 @@ import { Station } from '../../src/structs/Scheduling/Station';
 import { Store } from '../../src/structs/Interfaces/Store';
 import { Coordinate } from '../../src/structs/Geometry/Coordinate';
 import { Circle } from '../../src/structs/Geometry/Circle';
-import { Track } from '../../src/structs/Interfaces/Track';
+import { Track } from '../../src/modules/Track/Track';
 import { Platform } from '../../src/structs/Interfaces/Platform';
 import { Side } from '../../src/structs/Interfaces/Side';
 chai.use(chaiAlmost());

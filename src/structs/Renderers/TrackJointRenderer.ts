@@ -1,4 +1,4 @@
-import { TrackJoint } from '../Interfaces/TrackJoint';
+import { TrackJoint } from '../../modules/Track/TrackJoint/TrackJoint';
 import { BaseRenderer } from './BaseRenderer';
 
 export interface TrackJointRenderer extends BaseRenderer {

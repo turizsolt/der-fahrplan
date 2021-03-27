@@ -5,7 +5,7 @@ import { TYPES } from '../../src/di/TYPES';
 import { CommandCreator } from '../../src/structs/Actuals/Store/Command/CommandCreator';
 import { CommandMode } from '../../src/structs/Actuals/Store/Command/CommandMode';
 import { Store } from '../../src/structs/Interfaces/Store';
-import { TrackJoint } from '../../src/structs/Interfaces/TrackJoint';
+import { TrackJoint } from '../../src/modules/Track/TrackJoint/TrackJoint';
 chai.use(chaiAlmost());
 
 export const store: Store = testContainer

@@ -1,7 +1,7 @@
 import * as BABYLON from 'babylonjs';
 import { TrackSwitchRenderer } from '../../structs/Renderers/TrackSwitchRenderer';
 import { injectable, inject } from 'inversify';
-import { TrackSwitch } from '../../structs/Interfaces/TrackSwitch';
+import { TrackSwitch } from '../../modules/Track/TrackSwitch';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
 import { TYPES } from '../../di/TYPES';
 import { MeshProvider } from './MeshProvider';
@@ -164,23 +164,23 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
       if (this.selected && !this.lastSelected) {
         this.selectableMeshes.map(
           x =>
-            (x.material = this.meshProvider.getMaterial(
-              MaterialName.SelectorRed
-            ))
+          (x.material = this.meshProvider.getMaterial(
+            MaterialName.SelectorRed
+          ))
         );
       } else if (!this.selected && this.lastSelected) {
         this.selectableMeshes.map(
           x =>
-            (x.material = this.meshProvider.getMaterial(
-              MaterialName.SleeperBrown
-            ))
+          (x.material = this.meshProvider.getMaterial(
+            MaterialName.SleeperBrown
+          ))
         );
       } else {
         this.selectableMeshes.map(
           x =>
-            (x.material = this.meshProvider.getMaterial(
-              MaterialName.SleeperBrown
-            ))
+          (x.material = this.meshProvider.getMaterial(
+            MaterialName.SleeperBrown
+          ))
         );
       }
     }

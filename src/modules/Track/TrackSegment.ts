@@ -1,7 +1,7 @@
-import { Coordinate } from '../../Geometry/Coordinate';
-import { Bezier } from '../../Geometry/Bezier/Bezier';
-import { BezierCreater } from '../../Geometry/Bezier/BezierCreater';
-import { LineSegmentChain } from '../../Geometry/LineSegmentChain';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { Bezier } from '../../structs/Geometry/Bezier/Bezier';
+import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
+import { LineSegmentChain } from '../../structs/Geometry/LineSegmentChain';
 
 export class TrackSegment {
   readonly length: number;

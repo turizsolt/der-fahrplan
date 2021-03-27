@@ -1,4 +1,4 @@
-import { TrackSwitch } from '../Interfaces/TrackSwitch';
+import { TrackSwitch } from '../../modules/Track/TrackSwitch';
 import { BaseRenderer } from './BaseRenderer';
 
 export interface TrackSwitchRenderer extends BaseRenderer {

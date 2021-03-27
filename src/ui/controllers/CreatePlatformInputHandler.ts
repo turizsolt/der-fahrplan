@@ -5,12 +5,11 @@ import { InputProps } from './InputProps';
 import { curveToTube } from '../../ui/babylon/TrackBabylonRenderer';
 import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/CoordinateToBabylonVector3';
-import { ActualTrack } from '../../structs/Actuals/Track/ActualTrack';
+import { ActualTrack } from '../../modules/Track/ActualTrack';
 import { Platform } from '../../structs/Interfaces/Platform';
 import { productionContainer } from '../../di/production.config';
 import { TYPES } from '../../di/TYPES';
 import { Side } from '../../structs/Interfaces/Side';
-import { Color } from '../../structs/Color';
 
 export class CreatePlatformInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;

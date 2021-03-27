@@ -1,10 +1,10 @@
-import { WhichEnd } from '../Interfaces/WhichEnd';
-import { TrackEnd } from '../Actuals/Track/TrackEnd';
-import { TrackBase } from './TrackBase';
-import { Ray } from '../Geometry/Ray';
-import { TrackJointEnd } from '../Actuals/TrackJoint/TrackJointEnd';
-import { Coordinate } from '../Geometry/Coordinate';
-import { BaseBrick } from './BaseBrick';
+import { WhichEnd } from '../../../structs/Interfaces/WhichEnd';
+import { TrackEnd } from '../TrackEnd';
+import { TrackBase } from '../TrackBase';
+import { Ray } from '../../../structs/Geometry/Ray';
+import { TrackJointEnd } from './TrackJointEnd';
+import { Coordinate } from '../../../structs/Geometry/Coordinate';
+import { BaseBrick } from '../../../structs/Interfaces/BaseBrick';
 
 export interface TrackJoint extends BaseBrick {
   init(x: number, z: number, rot: number): TrackJoint;

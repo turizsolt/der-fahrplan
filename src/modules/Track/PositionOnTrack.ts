@@ -1,9 +1,9 @@
-import { TrackBase } from '../../Interfaces/TrackBase';
-import { Platform } from '../../Interfaces/Platform';
-import { Ray } from '../../Geometry/Ray';
+import { TrackBase } from './TrackBase';
+import { Platform } from '../../structs/Interfaces/Platform';
+import { Ray } from '../../structs/Geometry/Ray';
 import { TrackEnd } from './TrackEnd';
-import { Circle } from '../../Geometry/Circle';
-import { Store } from '../../Interfaces/Store';
+import { Circle } from '../../structs/Geometry/Circle';
+import { Store } from '../../structs/Interfaces/Store';
 
 export class PositionOnTrack {
   private percentage: number;

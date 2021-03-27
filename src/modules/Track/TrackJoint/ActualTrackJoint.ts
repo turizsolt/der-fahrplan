@@ -1,17 +1,17 @@
-import { TrackJointRenderer } from '../../Renderers/TrackJointRenderer';
-import { Coordinate } from '../../Geometry/Coordinate';
+import { TrackJointRenderer } from '../../../structs/Renderers/TrackJointRenderer';
+import { Coordinate } from '../../../structs/Geometry/Coordinate';
 import { TYPES } from '../../../di/TYPES';
 import { TrackJointEnd } from './TrackJointEnd';
 import { inject, injectable } from 'inversify';
-import { TrackJoint } from '../../Interfaces/TrackJoint';
-import { WhichEnd, otherEnd } from '../../Interfaces/WhichEnd';
-import { TrackEnd } from '../Track/TrackEnd';
-import { TrackBase } from '../../Interfaces/TrackBase';
-import { Ray } from '../../Geometry/Ray';
+import { TrackJoint } from './TrackJoint';
+import { WhichEnd, otherEnd } from '../../../structs/Interfaces/WhichEnd';
+import { TrackEnd } from '../TrackEnd';
+import { TrackBase } from '../TrackBase';
+import { Ray } from '../../../structs/Geometry/Ray';
 import { TrackJointConnector } from './TrackJointConnector';
-import { ActualBaseBrick } from '../ActualBaseBrick';
-import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { Store } from '../../Interfaces/Store';
+import { ActualBaseBrick } from '../../../structs/Actuals/ActualBaseBrick';
+import { BaseRenderer } from '../../../structs/Renderers/BaseRenderer';
+import { Store } from '../../../structs/Interfaces/Store';
 
 @injectable()
 export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {

@@ -1,6 +1,6 @@
 import { Passenger } from '../Interfaces/Passenger';
 import { Side } from '../Interfaces/Side';
-import { TrackBase } from '../Interfaces/TrackBase';
+import { TrackBase } from '../../modules/Track/TrackBase';
 import { Coordinate } from '../Geometry/Coordinate';
 import { Platform } from '../Interfaces/Platform';
 import { Color } from '../Color';
