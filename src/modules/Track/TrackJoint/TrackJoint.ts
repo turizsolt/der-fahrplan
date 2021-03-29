@@ -8,7 +8,7 @@ import { BaseBrick } from '../../../structs/Interfaces/BaseBrick';
 import { Emitable } from '../../../mixins/Emitable';
 
 export interface TrackJoint extends BaseBrick, Emitable {
-  init(ray?: Ray): TrackJoint;
+  init(ray: Ray): TrackJoint;
 
   getRay(): Ray;
   getPosition(): Coordinate;

@@ -20,7 +20,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   private ray: Ray;
   private ends: Record<WhichEnd, TrackJointEnd>;
 
-  init(ray?: Ray): TrackJoint {
+  init(ray: Ray): TrackJoint {
     super.initStore(TYPES.TrackJoint);
 
     this.ray = ray ?? new Ray(new Coordinate(0, 0, 0), 0);
