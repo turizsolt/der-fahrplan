@@ -19,6 +19,7 @@ import { CommandLog } from './Command/CommandLog';
 import { TrackJointRenderer } from '../../Renderers/TrackJointRenderer';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { Emitable } from '../../../mixins/Emitable';
+import { DirectedTrack } from '../../../modules/Track/DirectedTrack';
 
 @injectable()
 export class ActualStore implements Store {
@@ -38,6 +39,7 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfTrack) private TrackFactory: () => Track;
   @inject(TYPES.FactoryOfTrackSwitch) private TrackSwitchFactory: () => TrackSwitch;
   @inject(TYPES.FactoryOfTrackJoint) private TrackJointFactory: () => TrackJoint;
+  @inject(TYPES.FactoryOfDirectedTrack) private DirectedTrackFactory: () => DirectedTrack;
   @inject(TYPES.FactoryOfTrackJointRenderer) private TrackJointRendererFactory: () => TrackJointRenderer;
   @inject(TYPES.FactoryOfPlatform) private PlatformFactory: () => Platform;
   @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
@@ -61,6 +63,7 @@ export class ActualStore implements Store {
       [TYPES.Track]: this.TrackFactory,
       [TYPES.TrackSwitch]: this.TrackSwitchFactory,
       [TYPES.TrackJoint]: this.TrackJointFactory,
+      [TYPES.DirectedTrack]: this.DirectedTrackFactory,
       [TYPES.Platform]: this.PlatformFactory,
       [TYPES.Train]: this.TrainFactory,
       [TYPES.Wagon]: this.WagonFactory
@@ -70,6 +73,7 @@ export class ActualStore implements Store {
       [TYPES.RouteStop]: 11,
       [TYPES.Route]: 10,
       [TYPES.Trip]: 8,
+      [TYPES.DirectedTrack]: 5,
       [TYPES.Track]: 4,
       [TYPES.TrackSwitch]: 3,
       [TYPES.TrackJoint]: 2,
