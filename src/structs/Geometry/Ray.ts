@@ -3,7 +3,11 @@ import { almost, almostDirection } from './Almost';
 import { WhichEnd } from '../Interfaces/WhichEnd';
 
 export class Ray {
-  constructor(public coord: Coordinate, public dirXZ: number) {}
+  constructor(public coord: Coordinate, public dirXZ: number) { }
+
+  static from(x: number, y: number, z: number, dirXZ: number): Ray {
+    return new Ray(new Coordinate(x, y, z), dirXZ);
+  }
 
   slope() {
     if (
@@ -18,13 +22,13 @@ export class Ray {
   equ() {
     return this.slope() !== Infinity
       ? {
-          a: this.slope(),
-          b: this.coord.x - this.slope() * this.coord.z
-        }
+        a: this.slope(),
+        b: this.coord.x - this.slope() * this.coord.z
+      }
       : {
-          a: this.slope(),
-          z: this.coord.z
-        };
+        a: this.slope(),
+        z: this.coord.z
+      };
   }
 
   computeMidpoint(otherRay: Ray): undefined | false | Coordinate {

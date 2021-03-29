@@ -33,6 +33,7 @@ export const TYPES = {
   TrackJoint: Symbol.for('TrackJoint'),
   TrackJointRenderer: Symbol.for('TrackJointRenderer'),
   FactoryOfTrackJoint: Symbol.for('Factory<TrackJoint>'),
+  FactoryOfTrackJointRenderer: Symbol.for('Factory<TrackJointRenderer>'),
 
   TrackJointConnector: Symbol.for('TrackJointConnector'),
   FactoryOfTrackJointConnector: Symbol.for('Factory<TrackJointConnector>'),

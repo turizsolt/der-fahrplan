@@ -74,7 +74,9 @@ export abstract class ActualBaseStorable implements BaseStorable {
 
   onSelectChanged(selected: boolean): void { }
 
-  remove(): void {
+  remove(): void { }
 
+  isRemovable(): boolean {
+    return true;
   }
 }

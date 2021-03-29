@@ -6,9 +6,9 @@ import { Track } from '../Track';
 import { TrackSwitch } from '../TrackSwitch';
 import { ActualTrackSwitch } from '../ActualTrackSwitch';
 import { Store } from '../../../structs/Interfaces/Store';
-import { ActualTrackJoint } from './ActualTrackJoint';
 import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
 import { GENERATE_ID } from '../../../structs/Actuals/Store/Command/CommandLog';
+import { TrackJointEnd } from './TrackJointEnd';
 
 @injectable()
 export class TrackJointConnector {
@@ -42,13 +42,13 @@ export class TrackJointConnector {
       .whichEnd(midpoint || one.getPosition());
     const otherEnd = other.getEnds()[otherEndLetter];
 
-    if (ActualTrackJoint.areBothEndsEmpty(oneEnd, otherEnd)) {
+    if (TrackJointConnector.areBothEndsEmpty(oneEnd, otherEnd)) {
       return [
         CommandCreator.joinTrackJoints(GENERATE_ID, coordinates, one.getId(), oneEndLetter, other.getId(), otherEndLetter)
       ];
     }
 
-    if (ActualTrackJoint.isEndEmpty(oneEnd) || ActualTrackJoint.isEndEmpty(otherEnd)) {
+    if (TrackJointConnector.isEndEmpty(oneEnd) || TrackJointConnector.isEndEmpty(otherEnd)) {
       const oldTrack: TrackBase = oneEnd.track || otherEnd.track;
       if (oldTrack.constructor.name === ActualTrackSwitch.name) return false;
 
@@ -126,4 +126,13 @@ export class TrackJointConnector {
 
     return false;
   }
+
+  static isEndEmpty(end: TrackJointEnd): boolean {
+    return !end.isSet();
+  }
+
+  static areBothEndsEmpty(oneEnd, otherEnd: TrackJointEnd): boolean {
+    return TrackJointConnector.isEndEmpty(oneEnd) && TrackJointConnector.isEndEmpty(otherEnd);
+  }
+
 }

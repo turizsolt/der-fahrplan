@@ -1,51 +1,38 @@
-import { TrackJointRenderer } from '../../../structs/Renderers/TrackJointRenderer';
-import { Coordinate } from '../../../structs/Geometry/Coordinate';
 import { TYPES } from '../../../di/TYPES';
 import { TrackJointEnd } from './TrackJointEnd';
-import { inject, injectable } from 'inversify';
+import { injectable } from 'inversify';
 import { TrackJoint } from './TrackJoint';
 import { WhichEnd, otherEnd } from '../../../structs/Interfaces/WhichEnd';
 import { TrackEnd } from '../TrackEnd';
 import { TrackBase } from '../TrackBase';
 import { Ray } from '../../../structs/Geometry/Ray';
-import { TrackJointConnector } from './TrackJointConnector';
 import { ActualBaseBrick } from '../../../structs/Actuals/ActualBaseBrick';
 import { BaseRenderer } from '../../../structs/Renderers/BaseRenderer';
 import { Store } from '../../../structs/Interfaces/Store';
+import { Coordinate } from '../../../structs/Geometry/Coordinate';
+import { applyMixins } from '../../../mixins/ApplyMixins';
+import { Emitable } from '../../../mixins/Emitable';
 
+export interface ActualTrackJoint extends Emitable { }
+const doApply = () => applyMixins(ActualTrackJoint, [Emitable]);
 @injectable()
 export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   private ray: Ray;
-  private removed: boolean = false;
   private ends: Record<WhichEnd, TrackJointEnd>;
 
-  @inject(TYPES.TrackJointRenderer) private renderer: TrackJointRenderer;
-  @inject(TYPES.FactoryOfTrackJointConnector)
-  TrackJointConnectorFactory: () => TrackJointConnector;
-  private connector: TrackJointConnector;
-
-  init(x: number, z: number, rot: number): TrackJoint {
+  init(ray?: Ray): TrackJoint {
     super.initStore(TYPES.TrackJoint);
 
-    this.connector = this.TrackJointConnectorFactory();
-    this.connector.setStore(this.store);
+    this.ray = ray ?? new Ray(new Coordinate(0, 0, 0), 0);
 
     this.ends = {
       A: new TrackJointEnd(),
       B: new TrackJointEnd()
     };
 
-    this.ray = new Ray(new Coordinate(x, 0, z), rot);
+    this.emit('init', this.persist());
 
-    this.renderer.init(this);
     return this;
-  }
-
-  rotate(rot: number) {
-    if (ActualTrackJoint.areBothEndsEmpty(this.ends.A, this.ends.B)) {
-      this.ray.dirXZ = rot;
-      this.renderer.update();
-    }
   }
 
   isRemovable(): boolean {
@@ -70,10 +57,8 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
         this.ends.B.track.remove();
         this.ends.B.unsetEnd();
       }
-      this.removed = true;
-      this.renderer.remove();
+      this.emit('remove', this.id);
 
-      this.store.unregister(this);
       return true;
     }
     return false;
@@ -86,18 +71,6 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     if (this.ends.B.end === end) {
       this.ends.B.unsetEnd();
     }
-  }
-
-  static isEndEmpty(end: TrackJointEnd): boolean {
-    return !end.isSet();
-  }
-
-  connect(other: TrackJoint): any {
-    return this.connector.connect(this, other);
-  }
-
-  static areBothEndsEmpty(oneEnd, otherEnd: TrackJointEnd): boolean {
-    return ActualTrackJoint.isEndEmpty(oneEnd) && ActualTrackJoint.isEndEmpty(otherEnd);
   }
 
   setOneEnd(jointEndLetter: WhichEnd, trackEnd: TrackEnd) {
@@ -132,19 +105,8 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     return this.ends;
   }
 
-  isRemoved(): boolean {
-    return this.removed;
-  }
-
-  verbose(): void {
-    // console.log('joint ', this.id);
-    // console.log('A ', this.ends.A.end && this.ends.A.end.getHash());
-    // console.log('B ', this.ends.B.end && this.ends.B.end.getHash());
-    // console.log('/joint');
-  }
-
   getRenderer(): BaseRenderer {
-    return this.renderer;
+    return null;
   }
 
   persist(): Object {
@@ -170,7 +132,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
 
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
-    this.init(obj.ray.x, obj.ray.z, obj.ray.dirXZ);
+    this.init(Ray.from(obj.ray.x, obj.ray.y, obj.ray.z, obj.ray.dirXZ));
 
     const trA: TrackBase = obj.A ? (store.get(obj.A.track) as TrackBase) : null;
     const trB: TrackBase = obj.B ? (store.get(obj.B.track) as TrackBase) : null;
@@ -184,3 +146,5 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     }
   }
 }
+
+doApply();

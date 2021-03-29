@@ -9,6 +9,7 @@ import { Wagon } from "../../../Interfaces/Wagon";
 import { WhichEnd } from "../../../Interfaces/WhichEnd";
 import { WagonConfig } from "../../Wagon/WagonConfig";
 import { CommandLog } from "./CommandLog";
+import { Ray } from "../../../Geometry/Ray";
 
 export class CommandProcessor {
     constructor(private store: Store, private logStore: CommandLog) { }
@@ -16,7 +17,7 @@ export class CommandProcessor {
     createTrackJoint(id: string, x: number, z: number, angle: number): TrackJoint {
         const j2 = this.store.create<TrackJoint>(TYPES.TrackJoint);
         j2.presetId(id);
-        j2.init(x, z, angle);
+        j2.init(Ray.from(x, 0, z, angle));
         return j2;
     }
 
