@@ -1,31 +1,13 @@
 import { TrackJoint } from './TrackJoint';
 import { TrackBase } from '../TrackBase';
-import { inject, injectable } from 'inversify';
-import { TYPES } from '../../../di/TYPES';
-import { Track } from '../Track';
-import { TrackSwitch } from '../TrackSwitch';
 import { ActualTrackSwitch } from '../ActualTrackSwitch';
-import { Store } from '../../../structs/Interfaces/Store';
 import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
 import { GENERATE_ID } from '../../../structs/Actuals/Store/Command/CommandLog';
 import { TrackJointEnd } from './TrackJointEnd';
 
-@injectable()
 export class TrackJointConnector {
-  @inject(TYPES.FactoryOfTrack) TrackFactory: () => Track;
-  @inject(TYPES.FactoryOfTrackSwitch) TrackSwitchFactory: () => TrackSwitch;
 
-  init(): TrackJointConnector {
-    return this;
-  }
-
-  private store: Store;
-
-  setStore(store: Store) {
-    this.store = store;
-  }
-
-  connect(one: TrackJoint, other: TrackJoint) {
+  static connect(one: TrackJoint, other: TrackJoint) {
     const midpoint = one.getRay().computeMidpoint(other.getRay());
 
     if (midpoint === false) {

@@ -12,6 +12,7 @@ import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreat
 import { Command } from '../../structs/Actuals/Store/Command/Command';
 import { TYPES } from '../../di/TYPES';
 import { Ray } from '../../structs/Geometry/Ray';
+import { TrackJointConnector } from '../../modules/Track/TrackJoint/TrackJointConnector';
 
 export class CreateTrackInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
@@ -193,7 +194,7 @@ export class CreateTrackInputHandler implements InputHandler {
         deletable.push(j2);
       }
 
-      const ret = j1.connect(j2);
+      const ret = TrackJointConnector.connect(j1, j2);
 
       const replacementIds = deletable.map(j => j.getId());
 

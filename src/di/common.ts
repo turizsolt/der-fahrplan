@@ -8,7 +8,6 @@ import { ActualTrackJoint } from '../modules/Track/TrackJoint/ActualTrackJoint';
 import { ActualStore } from '../structs/Actuals/Store/ActualStore';
 import { Platform } from '../structs/Interfaces/Platform';
 import { ActualPlatform } from '../structs/Actuals/ActualPlatform';
-import { TrackJointConnector } from '../modules/Track/TrackJoint/TrackJointConnector';
 import { ActualWagon } from '../structs/Actuals/Wagon/ActualWagon';
 import { Wagon } from '../structs/Interfaces/Wagon';
 import { RouteStop } from '../structs/Scheduling/RouteStop';
@@ -30,11 +29,6 @@ import { ActualTrip } from '../structs/Scheduling/ActualTrip';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
-  ioc.sng<TrackJointConnector>(
-    T.FactoryOfTrackJointConnector,
-    T.TrackJointConnector,
-    TrackJointConnector
-  );
 
   ioc.fm<PassengerGenerator>(T.FactoryOfPassengerGenerator, T.PassengerGenerator, ActualPassengerGenerator);
   ioc.fm<Train>(T.FactoryOfTrain, T.Train, ActualTrain);
