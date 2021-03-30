@@ -1,12 +1,15 @@
 import { injectable } from 'inversify';
+import { ActualTrackSegment } from './ActualTrackSegment';
 import { DirectedTrack } from './DirectedTrack';
 
 @injectable()
 export class ActualDirectedTrack implements DirectedTrack {
     private nextTrack: DirectedTrack = null;
     private reverseTrack: DirectedTrack = null;
+    private segment: ActualTrackSegment = null;
 
-    init(): DirectedTrack {
+    init(segment: ActualTrackSegment): DirectedTrack {
+        this.segment = segment;
         return this;
     }
 
@@ -24,5 +27,9 @@ export class ActualDirectedTrack implements DirectedTrack {
 
     setReverse(reverseTrack: DirectedTrack): void {
         this.reverseTrack = reverseTrack;
+    }
+
+    getSegment(): ActualTrackSegment {
+        return this.segment;
     }
 }

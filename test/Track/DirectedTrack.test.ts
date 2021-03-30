@@ -6,7 +6,7 @@ import { getTestStore } from '../getTestStore';
 chai.use(chaiAlmost());
 
 const store = getTestStore();
-const createDirectedTrack = () => store.create<DirectedTrack>(TYPES.DirectedTrack).init();
+const createDirectedTrack = () => store.create<DirectedTrack>(TYPES.DirectedTrack).init(null);
 
 describe('DirectedTrack', () => {
   it('create a dt', () => {

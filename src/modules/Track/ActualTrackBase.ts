@@ -88,6 +88,8 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     return null;
   }
 
+
+  // todo should be in separate static file
   getWagonClosest(
     from: number,
     to: number,
