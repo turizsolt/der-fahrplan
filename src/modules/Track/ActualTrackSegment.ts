@@ -4,6 +4,7 @@ import { DirectedTrack } from './DirectedTrack';
 import { ActualDirectedTrack } from './ActualDirectedTrack';
 import { ActualTrackEnd } from './ActualTrackEnd';
 import { Track } from './Track';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 
 export class ActualTrackSegment {
   protected A: ActualTrackEnd;
@@ -27,6 +28,10 @@ export class ActualTrackSegment {
     this.BA.setReverse(this.AB);
 
     return this;
+  }
+
+  getEnd(whichEnd: WhichEnd): ActualTrackEnd {
+    return this[whichEnd] ?? null;
   }
 
   getTrack(): Track {

@@ -10,6 +10,7 @@ import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
 import { Store } from '../../structs/Interfaces/Store';
 import { ActualTrackSegment } from './ActualTrackSegment';
 import { TrackSegment } from './TrackSegment';
+import { ActualTrackEnd } from './ActualTrackEnd';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
@@ -30,6 +31,14 @@ export class ActualTrack extends ActualTrackBase implements Track {
     // todo emit
     this.renderer.init(this);
     return this;
+  }
+
+  getAx(): ActualTrackEnd {
+    return this.segment2.getEnd(WhichEnd.A);
+  }
+
+  getBx(): ActualTrackEnd {
+    return this.segment2.getEnd(WhichEnd.B);
   }
 
   // todo emit

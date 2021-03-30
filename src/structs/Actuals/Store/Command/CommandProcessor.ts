@@ -34,8 +34,11 @@ export class CommandProcessor {
         const one = this.store.get(jointId1) as TrackJoint;
         const other = this.store.get(jointId2) as TrackJoint;
 
-        one.setOneEnd(whichEnd1, track.getA());
-        other.setOneEnd(whichEnd2, track.getB());
+        // one.setOneEnd(whichEnd1, track.getA());
+        // other.setOneEnd(whichEnd2, track.getB());
+
+        one.setOneEndx(whichEnd1, track.getAx());
+        other.setOneEndx(whichEnd2, track.getBx());
 
         return track;
     }
@@ -45,8 +48,12 @@ export class CommandProcessor {
         const one = this.store.get(jointId1) as TrackJoint;
         const other = this.store.get(jointId2) as TrackJoint;
 
-        one.removeEnd(track.getA());
-        other.removeEnd(track.getB());
+        // one.removeEnd(track.getA());
+        // other.removeEnd(track.getB());
+
+        one.removeEndx(track.getAx());
+        other.removeEndx(track.getBx());
+
         track.remove();
     }
 

@@ -13,4 +13,12 @@ export class ActualTrackEnd {
   getTrack(): Track {
     return this.start.getSegment().getTrack();
   }
+
+  getStart(): DirectedTrack {
+    return this.start;
+  }
+
+  getEnd(): DirectedTrack {
+    return this.end;
+  }
 }

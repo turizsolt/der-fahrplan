@@ -12,6 +12,7 @@ import { Store } from '../../../structs/Interfaces/Store';
 import { Coordinate } from '../../../structs/Geometry/Coordinate';
 import { applyMixins } from '../../../mixins/ApplyMixins';
 import { Emitable } from '../../../mixins/Emitable';
+import { ActualTrackEnd } from '../ActualTrackEnd';
 
 export interface ActualTrackJoint extends Emitable { }
 const doApply = () => applyMixins(ActualTrackJoint, [Emitable]);
@@ -19,6 +20,7 @@ const doApply = () => applyMixins(ActualTrackJoint, [Emitable]);
 export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   private ray: Ray;
   private ends: Record<WhichEnd, TrackJointEnd>;
+  private ends2: Record<WhichEnd, ActualTrackEnd>;
 
   init(ray: Ray): TrackJoint {
     super.initStore(TYPES.TrackJoint);
@@ -28,6 +30,11 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     this.ends = {
       A: new TrackJointEnd(),
       B: new TrackJointEnd()
+    };
+
+    this.ends2 = {
+      A: null,
+      B: null
     };
 
     this.emit('init', this.persist());
@@ -80,6 +87,30 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
       this.ends.A.end.connect(this.ends.B.end, this);
     } else {
       this.ends[jointEndLetter].end.setJointTo(this);
+    }
+  }
+
+  setOneEndx(jointEnd: WhichEnd, trackEnd: ActualTrackEnd): void {
+    this.ends2[jointEnd] = trackEnd;
+    if (this.ends2.A && this.ends2.B) {
+      this.ends2.A.getEnd().setNext(this.ends2.B.getStart());
+      this.ends2.B.getEnd().setNext(this.ends2.A.getStart());
+    }
+  }
+
+  removeEndx(trackEnd: ActualTrackEnd) {
+    if (this.ends2.A === trackEnd) {
+      if (this.ends2.A && this.ends2.B) {
+        this.ends2.A.getEnd().setNext(null);
+        this.ends2.B.getEnd().setNext(null);
+      }
+      this.ends2.A = null;
+    } else if (this.ends2.B === trackEnd) {
+      if (this.ends2.A && this.ends2.B) {
+        this.ends2.A.getEnd().setNext(null);
+        this.ends2.B.getEnd().setNext(null);
+      }
+      this.ends2.B = null;
     }
   }
 
