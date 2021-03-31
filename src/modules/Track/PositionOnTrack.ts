@@ -1,7 +1,6 @@
 import { TrackBase } from './TrackBase';
 import { Platform } from '../../structs/Interfaces/Platform';
 import { Ray } from '../../structs/Geometry/Ray';
-import { TrackEnd } from './TrackEnd';
 import { Circle } from '../../structs/Geometry/Circle';
 import { Store } from '../../structs/Interfaces/Store';
 
@@ -190,28 +189,28 @@ export class PositionOnTrack {
     return ret;
   }
 
-  private moveNextOnA(end: TrackEnd) {
-    this.moveToNextTrack(end);
-    if (end.isSwitchingEnds()) {
-      this.movePositionAB();
-    } else {
-      this.movePositionAA();
-    }
-  }
+  //   private moveNextOnA(end: TrackEnd) {
+  //     this.moveToNextTrack(end);
+  //     if (end.isSwitchingEnds()) {
+  //       this.movePositionAB();
+  //     } else {
+  //       this.movePositionAA();
+  //     }
+  //   }
 
-  private moveNextOnB(end: TrackEnd, oldTrackLength: number) {
-    this.moveToNextTrack(end);
-    if (end.isSwitchingEnds()) {
-      this.movePositionBA(oldTrackLength);
-    } else {
-      this.movePositionBB(oldTrackLength);
-    }
-  }
+  //   private moveNextOnB(end: TrackEnd, oldTrackLength: number) {
+  //     this.moveToNextTrack(end);
+  //     if (end.isSwitchingEnds()) {
+  //       this.movePositionBA(oldTrackLength);
+  //     } else {
+  //       this.movePositionBB(oldTrackLength);
+  //     }
+  //   }
 
-  private moveToNextTrack(end: TrackEnd) {
-    this.track = end.getConnectedEndOf();
-    return this.track;
-  }
+  //   private moveToNextTrack(end: TrackEnd) {
+  //     this.track = end.getConnectedEndOf();
+  //     return this.track;
+  //   }
 
   private movePositionAA() {
     const overRun = -this.position;
