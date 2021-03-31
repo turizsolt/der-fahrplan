@@ -30,10 +30,10 @@ describe('Train', () => {
 
   it('persist and load', () => {
     store.clear();
-    const track = TrackFactory().init([
-      new Coordinate(0, 0, 0),
-      new Coordinate(0, 0, 100)
-    ]);
+    const track = TrackFactory().init(
+      [new Coordinate(0, 0, 0), new Coordinate(0, 0, 100)],
+      []
+    );
     const w1 = WagonFactory().init();
     w1.putOnTrack(track);
     const train = w1.getTrain();

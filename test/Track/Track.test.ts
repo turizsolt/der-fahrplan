@@ -12,6 +12,6 @@ describe('Track', () => {
   it('create a track', () => {
     const track = store
       .create<Track>(TYPES.Track)
-      .init([new Coordinate(0, 0, 0), new Coordinate(0, 0, 100)]);
+      .init([new Coordinate(0, 0, 0), new Coordinate(0, 0, 100)], []);
   });
 });

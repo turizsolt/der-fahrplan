@@ -84,11 +84,13 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
       this.segmentL = new ActualTrackSegment().init(
         this,
-        tempE.getCoordinates()
+        tempE.getCoordinates(),
+        []
       );
       this.segmentR = new ActualTrackSegment().init(
         this,
-        tempF.getCoordinates()
+        tempF.getCoordinates(),
+        []
       );
     } else {
       this.segmentLeft = tempF;
@@ -96,11 +98,13 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
       this.segmentL = new ActualTrackSegment().init(
         this,
-        tempF.getCoordinates()
+        tempF.getCoordinates(),
+        []
       );
       this.segmentR = new ActualTrackSegment().init(
         this,
-        tempE.getCoordinates()
+        tempE.getCoordinates(),
+        []
       );
     }
 
