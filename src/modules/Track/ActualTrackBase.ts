@@ -4,6 +4,7 @@ import { injectable } from 'inversify';
 import { ActualBaseBrick } from '../../structs/Actuals/ActualBaseBrick';
 import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
 import { Wagon } from '../../structs/Interfaces/Wagon';
+import { TrackCurve } from './TrackCurve';
 
 @injectable()
 export abstract class ActualTrackBase extends ActualBaseBrick
@@ -12,6 +13,14 @@ export abstract class ActualTrackBase extends ActualBaseBrick
   protected platformsBeside: Platform[] = [];
 
   abstract getRenderer(): BaseRenderer;
+
+  getCurve(): TrackCurve {
+    throw new Error('Method not implemented.');
+  }
+
+  getLength(): number {
+    return this.getCurve().getLength();
+  }
 
   getPlatformsBeside() {
     return this.platformsBeside;

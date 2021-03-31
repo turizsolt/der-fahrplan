@@ -11,58 +11,60 @@ export class Nearest {
     ttl: number,
     initDist: number = 0
   ): NearestWagon {
-    if (ttl === 0) return null;
+    return null;
 
-    let sign = Math.sign(to - from); // 1 to B, -1 to A
+    // if (ttl === 0) return null;
 
-    let ret: NearestWagon = {
-      distance: Infinity,
-      wagon: null,
-      end: null
-    };
+    // let sign = Math.sign(to - from); // 1 to B, -1 to A
 
-    for (let wagon of track.getCheckedList()) {
-      if (wagon === excludeWagon) continue;
+    // let ret: NearestWagon = {
+    //   distance: Infinity,
+    //   wagon: null,
+    //   end: null
+    // };
 
-      ret = this.handleWagonEnd(ret, from, to, sign, wagon.getA());
-      ret = this.handleWagonEnd(ret, from, to, sign, wagon.getB());
-    }
+    // for (let wagon of track.getCheckedList()) {
+    //   if (wagon === excludeWagon) continue;
 
-    if (ret.distance === Infinity) {
-      if (sign === 1) {
-        const nextTrack = track.getB().getConnectedEndOf();
-        if (!nextTrack) return null;
-        const [newFrom, newTo] = track.getB().isSwitchingEnds()
-          ? [0, 1]
-          : [1, 0];
-        return Nearest.getWagonClosest(
-          nextTrack,
-          newFrom,
-          newTo,
-          excludeWagon,
-          ttl - 1,
-          initDist + Math.abs(to - from)
-        );
-      } else {
-        const nextTrack = track.getA().getConnectedEndOf();
-        if (!nextTrack) return null;
-        const [newFrom, newTo] = track.getA().isSwitchingEnds()
-          ? [1, 0]
-          : [0, 1];
-        return Nearest.getWagonClosest(
-          nextTrack,
-          newFrom,
-          newTo,
-          excludeWagon,
-          ttl - 1,
-          initDist + Math.abs(from - to)
-        );
-      }
-      return null;
-    } else {
-      ret.distance += initDist;
-      return ret;
-    }
+    //   ret = this.handleWagonEnd(ret, from, to, sign, wagon.getA());
+    //   ret = this.handleWagonEnd(ret, from, to, sign, wagon.getB());
+    // }
+
+    // if (ret.distance === Infinity) {
+    //   if (sign === 1) {
+    //     const nextTrack = track.getB().getConnectedEndOf();
+    //     if (!nextTrack) return null;
+    //     const [newFrom, newTo] = track.getB().isSwitchingEnds()
+    //       ? [0, 1]
+    //       : [1, 0];
+    //     return Nearest.getWagonClosest(
+    //       nextTrack,
+    //       newFrom,
+    //       newTo,
+    //       excludeWagon,
+    //       ttl - 1,
+    //       initDist + Math.abs(to - from)
+    //     );
+    //   } else {
+    //     const nextTrack = track.getA().getConnectedEndOf();
+    //     if (!nextTrack) return null;
+    //     const [newFrom, newTo] = track.getA().isSwitchingEnds()
+    //       ? [1, 0]
+    //       : [0, 1];
+    //     return Nearest.getWagonClosest(
+    //       nextTrack,
+    //       newFrom,
+    //       newTo,
+    //       excludeWagon,
+    //       ttl - 1,
+    //       initDist + Math.abs(from - to)
+    //     );
+    //   }
+    //   return null;
+    // } else {
+    //   ret.distance += initDist;
+    //   return ret;
+    // }
   }
 
   static handleWagonEnd(

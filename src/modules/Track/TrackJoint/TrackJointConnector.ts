@@ -1,9 +1,9 @@
 import { TrackJoint } from './TrackJoint';
-import { TrackBase } from '../TrackBase';
 import { ActualTrackSwitch } from '../ActualTrackSwitch';
 import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
 import { GENERATE_ID } from '../../../structs/Actuals/Store/Command/CommandLog';
 import { ActualTrackEnd } from '../ActualTrackEnd';
+import { Track } from '../Track';
 
 export class TrackJointConnector {
   static connect(one: TrackJoint, other: TrackJoint) {
@@ -40,13 +40,14 @@ export class TrackJointConnector {
       TrackJointConnector.isEndEmpty(oneEnd) ||
       TrackJointConnector.isEndEmpty(otherEnd)
     ) {
-      const oldTrack: TrackBase = oneEnd.getTrack() || otherEnd.getTrack();
+      const oldTrack: Track = ((oneEnd && oneEnd.getTrack()) ||
+        (otherEnd && otherEnd.getTrack())) as Track;
       if (oldTrack.constructor.name === ActualTrackSwitch.name) return false;
 
       const oldCoordinates = oldTrack.getCurve().getCoordinates();
 
-      const thirdA = oldTrack.getA().getJointTo();
-      const thirdB = oldTrack.getB().getJointTo();
+      const thirdA = oldTrack.getAx().getJointEnd().joint;
+      const thirdB = oldTrack.getBx().getJointEnd().joint;
 
       let third, second, peak, peakLetter, secondLetter;
       if (thirdA === one) {
@@ -76,21 +77,15 @@ export class TrackJointConnector {
       }
 
       let thirdLetter;
-      if (oldTrack.getA().getJointTo() === peak) {
-        thirdLetter = oldTrack
-          .getB()
-          .getJointTo()
-          .getTracksEnd(oldTrack);
+      if (oldTrack.getAx().getJointEnd().joint === peak) {
+        thirdLetter = oldTrack.getBx().getJointEnd().end;
       }
-      if (oldTrack.getB().getJointTo() === peak) {
-        thirdLetter = oldTrack
-          .getA()
-          .getJointTo()
-          .getTracksEnd(oldTrack);
+      if (oldTrack.getBx().getJointEnd().joint === peak) {
+        thirdLetter = oldTrack.getAx().getJointEnd().end;
       }
 
-      const j1 = oldTrack.getA().getJointTo();
-      const j2 = oldTrack.getB().getJointTo();
+      const j1 = oldTrack.getAx().getJointEnd().joint;
+      const j2 = oldTrack.getBx().getJointEnd().joint;
 
       return [
         CommandCreator.unjoinTrackJoints(
