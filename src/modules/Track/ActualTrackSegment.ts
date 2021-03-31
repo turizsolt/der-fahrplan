@@ -17,15 +17,15 @@ export class ActualTrackSegment {
   init(track: Track, coordinates: Coordinate[]): ActualTrackSegment {
     this.track = track;
 
-    this.A = new ActualTrackEnd(this.AB, this.BA);
-    this.B = new ActualTrackEnd(this.BA, this.AB);
-    this.curve = new TrackCurve(coordinates);
-
     // dt
     this.AB = (new ActualDirectedTrack()).init(this);
     this.BA = (new ActualDirectedTrack()).init(this);
     this.AB.setReverse(this.BA);
     this.BA.setReverse(this.AB);
+
+    this.A = new ActualTrackEnd(this.AB, this.BA);
+    this.B = new ActualTrackEnd(this.BA, this.AB);
+    this.curve = new TrackCurve(coordinates);
 
     return this;
   }

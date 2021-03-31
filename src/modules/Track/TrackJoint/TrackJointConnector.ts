@@ -3,7 +3,7 @@ import { TrackBase } from '../TrackBase';
 import { ActualTrackSwitch } from '../ActualTrackSwitch';
 import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
 import { GENERATE_ID } from '../../../structs/Actuals/Store/Command/CommandLog';
-import { TrackJointEnd } from './TrackJointEnd';
+import { ActualTrackEnd } from '../ActualTrackEnd';
 
 export class TrackJointConnector {
   static connect(one: TrackJoint, other: TrackJoint) {
@@ -16,12 +16,12 @@ export class TrackJointConnector {
     const coordinates = [one.getPosition(), midpoint, other.getPosition()];
 
     const oneEndLetter = one.getRay().whichEnd(midpoint || other.getPosition());
-    const oneEnd = one.getEnds()[oneEndLetter];
+    const oneEnd = one.getEnd(oneEndLetter);
 
     const otherEndLetter = other
       .getRay()
       .whichEnd(midpoint || one.getPosition());
-    const otherEnd = other.getEnds()[otherEndLetter];
+    const otherEnd = other.getEnd(otherEndLetter);
 
     if (TrackJointConnector.areBothEndsEmpty(oneEnd, otherEnd)) {
       return [
@@ -40,7 +40,7 @@ export class TrackJointConnector {
       TrackJointConnector.isEndEmpty(oneEnd) ||
       TrackJointConnector.isEndEmpty(otherEnd)
     ) {
-      const oldTrack: TrackBase = oneEnd.track || otherEnd.track;
+      const oldTrack: TrackBase = oneEnd.getTrack() || otherEnd.getTrack();
       if (oldTrack.constructor.name === ActualTrackSwitch.name) return false;
 
       const oldCoordinates = oldTrack.getCurve().getCoordinates();
@@ -118,11 +118,11 @@ export class TrackJointConnector {
     return false;
   }
 
-  static isEndEmpty(end: TrackJointEnd): boolean {
-    return !end.isSet();
+  static isEndEmpty(end: ActualTrackEnd): boolean {
+    return !end;
   }
 
-  static areBothEndsEmpty(oneEnd, otherEnd: TrackJointEnd): boolean {
+  static areBothEndsEmpty(oneEnd, otherEnd: ActualTrackEnd): boolean {
     return (
       TrackJointConnector.isEndEmpty(oneEnd) &&
       TrackJointConnector.isEndEmpty(otherEnd)
