@@ -68,8 +68,8 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   }
 
   getTracksEnd(track: TrackBase): WhichEnd | undefined {
-    if (this.ends.A.getTrack() === track) return WhichEnd.A;
-    if (this.ends.B.getTrack() === track) return WhichEnd.B;
+    if (this.ends.A && this.ends.A.getTrack() === track) return WhichEnd.A;
+    if (this.ends.B && this.ends.B.getTrack() === track) return WhichEnd.B;
     return undefined;
   }
 

@@ -86,11 +86,16 @@ export class CommandProcessor {
   ): TrackBase {
     const trackSwitch = this.store.create<TrackSwitch>(TYPES.TrackSwitch);
     trackSwitch.presetId(trackId);
-    trackSwitch.init(oldCoordinates, coordinates);
-
     const one = this.store.get(jointId1) as TrackJoint;
     const other = this.store.get(jointId2) as TrackJoint;
     const third = this.store.get(jointId3) as TrackJoint;
+
+    trackSwitch.init(oldCoordinates, coordinates, [
+      { joint: one, end: whichEnd1 },
+      { joint: other, end: whichEnd2 },
+      { joint: one, end: whichEnd1 },
+      { joint: third, end: whichEnd3 }
+    ]);
 
     // todo redo
     // one.setOneEnd(whichEnd1, trackSwitch.getA());

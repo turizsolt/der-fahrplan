@@ -208,14 +208,8 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
 
   // todo needs only for rendering, not for the model
   naturalSplitPoints(): Ray[] {
-    const chainE = this.trackSwitch
-      .getSegmentLeft()
-      .getCurve()
-      .getLineSegmentChain();
-    const chainF = this.trackSwitch
-      .getSegmentRight()
-      .getCurve()
-      .getLineSegmentChain();
+    const chainE = this.trackSwitch.getSegmentLeft().getLineSegmentChain();
+    const chainF = this.trackSwitch.getSegmentRight().getLineSegmentChain();
 
     const leftE = chainE.copyMove(Right, 1).getLineSegments();
     const rightF = chainF.copyMove(Left, 1).getLineSegments();

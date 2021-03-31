@@ -107,28 +107,28 @@ export class PositionOnTrack {
   private moveTowardsA(): void {
     this.position -= 1;
 
-    if (this.position < 0) {
-      const end = this.track.getA();
-      if (end.hasConnectedEndOf()) {
-        this.moveNextOnA(end);
-      } else {
-        this.stopOnA();
-      }
-    }
+    // if (this.position < 0) {
+    //   const end = this.track.getA();
+    //   if (end.hasConnectedEndOf()) {
+    //     this.moveNextOnA(end);
+    //   } else {
+    //     this.stopOnA();
+    //   }
+    // }
   }
 
   private moveTowardsB(): void {
     this.position += 1;
 
     const trackLength = this.track.getLength();
-    if (this.position > trackLength) {
-      const end = this.track.getB();
-      if (end.hasConnectedEndOf()) {
-        this.moveNextOnB(end, trackLength);
-      } else {
-        this.stopOnB();
-      }
-    }
+    // if (this.position > trackLength) {
+    //   const end = this.track.getB();
+    //   if (end.hasConnectedEndOf()) {
+    //     this.moveNextOnB(end, trackLength);
+    //   } else {
+    //     this.stopOnB();
+    //   }
+    // }
   }
 
   private hopTowardsB(distance): TrackBase[] {
@@ -139,20 +139,20 @@ export class PositionOnTrack {
     const point = bezier.getPoint(this.getPercentage());
     let fun = t => t > this.getPercentage();
 
-    if (lastPoint.distance2d(point) < distance) {
-      if (this.track.getB().hasConnectedEndOf()) {
-        if (!this.track.getB().isSwitchingEnds()) {
-          this.direction = -this.direction;
-        }
-        const nextTrack = this.moveToNextTrack(this.track.getB());
-        ret.push(nextTrack);
-        bezier = this.track.getCurve().getBezier();
-        fun = t => true;
-      } else {
-        this.setPercentage(1);
-        return ret;
-      }
-    }
+    // if (lastPoint.distance2d(point) < distance) {
+    //   if (this.track.getB().hasConnectedEndOf()) {
+    //     if (!this.track.getB().isSwitchingEnds()) {
+    //       this.direction = -this.direction;
+    //     }
+    //     const nextTrack = this.moveToNextTrack(this.track.getB());
+    //     ret.push(nextTrack);
+    //     bezier = this.track.getCurve().getBezier();
+    //     fun = t => true;
+    //   } else {
+    //     this.setPercentage(1);
+    //     return ret;
+    //   }
+    // }
 
     const circle = new Circle(point, distance);
     const vals = bezier.intersectWithCircle(circle).filter(fun);
@@ -168,20 +168,20 @@ export class PositionOnTrack {
     const point = bezier.getPoint(this.getPercentage());
     let fun = t => t < this.getPercentage();
 
-    if (firstPoint.distance2d(point) < distance) {
-      if (this.track.getA().hasConnectedEndOf()) {
-        if (!this.track.getA().isSwitchingEnds()) {
-          this.direction = -this.direction;
-        }
-        const nextTrack = this.moveToNextTrack(this.track.getA());
-        ret.push(nextTrack);
-        bezier = this.track.getCurve().getBezier();
-        fun = t => true;
-      } else {
-        this.setPercentage(0);
-        return ret;
-      }
-    }
+    // if (firstPoint.distance2d(point) < distance) {
+    //   if (this.track.getA().hasConnectedEndOf()) {
+    //     if (!this.track.getA().isSwitchingEnds()) {
+    //       this.direction = -this.direction;
+    //     }
+    //     const nextTrack = this.moveToNextTrack(this.track.getA());
+    //     ret.push(nextTrack);
+    //     bezier = this.track.getCurve().getBezier();
+    //     fun = t => true;
+    //   } else {
+    //     this.setPercentage(0);
+    //     return ret;
+    //   }
+    // }
 
     const circle = new Circle(point, distance);
     const vals = bezier.intersectWithCircle(circle);
