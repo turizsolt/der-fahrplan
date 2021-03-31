@@ -3,7 +3,7 @@ import { Bezier } from '../../structs/Geometry/Bezier/Bezier';
 import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { LineSegmentChain } from '../../structs/Geometry/LineSegmentChain';
 
-export class TrackSegment {
+export class TrackCurve {
   readonly length: number;
   readonly isCurve: boolean;
   readonly curvePoints: Coordinate[];

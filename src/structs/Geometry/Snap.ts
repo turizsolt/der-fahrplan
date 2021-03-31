@@ -24,7 +24,7 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
   for (let thisTrack of trackList) {
     if (thisTrack.constructor.name === ActualTrack.name) {
       const linePoints = thisTrack
-        .getSegment()
+        .getCurve()
         .getBezier()
         .getLineSegmentChain()
         .getPoints();

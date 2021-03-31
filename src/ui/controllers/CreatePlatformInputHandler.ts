@@ -73,7 +73,7 @@ export class CreatePlatformInputHandler implements InputHandler {
     if (pot && pot.track.constructor.name === ActualTrack.name) {
       this.fromMesh.position = CoordinateToBabylonVector3(
         pot.track
-          .getSegment()
+          .getCurve()
           .getBezier()
           .getPoint(pot.position)
       );
@@ -89,7 +89,7 @@ export class CreatePlatformInputHandler implements InputHandler {
     if (pot && pot.track.constructor.name === ActualTrack.name) {
       this.fromMesh.position = CoordinateToBabylonVector3(
         pot.track
-          .getSegment()
+          .getCurve()
           .getBezier()
           .getPoint(pot.position)
       );
@@ -105,7 +105,7 @@ export class CreatePlatformInputHandler implements InputHandler {
     if (pot && pot.track.constructor.name === ActualTrack.name) {
       this.toMesh.position = CoordinateToBabylonVector3(
         pot.track
-          .getSegment()
+          .getCurve()
           .getBezier()
           .getPoint(pot.position)
       );
@@ -142,8 +142,8 @@ export class CreatePlatformInputHandler implements InputHandler {
       pot.track === dpot.track &&
       pot.position !== dpot.position
     ) {
-      const a = pot.track.getSegment().getFirstPoint();
-      const b = pot.track.getSegment().getLastPoint();
+      const a = pot.track.getCurve().getFirstPoint();
+      const b = pot.track.getCurve().getLastPoint();
       const p = props.point.coord;
       const side = Math.sign(
         (b.x - a.x) * (p.z - a.z) - (b.z - a.z) * (p.x - a.x)

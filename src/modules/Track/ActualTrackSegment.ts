@@ -1,4 +1,4 @@
-import { TrackSegment } from './TrackSegment';
+import { TrackCurve } from './TrackCurve';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { DirectedTrack } from './DirectedTrack';
 import { ActualDirectedTrack } from './ActualDirectedTrack';
@@ -9,7 +9,7 @@ import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 export class ActualTrackSegment {
   protected A: ActualTrackEnd;
   protected B: ActualTrackEnd;
-  protected segment: TrackSegment;
+  protected curve: TrackCurve;
   protected AB: DirectedTrack;
   protected BA: DirectedTrack;
   protected track: Track;
@@ -19,7 +19,7 @@ export class ActualTrackSegment {
 
     this.A = new ActualTrackEnd(this.AB, this.BA);
     this.B = new ActualTrackEnd(this.BA, this.AB);
-    this.segment = new TrackSegment(coordinates);
+    this.curve = new TrackCurve(coordinates);
 
     // dt
     this.AB = (new ActualDirectedTrack()).init(this);

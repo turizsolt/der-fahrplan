@@ -1,6 +1,6 @@
 import { Platform } from '../../structs/Interfaces/Platform';
 import { TrackEnd } from './TrackEnd';
-import { TrackSegment } from './TrackSegment';
+import { TrackCurve } from './TrackCurve';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { TrackBase } from './TrackBase';
 import { injectable } from 'inversify';
@@ -15,7 +15,7 @@ export abstract class ActualTrackBase extends ActualBaseBrick
   protected A: TrackEnd;
   protected B: TrackEnd;
   protected I: Coordinate;
-  protected segment: TrackSegment;
+  protected curve: TrackCurve;
   protected checkedList: Wagon[] = [];
   protected _platformsBeside: Platform[] = [];
   protected removed: boolean = false;
@@ -48,8 +48,8 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     this._platformsBeside.push(platform);
   }
 
-  getSegment(): TrackSegment {
-    return this.segment;
+  getCurve(): TrackCurve {
+    return this.curve;
   }
 
   getA(): TrackEnd {
@@ -61,7 +61,7 @@ export abstract class ActualTrackBase extends ActualBaseBrick
   }
 
   getLength(): number {
-    return this.getSegment().getLength();
+    return this.getCurve().getLength();
   }
 
   remove(): boolean {
@@ -80,14 +80,13 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     return this.removed;
   }
 
-  update(): void { }
+  update(): void {}
 
   getEnd(e: string): TrackEnd {
     if (e === 'A') return this.getA();
     if (e === 'B') return this.getB();
     return null;
   }
-
 
   // todo should be in separate static file
   getWagonClosest(

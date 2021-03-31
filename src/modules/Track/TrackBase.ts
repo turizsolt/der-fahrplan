@@ -1,5 +1,5 @@
 import { Platform } from '../../structs/Interfaces/Platform';
-import { TrackSegment } from './TrackSegment';
+import { TrackCurve } from './TrackCurve';
 import { TrackEnd } from './TrackEnd';
 import { BaseBrick } from '../../structs/Interfaces/BaseBrick';
 import { Wagon, NearestWagon } from '../../structs/Interfaces/Wagon';
@@ -18,7 +18,7 @@ export interface TrackBase extends BaseBrick {
   ): NearestWagon;
 
   addPlatform(platform: Platform);
-  getSegment(): TrackSegment;
+  getCurve(): TrackCurve;
 
   getPlatformsBeside();
   getA(): TrackEnd;

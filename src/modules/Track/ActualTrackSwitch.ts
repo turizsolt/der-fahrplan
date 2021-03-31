@@ -1,6 +1,6 @@
 import { TrackSwitchEnd } from './TrackSwitchEnd';
 import { TrackEnd } from './TrackEnd';
-import { TrackSegment } from './TrackSegment';
+import { TrackCurve } from './TrackCurve';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { TrackSwitchRenderer } from '../../structs/Renderers/TrackSwitchRenderer';
 import { TYPES } from '../../di/TYPES';
@@ -20,10 +20,10 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   protected E: TrackSwitchEnd;
   protected F: TrackSwitchEnd;
 
-  protected segmentE: TrackSegment;
-  protected segmentF: TrackSegment;
-  protected segmentLeft: TrackSegment;
-  protected segmentRight: TrackSegment;
+  protected segmentE: TrackCurve;
+  protected segmentF: TrackCurve;
+  protected segmentLeft: TrackCurve;
+  protected segmentRight: TrackCurve;
 
   getA() {
     return this.D;
@@ -45,19 +45,19 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
     const last1 = coordinates1.length - 1;
     const last2 = coordinates2.length - 1;
-    let tempE: TrackSegment, tempF: TrackSegment;
+    let tempE: TrackCurve, tempF: TrackCurve;
     if (coordinates1[0].equalsTo(coordinates2[0])) {
-      tempE = new TrackSegment(coordinates1);
-      tempF = new TrackSegment(coordinates2);
+      tempE = new TrackCurve(coordinates1);
+      tempF = new TrackCurve(coordinates2);
     } else if (coordinates1[last1].equalsTo(coordinates2[last2])) {
-      tempE = new TrackSegment(coordinates1.reverse());
-      tempF = new TrackSegment(coordinates2.reverse());
+      tempE = new TrackCurve(coordinates1.reverse());
+      tempF = new TrackCurve(coordinates2.reverse());
     } else if (coordinates1[0].equalsTo(coordinates2[last2])) {
-      tempE = new TrackSegment(coordinates1);
-      tempF = new TrackSegment(coordinates2.reverse());
+      tempE = new TrackCurve(coordinates1);
+      tempF = new TrackCurve(coordinates2.reverse());
     } else if (coordinates1[last1].equalsTo(coordinates2[0])) {
-      tempE = new TrackSegment(coordinates1.reverse());
-      tempF = new TrackSegment(coordinates2);
+      tempE = new TrackCurve(coordinates1.reverse());
+      tempF = new TrackCurve(coordinates2);
     } else {
       throw new Error('Segments has no meeting point');
     }
@@ -116,23 +116,23 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     return removable;
   }
 
-  getSegmentE(): TrackSegment {
+  getSegmentE(): TrackCurve {
     return this.segmentE;
   }
 
-  getSegmentF(): TrackSegment {
+  getSegmentF(): TrackCurve {
     return this.segmentF;
   }
 
-  getSegmentLeft(): TrackSegment {
+  getSegmentLeft(): TrackCurve {
     return this.segmentLeft;
   }
 
-  getSegmentRight(): TrackSegment {
+  getSegmentRight(): TrackCurve {
     return this.segmentRight;
   }
 
-  getSegment(): TrackSegment {
+  getCurve(): TrackCurve {
     return this.state ? this.segmentE : this.segmentF;
   }
 

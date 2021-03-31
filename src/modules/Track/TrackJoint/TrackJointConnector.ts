@@ -6,7 +6,6 @@ import { GENERATE_ID } from '../../../structs/Actuals/Store/Command/CommandLog';
 import { TrackJointEnd } from './TrackJointEnd';
 
 export class TrackJointConnector {
-
   static connect(one: TrackJoint, other: TrackJoint) {
     const midpoint = one.getRay().computeMidpoint(other.getRay());
 
@@ -26,15 +25,25 @@ export class TrackJointConnector {
 
     if (TrackJointConnector.areBothEndsEmpty(oneEnd, otherEnd)) {
       return [
-        CommandCreator.joinTrackJoints(GENERATE_ID, coordinates, one.getId(), oneEndLetter, other.getId(), otherEndLetter)
+        CommandCreator.joinTrackJoints(
+          GENERATE_ID,
+          coordinates,
+          one.getId(),
+          oneEndLetter,
+          other.getId(),
+          otherEndLetter
+        )
       ];
     }
 
-    if (TrackJointConnector.isEndEmpty(oneEnd) || TrackJointConnector.isEndEmpty(otherEnd)) {
+    if (
+      TrackJointConnector.isEndEmpty(oneEnd) ||
+      TrackJointConnector.isEndEmpty(otherEnd)
+    ) {
       const oldTrack: TrackBase = oneEnd.track || otherEnd.track;
       if (oldTrack.constructor.name === ActualTrackSwitch.name) return false;
 
-      const oldCoordinates = oldTrack.getSegment().getCoordinates();
+      const oldCoordinates = oldTrack.getCurve().getCoordinates();
 
       const thirdA = oldTrack.getA().getJointTo();
       const thirdB = oldTrack.getB().getJointTo();
@@ -114,7 +123,9 @@ export class TrackJointConnector {
   }
 
   static areBothEndsEmpty(oneEnd, otherEnd: TrackJointEnd): boolean {
-    return TrackJointConnector.isEndEmpty(oneEnd) && TrackJointConnector.isEndEmpty(otherEnd);
+    return (
+      TrackJointConnector.isEndEmpty(oneEnd) &&
+      TrackJointConnector.isEndEmpty(otherEnd)
+    );
   }
-
 }

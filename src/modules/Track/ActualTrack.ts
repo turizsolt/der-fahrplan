@@ -9,7 +9,7 @@ import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
 import { Store } from '../../structs/Interfaces/Store';
 import { ActualTrackSegment } from './ActualTrackSegment';
-import { TrackSegment } from './TrackSegment';
+import { TrackCurve } from './TrackCurve';
 import { ActualTrackEnd } from './ActualTrackEnd';
 
 @injectable()
@@ -25,8 +25,8 @@ export class ActualTrack extends ActualTrackBase implements Track {
 
     this.A = new TrackEnd(WhichEnd.A, this);
     this.B = new TrackEnd(WhichEnd.B, this);
-    this.segment = new TrackSegment(coordinates);
-    this.segment2 = (new ActualTrackSegment()).init(this, coordinates);
+    this.curve = new TrackCurve(coordinates);
+    this.segment2 = new ActualTrackSegment().init(this, coordinates);
 
     // todo emit
     this.renderer.init(this);
@@ -69,7 +69,7 @@ export class ActualTrack extends ActualTrackBase implements Track {
       id: this.getId(),
       type: 'Track',
 
-      segment: this.segment.persist()
+      segment: this.curve.persist()
     };
   }
 

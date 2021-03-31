@@ -13,7 +13,7 @@ export class PositionOnTrack {
     private direction: number = 1
   ) {
     this.percentage = position;
-    this.position = position * track.getSegment().getLength();
+    this.position = position * track.getCurve().getLength();
   }
 
   persist(): Object {
@@ -48,7 +48,7 @@ export class PositionOnTrack {
 
   getRay(): Ray {
     return this.track
-      .getSegment()
+      .getCurve()
       .getBezier()
       .getRay(this.getPercentage());
   }
@@ -133,9 +133,9 @@ export class PositionOnTrack {
 
   private hopTowardsB(distance): TrackBase[] {
     const ret = [this.track];
-    const lastPoint = this.track.getSegment().getLastPoint();
+    const lastPoint = this.track.getCurve().getLastPoint();
 
-    let bezier = this.track.getSegment().getBezier();
+    let bezier = this.track.getCurve().getBezier();
     const point = bezier.getPoint(this.getPercentage());
     let fun = t => t > this.getPercentage();
 
@@ -146,7 +146,7 @@ export class PositionOnTrack {
         }
         const nextTrack = this.moveToNextTrack(this.track.getB());
         ret.push(nextTrack);
-        bezier = this.track.getSegment().getBezier();
+        bezier = this.track.getCurve().getBezier();
         fun = t => true;
       } else {
         this.setPercentage(1);
@@ -162,9 +162,9 @@ export class PositionOnTrack {
 
   private hopTowardsA(distance): TrackBase[] {
     const ret = [this.track];
-    const firstPoint = this.track.getSegment().getFirstPoint();
+    const firstPoint = this.track.getCurve().getFirstPoint();
 
-    let bezier = this.track.getSegment().getBezier();
+    let bezier = this.track.getCurve().getBezier();
     const point = bezier.getPoint(this.getPercentage());
     let fun = t => t < this.getPercentage();
 
@@ -175,7 +175,7 @@ export class PositionOnTrack {
         }
         const nextTrack = this.moveToNextTrack(this.track.getA());
         ret.push(nextTrack);
-        bezier = this.track.getSegment().getBezier();
+        bezier = this.track.getCurve().getBezier();
         fun = t => true;
       } else {
         this.setPercentage(0);
