@@ -1,16 +1,15 @@
 import { DirectedTrack } from './DirectedTrack';
-import { Track } from './Track';
 import { ActualTrackSegment } from './ActualTrackSegment';
+import { TrackBase } from './TrackBase';
 
 export class ActualTrackEnd {
-
-  constructor(private start: DirectedTrack, private end: DirectedTrack) { }
+  constructor(private start: DirectedTrack, private end: DirectedTrack) {}
 
   getSegment(): ActualTrackSegment {
     return this.start.getSegment();
   }
 
-  getTrack(): Track {
+  getTrack(): TrackBase {
     return this.start.getSegment().getTrack();
   }
 

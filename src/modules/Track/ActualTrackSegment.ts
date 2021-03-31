@@ -3,8 +3,8 @@ import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { DirectedTrack } from './DirectedTrack';
 import { ActualDirectedTrack } from './ActualDirectedTrack';
 import { ActualTrackEnd } from './ActualTrackEnd';
-import { Track } from './Track';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
+import { TrackBase } from './TrackBase';
 
 export class ActualTrackSegment {
   protected A: ActualTrackEnd;
@@ -12,9 +12,9 @@ export class ActualTrackSegment {
   protected curve: TrackCurve;
   protected AB: DirectedTrack;
   protected BA: DirectedTrack;
-  protected track: Track;
+  protected track: TrackBase;
 
-  init(track: Track, coordinates: Coordinate[]): ActualTrackSegment {
+  init(track: TrackBase, coordinates: Coordinate[]): ActualTrackSegment {
     this.track = track;
 
     // dt
@@ -34,7 +34,7 @@ export class ActualTrackSegment {
     return this[whichEnd] ?? null;
   }
 
-  getTrack(): Track {
+  getTrack(): TrackBase {
     return this.track;
   }
 }

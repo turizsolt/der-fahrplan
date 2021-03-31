@@ -13,17 +13,24 @@ import { Ray } from '../../structs/Geometry/Ray';
 import { Left, Right } from '../../structs/Geometry/Directions';
 import { Store } from '../../structs/Interfaces/Store';
 import { WhichSwitchEnd } from '../../structs/Interfaces/WhichTrackEnd';
+import { ActualTrackSegment } from './ActualTrackSegment';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
+  // todo should remove
   protected D: TrackEnd;
   protected E: TrackSwitchEnd;
   protected F: TrackSwitchEnd;
 
+  // todo should remove
   protected segmentE: TrackCurve;
   protected segmentF: TrackCurve;
   protected segmentLeft: TrackCurve;
   protected segmentRight: TrackCurve;
+
+  private segmentL: ActualTrackSegment; // A-B
+  private segmentR: ActualTrackSegment; // A-C
+  private activeSegment: ActualTrackSegment;
 
   getA() {
     return this.D;
@@ -65,6 +72,7 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     this.segmentE = tempE;
     this.segmentF = tempF;
 
+    // decides which is the left one
     if (
       tempE
         .getLineSegmentChain()
@@ -73,15 +81,36 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     ) {
       this.segmentLeft = tempE;
       this.segmentRight = tempF;
+
+      this.segmentL = new ActualTrackSegment().init(
+        this,
+        tempE.getCoordinates()
+      );
+      this.segmentR = new ActualTrackSegment().init(
+        this,
+        tempF.getCoordinates()
+      );
     } else {
       this.segmentLeft = tempF;
       this.segmentRight = tempE;
+
+      this.segmentL = new ActualTrackSegment().init(
+        this,
+        tempF.getCoordinates()
+      );
+      this.segmentR = new ActualTrackSegment().init(
+        this,
+        tempE.getCoordinates()
+      );
     }
 
     this.state = 0;
     this.E.setActive(true);
     this.F.setActive(false);
 
+    this.activeSegment = this.segmentL;
+
+    // todo emit
     this.renderer.init(this);
 
     return this;
@@ -95,11 +124,16 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     if (this.state) {
       this.E.setActive(false);
       this.F.setActive(true);
+
+      this.activeSegment = this.segmentR;
     } else {
       this.E.setActive(true);
       this.F.setActive(false);
+
+      this.activeSegment = this.segmentL;
     }
 
+    // todo emit
     this.renderer.update();
   }
 
@@ -144,6 +178,7 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     return this.F;
   }
 
+  // todo important
   getState(): number {
     return this.state;
   }
