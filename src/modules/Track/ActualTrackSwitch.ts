@@ -6,7 +6,6 @@ import { TrackSwitch } from './TrackSwitch';
 import { ActualTrackBase } from './ActualTrackBase';
 import { injectable, inject } from 'inversify';
 import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
-import { Ray } from '../../structs/Geometry/Ray';
 import { Left, Right } from '../../structs/Geometry/Directions';
 import { Store } from '../../structs/Interfaces/Store';
 import { ActualTrackSegment } from './ActualTrackSegment';
@@ -136,39 +135,5 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
       obj.segmentE.map(a => new Coordinate(a.x, a.y, a.z)),
       obj.segmentF.map(a => new Coordinate(a.x, a.y, a.z))
     );
-  }
-
-  // todo needs only for rendering, not for the model
-  naturalSplitPoints(): Ray[] {
-    const chainE = this.segmentL.getCurve().getLineSegmentChain();
-    const chainF = this.segmentR.getCurve().getLineSegmentChain();
-
-    const leftE = chainE.copyMove(Right, 1).getLineSegments();
-    const rightF = chainF.copyMove(Left, 1).getLineSegments();
-
-    let peak = new Ray(new Coordinate(0, 0, 0), 0);
-
-    for (let i of leftE) {
-      for (let j of rightF) {
-        if (i.isIntersectsWith(j)) {
-          peak = new Ray(i.getIntersectionsWith(j)[0], 0);
-        }
-      }
-    }
-
-    const left2E = chainE.copyMove(Right, 2).getLineSegments();
-    const right2F = chainF.copyMove(Left, 2).getLineSegments();
-
-    let peak2 = new Ray(new Coordinate(0, 0, 0), 0);
-
-    for (let i of left2E) {
-      for (let j of right2F) {
-        if (i.isIntersectsWith(j)) {
-          peak2 = new Ray(i.getIntersectionsWith(j)[0], 0);
-        }
-      }
-    }
-
-    return [peak, peak2];
   }
 }
