@@ -1,12 +1,12 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { TYPES } from '../../src/di/TYPES';
 import { DirectedTrack } from '../../src/modules/Track/DirectedTrack';
 import { getTestStore } from '../getTestStore';
+import { ActualDirectedTrack } from '../../src/modules/Track/ActualDirectedTrack';
 chai.use(chaiAlmost());
 
 const store = getTestStore();
-const createDirectedTrack = () => store.create<DirectedTrack>(TYPES.DirectedTrack).init(null);
+const createDirectedTrack = (): DirectedTrack => new ActualDirectedTrack(null);
 
 describe('DirectedTrack', () => {
   it('create a dt', () => {
@@ -25,7 +25,6 @@ describe('DirectedTrack', () => {
     dt.setReverse(dt2);
     expect(dt.reverse()).equals(dt2);
   });
-
 
   it('next a dt, without setting it', () => {
     const dt = createDirectedTrack();

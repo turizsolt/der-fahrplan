@@ -19,7 +19,6 @@ import { CommandLog } from './Command/CommandLog';
 import { TrackJointRenderer } from '../../Renderers/TrackJointRenderer';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { Emitable } from '../../../mixins/Emitable';
-import { DirectedTrack } from '../../../modules/Track/DirectedTrack';
 
 @injectable()
 export class ActualStore implements Store {
@@ -37,14 +36,17 @@ export class ActualStore implements Store {
 
   @inject(TYPES.FactoryOfTrain) private TrainFactory: () => Train;
   @inject(TYPES.FactoryOfTrack) private TrackFactory: () => Track;
-  @inject(TYPES.FactoryOfTrackSwitch) private TrackSwitchFactory: () => TrackSwitch;
-  @inject(TYPES.FactoryOfTrackJoint) private TrackJointFactory: () => TrackJoint;
-  @inject(TYPES.FactoryOfDirectedTrack) private DirectedTrackFactory: () => DirectedTrack;
-  @inject(TYPES.FactoryOfTrackJointRenderer) private TrackJointRendererFactory: () => TrackJointRenderer;
+  @inject(TYPES.FactoryOfTrackSwitch)
+  private TrackSwitchFactory: () => TrackSwitch;
+  @inject(TYPES.FactoryOfTrackJoint)
+  private TrackJointFactory: () => TrackJoint;
+  @inject(TYPES.FactoryOfTrackJointRenderer)
+  private TrackJointRendererFactory: () => TrackJointRenderer;
   @inject(TYPES.FactoryOfPlatform) private PlatformFactory: () => Platform;
   @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
 
-  @inject(TYPES.FactoryOfPassengerGenerator) private PassengerGeneratorFactory: () => PassengerGenerator;
+  @inject(TYPES.FactoryOfPassengerGenerator)
+  private PassengerGeneratorFactory: () => PassengerGenerator;
   private passengerGenerator: PassengerGenerator;
 
   private logStore: CommandLog;
@@ -63,7 +65,6 @@ export class ActualStore implements Store {
       [TYPES.Track]: this.TrackFactory,
       [TYPES.TrackSwitch]: this.TrackSwitchFactory,
       [TYPES.TrackJoint]: this.TrackJointFactory,
-      [TYPES.DirectedTrack]: this.DirectedTrackFactory,
       [TYPES.Platform]: this.PlatformFactory,
       [TYPES.Train]: this.TrainFactory,
       [TYPES.Wagon]: this.WagonFactory
@@ -73,7 +74,6 @@ export class ActualStore implements Store {
       [TYPES.RouteStop]: 11,
       [TYPES.Route]: 10,
       [TYPES.Trip]: 8,
-      [TYPES.DirectedTrack]: 5,
       [TYPES.Track]: 4,
       [TYPES.TrackSwitch]: 3,
       [TYPES.TrackJoint]: 2,
@@ -86,7 +86,7 @@ export class ActualStore implements Store {
 
     this.renderers = {
       [TYPES.TrackJoint]: [this.TrackJointRendererFactory]
-    }
+    };
 
     shortid.characters(
       '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_*'
@@ -105,17 +105,21 @@ export class ActualStore implements Store {
         const g: BaseRenderer = f();
 
         // todo prettify
-        (created as any as Emitable).on('init', (data) => g.init(data));
-        (created as any as Emitable).on('update', (data) => g.update(data));
-        (created as any as Emitable).on('remove', (data) => g.remove(data));
-        (created as any as Emitable).on('remove', id => this.unregister(this.get(id)));
+        ((created as any) as Emitable).on('init', data => g.init(data));
+        ((created as any) as Emitable).on('update', data => g.update(data));
+        ((created as any) as Emitable).on('remove', data => g.remove(data));
+        ((created as any) as Emitable).on('remove', id =>
+          this.unregister(this.get(id))
+        );
       });
     }
     return created;
   }
 
   clear() {
-    this.getFiltered(x => x.getType() === Symbol.for('Wagon')).map(e => e.remove());
+    this.getFiltered(x => x.getType() === Symbol.for('Wagon')).map(e =>
+      e.remove()
+    );
     this.getFiltered(() => true).map(e => e.remove());
 
     this.elements = {};

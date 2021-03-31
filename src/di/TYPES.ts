@@ -24,9 +24,6 @@ export const TYPES = {
   FactoryOfTrackJoint: Symbol.for('Factory<TrackJoint>'),
   FactoryOfTrackJointRenderer: Symbol.for('Factory<TrackJointRenderer>'),
 
-  DirectedTrack: Symbol.for('DirectedTrack'),
-  FactoryOfDirectedTrack: Symbol.for('Factory<DirectedTrack>'),
-
   Passenger: Symbol.for('Passenger'),
   PassengerRenderer: Symbol.for('PassengerRenderer'),
   FactoryOfPassenger: Symbol.for('Factory<Passenger>'),

@@ -19,8 +19,8 @@ export class ActualTrackSegment {
     this.track = track;
 
     // dt
-    this.AB = (new ActualDirectedTrack()).init(this);
-    this.BA = (new ActualDirectedTrack()).init(this);
+    this.AB = new ActualDirectedTrack(this);
+    this.BA = new ActualDirectedTrack(this);
     this.AB.setReverse(this.BA);
     this.BA.setReverse(this.AB);
 
