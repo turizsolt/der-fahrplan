@@ -11,9 +11,10 @@ export interface TrackBase extends BaseBrick {
   getCheckedList(): Wagon[];
 
   addPlatform(platform: Platform);
-  getCurve(): TrackCurve;
-
   getPlatformsBeside();
+
+  // todo remove everything below
+  getCurve(): TrackCurve;
   getA(): TrackEnd;
   getB(): TrackEnd;
   getId(): string;

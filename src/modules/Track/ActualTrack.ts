@@ -16,17 +16,19 @@ import { ActualTrackEnd } from './ActualTrackEnd';
 export class ActualTrack extends ActualTrackBase implements Track {
   protected A: TrackEnd;
   protected B: TrackEnd;
-  protected segment2: ActualTrackSegment;
+  protected segment: ActualTrackSegment;
 
   @inject(TYPES.TrackRenderer) private renderer: TrackRenderer;
 
   init(coordinates: Coordinate[]): Track {
     super.initStore(TYPES.Track);
 
+    // todo remove when possible
     this.A = new TrackEnd(WhichEnd.A, this);
     this.B = new TrackEnd(WhichEnd.B, this);
     this.curve = new TrackCurve(coordinates);
-    this.segment2 = new ActualTrackSegment().init(this, coordinates);
+
+    this.segment = new ActualTrackSegment().init(this, coordinates);
 
     // todo emit
     this.renderer.init(this);
@@ -34,11 +36,11 @@ export class ActualTrack extends ActualTrackBase implements Track {
   }
 
   getAx(): ActualTrackEnd {
-    return this.segment2.getEnd(WhichEnd.A);
+    return this.segment.getEnd(WhichEnd.A);
   }
 
   getBx(): ActualTrackEnd {
-    return this.segment2.getEnd(WhichEnd.B);
+    return this.segment.getEnd(WhichEnd.B);
   }
 
   // todo emit

@@ -14,7 +14,6 @@ export interface TrackSwitch extends TrackBase {
   getE(): TrackSwitchEnd;
   getF(): TrackSwitchEnd;
   getState(): number;
-  verbose(): void;
   update(): void;
 
   naturalSplitPoints(): Ray[];
