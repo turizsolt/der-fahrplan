@@ -62,11 +62,7 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     this.state = 1 - this.state;
 
     this.activeSegment.disconnect();
-    if (this.state) {
-      this.activeSegment = this.segmentRight;
-    } else {
-      this.activeSegment = this.segmentLeft;
-    }
+    this.activeSegment = this.state ? this.segmentRight : this.segmentLeft;
     this.activeSegment.connect();
 
     // todo emit
