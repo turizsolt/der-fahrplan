@@ -1,6 +1,4 @@
 import { Platform } from '../../structs/Interfaces/Platform';
-import { TrackCurve } from './TrackCurve';
-import { TrackEnd } from './TrackEnd';
 import { BaseBrick } from '../../structs/Interfaces/BaseBrick';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 
@@ -13,17 +11,5 @@ export interface TrackBase extends BaseBrick {
   addPlatform(platform: Platform);
   getPlatformsBeside();
 
-  // todo remove everything below
-  getCurve(): TrackCurve;
-  getA(): TrackEnd;
-  getB(): TrackEnd;
-  getId(): string;
-  getLength(): number;
-
-  remove(): boolean;
-  isRemovable(): boolean;
-  isRemoved(): boolean;
-  update(): void;
-
-  getEnd(e: string): TrackEnd;
+  update();
 }

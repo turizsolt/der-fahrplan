@@ -1,4 +1,3 @@
-import { TrackEnd } from './TrackEnd';
 import { TrackRenderer } from '../../structs/Renderers/TrackRenderer';
 import { TYPES } from '../../di/TYPES';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
@@ -9,25 +8,17 @@ import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
 import { Store } from '../../structs/Interfaces/Store';
 import { ActualTrackSegment } from './ActualTrackSegment';
-import { TrackCurve } from './TrackCurve';
 import { ActualTrackEnd } from './ActualTrackEnd';
 import { TrackJointEnd } from './TrackJoint/TrackJointEnd';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
-  protected A: TrackEnd;
-  protected B: TrackEnd;
   protected segment: ActualTrackSegment;
 
   @inject(TYPES.TrackRenderer) private renderer: TrackRenderer;
 
   init(coordinates: Coordinate[], joints: TrackJointEnd[]): Track {
     super.initStore(TYPES.Track);
-
-    // todo remove when possible
-    this.A = new TrackEnd(WhichEnd.A, this);
-    this.B = new TrackEnd(WhichEnd.B, this);
-    this.curve = new TrackCurve(coordinates);
 
     this.segment = new ActualTrackSegment().init(this, coordinates, joints);
 
@@ -52,8 +43,6 @@ export class ActualTrack extends ActualTrackBase implements Track {
   remove(): boolean {
     const removable = super.remove();
     if (removable) {
-      this.A.remove();
-      this.B.remove();
       this.renderer.remove();
       this.segment.remove();
 
@@ -71,9 +60,9 @@ export class ActualTrack extends ActualTrackBase implements Track {
   persist(): Object {
     return {
       id: this.getId(),
-      type: 'Track',
+      type: 'Track'
 
-      segment: this.curve.persist()
+      // segment: this.curve.persist()
     };
   }
 

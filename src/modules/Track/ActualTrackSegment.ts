@@ -45,6 +45,10 @@ export class ActualTrackSegment {
     return this.track;
   }
 
+  getCurve(): TrackCurve {
+      return this.curve;
+  }
+
   connect(): void {
       this.A.connect();
       this.B.connect();

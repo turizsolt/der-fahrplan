@@ -1,7 +1,4 @@
 import { Platform } from '../../structs/Interfaces/Platform';
-import { TrackEnd } from './TrackEnd';
-import { TrackCurve } from './TrackCurve';
-import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { TrackBase } from './TrackBase';
 import { injectable } from 'inversify';
 import { ActualBaseBrick } from '../../structs/Actuals/ActualBaseBrick';
@@ -11,18 +8,13 @@ import { Wagon } from '../../structs/Interfaces/Wagon';
 @injectable()
 export abstract class ActualTrackBase extends ActualBaseBrick
   implements TrackBase {
-  protected A: TrackEnd;
-  protected B: TrackEnd;
-  protected I: Coordinate;
-  protected curve: TrackCurve;
   protected checkedList: Wagon[] = [];
-  protected _platformsBeside: Platform[] = [];
-  protected removed: boolean = false;
+  protected platformsBeside: Platform[] = [];
 
   abstract getRenderer(): BaseRenderer;
 
   getPlatformsBeside() {
-    return this._platformsBeside;
+    return this.platformsBeside;
   }
 
   checkin(engine: Wagon) {
@@ -44,46 +36,16 @@ export abstract class ActualTrackBase extends ActualBaseBrick
   }
 
   addPlatform(platform: Platform) {
-    this._platformsBeside.push(platform);
-  }
-
-  getCurve(): TrackCurve {
-    return this.curve;
-  }
-
-  getA(): TrackEnd {
-    return this.A;
-  }
-
-  getB(): TrackEnd {
-    return this.B;
-  }
-
-  getLength(): number {
-    return this.getCurve().getLength();
+    this.platformsBeside.push(platform);
   }
 
   remove(): boolean {
-    if (this.isRemovable()) {
-      this.removed = true;
-      return true;
-    }
-    return false;
+    return this.isRemovable();
   }
 
   isRemovable(): boolean {
     return this.checkedList.length === 0;
   }
 
-  isRemoved(): boolean {
-    return this.removed;
-  }
-
   update(): void {}
-
-  getEnd(e: string): TrackEnd {
-    if (e === 'A') return this.getA();
-    if (e === 'B') return this.getB();
-    return null;
-  }
 }
