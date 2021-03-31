@@ -21,7 +21,7 @@ export class ActualTrack extends ActualTrackBase implements Track {
   init(coordinates: Coordinate[], joints: TrackJointEnd[]): Track {
     super.initStore(TYPES.Track);
 
-    this.segment = new ActualTrackSegment().init(this, coordinates, joints);
+    this.segment = new ActualTrackSegment(this, coordinates, joints);
 
     // todo emit
     this.renderer.init(this);

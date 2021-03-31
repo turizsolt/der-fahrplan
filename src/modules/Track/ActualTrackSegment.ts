@@ -15,7 +15,7 @@ export class ActualTrackSegment {
   protected BA: DirectedTrack;
   protected track: TrackBase;
 
-  init(track: TrackBase, coordinates: Coordinate[], joints: TrackJointEnd[]): ActualTrackSegment {
+  constructor(track: TrackBase, coordinates: Coordinate[], joints: TrackJointEnd[]) {
     this.track = track;
 
     // dt
@@ -29,8 +29,6 @@ export class ActualTrackSegment {
     this.curve = new TrackCurve(coordinates);
 
     this.connect();
-
-    return this;
   }
 
   remove(): void {

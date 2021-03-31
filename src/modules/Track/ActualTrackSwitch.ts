@@ -32,16 +32,14 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
       coordinates2,
       jointEnds
     );
-    this.segmentLeft = new ActualTrackSegment().init(
-      this,
-      coords1 as Coordinate[],
-      [(jes as TrackJointEnd[])[0], (jes as TrackJointEnd[])[1]]
-    );
-    this.segmentRight = new ActualTrackSegment().init(
-      this,
-      coords2 as Coordinate[],
-      [(jes as TrackJointEnd[])[2], (jes as TrackJointEnd[])[3]]
-    );
+    this.segmentLeft = new ActualTrackSegment(this, coords1 as Coordinate[], [
+      (jes as TrackJointEnd[])[0],
+      (jes as TrackJointEnd[])[1]
+    ]);
+    this.segmentRight = new ActualTrackSegment(this, coords2 as Coordinate[], [
+      (jes as TrackJointEnd[])[2],
+      (jes as TrackJointEnd[])[3]
+    ]);
 
     this.state = 0;
 
