@@ -21,8 +21,8 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
   private selectableMeshes: BABYLON.AbstractMesh[];
   private leftMeshes: BABYLON.AbstractMesh[];
   private rightMeshes: BABYLON.AbstractMesh[];
-  private left: number;
-  private right: number;
+  private left: number = 1;
+  private right: number = 0;
 
   init(trackSwitch: TrackSwitch): void {
     this.trackSwitch = trackSwitch;
@@ -32,14 +32,6 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
     const chainF = this.trackSwitch.getSegmentRight().getLineSegmentChain();
 
     const name = 'clickable-track-' + this.trackSwitch.getId();
-
-    if (this.trackSwitch.getSegmentE() === this.trackSwitch.getSegmentLeft()) {
-      this.left = 1;
-      this.right = 0;
-    } else {
-      this.left = 0;
-      this.right = 1;
-    }
 
     const bedSegmentMeshesE = chainE
       .getRayPairs()
@@ -73,12 +65,12 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
       .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
     const maxRad1 = this.trackSwitch
-      .getSegmentE()
+      .getSegmentLeft()
       .getFirstPoint()
       .distance2d(peakPoint.coord);
 
     const maxRad2 = this.trackSwitch
-      .getSegmentE()
+      .getSegmentLeft()
       .getFirstPoint()
       .distance2d(peak2.coord);
 
