@@ -1,14 +1,10 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import { DirectedTrack } from '../../src/modules/Track/DirectedTrack';
-import { getTestStore } from '../getTestStore';
 import { ActualDirectedTrack } from '../../src/modules/Track/ActualDirectedTrack';
-import { ActualTrackSegment } from '../../src/modules/Track/ActualTrackSegment';
 import { TrackSegment } from '../../src/modules/Track/TrackSegment';
-import { Track } from '../../src/modules/Track/Track';
 chai.use(chaiAlmost());
 
-const store = getTestStore();
 const mockTrackSegment: TrackSegment = {
   connect: () => {},
   disconnect: () => {},
