@@ -19,11 +19,10 @@ describe('Track', () => {
     const j2 = store
       .create<TrackJoint>(TYPES.TrackJoint)
       .init(Ray.from(0, 0, 100, 0));
-    const track = store
-      .create<Track>(TYPES.Track)
-      .init(
-        [new Coordinate(0, 0, 0), new Coordinate(0, 0, 100)],
-        [{ joint: j1, end: WhichEnd.A }, { joint: j2, end: WhichEnd.B }]
-      );
+    const track = store.create<Track>(TYPES.Track).init({
+      coordinates: [new Coordinate(0, 0, 0), new Coordinate(0, 0, 100)],
+      startJointEnd: { joint: j1, end: WhichEnd.A },
+      endJointEnd: { joint: j2, end: WhichEnd.B }
+    });
   });
 });

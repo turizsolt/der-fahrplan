@@ -1,14 +1,13 @@
 import { ActualTrackCurve } from './ActualTrackCurve';
-import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { DirectedTrack } from './DirectedTrack';
 import { ActualDirectedTrack } from './ActualDirectedTrack';
 import { ActualTrackEnd } from './ActualTrackEnd';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { TrackBase } from './TrackBase';
-import { TrackJointEnd } from './TrackJoint/TrackJointEnd';
 import { TrackSegment } from './TrackSegment';
 import { TrackEnd } from './TrackEnd';
 import { TrackCurve } from './TrackCurve';
+import { TrackSegmentData } from './TrackSegmentData';
 
 export class ActualTrackSegment implements TrackSegment {
   protected A: TrackEnd;
@@ -18,7 +17,7 @@ export class ActualTrackSegment implements TrackSegment {
   protected BA: DirectedTrack;
   protected track: TrackBase;
 
-  constructor(track: TrackBase, coordinates: Coordinate[], joints: TrackJointEnd[]) {
+  constructor(track: TrackBase, segmentData: TrackSegmentData) {
     this.track = track;
 
     // dt
@@ -27,9 +26,9 @@ export class ActualTrackSegment implements TrackSegment {
     this.AB.setReverse(this.BA);
     this.BA.setReverse(this.AB);
 
-    this.A = new ActualTrackEnd(this.AB, this.BA, joints[0]);
-    this.B = new ActualTrackEnd(this.BA, this.AB, joints[1]);
-    this.curve = new ActualTrackCurve(coordinates);
+    this.A = new ActualTrackEnd(this.AB, this.BA, segmentData.startJointEnd);
+    this.B = new ActualTrackEnd(this.BA, this.AB, segmentData.endJointEnd);
+    this.curve = new ActualTrackCurve(segmentData.coordinates);
 
     this.connect();
   }

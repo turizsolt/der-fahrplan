@@ -1,13 +1,11 @@
 import { TrackBase } from './TrackBase';
-import { Coordinate } from '../../structs/Geometry/Coordinate';
-import { TrackJointEnd } from './TrackJoint/TrackJointEnd';
 import { TrackCurve } from './TrackCurve';
+import { TrackSegmentData } from './TrackSegmentData';
 
 export interface TrackSwitch extends TrackBase {
   init(
-    coordinates1: Coordinate[],
-    coordinates2: Coordinate[],
-    jointEnds: TrackJointEnd[]
+    segmentData1: TrackSegmentData,
+    segmentData2: TrackSegmentData
   ): TrackSwitch;
   switch();
   getState(): number;

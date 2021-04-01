@@ -1,35 +1,60 @@
-import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { ActualTrackCurve } from './ActualTrackCurve';
 import { TrackCurve } from './TrackCurve';
 import { Left, Right } from '../../structs/Geometry/Directions';
 import { TrackJointEnd } from './TrackJoint/TrackJointEnd';
+import { TrackSegmentData } from './TrackSegmentData';
 
 export class TrackSwitchCoordinates {
   static align(
-    coordinates1: Coordinate[],
-    coordinates2: Coordinate[],
-    jointEnds: TrackJointEnd[]
-  ): (Coordinate[] | TrackJointEnd[])[] {
-    const last1 = coordinates1.length - 1;
-    const last2 = coordinates2.length - 1;
+    segmentData1: TrackSegmentData,
+    segmentData2: TrackSegmentData
+  ): TrackSegmentData[] {
+    const last1 = segmentData1.coordinates.length - 1;
+    const last2 = segmentData2.coordinates.length - 1;
     let tempE: TrackCurve, tempF: TrackCurve;
     let tj: TrackJointEnd[];
-    if (coordinates1[0].equalsTo(coordinates2[0])) {
-      tempE = new ActualTrackCurve(coordinates1);
-      tempF = new ActualTrackCurve(coordinates2);
-      tj = [jointEnds[0], jointEnds[1], jointEnds[2], jointEnds[3]];
-    } else if (coordinates1[last1].equalsTo(coordinates2[last2])) {
-      tempE = new ActualTrackCurve(coordinates1.reverse());
-      tempF = new ActualTrackCurve(coordinates2.reverse());
-      tj = [jointEnds[1], jointEnds[0], jointEnds[3], jointEnds[2]];
-    } else if (coordinates1[0].equalsTo(coordinates2[last2])) {
-      tempE = new ActualTrackCurve(coordinates1);
-      tempF = new ActualTrackCurve(coordinates2.reverse());
-      tj = [jointEnds[0], jointEnds[1], jointEnds[3], jointEnds[2]];
-    } else if (coordinates1[last1].equalsTo(coordinates2[0])) {
-      tempE = new ActualTrackCurve(coordinates1.reverse());
-      tempF = new ActualTrackCurve(coordinates2);
-      tj = [jointEnds[1], jointEnds[0], jointEnds[2], jointEnds[3]];
+    if (segmentData1.coordinates[0].equalsTo(segmentData2.coordinates[0])) {
+      tempE = new ActualTrackCurve(segmentData1.coordinates);
+      tempF = new ActualTrackCurve(segmentData2.coordinates);
+      tj = [
+        segmentData1.startJointEnd,
+        segmentData1.endJointEnd,
+        segmentData2.startJointEnd,
+        segmentData2.endJointEnd
+      ];
+    } else if (
+      segmentData1.coordinates[last1].equalsTo(segmentData2.coordinates[last2])
+    ) {
+      tempE = new ActualTrackCurve(segmentData1.coordinates.reverse());
+      tempF = new ActualTrackCurve(segmentData2.coordinates.reverse());
+      tj = [
+        segmentData1.endJointEnd,
+        segmentData1.startJointEnd,
+        segmentData2.endJointEnd,
+        segmentData2.startJointEnd
+      ];
+    } else if (
+      segmentData1.coordinates[0].equalsTo(segmentData2.coordinates[last2])
+    ) {
+      tempE = new ActualTrackCurve(segmentData1.coordinates);
+      tempF = new ActualTrackCurve(segmentData2.coordinates.reverse());
+      tj = [
+        segmentData1.startJointEnd,
+        segmentData1.endJointEnd,
+        segmentData2.endJointEnd,
+        segmentData2.startJointEnd
+      ];
+    } else if (
+      segmentData1.coordinates[last1].equalsTo(segmentData2.coordinates[0])
+    ) {
+      tempE = new ActualTrackCurve(segmentData1.coordinates.reverse());
+      tempF = new ActualTrackCurve(segmentData2.coordinates);
+      tj = [
+        segmentData1.endJointEnd,
+        segmentData1.startJointEnd,
+        segmentData2.startJointEnd,
+        segmentData2.endJointEnd
+      ];
     } else {
       throw new Error('Segments has no meeting point');
     }
@@ -42,15 +67,29 @@ export class TrackSwitchCoordinates {
         .isIntersectsWithChain(tempF.getLineSegmentChain().copyMove(Left, 1))
     ) {
       return [
-        tempE.getCoordinates(),
-        tempF.getCoordinates(),
-        [tj[0], tj[1], tj[2], tj[3]]
+        {
+          startJointEnd: tj[0],
+          endJointEnd: tj[1],
+          coordinates: tempE.getCoordinates()
+        },
+        {
+          startJointEnd: tj[2],
+          endJointEnd: tj[3],
+          coordinates: tempF.getCoordinates()
+        }
       ];
     } else {
       return [
-        tempF.getCoordinates(),
-        tempE.getCoordinates(),
-        [tj[2], tj[3], tj[0], tj[1]]
+        {
+          startJointEnd: tj[2],
+          endJointEnd: tj[3],
+          coordinates: tempF.getCoordinates()
+        },
+        {
+          startJointEnd: tj[0],
+          endJointEnd: tj[1],
+          coordinates: tempE.getCoordinates()
+        }
       ];
     }
   }

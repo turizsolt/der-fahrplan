@@ -1,6 +1,5 @@
 import { TrackRenderer } from '../../structs/Renderers/TrackRenderer';
 import { TYPES } from '../../di/TYPES';
-import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { Track } from './Track';
 import { ActualTrackBase } from './ActualTrackBase';
 import { injectable, inject } from 'inversify';
@@ -9,8 +8,8 @@ import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
 import { Store } from '../../structs/Interfaces/Store';
 import { ActualTrackSegment } from './ActualTrackSegment';
 import { TrackEnd } from './TrackEnd';
-import { TrackJointEnd } from './TrackJoint/TrackJointEnd';
 import { TrackCurve } from './TrackCurve';
+import { TrackSegmentData } from './TrackSegmentData';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
@@ -18,10 +17,10 @@ export class ActualTrack extends ActualTrackBase implements Track {
 
   @inject(TYPES.TrackRenderer) private renderer: TrackRenderer;
 
-  init(coordinates: Coordinate[], joints: TrackJointEnd[]): Track {
+  init(segmentData: TrackSegmentData): Track {
     super.initStore(TYPES.Track);
 
-    this.segment = new ActualTrackSegment(this, coordinates, joints);
+    this.segment = new ActualTrackSegment(this, segmentData);
 
     // todo emit
     this.renderer.init(this);

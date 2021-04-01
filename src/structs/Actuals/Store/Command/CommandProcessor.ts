@@ -44,10 +44,11 @@ export class CommandProcessor {
 
     const track = this.store.create<Track>(TYPES.Track);
     track.presetId(trackId);
-    track.init(coordinates, [
-      { joint: one, end: whichEnd1 },
-      { joint: other, end: whichEnd2 }
-    ]);
+    track.init({
+      coordinates,
+      startJointEnd: { joint: one, end: whichEnd1 },
+      endJointEnd: { joint: other, end: whichEnd2 }
+    });
 
     // one.setOneEnd(whichEnd1, track.getAx());
     // other.setOneEnd(whichEnd2, track.getBx());
@@ -90,12 +91,18 @@ export class CommandProcessor {
     const other = this.store.get(jointId2) as TrackJoint;
     const third = this.store.get(jointId3) as TrackJoint;
 
-    trackSwitch.init(oldCoordinates, coordinates, [
-      { joint: one, end: whichEnd1 },
-      { joint: other, end: whichEnd2 },
-      { joint: one, end: whichEnd1 },
-      { joint: third, end: whichEnd3 }
-    ]);
+    trackSwitch.init(
+      {
+        coordinates: oldCoordinates,
+        startJointEnd: { joint: one, end: whichEnd1 },
+        endJointEnd: { joint: other, end: whichEnd2 }
+      },
+      {
+        coordinates,
+        startJointEnd: { joint: one, end: whichEnd1 },
+        endJointEnd: { joint: third, end: whichEnd3 }
+      }
+    );
 
     // todo redo
     // one.setOneEnd(whichEnd1, trackSwitch.getA());

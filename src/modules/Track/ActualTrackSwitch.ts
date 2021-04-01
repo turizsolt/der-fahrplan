@@ -8,9 +8,9 @@ import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
 import { Store } from '../../structs/Interfaces/Store';
 import { ActualTrackSegment } from './ActualTrackSegment';
 import { TrackSwitchCoordinates } from './TrackSwitchCoordinates';
-import { TrackJointEnd } from './TrackJoint/TrackJointEnd';
 import { TrackCurve } from './TrackCurve';
 import { TrackSegment } from './TrackSegment';
+import { TrackSegmentData } from './TrackSegmentData';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
@@ -22,25 +22,17 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   @inject(TYPES.TrackSwitchRenderer) private renderer: TrackSwitchRenderer;
 
   init(
-    coordinates1: Coordinate[],
-    coordinates2: Coordinate[],
-    jointEnds: TrackJointEnd[]
+    segmentData1: TrackSegmentData,
+    segmentData2: TrackSegmentData
   ): TrackSwitch {
     super.initStore(TYPES.TrackSwitch);
 
-    const [coords1, coords2, jes] = TrackSwitchCoordinates.align(
-      coordinates1,
-      coordinates2,
-      jointEnds
+    const [seg1, seg2] = TrackSwitchCoordinates.align(
+      segmentData1,
+      segmentData2
     );
-    this.segmentLeft = new ActualTrackSegment(this, coords1 as Coordinate[], [
-      (jes as TrackJointEnd[])[0],
-      (jes as TrackJointEnd[])[1]
-    ]);
-    this.segmentRight = new ActualTrackSegment(this, coords2 as Coordinate[], [
-      (jes as TrackJointEnd[])[2],
-      (jes as TrackJointEnd[])[3]
-    ]);
+    this.segmentLeft = new ActualTrackSegment(this, seg1);
+    this.segmentRight = new ActualTrackSegment(this, seg2);
 
     this.state = 0;
 
