@@ -8,7 +8,7 @@ import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
 import { Store } from '../../structs/Interfaces/Store';
 import { ActualTrackSegment } from './ActualTrackSegment';
-import { ActualTrackEnd } from './ActualTrackEnd';
+import { TrackEnd } from './TrackEnd';
 import { TrackJointEnd } from './TrackJoint/TrackJointEnd';
 import { TrackCurve } from './TrackCurve';
 
@@ -32,11 +32,11 @@ export class ActualTrack extends ActualTrackBase implements Track {
     return this.segment.getCurve();
   }
 
-  getAx(): ActualTrackEnd {
+  getAx(): TrackEnd {
     return this.segment.getEnd(WhichEnd.A);
   }
 
-  getBx(): ActualTrackEnd {
+  getBx(): TrackEnd {
     return this.segment.getEnd(WhichEnd.B);
   }
 

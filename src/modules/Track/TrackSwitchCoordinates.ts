@@ -1,4 +1,5 @@
 import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { ActualTrackCurve } from './ActualTrackCurve';
 import { TrackCurve } from './TrackCurve';
 import { Left, Right } from '../../structs/Geometry/Directions';
 import { TrackJointEnd } from './TrackJoint/TrackJointEnd';
@@ -14,20 +15,20 @@ export class TrackSwitchCoordinates {
     let tempE: TrackCurve, tempF: TrackCurve;
     let tj: TrackJointEnd[];
     if (coordinates1[0].equalsTo(coordinates2[0])) {
-      tempE = new TrackCurve(coordinates1);
-      tempF = new TrackCurve(coordinates2);
+      tempE = new ActualTrackCurve(coordinates1);
+      tempF = new ActualTrackCurve(coordinates2);
       tj = [jointEnds[0], jointEnds[1], jointEnds[2], jointEnds[3]];
     } else if (coordinates1[last1].equalsTo(coordinates2[last2])) {
-      tempE = new TrackCurve(coordinates1.reverse());
-      tempF = new TrackCurve(coordinates2.reverse());
+      tempE = new ActualTrackCurve(coordinates1.reverse());
+      tempF = new ActualTrackCurve(coordinates2.reverse());
       tj = [jointEnds[1], jointEnds[0], jointEnds[3], jointEnds[2]];
     } else if (coordinates1[0].equalsTo(coordinates2[last2])) {
-      tempE = new TrackCurve(coordinates1);
-      tempF = new TrackCurve(coordinates2.reverse());
+      tempE = new ActualTrackCurve(coordinates1);
+      tempF = new ActualTrackCurve(coordinates2.reverse());
       tj = [jointEnds[0], jointEnds[1], jointEnds[3], jointEnds[2]];
     } else if (coordinates1[last1].equalsTo(coordinates2[0])) {
-      tempE = new TrackCurve(coordinates1.reverse());
-      tempF = new TrackCurve(coordinates2);
+      tempE = new ActualTrackCurve(coordinates1.reverse());
+      tempF = new ActualTrackCurve(coordinates2);
       tj = [jointEnds[1], jointEnds[0], jointEnds[2], jointEnds[3]];
     } else {
       throw new Error('Segments has no meeting point');

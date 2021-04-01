@@ -10,12 +10,13 @@ import { ActualTrackSegment } from './ActualTrackSegment';
 import { TrackSwitchCoordinates } from './TrackSwitchCoordinates';
 import { TrackJointEnd } from './TrackJoint/TrackJointEnd';
 import { TrackCurve } from './TrackCurve';
+import { TrackSegment } from './TrackSegment';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
-  private segmentLeft: ActualTrackSegment; // A-B
-  private segmentRight: ActualTrackSegment; // A-C
-  private activeSegment: ActualTrackSegment;
+  private segmentLeft: TrackSegment; // A-B
+  private segmentRight: TrackSegment; // A-C
+  private activeSegment: TrackSegment;
   private state: number;
 
   @inject(TYPES.TrackSwitchRenderer) private renderer: TrackSwitchRenderer;

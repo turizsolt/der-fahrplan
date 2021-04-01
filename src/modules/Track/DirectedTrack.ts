@@ -1,4 +1,4 @@
-import { ActualTrackSegment } from './ActualTrackSegment';
+import { TrackSegment } from './TrackSegment';
 
 export interface DirectedTrack {
   next(): DirectedTrack;
@@ -7,5 +7,5 @@ export interface DirectedTrack {
   reverse(): DirectedTrack;
   setReverse(reverseTrack: DirectedTrack): void;
 
-  getSegment(): ActualTrackSegment;
+  getSegment(): TrackSegment;
 }

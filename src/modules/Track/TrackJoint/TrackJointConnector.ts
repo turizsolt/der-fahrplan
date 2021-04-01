@@ -2,7 +2,7 @@ import { TrackJoint } from './TrackJoint';
 import { ActualTrackSwitch } from '../ActualTrackSwitch';
 import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
 import { GENERATE_ID } from '../../../structs/Actuals/Store/Command/CommandLog';
-import { ActualTrackEnd } from '../ActualTrackEnd';
+import { TrackEnd } from '../TrackEnd';
 import { Track } from '../Track';
 
 export class TrackJointConnector {
@@ -113,11 +113,11 @@ export class TrackJointConnector {
     return false;
   }
 
-  static isEndEmpty(end: ActualTrackEnd): boolean {
+  static isEndEmpty(end: TrackEnd): boolean {
     return !end;
   }
 
-  static areBothEndsEmpty(oneEnd, otherEnd: ActualTrackEnd): boolean {
+  static areBothEndsEmpty(oneEnd, otherEnd: TrackEnd): boolean {
     return (
       TrackJointConnector.isEndEmpty(oneEnd) &&
       TrackJointConnector.isEndEmpty(otherEnd)

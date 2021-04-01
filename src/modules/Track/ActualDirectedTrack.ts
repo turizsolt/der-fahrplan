@@ -1,11 +1,11 @@
-import { ActualTrackSegment } from './ActualTrackSegment';
+import { TrackSegment } from './TrackSegment';
 import { DirectedTrack } from './DirectedTrack';
 
 export class ActualDirectedTrack implements DirectedTrack {
   private nextTrack: DirectedTrack = null;
   private reverseTrack: DirectedTrack = null;
 
-  constructor(private segment: ActualTrackSegment) {}
+  constructor(private segment: TrackSegment) {}
 
   next(): DirectedTrack {
     return this.nextTrack;
@@ -23,7 +23,7 @@ export class ActualDirectedTrack implements DirectedTrack {
     this.reverseTrack = reverseTrack;
   }
 
-  getSegment(): ActualTrackSegment {
+  getSegment(): TrackSegment {
     return this.segment;
   }
 }

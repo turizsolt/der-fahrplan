@@ -1,4 +1,4 @@
-import { TrackCurve } from './TrackCurve';
+import { ActualTrackCurve } from './ActualTrackCurve';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { DirectedTrack } from './DirectedTrack';
 import { ActualDirectedTrack } from './ActualDirectedTrack';
@@ -6,10 +6,13 @@ import { ActualTrackEnd } from './ActualTrackEnd';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { TrackBase } from './TrackBase';
 import { TrackJointEnd } from './TrackJoint/TrackJointEnd';
+import { TrackSegment } from './TrackSegment';
+import { TrackEnd } from './TrackEnd';
+import { TrackCurve } from './TrackCurve';
 
-export class ActualTrackSegment {
-  protected A: ActualTrackEnd;
-  protected B: ActualTrackEnd;
+export class ActualTrackSegment implements TrackSegment {
+  protected A: TrackEnd;
+  protected B: TrackEnd;
   protected curve: TrackCurve;
   protected AB: DirectedTrack;
   protected BA: DirectedTrack;
@@ -26,7 +29,7 @@ export class ActualTrackSegment {
 
     this.A = new ActualTrackEnd(this.AB, this.BA, joints[0]);
     this.B = new ActualTrackEnd(this.BA, this.AB, joints[1]);
-    this.curve = new TrackCurve(coordinates);
+    this.curve = new ActualTrackCurve(coordinates);
 
     this.connect();
   }
@@ -35,7 +38,7 @@ export class ActualTrackSegment {
     this.disconnect();
   }
 
-  getEnd(whichEnd: WhichEnd): ActualTrackEnd {
+  getEnd(whichEnd: WhichEnd): TrackEnd {
     return this[whichEnd] ?? null;
   }
 

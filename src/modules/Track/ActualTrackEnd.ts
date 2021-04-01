@@ -1,16 +1,17 @@
 import { DirectedTrack } from './DirectedTrack';
-import { ActualTrackSegment } from './ActualTrackSegment';
+import { TrackSegment } from './TrackSegment';
 import { TrackBase } from './TrackBase';
 import { TrackJointEnd } from './TrackJoint/TrackJointEnd';
+import { TrackEnd } from './TrackEnd';
 
-export class ActualTrackEnd {
+export class ActualTrackEnd implements TrackEnd {
   constructor(
     private start: DirectedTrack,
     private end: DirectedTrack,
     private jointEnd: TrackJointEnd
   ) {}
 
-  getSegment(): ActualTrackSegment {
+  getSegment(): TrackSegment {
     return this.start.getSegment();
   }
 

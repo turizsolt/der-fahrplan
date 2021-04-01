@@ -9,14 +9,14 @@ import { BaseRenderer } from '../../../structs/Renderers/BaseRenderer';
 import { Store } from '../../../structs/Interfaces/Store';
 import { applyMixins } from '../../../mixins/ApplyMixins';
 import { Emitable } from '../../../mixins/Emitable';
-import { ActualTrackEnd } from '../ActualTrackEnd';
+import { TrackEnd } from '../TrackEnd';
 
 export interface ActualTrackJoint extends Emitable {}
 const doApply = () => applyMixins(ActualTrackJoint, [Emitable]);
 @injectable()
 export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   private ray: Ray;
-  private ends: Record<WhichEnd, ActualTrackEnd>;
+  private ends: Record<WhichEnd, TrackEnd>;
 
   init(ray: Ray): TrackJoint {
     super.initStore(TYPES.TrackJoint);
@@ -43,7 +43,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     }
   }
 
-  setOneEnd(jointEnd: WhichEnd, trackEnd: ActualTrackEnd): void {
+  setOneEnd(jointEnd: WhichEnd, trackEnd: TrackEnd): void {
     this.ends[jointEnd] = trackEnd;
     if (this.ends.A && this.ends.B) {
       this.ends.A.getEnd().setNext(this.ends.B.getStart());
@@ -51,7 +51,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     }
   }
 
-  removeEnd(trackEnd: ActualTrackEnd) {
+  removeEnd(trackEnd: TrackEnd) {
     if (this.ends.A === trackEnd) {
       if (this.ends.A && this.ends.B) {
         this.ends.A.getEnd().setNext(null);
@@ -85,7 +85,7 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     return this.getRay().dirXZ;
   }
 
-  getEnd(whichEnd: WhichEnd): ActualTrackEnd {
+  getEnd(whichEnd: WhichEnd): TrackEnd {
     return this.ends[whichEnd];
   }
 

@@ -4,7 +4,7 @@ import { Ray } from '../../../structs/Geometry/Ray';
 import { Coordinate } from '../../../structs/Geometry/Coordinate';
 import { BaseBrick } from '../../../structs/Interfaces/BaseBrick';
 import { Emitable } from '../../../mixins/Emitable';
-import { ActualTrackEnd } from '../ActualTrackEnd';
+import { TrackEnd } from '../TrackEnd';
 
 export interface TrackJoint extends BaseBrick, Emitable {
   init(ray: Ray): TrackJoint;
@@ -15,7 +15,7 @@ export interface TrackJoint extends BaseBrick, Emitable {
 
   getTracksEnd(track: TrackBase): WhichEnd | undefined;
 
-  getEnd(whichEnd: WhichEnd): ActualTrackEnd;
-  setOneEnd(jointEnd: WhichEnd, trackEnd: ActualTrackEnd): void;
-  removeEnd(trackEnd: ActualTrackEnd): void;
+  getEnd(whichEnd: WhichEnd): TrackEnd;
+  setOneEnd(jointEnd: WhichEnd, trackEnd: TrackEnd): void;
+  removeEnd(trackEnd: TrackEnd): void;
 }
