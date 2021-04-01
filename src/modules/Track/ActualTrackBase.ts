@@ -5,11 +5,13 @@ import { ActualBaseBrick } from '../../structs/Actuals/ActualBaseBrick';
 import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 import { TrackCurve } from './TrackCurve';
+import { TrackOcupancy } from './TrackOcupancy';
+import { ActualTrackOcupancy } from './ActualTrackOcupancy';
 
 @injectable()
 export abstract class ActualTrackBase extends ActualBaseBrick
   implements TrackBase {
-  protected checkedList: Wagon[] = [];
+  protected ocupancy: TrackOcupancy = new ActualTrackOcupancy();
   protected platformsBeside: Platform[] = [];
 
   abstract getRenderer(): BaseRenderer;
@@ -22,30 +24,30 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     return this.getCurve().getLength();
   }
 
+  addPlatform(platform: Platform) {
+    this.platformsBeside.push(platform);
+  }
+
   getPlatformsBeside() {
     return this.platformsBeside;
   }
 
   checkin(engine: Wagon) {
-    this.checkedList.push(engine);
+    this.ocupancy.checkin(engine);
     this.update();
   }
 
   checkout(engine: Wagon) {
-    this.checkedList = this.checkedList.filter(elem => elem !== engine);
+    this.ocupancy.checkout(engine);
     this.update();
   }
 
   isEmpty(): boolean {
-    return this.checkedList.length === 0;
+    return this.ocupancy.isEmpty();
   }
 
   getCheckedList(): Wagon[] {
-    return this.checkedList;
-  }
-
-  addPlatform(platform: Platform) {
-    this.platformsBeside.push(platform);
+    return this.ocupancy.getCheckedList();
   }
 
   remove(): boolean {
@@ -53,7 +55,7 @@ export abstract class ActualTrackBase extends ActualBaseBrick
   }
 
   isRemovable(): boolean {
-    return this.checkedList.length === 0;
+    return this.isEmpty();
   }
 
   update(): void {}
