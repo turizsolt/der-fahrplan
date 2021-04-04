@@ -9,6 +9,7 @@ import { TrackWorm } from '../../../modules/Track/TrackWorm';
 import { WagonEnd } from './WagonEnd';
 import { Coordinate } from '../../Geometry/Coordinate';
 import { WagonMovingState } from './WagonMovingState';
+import { Nearest } from '../../../modules/Train/Nearest';
 
 const WAGON_GAP: number = 1;
 const DEFAULT_WAGON_LENGTH: number = 14;
@@ -214,7 +215,8 @@ export class WagonPosition {
       to = whichEnd === WhichEnd.A ? 1 : 0;
     }
 
-    return track.getWagonClosest(
+    return Nearest.getWagonClosest(
+      track,
       end.positionOnTrack.getPercentage(),
       to,
       this.parent,

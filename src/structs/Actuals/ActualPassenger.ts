@@ -184,6 +184,10 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     return this.renderer;
   }
 
+  isRemovable(): boolean {
+    return false;
+  }
+
   // persistance
 
   persist(): Object {

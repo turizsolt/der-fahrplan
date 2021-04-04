@@ -8,6 +8,8 @@ import { MeshProvider } from './MeshProvider';
 import { Left, Right } from '../../structs/Geometry/Directions';
 import { CoordinateToBabylonVector3 } from './converters/CoordinateToBabylonVector3';
 import { MaterialName } from './MaterialName';
+import { Ray } from '../../structs/Geometry/Ray';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
 
 @injectable()
 export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
@@ -19,8 +21,8 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
   private selectableMeshes: BABYLON.AbstractMesh[];
   private leftMeshes: BABYLON.AbstractMesh[];
   private rightMeshes: BABYLON.AbstractMesh[];
-  private left: number;
-  private right: number;
+  private left: number = 1;
+  private right: number = 0;
 
   init(trackSwitch: TrackSwitch): void {
     this.trackSwitch = trackSwitch;
@@ -30,14 +32,6 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
     const chainF = this.trackSwitch.getSegmentRight().getLineSegmentChain();
 
     const name = 'clickable-track-' + this.trackSwitch.getId();
-
-    if (this.trackSwitch.getSegmentE() === this.trackSwitch.getSegmentLeft()) {
-      this.left = 1;
-      this.right = 0;
-    } else {
-      this.left = 0;
-      this.right = 1;
-    }
 
     const bedSegmentMeshesE = chainE
       .getRayPairs()
@@ -57,7 +51,7 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
       .getRayPairs()
       .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
-    const [peakPoint, peak2] = this.trackSwitch.naturalSplitPoints();
+    const [peakPoint, peak2] = this.naturalSplitPoints();
 
     // todo is the following two mandatory?
     const innerLeftRailMeshes = chainE
@@ -71,12 +65,12 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
       .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
     const maxRad1 = this.trackSwitch
-      .getSegmentE()
+      .getSegmentLeft()
       .getFirstPoint()
       .distance2d(peakPoint.coord);
 
     const maxRad2 = this.trackSwitch
-      .getSegmentE()
+      .getSegmentLeft()
       .getFirstPoint()
       .distance2d(peak2.coord);
 
@@ -164,23 +158,23 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
       if (this.selected && !this.lastSelected) {
         this.selectableMeshes.map(
           x =>
-          (x.material = this.meshProvider.getMaterial(
-            MaterialName.SelectorRed
-          ))
+            (x.material = this.meshProvider.getMaterial(
+              MaterialName.SelectorRed
+            ))
         );
       } else if (!this.selected && this.lastSelected) {
         this.selectableMeshes.map(
           x =>
-          (x.material = this.meshProvider.getMaterial(
-            MaterialName.SleeperBrown
-          ))
+            (x.material = this.meshProvider.getMaterial(
+              MaterialName.SleeperBrown
+            ))
         );
       } else {
         this.selectableMeshes.map(
           x =>
-          (x.material = this.meshProvider.getMaterial(
-            MaterialName.SleeperBrown
-          ))
+            (x.material = this.meshProvider.getMaterial(
+              MaterialName.SleeperBrown
+            ))
         );
       }
     }
@@ -202,6 +196,40 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
         this.trackSwitch.remove();
         break;
     }
+  }
+
+  // todo needs only for rendering, not for the model
+  naturalSplitPoints(): Ray[] {
+    const chainE = this.trackSwitch.getSegmentLeft().getLineSegmentChain();
+    const chainF = this.trackSwitch.getSegmentRight().getLineSegmentChain();
+
+    const leftE = chainE.copyMove(Right, 1).getLineSegments();
+    const rightF = chainF.copyMove(Left, 1).getLineSegments();
+
+    let peak = new Ray(new Coordinate(0, 0, 0), 0);
+
+    for (let i of leftE) {
+      for (let j of rightF) {
+        if (i.isIntersectsWith(j)) {
+          peak = new Ray(i.getIntersectionsWith(j)[0], 0);
+        }
+      }
+    }
+
+    const left2E = chainE.copyMove(Right, 2).getLineSegments();
+    const right2F = chainF.copyMove(Left, 2).getLineSegments();
+
+    let peak2 = new Ray(new Coordinate(0, 0, 0), 0);
+
+    for (let i of left2E) {
+      for (let j of right2F) {
+        if (i.isIntersectsWith(j)) {
+          peak2 = new Ray(i.getIntersectionsWith(j)[0], 0);
+        }
+      }
+    }
+
+    return [peak, peak2];
   }
 }
 

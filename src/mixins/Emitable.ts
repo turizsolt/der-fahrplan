@@ -3,11 +3,10 @@ export type EmitableCallback = (data: any) => void;
 export class Emitable {
   private updateCallbacks: Record<string, EmitableCallback[]>;
 
-  init() {
-    this.updateCallbacks = {};
-  }
-
   on(event: string, callback: EmitableCallback) {
+    if (!this.updateCallbacks) {
+      this.updateCallbacks = {};
+    }
     if (!this.updateCallbacks[event]) {
       this.updateCallbacks[event] = [];
     }

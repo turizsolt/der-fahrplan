@@ -1,21 +1,7 @@
-import { TrackBase } from '../TrackBase';
-import { TrackEnd } from '../TrackEnd';
+import { TrackJoint } from './TrackJoint';
+import { WhichEnd } from '../../../structs/Interfaces/WhichEnd';
 
-export class TrackJointEnd {
-  public track: TrackBase = null;
-  public end: TrackEnd = null;
-
-  setEnd(track: TrackBase, end: TrackEnd) {
-    this.track = track;
-    this.end = end;
-  }
-
-  unsetEnd() {
-    this.track = null;
-    this.end = null;
-  }
-
-  isSet(): boolean {
-    return !!this.track;
-  }
+export interface TrackJointEnd {
+  joint: TrackJoint;
+  end: WhichEnd;
 }

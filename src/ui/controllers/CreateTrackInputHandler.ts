@@ -11,6 +11,8 @@ import { CommandLog, GENERATE_ID } from '../../structs/Actuals/Store/Command/Com
 import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
 import { Command } from '../../structs/Actuals/Store/Command/Command';
 import { TYPES } from '../../di/TYPES';
+import { Ray } from '../../structs/Geometry/Ray';
+import { TrackJointConnector } from '../../modules/Track/TrackJoint/TrackJointConnector';
 
 export class CreateTrackInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
@@ -157,10 +159,12 @@ export class CreateTrackInputHandler implements InputHandler {
       } else {
         s1 = true;
         j1 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
-          downProps.snappedPoint.coord.x,
-          downProps.snappedPoint.coord.z,
-          downProps.wheelRad
-        );
+          Ray.from(
+            downProps.snappedPoint.coord.x,
+            0,
+            downProps.snappedPoint.coord.z,
+            downProps.wheelRad
+          ));
         actions.push(CommandCreator.createTrackJoint(
           GENERATE_ID,
           downProps.snappedPoint.coord.x,
@@ -175,10 +179,12 @@ export class CreateTrackInputHandler implements InputHandler {
       } else {
         s2 = true;
         j2 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
-          props.snappedPoint.coord.x,
-          props.snappedPoint.coord.z,
-          props.wheelRad
-        );
+          Ray.from(
+            props.snappedPoint.coord.x,
+            0,
+            props.snappedPoint.coord.z,
+            props.wheelRad
+          ));
         actions.push(CommandCreator.createTrackJoint(
           GENERATE_ID,
           props.snappedPoint.coord.x,
@@ -188,7 +194,7 @@ export class CreateTrackInputHandler implements InputHandler {
         deletable.push(j2);
       }
 
-      const ret = j1.connect(j2);
+      const ret = TrackJointConnector.connect(j1, j2);
 
       const replacementIds = deletable.map(j => j.getId());
 

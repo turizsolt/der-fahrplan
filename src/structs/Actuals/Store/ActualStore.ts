@@ -16,12 +16,16 @@ import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
 import { PassengerGenerator } from '../PassengerGenerator';
 import { CommandLog } from './Command/CommandLog';
+import { TrackJointRenderer } from '../../Renderers/TrackJointRenderer';
+import { BaseRenderer } from '../../Renderers/BaseRenderer';
+import { Emitable } from '../../../mixins/Emitable';
 
 @injectable()
 export class ActualStore implements Store {
   private elements: Record<string, BaseStorable>;
   private typedElements: Record<symbol, BaseStorable[]>;
   private factoryMethods: Record<symbol, () => any>;
+  private renderers: Record<symbol, () => any[]>;
   private typeOrder: Record<symbol, number>;
 
   @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
@@ -36,10 +40,13 @@ export class ActualStore implements Store {
   private TrackSwitchFactory: () => TrackSwitch;
   @inject(TYPES.FactoryOfTrackJoint)
   private TrackJointFactory: () => TrackJoint;
+  @inject(TYPES.FactoryOfTrackJointRenderer)
+  private TrackJointRendererFactory: () => TrackJointRenderer;
   @inject(TYPES.FactoryOfPlatform) private PlatformFactory: () => Platform;
   @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
 
-  @inject(TYPES.FactoryOfPassengerGenerator) private PassengerGeneratorFactory: () => PassengerGenerator;
+  @inject(TYPES.FactoryOfPassengerGenerator)
+  private PassengerGeneratorFactory: () => PassengerGenerator;
   private passengerGenerator: PassengerGenerator;
 
   private logStore: CommandLog;
@@ -76,6 +83,11 @@ export class ActualStore implements Store {
       [TYPES.Train]: -2,
       [TYPES.Passenger]: -3
     };
+
+    this.renderers = {
+      [TYPES.TrackJoint]: [this.TrackJointRendererFactory]
+    };
+
     shortid.characters(
       '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_*'
     );
@@ -87,11 +99,27 @@ export class ActualStore implements Store {
     if (type === Symbol.for('Passenger')) {
       this.passengerCount++;
     }
-    return this.factoryMethods[type]() as T;
+    const created = this.factoryMethods[type]() as T;
+    if (this.renderers[type]) {
+      this.renderers[type].map(f => {
+        const g: BaseRenderer = f();
+
+        // todo prettify
+        ((created as any) as Emitable).on('init', data => g.init(data));
+        ((created as any) as Emitable).on('update', data => g.update(data));
+        ((created as any) as Emitable).on('remove', data => g.remove(data));
+        ((created as any) as Emitable).on('remove', id =>
+          this.unregister(this.get(id))
+        );
+      });
+    }
+    return created;
   }
 
   clear() {
-    this.getFiltered(x => x.getType() === Symbol.for('Wagon')).map(e => e.remove());
+    this.getFiltered(x => x.getType() === Symbol.for('Wagon')).map(e =>
+      e.remove()
+    );
     this.getFiltered(() => true).map(e => e.remove());
 
     this.elements = {};

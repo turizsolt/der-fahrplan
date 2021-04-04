@@ -85,19 +85,19 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
 
   getLineSegmentChain(): LineSegmentChain {
     const p1 = this.track
-      .getSegment()
+      .getCurve()
       .getBezier()
       .getPoint(this.startPerc);
 
     const p2 = this.track
-      .getSegment()
+      .getCurve()
       .getBezier()
       .getPoint(this.endPerc);
 
     //console.log('p1', p1);
     //console.log('p2', p2);
 
-    const chain = this.track.getSegment().getLineSegmentChain();
+    const chain = this.track.getCurve().getLineSegmentChain();
 
     const chain2 = chain.getChainFromPoint(chain.project(p1).coord);
     const chain3 = chain2.getChainToPoint(chain2.project(p2).coord);
@@ -138,7 +138,7 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
   ): Platform {
     super.initStore(TYPES.Platform);
 
-    const segment = track.getSegment();
+    const segment = track.getCurve();
     const a = segment.getFirstPoint();
     const b = segment.getLastPoint();
     const segLen = segment.getLength();

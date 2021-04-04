@@ -37,14 +37,14 @@ export class CreateEngineInputHandler implements InputHandler {
     this.fromMesh.isPickable = false;
   }
 
-  down(props: InputProps, event: PointerEvent): void { }
+  down(props: InputProps, event: PointerEvent): void {}
 
   roam(props: InputProps, event: PointerEvent): void {
     const pot = props.snappedPositionOnTrack;
     if (pot && pot.track.constructor.name === ActualTrack.name) {
       this.fromMesh.position = CoordinateToBabylonVector3(
         pot.track
-          .getSegment()
+          .getCurve()
           .getBezier()
           .getPoint(pot.position)
       );
@@ -55,23 +55,30 @@ export class CreateEngineInputHandler implements InputHandler {
     }
   }
 
-  move(downProps: InputProps, props: InputProps, event: PointerEvent): void { }
+  move(downProps: InputProps, props: InputProps, event: PointerEvent): void {}
 
   click(downProps: InputProps, event: PointerEvent): void {
     const dpot = downProps.snappedPositionOnTrack;
 
     if (dpot && dpot.track.constructor.name === ActualTrack.name) {
-      this.store.getCommandLog().addAction(
-        CommandCreator.createWagon(GENERATE_ID, GENERATE_ID,
-          getPredefinedWagonConfig(downProps.wagonType), (dpot.track as Track).getId(), dpot.position, 1
-        )
-      );
+      this.store
+        .getCommandLog()
+        .addAction(
+          CommandCreator.createWagon(
+            GENERATE_ID,
+            GENERATE_ID,
+            getPredefinedWagonConfig(downProps.wagonType),
+            (dpot.track as Track).getId(),
+            dpot.position,
+            1
+          )
+        );
     }
 
     this.fromMesh.setEnabled(false);
   }
 
-  up(downProps: InputProps, props: InputProps, event: PointerEvent): void { }
+  up(downProps: InputProps, props: InputProps, event: PointerEvent): void {}
 
   cancel(): void {
     this.fromMesh.setEnabled(false);

@@ -1,31 +1,12 @@
 import { TrackJoint } from './TrackJoint';
-import { TrackBase } from '../TrackBase';
-import { inject, injectable } from 'inversify';
-import { TYPES } from '../../../di/TYPES';
-import { Track } from '../Track';
-import { TrackSwitch } from '../TrackSwitch';
 import { ActualTrackSwitch } from '../ActualTrackSwitch';
-import { Store } from '../../../structs/Interfaces/Store';
-import { ActualTrackJoint } from './ActualTrackJoint';
 import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
 import { GENERATE_ID } from '../../../structs/Actuals/Store/Command/CommandLog';
+import { TrackEnd } from '../TrackEnd';
+import { Track } from '../Track';
 
-@injectable()
 export class TrackJointConnector {
-  @inject(TYPES.FactoryOfTrack) TrackFactory: () => Track;
-  @inject(TYPES.FactoryOfTrackSwitch) TrackSwitchFactory: () => TrackSwitch;
-
-  init(): TrackJointConnector {
-    return this;
-  }
-
-  private store: Store;
-
-  setStore(store: Store) {
-    this.store = store;
-  }
-
-  connect(one: TrackJoint, other: TrackJoint) {
+  static connect(one: TrackJoint, other: TrackJoint) {
     const midpoint = one.getRay().computeMidpoint(other.getRay());
 
     if (midpoint === false) {
@@ -35,27 +16,38 @@ export class TrackJointConnector {
     const coordinates = [one.getPosition(), midpoint, other.getPosition()];
 
     const oneEndLetter = one.getRay().whichEnd(midpoint || other.getPosition());
-    const oneEnd = one.getEnds()[oneEndLetter];
+    const oneEnd = one.getEnd(oneEndLetter);
 
     const otherEndLetter = other
       .getRay()
       .whichEnd(midpoint || one.getPosition());
-    const otherEnd = other.getEnds()[otherEndLetter];
+    const otherEnd = other.getEnd(otherEndLetter);
 
-    if (ActualTrackJoint.areBothEndsEmpty(oneEnd, otherEnd)) {
+    if (TrackJointConnector.areBothEndsEmpty(oneEnd, otherEnd)) {
       return [
-        CommandCreator.joinTrackJoints(GENERATE_ID, coordinates, one.getId(), oneEndLetter, other.getId(), otherEndLetter)
+        CommandCreator.joinTrackJoints(
+          GENERATE_ID,
+          coordinates,
+          one.getId(),
+          oneEndLetter,
+          other.getId(),
+          otherEndLetter
+        )
       ];
     }
 
-    if (ActualTrackJoint.isEndEmpty(oneEnd) || ActualTrackJoint.isEndEmpty(otherEnd)) {
-      const oldTrack: TrackBase = oneEnd.track || otherEnd.track;
+    if (
+      TrackJointConnector.isEndEmpty(oneEnd) ||
+      TrackJointConnector.isEndEmpty(otherEnd)
+    ) {
+      const oldTrack: Track = ((oneEnd && oneEnd.getTrack()) ||
+        (otherEnd && otherEnd.getTrack())) as Track;
       if (oldTrack.constructor.name === ActualTrackSwitch.name) return false;
 
-      const oldCoordinates = oldTrack.getSegment().getCoordinates();
+      const oldCoordinates = oldTrack.getCurve().getCoordinates();
 
-      const thirdA = oldTrack.getA().getJointTo();
-      const thirdB = oldTrack.getB().getJointTo();
+      const thirdA = oldTrack.getAx().getJointEnd().joint;
+      const thirdB = oldTrack.getBx().getJointEnd().joint;
 
       let third, second, peak, peakLetter, secondLetter;
       if (thirdA === one) {
@@ -85,21 +77,15 @@ export class TrackJointConnector {
       }
 
       let thirdLetter;
-      if (oldTrack.getA().getJointTo() === peak) {
-        thirdLetter = oldTrack
-          .getB()
-          .getJointTo()
-          .getTracksEnd(oldTrack);
+      if (oldTrack.getAx().getJointEnd().joint === peak) {
+        thirdLetter = oldTrack.getBx().getJointEnd().end;
       }
-      if (oldTrack.getB().getJointTo() === peak) {
-        thirdLetter = oldTrack
-          .getA()
-          .getJointTo()
-          .getTracksEnd(oldTrack);
+      if (oldTrack.getBx().getJointEnd().joint === peak) {
+        thirdLetter = oldTrack.getAx().getJointEnd().end;
       }
 
-      const j1 = oldTrack.getA().getJointTo();
-      const j2 = oldTrack.getB().getJointTo();
+      const j1 = oldTrack.getAx().getJointEnd().joint;
+      const j2 = oldTrack.getBx().getJointEnd().joint;
 
       return [
         CommandCreator.unjoinTrackJoints(
@@ -125,5 +111,16 @@ export class TrackJointConnector {
     }
 
     return false;
+  }
+
+  static isEndEmpty(end: TrackEnd): boolean {
+    return !end;
+  }
+
+  static areBothEndsEmpty(oneEnd, otherEnd: TrackEnd): boolean {
+    return (
+      TrackJointConnector.isEndEmpty(oneEnd) &&
+      TrackJointConnector.isEndEmpty(otherEnd)
+    );
   }
 }

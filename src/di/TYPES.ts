@@ -19,6 +19,11 @@ export const TYPES = {
   TrackSwitchRenderer: Symbol.for('TrackSwitchRenderer'),
   FactoryOfTrackSwitch: Symbol.for('Factory<TrackSwitch>'),
 
+  TrackJoint: Symbol.for('TrackJoint'),
+  TrackJointRenderer: Symbol.for('TrackJointRenderer'),
+  FactoryOfTrackJoint: Symbol.for('Factory<TrackJoint>'),
+  FactoryOfTrackJointRenderer: Symbol.for('Factory<TrackJointRenderer>'),
+
   Passenger: Symbol.for('Passenger'),
   PassengerRenderer: Symbol.for('PassengerRenderer'),
   FactoryOfPassenger: Symbol.for('Factory<Passenger>'),
@@ -29,13 +34,6 @@ export const TYPES = {
   Platform: Symbol.for('Platform'),
   PlatformRenderer: Symbol.for('PlatformRenderer'),
   FactoryOfPlatform: Symbol.for('Factory<Platform>'),
-
-  TrackJoint: Symbol.for('TrackJoint'),
-  TrackJointRenderer: Symbol.for('TrackJointRenderer'),
-  FactoryOfTrackJoint: Symbol.for('Factory<TrackJoint>'),
-
-  TrackJointConnector: Symbol.for('TrackJointConnector'),
-  FactoryOfTrackJointConnector: Symbol.for('Factory<TrackJointConnector>'),
 
   MeshProvider: Symbol.for('MeshProvider'),
   FactoryOfMeshProvider: Symbol.for('Factory<MeshProvider>'),

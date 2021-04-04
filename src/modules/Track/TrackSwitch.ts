@@ -1,21 +1,15 @@
 import { TrackBase } from './TrackBase';
-import { TrackSegment } from './TrackSegment';
-import { Coordinate } from '../../structs/Geometry/Coordinate';
-import { TrackSwitchEnd } from './TrackSwitchEnd';
-import { Ray } from '../../structs/Geometry/Ray';
+import { TrackCurve } from './TrackCurve';
+import { TrackSegmentData } from './TrackSegmentData';
 
 export interface TrackSwitch extends TrackBase {
-  init(coordinates1: Coordinate[], coordinates2: Coordinate[]): TrackSwitch;
+  init(
+    segmentData1: TrackSegmentData,
+    segmentData2: TrackSegmentData
+  ): TrackSwitch;
   switch();
-  getSegmentE(): TrackSegment;
-  getSegmentF(): TrackSegment;
-  getSegmentLeft(): TrackSegment;
-  getSegmentRight(): TrackSegment;
-  getE(): TrackSwitchEnd;
-  getF(): TrackSwitchEnd;
   getState(): number;
-  verbose(): void;
-  update(): void;
 
-  naturalSplitPoints(): Ray[];
+  getSegmentLeft(): TrackCurve;
+  getSegmentRight(): TrackCurve;
 }

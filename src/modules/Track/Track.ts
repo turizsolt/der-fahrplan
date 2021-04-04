@@ -1,7 +1,10 @@
 import { TrackBase } from './TrackBase';
-import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { TrackEnd } from './TrackEnd';
+import { TrackSegmentData } from './TrackSegmentData';
 
 export interface Track extends TrackBase {
-  init(coordinates: Coordinate[]): Track;
-  verbose(): void;
+  init(segmentData: TrackSegmentData): Track;
+
+  getAx(): TrackEnd;
+  getBx(): TrackEnd;
 }

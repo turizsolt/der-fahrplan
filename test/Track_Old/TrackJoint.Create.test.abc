@@ -12,7 +12,7 @@ const TrackJointFactory = testContainer.get<() => TrackJoint>(
   TYPES.FactoryOfTrackJoint
 );
 
-describe('Track joint - create', () => {
+xdescribe('Track joint - create', () => {
   it('creates new track', () => {
     const j1 = TrackJointFactory().init(0, 0, 0);
     const j2 = TrackJointFactory().init(0, 10, 0);

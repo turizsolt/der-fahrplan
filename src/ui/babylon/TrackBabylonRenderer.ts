@@ -20,8 +20,8 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
   init(track: Track): void {
     this.track = track;
     this.meshProvider = this.meshProviderFactory();
-    const chain = this.track.getSegment().getLineSegmentChain();
-    const len = this.track.getSegment().getLength();
+    const chain = this.track.getCurve().getLineSegmentChain();
+    const len = this.track.getCurve().getLength();
 
     const name = 'clickable-track-' + this.track.getId();
 
@@ -64,23 +64,23 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
       if (this.selected && !this.lastSelected) {
         this.selectableMeshes.map(
           x =>
-          (x.material = this.meshProvider.getMaterial(
-            MaterialName.SelectorRed
-          ))
+            (x.material = this.meshProvider.getMaterial(
+              MaterialName.SelectorRed
+            ))
         );
       } else if (!this.selected && this.lastSelected) {
         this.selectableMeshes.map(
           x =>
-          (x.material = this.meshProvider.getMaterial(
-            MaterialName.SleeperBrown
-          ))
+            (x.material = this.meshProvider.getMaterial(
+              MaterialName.SleeperBrown
+            ))
         );
       } else {
         this.selectableMeshes.map(
           x =>
-          (x.material = this.meshProvider.getMaterial(
-            MaterialName.SleeperBrown
-          ))
+            (x.material = this.meshProvider.getMaterial(
+              MaterialName.SleeperBrown
+            ))
         );
       }
     }

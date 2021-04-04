@@ -29,7 +29,8 @@ ioc.sng<MeshProvider>(T.FactoryOfMeshProvider, T.MeshProvider, MeshProvider);
 ioc.map<WagonRenderer>(T.WagonRenderer, WagonBabylonRenderer);
 ioc.map<TrackRenderer>(T.TrackRenderer, TrackBabylonRenderer);
 ioc.map<TrackSwitchRenderer>(T.TrackSwitchRenderer, TrackSwitchBabylonRenderer);
-ioc.map<TrackJointRenderer>(T.TrackJointRenderer, TrackJointBabylonRenderer);
 ioc.map<StationRenderer>(T.StationRenderer, StationBabylonRenderer);
 ioc.map<PlatformRenderer>(T.PlatformRenderer, PlatformBabylonRenderer);
 ioc.map<PassengerRenderer>(T.PassengerRenderer, PassengerBabylonRenderer);
+
+ioc.fm<TrackJointRenderer>(T.FactoryOfTrackJointRenderer, T.TrackJointRenderer, TrackJointBabylonRenderer);

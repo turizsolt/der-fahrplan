@@ -24,7 +24,8 @@ addCommonMaps(ioc);
 ioc.map<WagonRenderer>(T.WagonRenderer, WagonDummyRenderer);
 ioc.map<TrackRenderer>(T.TrackRenderer, TrackDummyRenderer);
 ioc.map<TrackSwitchRenderer>(T.TrackSwitchRenderer, TrackSwitchDummyRenderer);
-ioc.map<TrackJointRenderer>(T.TrackJointRenderer, TrackJointDummyRenderer);
 ioc.map<StationRenderer>(T.StationRenderer, StationDummyRenderer);
 ioc.map<PlatformRenderer>(T.PlatformRenderer, PlatformDummyRenderer);
 ioc.map<PassengerRenderer>(T.PassengerRenderer, PassengerDummyRenderer);
+
+ioc.fm<TrackJointRenderer>(T.FactoryOfTrackJointRenderer, T.TrackJointRenderer, TrackJointDummyRenderer);

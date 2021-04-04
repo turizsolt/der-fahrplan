@@ -1,104 +1,28 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { testContainer } from '../../src/di/test.config';
 import { TYPES } from '../../src/di/TYPES';
 import { Track } from '../../src/modules/Track/Track';
 import { Coordinate } from '../../src/structs/Geometry/Coordinate';
-import { TrackSwitch } from '../../src/modules/Track/TrackSwitch';
+import { getTestStore } from '../getTestStore';
+import { TrackJoint } from '../../src/modules/Track/TrackJoint/TrackJoint';
+import { Ray } from '../../src/structs/Geometry/Ray';
+import { WhichEnd } from '../../src/structs/Interfaces/WhichEnd';
 chai.use(chaiAlmost());
 
-const TrackFactory = testContainer.get<() => Track>(TYPES.FactoryOfTrack);
-const TrackSwitchFactory = testContainer.get<() => TrackSwitch>(
-  TYPES.FactoryOfTrackSwitch
-);
+const store = getTestStore();
 
-const p1 = new Coordinate(0, 0, 0);
-const p2 = new Coordinate(10, 0, 0);
-const p3 = new Coordinate(10, 0, 10);
-const p4 = new Coordinate(10, 0, 20);
-const p5 = new Coordinate(20, 0, 20);
-const p6 = new Coordinate(20, 0, 30);
-const p3b = new Coordinate(10, 0, 30);
-const p4b = new Coordinate(10, 0, 40);
-const p3c = new Coordinate(10, 0, 35);
-const p2c = new Coordinate(0, 0, 30);
-
-describe('Track connection', () => {
-  it('two track are connected', () => {
-    const t1 = TrackFactory().init([p1, p2, p3]);
-    const t2 = TrackFactory().init([p3, p4, p5]);
-
-    t1.getB().connect(t2.getA());
-
-    expect(t1.getB().getConnectedEnd()).equals(t2.getA());
-    expect(t2.getA().getConnectedEnd()).equals(t1.getB());
-  });
-
-  it('two track are disconnected', () => {
-    const t1 = TrackFactory().init([p1, p2, p3]);
-    const t2 = TrackFactory().init([p3, p4, p5]);
-
-    t1.getB().connect(t2.getA());
-    t2.getA().disconnect();
-
-    expect(t1.getB().getConnectedEnd()).equals(null);
-    expect(t2.getA().getConnectedEnd()).equals(null);
-  });
-
-  it('track, switch are connected', () => {
-    const t = TrackFactory().init([p1, p2, p3]);
-    const s = TrackSwitchFactory().init([p3, p4, p5], [p3, p3b]);
-
-    t.getB().connect(s.getA());
-
-    expect(t.getB().getConnectedEnd()).equals(s.getA());
-    expect(s.getA().getConnectedEnd()).equals(t.getB());
-  });
-
-  it('switch and two tracks are connected', () => {
-    const s = TrackSwitchFactory().init([p3, p4, p5], [p3, p3b]);
-    const t1 = TrackFactory().init([p3b, p4b]);
-    const t2 = TrackFactory().init([p5, p6]);
-
-    s.getE().connect(t1.getA());
-    s.getF().connect(t2.getA());
-
-    expect(s.getB().getConnectedEnd()).equals(t1.getA());
-    expect(t1.getA().getConnectedEnd()).equals(s.getB());
-    expect(t1.getA().getConnectedEndOf()).equals(s.getB().getEndOf());
-
-    expect(t2.getA().getConnectedEnd()).equals(s.getF());
-    expect(t2.getA().getConnectedEndOf()).equals(null);
-
-    s.switch();
-
-    expect(s.getB().getConnectedEnd()).equals(t2.getA());
-    expect(t1.getA().getConnectedEnd()).equals(s.getE());
-    expect(t1.getA().getConnectedEndOf()).equals(null);
-
-    expect(t2.getA().getConnectedEnd()).equals(s.getB());
-    expect(t2.getA().getConnectedEndOf()).equals(s.getB().getEndOf());
-  });
-
-  it('switch and opposing are connected', () => {
-    const s1 = TrackSwitchFactory().init([p3, p4, p5], [p3, p3b]);
-    const s2 = TrackSwitchFactory().init([p4b, p3b], [p4b, p3c, p2c]);
-
-    s1.getF().connect(s2.getE());
-    s1.switch();
-
-    expect(s1.getF().getConnectedEnd()).equals(s2.getE());
-    expect(s2.getE().getConnectedEnd()).equals(s1.getF());
-
-    s1.switch();
-    s2.switch();
-
-    expect(s1.getF().getConnectedEnd()).equals(s2.getE());
-    expect(s2.getE().getConnectedEnd()).equals(s1.getF());
-
-    expect(s1.getF().getConnectedEndOf()).equals(null);
-    expect(s2.getE().getConnectedEndOf()).equals(null);
+describe('Track', () => {
+  it('create a track', () => {
+    const j1 = store
+      .create<TrackJoint>(TYPES.TrackJoint)
+      .init(Ray.from(0, 0, 0, 0));
+    const j2 = store
+      .create<TrackJoint>(TYPES.TrackJoint)
+      .init(Ray.from(0, 0, 100, 0));
+    const track = store.create<Track>(TYPES.Track).init({
+      coordinates: [new Coordinate(0, 0, 0), new Coordinate(0, 0, 100)],
+      startJointEnd: { joint: j1, end: WhichEnd.A },
+      endJointEnd: { joint: j2, end: WhichEnd.B }
+    });
   });
 });
-
-// TODO atgondolni mi miert hasal el az uj rendszerben
