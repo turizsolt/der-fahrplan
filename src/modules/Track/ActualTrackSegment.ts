@@ -8,6 +8,7 @@ import { TrackSegment } from './TrackSegment';
 import { TrackEnd } from './TrackEnd';
 import { TrackCurve } from './TrackCurve';
 import { TrackSegmentData } from './TrackSegmentData';
+import { TrackDirection } from './TrackDirection';
 
 export class ActualTrackSegment implements TrackSegment {
   protected A: TrackEnd;
@@ -45,13 +46,21 @@ export class ActualTrackSegment implements TrackSegment {
     return this.track;
   }
 
+  getDirected(direction: TrackDirection): DirectedTrack {
+    return this[direction];
+  }
+
+  getLength(): number {
+      return this.curve.getLength();
+  }
+
   getCurve(): TrackCurve {
-      return this.curve;
+    return this.curve;
   }
 
   connect(): void {
-      this.A.connect();
-      this.B.connect();
+    this.A.connect();
+    this.B.connect();
   }
 
   disconnect(): void {

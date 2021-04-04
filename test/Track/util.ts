@@ -28,3 +28,33 @@ export function createTrack(): {
 
   return { jointStart: j1, track, jointEnd: j2 };
 }
+
+export function createTrackLine(
+  count: number,
+  distance: number
+): {
+  joint: TrackJoint[];
+  track: TrackBase[];
+} {
+  const joint: TrackJoint[] = [];
+  for (let i = 0; i < count; i++) {
+    joint.push(
+      store
+        .create<TrackJoint>(TYPES.TrackJoint)
+        .init(Ray.from(0, 0, i * distance, 0))
+    );
+  }
+
+  const track: TrackBase[] = [];
+  for (let i = 1; i < count; i++) {
+    track.push(
+      store.create<Track>(TYPES.Track).init({
+        coordinates: [joint[i - 1].getRay().coord, joint[i].getRay().coord],
+        startJointEnd: { joint: joint[i - 1], end: WhichEnd.A },
+        endJointEnd: { joint: joint[i], end: WhichEnd.B }
+      })
+    );
+  }
+
+  return { joint, track };
+}

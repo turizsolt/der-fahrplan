@@ -1,12 +1,17 @@
 import { TrackBase } from '../Track/TrackBase';
 import { TrackDirection } from '../Track/TrackDirection';
+import { DirectedTrack } from '../Track/DirectedTrack';
 
 export class PositionOnTrack2 {
+  private directedTrack: DirectedTrack;
+
   constructor(
-    private track: TrackBase,
+    track: TrackBase,
     private position: number,
     private direction: TrackDirection
-  ) {}
+  ) {
+    this.directedTrack = track.getDirected(direction);
+  }
 
   reverse(): void {
     this.direction =
@@ -14,7 +19,7 @@ export class PositionOnTrack2 {
         ? TrackDirection.BA
         : TrackDirection.AB;
 
-    this.position = this.track.getLength() - this.position;
+    this.position = this.directedTrack.getLength() - this.position;
   }
 
   getPosition(): number {
@@ -25,7 +30,16 @@ export class PositionOnTrack2 {
     return this.direction;
   }
 
+  getTrack(): TrackBase {
+    return this.directedTrack.getTrack();
+  }
+
   move(distance: number): void {
-    this.position += distance;
+    if (this.position + distance > this.directedTrack.getLength()) {
+      this.position += distance - this.directedTrack.getLength();
+      this.directedTrack = this.directedTrack.next();
+    } else {
+      this.position += distance;
+    }
   }
 }

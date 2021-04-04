@@ -10,6 +10,8 @@ import { ActualTrackSegment } from './ActualTrackSegment';
 import { TrackEnd } from './TrackEnd';
 import { TrackCurve } from './TrackCurve';
 import { TrackSegmentData } from './TrackSegmentData';
+import { TrackDirection } from './TrackDirection';
+import { DirectedTrack } from './DirectedTrack';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
@@ -25,6 +27,10 @@ export class ActualTrack extends ActualTrackBase implements Track {
     // todo emit
     this.renderer.init(this);
     return this;
+  }
+
+  getDirected(direction: TrackDirection): DirectedTrack {
+    return this.segment.getDirected(direction);
   }
 
   getCurve(): TrackCurve {

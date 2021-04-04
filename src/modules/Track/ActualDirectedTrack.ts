@@ -1,5 +1,6 @@
 import { TrackSegment } from './TrackSegment';
 import { DirectedTrack } from './DirectedTrack';
+import { TrackBase } from './TrackBase';
 
 export class ActualDirectedTrack implements DirectedTrack {
   private nextTrack: DirectedTrack = null;
@@ -25,5 +26,13 @@ export class ActualDirectedTrack implements DirectedTrack {
 
   getSegment(): TrackSegment {
     return this.segment;
+  }
+
+  getTrack(): TrackBase {
+    return this.segment.getTrack();
+  }
+
+  getLength(): number {
+    return this.segment.getLength();
   }
 }
