@@ -6,7 +6,7 @@ import { WhichEnd } from '../Interfaces/WhichEnd';
 import { Platform } from './Platform';
 import { Updatable } from '../../mixins/Updatable';
 import { BaseBrick } from './BaseBrick';
-import { Train } from '../Scheduling/Train';
+import { Train } from '../../modules/Train/Train';
 import { TrackWorm } from '../../modules/Train/TrackWorm';
 import { Passenger } from './Passenger';
 import { Boardable } from '../../mixins/Boardable';

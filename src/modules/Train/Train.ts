@@ -1,12 +1,15 @@
-import { BaseStorable } from '../Interfaces/BaseStorable';
-import { Wagon } from '../Interfaces/Wagon';
-import { Route } from './Route';
-import { Platform } from '../Interfaces/Platform';
-import { Station } from './Station';
-import { WagonWithSide, WagonIdWithSide } from '../Interfaces/WagonWithSide';
-import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
-import { WhichEnd } from '../Interfaces/WhichEnd';
-import { Trip } from './Trip';
+import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
+import { Wagon } from '../../structs/Interfaces/Wagon';
+import { Route } from '../../structs/Scheduling/Route';
+import { Platform } from '../../structs/Interfaces/Platform';
+import { Station } from '../../structs/Scheduling/Station';
+import {
+  WagonWithSide,
+  WagonIdWithSide
+} from '../../structs/Interfaces/WagonWithSide';
+import { WagonEnd } from '../../structs/Actuals/Wagon/WagonEnd';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
+import { Trip } from '../../structs/Scheduling/Trip';
 
 export interface Train extends BaseStorable {
   init(first: Wagon): Train;

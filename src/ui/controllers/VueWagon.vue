@@ -87,7 +87,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { Wagon } from "../../structs/Interfaces/Wagon";
 import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
-import { Train } from "../../structs/Scheduling/Train";
+import { Train } from "../../modules/Train/Train";
 import { Trip } from "../../structs/Scheduling/Trip";
 
 @Component

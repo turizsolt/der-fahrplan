@@ -1,16 +1,16 @@
-import { ActualBaseStorable } from '../Actuals/ActualStorable';
-import { Store } from '../Interfaces/Store';
+import { ActualBaseStorable } from '../../structs/Actuals/ActualStorable';
+import { Store } from '../../structs/Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
 import { Train } from './Train';
-import { Wagon } from '../Interfaces/Wagon';
-import { Platform } from '../Interfaces/Platform';
-import { Station } from './Station';
-import { Passenger } from '../Interfaces/Passenger';
-import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
-import { WagonWithSide, WagonIdWithSide } from '../Interfaces/WagonWithSide';
-import { WhichEnd, otherEnd } from '../Interfaces/WhichEnd';
-import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
-import { Trip } from './Trip';
+import { Wagon } from '../../structs/Interfaces/Wagon';
+import { Platform } from '../../structs/Interfaces/Platform';
+import { Station } from '../../structs/Scheduling/Station';
+import { Passenger } from '../../structs/Interfaces/Passenger';
+import { WagonControlType } from '../../structs/Actuals/Wagon/WagonControl/WagonControlType';
+import { WagonWithSide, WagonIdWithSide } from '../../structs/Interfaces/WagonWithSide';
+import { WhichEnd, otherEnd } from '../../structs/Interfaces/WhichEnd';
+import { WagonEnd } from '../../structs/Actuals/Wagon/WagonEnd';
+import { Trip } from '../../structs/Scheduling/Trip';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private wagonsWithSides: WagonWithSide[] = [];

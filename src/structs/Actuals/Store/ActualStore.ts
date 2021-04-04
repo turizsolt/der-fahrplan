@@ -12,7 +12,7 @@ import { Route } from '../../Scheduling/Route';
 import { Store } from '../../Interfaces/Store';
 import { Wagon } from '../../Interfaces/Wagon';
 import { Passenger } from '../../Interfaces/Passenger';
-import { Train } from '../../Scheduling/Train';
+import { Train } from '../../../modules/Train/Train';
 import { Trip } from '../../Scheduling/Trip';
 import { PassengerGenerator } from '../PassengerGenerator';
 import { CommandLog } from './Command/CommandLog';

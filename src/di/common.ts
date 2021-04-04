@@ -22,8 +22,8 @@ import { ActualPassenger } from '../structs/Actuals/ActualPassenger';
 import { PassengerGenerator } from '../structs/Actuals/PassengerGenerator';
 import { ActualPassengerGenerator } from '../structs/Actuals/ActualPassengerGenerator';
 import { DependencyContainer } from './DependencyContainer';
-import { Train } from '../structs/Scheduling/Train';
-import { ActualTrain } from '../structs/Scheduling/ActualTrain';
+import { Train } from '../modules/Train/Train';
+import { ActualTrain } from '../modules/Train/ActualTrain';
 import { Trip } from '../structs/Scheduling/Trip';
 import { ActualTrip } from '../structs/Scheduling/ActualTrip';
 

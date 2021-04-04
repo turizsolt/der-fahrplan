@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { Wagon } from '../../Interfaces/Wagon';
-import { Train } from '../../Scheduling/Train';
+import { Train } from '../../../modules/Train/Train';
 import { TYPES } from '../../../di/TYPES';
 import { Store } from '../../Interfaces/Store';
 import { Platform } from '../../Interfaces/Platform';

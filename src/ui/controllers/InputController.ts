@@ -33,7 +33,7 @@ import { Trip } from '../../structs/Scheduling/Trip';
 import { TickInputProps } from './TickInputProps';
 import { PassengerGenerator } from '../../structs/Actuals/PassengerGenerator';
 import { VueViewbox } from './VueViewbox';
-import { Train } from '../../structs/Scheduling/Train';
+import { Train } from '../../modules/Train/Train';
 import { VueTestPanel } from './VueTestPanel';
 
 export enum InputMode {

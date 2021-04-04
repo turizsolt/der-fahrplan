@@ -3,7 +3,7 @@ import { Platform } from '../Interfaces/Platform';
 import { Color } from '../Color';
 import { Route } from './Route';
 import { BaseBrick } from '../Interfaces/BaseBrick';
-import { Train } from './Train';
+import { Train } from '../../modules/Train/Train';
 import { Boardable } from '../../mixins/Boardable';
 import { Trip } from './Trip';
 import { TripInSchedule } from './TripInSchedule';

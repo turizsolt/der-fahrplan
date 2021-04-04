@@ -16,7 +16,7 @@ import { Coordinate } from '../../Geometry/Coordinate';
 import { Updatable } from '../../../mixins/Updatable';
 import { applyMixins } from '../../../mixins/ApplyMixins';
 import { ActualBaseBrick } from '../ActualBaseBrick';
-import { Train } from '../../Scheduling/Train';
+import { Train } from '../../../modules/Train/Train';
 import { WagonPosition } from './WagonPosition';
 import {
   BoardableWagon,
