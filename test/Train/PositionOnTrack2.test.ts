@@ -21,4 +21,13 @@ describe('PositionOnTrack2', () => {
     expect(pot.getPosition()).equals(track.getLength());
     expect(pot.getDirection()).equals(TrackDirection.BA);
   });
+
+  it('reverse of reverse is idempotent', () => {
+    const { track } = createTrack();
+    const pot = new PositionOnTrack2(track, 0, TrackDirection.AB);
+    pot.reverse();
+    pot.reverse();
+    expect(pot.getPosition()).equals(0);
+    expect(pot.getDirection()).equals(TrackDirection.AB);
+  });
 });
