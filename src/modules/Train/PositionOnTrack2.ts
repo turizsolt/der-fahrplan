@@ -24,4 +24,8 @@ export class PositionOnTrack2 {
   getDirection(): TrackDirection {
     return this.direction;
   }
+
+  move(distance: number): void {
+    this.position += distance;
+  }
 }

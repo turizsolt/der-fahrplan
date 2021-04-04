@@ -30,4 +30,12 @@ describe('PositionOnTrack2', () => {
     expect(pot.getPosition()).equals(0);
     expect(pot.getDirection()).equals(TrackDirection.AB);
   });
+
+  it('moving a PoT inside a track', () => {
+    const { track } = createTrack();
+    const pot = new PositionOnTrack2(track, 0, TrackDirection.AB);
+    expect(pot.getPosition()).equals(0);
+    pot.move(10);
+    expect(pot.getPosition()).equals(10);
+  });
 });
