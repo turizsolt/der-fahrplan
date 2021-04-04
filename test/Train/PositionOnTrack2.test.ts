@@ -39,16 +39,16 @@ describe('PositionOnTrack2', () => {
     expect(pot.getPosition()).equals(10);
   });
 
-  it('moving a PoT to a next track', () => {
+  it('moving a PoT to a next, next track', () => {
     const {
-      track: [track1, track2]
-    } = createTrackLine(3, 10);
+      track: [track1, track2, track3]
+    } = createTrackLine(4, 10);
     const pot = new PositionOnTrack2(track1, 5, TrackDirection.AB);
     expect(pot.getPosition()).equals(5);
     expect(pot.getTrack()).equals(track1);
-    pot.move(11);
+    pot.move(21);
     expect(pot.getPosition()).equals(6);
-    expect(pot.getTrack()).equals(track2);
+    expect(pot.getTrack()).equals(track3);
   });
 
   it('moving a PoT beyond the last track', () => {
