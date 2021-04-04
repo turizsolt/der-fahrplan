@@ -174,6 +174,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     }
   }
 
+  
   accelerate(): void {
     this.speed.accelerate();
   }
