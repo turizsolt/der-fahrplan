@@ -36,8 +36,14 @@ export class PositionOnTrack2 {
 
   move(distance: number): void {
     if (this.position + distance > this.directedTrack.getLength()) {
-      this.position += distance - this.directedTrack.getLength();
-      this.directedTrack = this.directedTrack.next();
+      if (this.directedTrack.next()) {
+        const tillEnd = this.directedTrack.getLength() - this.position;
+        this.directedTrack = this.directedTrack.next();
+        this.position = 0;
+        this.move(distance - tillEnd);
+      } else {
+        this.position = this.directedTrack.getLength();
+      }
     } else {
       this.position += distance;
     }
