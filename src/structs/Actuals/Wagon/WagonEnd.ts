@@ -1,4 +1,4 @@
-import { PositionOnTrack } from '../../../modules/Track/PositionOnTrack';
+import { PositionOnTrack } from '../../../modules/Train/PositionOnTrack';
 import { WhichEnd, otherEnd } from '../../Interfaces/WhichEnd';
 import { End } from '../End';
 import { Wagon } from '../../Interfaces/Wagon';

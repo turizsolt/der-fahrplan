@@ -1,4 +1,4 @@
-import { TrackBase } from './TrackBase';
+import { TrackBase } from '../Track/TrackBase';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 
 export class TrackWorm {

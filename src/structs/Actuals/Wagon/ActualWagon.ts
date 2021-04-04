@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { PositionOnTrack } from '../../../modules/Track/PositionOnTrack';
+import { PositionOnTrack } from '../../../modules/Train/PositionOnTrack';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { WhichEnd, otherEnd } from '../../Interfaces/WhichEnd';
 import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
@@ -7,7 +7,7 @@ import { Ray } from '../../Geometry/Ray';
 import { TYPES } from '../../../di/TYPES';
 import { WagonRenderer } from '../../Renderers/WagonRenderer';
 import { TrackBase } from '../../../modules/Track/TrackBase';
-import { TrackWorm } from '../../../modules/Track/TrackWorm';
+import { TrackWorm } from '../../../modules/Train/TrackWorm';
 import { WagonEnd } from './WagonEnd';
 import { Store } from '../../Interfaces/Store';
 import { Platform } from '../../Interfaces/Platform';

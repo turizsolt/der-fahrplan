@@ -1,4 +1,4 @@
-import { TrackBase } from './TrackBase';
+import { TrackBase } from '../Track/TrackBase';
 import { Platform } from '../../structs/Interfaces/Platform';
 import { Ray } from '../../structs/Geometry/Ray';
 import { Circle } from '../../structs/Geometry/Circle';
