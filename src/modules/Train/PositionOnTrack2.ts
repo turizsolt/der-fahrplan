@@ -8,30 +8,14 @@ export class PositionOnTrack2 {
   constructor(
     track: TrackBase,
     private position: number,
-    private direction: TrackDirection
+    direction: TrackDirection
   ) {
     this.directedTrack = track.getDirected(direction);
   }
 
   reverse(): void {
-    this.direction =
-      this.direction === TrackDirection.AB
-        ? TrackDirection.BA
-        : TrackDirection.AB;
-
+    this.directedTrack = this.directedTrack.reverse();
     this.position = this.directedTrack.getLength() - this.position;
-  }
-
-  getPosition(): number {
-    return this.position;
-  }
-
-  getDirection(): TrackDirection {
-    return this.direction;
-  }
-
-  getTrack(): TrackBase {
-    return this.directedTrack.getTrack();
   }
 
   move(distance: number): void {
@@ -47,5 +31,19 @@ export class PositionOnTrack2 {
     } else {
       this.position += distance;
     }
+  }
+
+  // getters
+
+  getPosition(): number {
+    return this.position;
+  }
+
+  getTrack(): TrackBase {
+    return this.directedTrack.getTrack();
+  }
+
+  getDirectedTrack(): DirectedTrack {
+    return this.directedTrack;
   }
 }
