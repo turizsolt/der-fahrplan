@@ -1,12 +1,13 @@
 import { TrackSegment } from './TrackSegment';
 import { DirectedTrack } from './DirectedTrack';
 import { TrackBase } from './TrackBase';
+import { TrackCurve } from './TrackCurve';
 
 export class ActualDirectedTrack implements DirectedTrack {
   private nextTrack: DirectedTrack = null;
   private reverseTrack: DirectedTrack = null;
 
-  constructor(private segment: TrackSegment) {}
+  constructor(private segment: TrackSegment, private curve: TrackCurve) {}
 
   next(): DirectedTrack {
     return this.nextTrack;
@@ -32,7 +33,11 @@ export class ActualDirectedTrack implements DirectedTrack {
     return this.segment.getTrack();
   }
 
+  getCurve(): TrackCurve {
+    return this.curve;
+  }
+
   getLength(): number {
-    return this.segment.getLength();
+    return this.curve.getLength();
   }
 }

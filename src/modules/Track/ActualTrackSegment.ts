@@ -13,7 +13,6 @@ import { TrackDirection } from './TrackDirection';
 export class ActualTrackSegment implements TrackSegment {
   protected A: TrackEnd;
   protected B: TrackEnd;
-  protected curve: TrackCurve;
   protected AB: DirectedTrack;
   protected BA: DirectedTrack;
   protected track: TrackBase;
@@ -22,14 +21,13 @@ export class ActualTrackSegment implements TrackSegment {
     this.track = track;
 
     // dt
-    this.AB = new ActualDirectedTrack(this);
-    this.BA = new ActualDirectedTrack(this);
+    this.AB = new ActualDirectedTrack(this, new ActualTrackCurve(segmentData.coordinates));
+    this.BA = new ActualDirectedTrack(this, new ActualTrackCurve(segmentData.coordinates.reverse()));
     this.AB.setReverse(this.BA);
     this.BA.setReverse(this.AB);
 
     this.A = new ActualTrackEnd(this.AB, this.BA, segmentData.startJointEnd);
     this.B = new ActualTrackEnd(this.BA, this.AB, segmentData.endJointEnd);
-    this.curve = new ActualTrackCurve(segmentData.coordinates);
 
     this.connect();
   }
@@ -46,16 +44,16 @@ export class ActualTrackSegment implements TrackSegment {
     return this.track;
   }
 
-  getDirected(direction: TrackDirection): DirectedTrack {
-    return this[direction];
+  getCurve(): TrackCurve {
+    return this.AB.getCurve();
   }
 
   getLength(): number {
-      return this.curve.getLength();
+    return this.AB.getLength();
   }
 
-  getCurve(): TrackCurve {
-    return this.curve;
+  getDirected(direction: TrackDirection): DirectedTrack {
+    return this[direction];
   }
 
   connect(): void {

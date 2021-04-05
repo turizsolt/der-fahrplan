@@ -36,14 +36,8 @@ export class PositionOnTrack2 {
   }
 
   hop(distance: number, prevPoint?: Coordinate): void {
-    const lastPoint = this.directedTrack
-      .getSegment()
-      .getCurve()
-      .getLastPoint();
-    const bezier = this.directedTrack
-      .getSegment()
-      .getCurve()
-      .getBezier();
+    const lastPoint = this.directedTrack.getCurve().getLastPoint();
+    const bezier = this.directedTrack.getCurve().getBezier();
     const point =
       prevPoint ||
       bezier.getPoint(this.position / this.getDirectedTrack().getLength());

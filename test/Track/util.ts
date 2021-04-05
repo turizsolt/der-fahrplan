@@ -59,6 +59,40 @@ export function createTrackLine(
   return { joint, track };
 }
 
+export function createAlternatingTrackLine(
+  count: number,
+  distance: number
+): {
+  joint: TrackJoint[];
+  track: TrackBase[];
+} {
+  const joint: TrackJoint[] = [];
+  for (let i = 0; i < count; i++) {
+    joint.push(
+      store
+        .create<TrackJoint>(TYPES.TrackJoint)
+        .init(Ray.from(0, 0, i * distance, 0))
+    );
+  }
+
+  const track: TrackBase[] = [];
+  for (let i = 1; i < count; i++) {
+    const [j, k, endA, endB] =
+      i % 2 == 0
+        ? [i, i - 1, WhichEnd.B, WhichEnd.A]
+        : [i - 1, i, WhichEnd.A, WhichEnd.B];
+    track.push(
+      store.create<Track>(TYPES.Track).init({
+        coordinates: [joint[j].getRay().coord, joint[k].getRay().coord],
+        startJointEnd: { joint: joint[j], end: endA },
+        endJointEnd: { joint: joint[k], end: endB }
+      })
+    );
+  }
+
+  return { joint, track };
+}
+
 export function createCurlyZigZagTrackLine(
   count: number,
   distance: number

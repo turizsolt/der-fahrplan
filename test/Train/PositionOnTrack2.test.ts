@@ -5,7 +5,8 @@ import { TrackDirection } from '../../src/modules/Track/TrackDirection';
 import {
   createTrack,
   createTrackLine,
-  createCurlyZigZagTrackLine
+  createCurlyZigZagTrackLine,
+  createAlternatingTrackLine
 } from '../Track/util';
 chai.use(chaiAlmost());
 
@@ -111,6 +112,18 @@ describe('PositionOnTrack2', () => {
     expect(pot.getTrack()).equals(track1);
     pot.hop(30);
     expect(pot.getPosition()).equals(50.93862166453321);
+    expect(pot.getTrack()).equals(track2);
+  });
+
+  it('hoping between AB-BA track', () => {
+    const {
+      track: [track1, track2]
+    } = createAlternatingTrackLine(3, 10);
+    const pot = new PositionOnTrack2(track1, 5, AB);
+    expect(pot.getPosition()).equals(5);
+    expect(pot.getTrack()).equals(track1);
+    pot.hop(11);
+    expect(pot.getPosition()).equals(6);
     expect(pot.getTrack()).equals(track2);
   });
 });
