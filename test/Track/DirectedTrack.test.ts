@@ -11,10 +11,12 @@ const mockTrackSegment: TrackSegment = {
   getCurve: () => null,
   getEnd: () => null,
   getTrack: () => null,
-  remove: () => {}
+  remove: () => {},
+  getDirected: () => null,
+  getLength: () => null
 };
 const createDirectedTrack = (segment?: TrackSegment): DirectedTrack =>
-  new ActualDirectedTrack(segment);
+  new ActualDirectedTrack(segment, null);
 
 describe('DirectedTrack', () => {
   it('create a dt', () => {

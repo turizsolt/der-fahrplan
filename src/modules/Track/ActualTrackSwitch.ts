@@ -11,6 +11,8 @@ import { TrackSwitchCoordinates } from './TrackSwitchCoordinates';
 import { TrackCurve } from './TrackCurve';
 import { TrackSegment } from './TrackSegment';
 import { TrackSegmentData } from './TrackSegmentData';
+import { TrackDirection } from './TrackDirection';
+import { DirectedTrack } from './DirectedTrack';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
@@ -60,6 +62,10 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
     // todo emit
     this.renderer.update();
+  }
+
+  getDirected(direction: TrackDirection): DirectedTrack {
+    return this.activeSegment.getDirected(direction);
   }
 
   getCurve(): TrackCurve {

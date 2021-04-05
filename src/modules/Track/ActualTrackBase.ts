@@ -7,6 +7,8 @@ import { Wagon } from '../../structs/Interfaces/Wagon';
 import { TrackCurve } from './TrackCurve';
 import { TrackOcupancy } from './TrackOcupancy';
 import { ActualTrackOcupancy } from './ActualTrackOcupancy';
+import { TrackDirection } from './TrackDirection';
+import { DirectedTrack } from './DirectedTrack';
 
 @injectable()
 export abstract class ActualTrackBase extends ActualBaseBrick
@@ -22,6 +24,10 @@ export abstract class ActualTrackBase extends ActualBaseBrick
 
   getLength(): number {
     return this.getCurve().getLength();
+  }
+
+  getDirected(direction: TrackDirection): DirectedTrack {
+    throw new Error('Method not implemented.');
   }
 
   addPlatform(platform: Platform) {

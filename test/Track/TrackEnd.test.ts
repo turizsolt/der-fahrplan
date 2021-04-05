@@ -39,7 +39,8 @@ const mockTrackBase: TrackBase = {
   removeSelect: () => {},
   select: () => {},
   toggleSelect: () => {},
-  update: () => {}
+  update: () => {},
+  getDirected: () => null
 };
 
 const mockTrackSegment: TrackSegment = {
@@ -48,14 +49,19 @@ const mockTrackSegment: TrackSegment = {
   getCurve: () => null,
   getEnd: () => null,
   getTrack: () => mockTrackBase,
-  remove: () => {}
+  remove: () => {},
+  getDirected: () => null,
+  getLength: () => null
 };
 const mockDirectedTrack: DirectedTrack = {
   next: () => null,
   reverse: () => null,
   setNext: () => {},
   setReverse: () => {},
-  getSegment: () => mockTrackSegment
+  getSegment: () => mockTrackSegment,
+  getCurve: () => null,
+  getLength: () => null,
+  getTrack: () => null
 };
 const mockDirectedTrack2: DirectedTrack = { ...mockDirectedTrack };
 
