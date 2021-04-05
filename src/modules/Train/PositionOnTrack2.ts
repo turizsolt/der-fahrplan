@@ -50,16 +50,19 @@ export class PositionOnTrack2 {
     const circle = new Circle(point, distance);
 
     if (lastPoint.distance2d(point) < distance) {
-      this.directedTrack = this.directedTrack.next();
-      this.position = 0;
-      this.hop(distance, point);
+      if (this.directedTrack.next()) {
+        this.directedTrack = this.directedTrack.next();
+        this.position = 0;
+        this.hop(distance, point);
+      } else {
+        this.position = this.directedTrack.getLength();
+      }
     } else {
-      let fun = t => t > this.position;
-      const vals = bezier
+      const intersectionPoints = bezier
         .intersectWithCircle(circle)
         .map(t => t * this.getDirectedTrack().getLength())
-        .filter(fun);
-      this.position = vals[0];
+        .filter(t => t > this.position);
+      this.position = intersectionPoints[0];
     }
   }
 
