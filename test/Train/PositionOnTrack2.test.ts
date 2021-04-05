@@ -73,4 +73,16 @@ describe('PositionOnTrack2', () => {
     pot.hop(10);
     expect(pot.getPosition()).equals(10);
   });
+
+  it('hoping a PoT to a next, next track', () => {
+    const {
+      track: [track1, track2, track3]
+    } = createTrackLine(4, 10);
+    const pot = new PositionOnTrack2(track1, 5, AB);
+    expect(pot.getPosition()).equals(5);
+    expect(pot.getTrack()).equals(track1);
+    pot.hop(21);
+    expect(pot.getPosition()).equals(6);
+    expect(pot.getTrack()).equals(track3);
+  });
 });
