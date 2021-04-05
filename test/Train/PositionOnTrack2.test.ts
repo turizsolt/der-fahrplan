@@ -2,7 +2,11 @@ import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import { PositionOnTrack2 } from '../../src/modules/Train/PositionOnTrack2';
 import { TrackDirection } from '../../src/modules/Track/TrackDirection';
-import { createTrack, createTrackLine } from '../Track/util';
+import {
+  createTrack,
+  createTrackLine,
+  createCurlyZigZagTrackLine
+} from '../Track/util';
 chai.use(chaiAlmost());
 
 const AB = TrackDirection.AB;
@@ -95,6 +99,18 @@ describe('PositionOnTrack2', () => {
     expect(pot.getTrack()).equals(track1);
     pot.hop(100);
     expect(pot.getPosition()).equals(10);
+    expect(pot.getTrack()).equals(track2);
+  });
+
+  it('general tracks and hoping', () => {
+    const {
+      track: [track1, track2]
+    } = createCurlyZigZagTrackLine(3, 100);
+    const pot = new PositionOnTrack2(track1, 140, AB);
+    expect(pot.getPosition()).equals(140);
+    expect(pot.getTrack()).equals(track1);
+    pot.hop(30);
+    expect(pot.getPosition()).equals(50.93862166453321);
     expect(pot.getTrack()).equals(track2);
   });
 });

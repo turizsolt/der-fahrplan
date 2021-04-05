@@ -58,3 +58,46 @@ export function createTrackLine(
 
   return { joint, track };
 }
+
+export function createCurlyZigZagTrackLine(
+  count: number,
+  distance: number
+): {
+  joint: TrackJoint[];
+  track: TrackBase[];
+} {
+  const joint: TrackJoint[] = [];
+  for (let i = 0; i < count; i++) {
+    joint.push(
+      store
+        .create<TrackJoint>(TYPES.TrackJoint)
+        .init(
+          Ray.from(
+            Math.sin((i * Math.PI) / 2) * distance,
+            0,
+            -Math.cos((i * Math.PI) / 2) * distance,
+            (i * Math.PI) / 2
+          )
+        )
+    );
+  }
+
+  const track: TrackBase[] = [];
+  for (let i = 1; i < count; i++) {
+    track.push(
+      store.create<Track>(TYPES.Track).init({
+        coordinates: [
+          joint[i - 1].getRay().coord,
+          joint[i - 1]
+            .getRay()
+            .computeMidpoint(joint[i].getRay()) as Coordinate,
+          joint[i].getRay().coord
+        ],
+        startJointEnd: { joint: joint[i - 1], end: WhichEnd.A },
+        endJointEnd: { joint: joint[i], end: WhichEnd.B }
+      })
+    );
+  }
+
+  return { joint, track };
+}
