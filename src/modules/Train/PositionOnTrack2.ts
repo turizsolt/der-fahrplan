@@ -1,6 +1,7 @@
 import { TrackBase } from '../Track/TrackBase';
 import { TrackDirection } from '../Track/TrackDirection';
 import { DirectedTrack } from '../Track/DirectedTrack';
+import { Circle } from '../../structs/Geometry/Circle';
 
 export class PositionOnTrack2 {
   private directedTrack: DirectedTrack;
@@ -31,6 +32,27 @@ export class PositionOnTrack2 {
     } else {
       this.position += distance;
     }
+  }
+
+  hop(distance: number): void {
+    const circle = new Circle(
+      this.directedTrack
+        .getSegment()
+        .getCurve()
+        .getBezier()
+        .getPoint(this.position * this.getDirectedTrack().getLength()),
+      distance
+    );
+    const bezier = this.directedTrack
+      .getSegment()
+      .getCurve()
+      .getBezier();
+    let fun = t => t > this.position;
+    const vals = bezier
+      .intersectWithCircle(circle)
+      .map(t => t * this.getDirectedTrack().getLength())
+      .filter(fun);
+    this.position = vals[0];
   }
 
   // getters

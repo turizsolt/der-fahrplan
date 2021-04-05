@@ -65,4 +65,12 @@ describe('PositionOnTrack2', () => {
     expect(pot.getPosition()).equals(10);
     expect(pot.getTrack()).equals(track2);
   });
+
+  it('hoping a PoT inside a track', () => {
+    const { track } = createTrack();
+    const pot = new PositionOnTrack2(track, 0, AB);
+    expect(pot.getPosition()).equals(0);
+    pot.hop(10);
+    expect(pot.getPosition()).equals(10);
+  });
 });
