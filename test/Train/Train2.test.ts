@@ -31,4 +31,18 @@ describe('Train2', () => {
     train.addWagons([wagon2]);
     expect(train.getWagons()).deep.equals([wagon, wagon2]);
   });
+
+  it('merge two trains', () => {
+    const { track } = createTrack();
+    const wagon = store.create<Wagon>(TYPES.Wagon);
+    const wagon2 = store.create<Wagon>(TYPES.Wagon);
+    const pot = new PositionOnTrack2(track, 0, TrackDirection.AB);
+    const pot2 = new PositionOnTrack2(track, 40, TrackDirection.AB);
+    const train = new ActualTrain2().init(pot, [wagon]);
+    const train2 = new ActualTrain2().init(pot2, [wagon2]);
+    train.merge(train2);
+    expect(train).not.equals(null);
+    expect(store.get(train2.getId())).equals(undefined);
+    expect(train.getWagons()).deep.equals([wagon, wagon2]);
+  });
 });

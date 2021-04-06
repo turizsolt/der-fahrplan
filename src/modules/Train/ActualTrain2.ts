@@ -29,6 +29,11 @@ export class ActualTrain2 extends ActualBaseStorable implements Train2 {
     this.wagons.push(...wagons);
   }
 
+  merge(otherTrain: Train2): void {
+    this.wagons.push(...otherTrain.getWagons());
+    otherTrain.remove();
+  }
+
   persist(): Object {
     throw new Error('Method not implemented.');
   }

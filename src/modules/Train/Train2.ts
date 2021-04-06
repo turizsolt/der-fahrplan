@@ -7,4 +7,5 @@ export interface Train2 extends BaseStorable {
   getPosition(): PositionOnTrack2;
   getWagons(): Wagon[];
   addWagons(wagons: Wagon[]): void;
+  merge(otherTrain: Train2): void;
 }
