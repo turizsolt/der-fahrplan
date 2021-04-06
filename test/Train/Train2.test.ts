@@ -80,4 +80,22 @@ describe('Train2', () => {
     expect(train.getWagons()).deep.equals([wagon, wagon2]);
     expect(train2.getWagons()).deep.equals([]);
   });
+
+  it('reverse a train', () => {
+    const { track } = createTrack();
+    const pot = new PositionOnTrack2(track, 0, TrackDirection.AB);
+    const wagon = store
+      .create<Wagon>(TYPES.Wagon)
+      .init(getPredefinedWagonConfig('wagon'));
+    wagon.putOnTrack(pot.getTrack() as Track, pot.getPosition(), 1);
+    const wagon2 = store
+      .create<Wagon>(TYPES.Wagon)
+      .init(getPredefinedWagonConfig('wagon'));
+    wagon2.putOnTrack(pot.getTrack() as Track, pot.getPosition(), 1);
+
+    const train = new ActualTrain2().init(pot, [wagon, wagon2]);
+    train.reverse();
+    // expect(train.getPosition()).deep.equals(wagon2.getB());
+    expect(train.getWagons()).deep.equals([wagon2, wagon]);
+  });
 });

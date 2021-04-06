@@ -54,6 +54,10 @@ export class ActualTrain2 extends ActualBaseStorable implements Train2 {
     return newTrain;
   }
 
+  reverse(): void {
+    this.wagons = this.wagons.reverse();
+  }
+
   persist(): Object {
     throw new Error('Method not implemented.');
   }
