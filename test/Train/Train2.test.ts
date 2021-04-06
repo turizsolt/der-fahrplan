@@ -7,6 +7,8 @@ import { TrackDirection } from '../../src/modules/Track/TrackDirection';
 import { getTestStore } from '../getTestStore';
 import { Wagon } from '../../src/structs/Interfaces/Wagon';
 import { TYPES } from '../../src/di/TYPES';
+import { getPredefinedWagonConfig } from '../../src/structs/Actuals/Wagon/ActualWagonConfigs';
+import { Track } from '../../src/modules/Track/Track';
 chai.use(chaiAlmost());
 
 const store = getTestStore();
@@ -44,5 +46,38 @@ describe('Train2', () => {
     expect(train).not.equals(null);
     expect(store.get(train2.getId())).equals(undefined);
     expect(train.getWagons()).deep.equals([wagon, wagon2]);
+  });
+
+  it('separate a train into two', () => {
+    const { track } = createTrack();
+    const pot = new PositionOnTrack2(track, 0, TrackDirection.AB);
+    const pot2 = new PositionOnTrack2(track, 40, TrackDirection.AB);
+    const wagon = store.create<Wagon>(TYPES.Wagon);
+    // todo mock it out
+    const wagon2 = store
+      .create<Wagon>(TYPES.Wagon)
+      .init(getPredefinedWagonConfig('wagon'));
+    wagon2.putOnTrack(pot2.getTrack() as Track, pot2.getPosition(), 1);
+    const train = new ActualTrain2().init(pot, [wagon, wagon2]);
+    const train2 = train.separate(wagon2);
+    expect(train.getWagons()).deep.equals([wagon]);
+    expect(train2.getWagons()).deep.equals([wagon2]);
+  });
+
+  it('separate a train into two, but wagon is not present', () => {
+    const { track } = createTrack();
+    const pot = new PositionOnTrack2(track, 0, TrackDirection.AB);
+    const pot2 = new PositionOnTrack2(track, 40, TrackDirection.AB);
+    const wagon = store.create<Wagon>(TYPES.Wagon);
+    const wagon2 = store.create<Wagon>(TYPES.Wagon);
+    const wagon3 = store
+      .create<Wagon>(TYPES.Wagon)
+      .init(getPredefinedWagonConfig('wagon'));
+    wagon3.putOnTrack(pot2.getTrack() as Track, pot2.getPosition(), -1);
+
+    const train = new ActualTrain2().init(pot, [wagon, wagon2]);
+    const train2 = train.separate(wagon3);
+    expect(train.getWagons()).deep.equals([wagon, wagon2]);
+    expect(train2.getWagons()).deep.equals([]);
   });
 });

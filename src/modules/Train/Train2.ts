@@ -8,4 +8,5 @@ export interface Train2 extends BaseStorable {
   getWagons(): Wagon[];
   addWagons(wagons: Wagon[]): void;
   merge(otherTrain: Train2): void;
+  separate(wagon: Wagon, newTrainId?: string): Train2;
 }
