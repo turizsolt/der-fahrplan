@@ -25,6 +25,10 @@ export class ActualTrain2 extends ActualBaseStorable implements Train2 {
     return this.wagons;
   }
 
+  addWagons(wagons: Wagon[]): void {
+    this.wagons.push(...wagons);
+  }
+
   persist(): Object {
     throw new Error('Method not implemented.');
   }

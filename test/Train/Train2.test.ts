@@ -21,4 +21,14 @@ describe('Train2', () => {
     expect(train.getPosition()).equals(pot);
     expect(train.getWagons()).deep.equals([wagon]);
   });
+
+  it('add wagons to train', () => {
+    const { track } = createTrack();
+    const wagon = store.create<Wagon>(TYPES.Wagon);
+    const wagon2 = store.create<Wagon>(TYPES.Wagon);
+    const pot = new PositionOnTrack2(track, 0, TrackDirection.AB);
+    const train = new ActualTrain2().init(pot, [wagon]);
+    train.addWagons([wagon2]);
+    expect(train.getWagons()).deep.equals([wagon, wagon2]);
+  });
 });
