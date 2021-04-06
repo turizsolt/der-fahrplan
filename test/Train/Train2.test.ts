@@ -12,11 +12,13 @@ chai.use(chaiAlmost());
 const store = getTestStore();
 
 describe('Train2', () => {
-  it('create a Train2', () => {
+  it('create a Train2 and get basic props', () => {
     const { track } = createTrack();
     const wagon = store.create<Wagon>(TYPES.Wagon);
     const pot = new PositionOnTrack2(track, 0, TrackDirection.AB);
     const train = new ActualTrain2().init(pot, [wagon]);
     expect(train).not.equals(null);
+    expect(train.getPosition()).equals(pot);
+    expect(train.getWagons()).deep.equals([wagon]);
   });
 });
