@@ -4,7 +4,6 @@ import { Track } from '../../modules/Track/Track';
 import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
 import { WhichEnd } from '../Interfaces/WhichEnd';
 import { Platform } from './Platform';
-import { Updatable } from '../../mixins/Updatable';
 import { BaseBrick } from './BaseBrick';
 import { Train } from '../../modules/Train/Train';
 import { TrackWorm } from '../../modules/Train/TrackWorm';
@@ -17,8 +16,9 @@ import { WagonConnectable } from '../Actuals/Wagon/WagonConnectable';
 import { WagonMovingState } from '../Actuals/Wagon/WagonMovingState';
 import { Trip } from '../Scheduling/Trip';
 import { PositionOnTrack2 } from '../../modules/Train/PositionOnTrack2';
+import { Emitable } from '../../mixins/Emitable';
 
-export interface Wagon extends Boardable, BaseBrick, Updatable {
+export interface Wagon extends Boardable, BaseBrick, Emitable {
   init(config?: WagonConfig, trainId?: string): Wagon;
   update(): void;
   getA(): WagonEnd;

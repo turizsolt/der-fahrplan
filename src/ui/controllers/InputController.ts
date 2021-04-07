@@ -270,7 +270,7 @@ export class InputController {
                 this.selectCallback &&
                 selected.getType() === Symbol.for('Wagon')
               ) {
-                (selected as Wagon).unsubscribeToUpdates(this.selectCallback);
+                (selected as Wagon).off('update', this.selectCallback);
               }
 
               this.store.clearSelected();
@@ -302,7 +302,7 @@ export class InputController {
         this.selectCallback &&
         this.getSelected().getType() === Symbol.for('Wagon')
       ) {
-        (this.getSelected() as Wagon).unsubscribeToUpdates(this.selectCallback);
+        (this.getSelected() as Wagon).off('update', this.selectCallback);
       }
     }
 
@@ -312,7 +312,7 @@ export class InputController {
       this.selectCallback = (obj: Object): void => {
         this.vueSidebar.setData('selected', obj);
       };
-      (this.getSelected() as Wagon).subscribeToUpdates(this.selectCallback);
+      (this.getSelected() as Wagon).on('update', this.selectCallback);
     }
     this.vueSidebar.setData('selected', Object.freeze(storedObj.persistDeep()));
     this.vueSidebar.setData(

@@ -13,7 +13,6 @@ import { Store } from '../../Interfaces/Store';
 import { Platform } from '../../Interfaces/Platform';
 import { Passenger } from '../../Interfaces/Passenger';
 import { Coordinate } from '../../Geometry/Coordinate';
-import { Updatable } from '../../../mixins/Updatable';
 import { applyMixins } from '../../../mixins/ApplyMixins';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { Train } from '../../../modules/Train/Train';
@@ -37,9 +36,10 @@ import { Trip } from '../../Scheduling/Trip';
 import { WagonAxles } from '../../../modules/Train/WagonAxles';
 import { ActualWagonAxles } from '../../../modules/Train/ActualWagonAxles';
 import { PositionOnTrack2 } from '../../../modules/Train/PositionOnTrack2';
+import { Emitable } from '../../../mixins/Emitable';
 
-export interface ActualWagon extends Updatable { }
-const doApply = () => applyMixins(ActualWagon, [Updatable]);
+export interface ActualWagon extends Emitable { }
+const doApply = () => applyMixins(ActualWagon, [Emitable]);
 @injectable()
 export class ActualWagon extends ActualBaseBrick implements Wagon {
   private removed: boolean = false;
@@ -89,6 +89,9 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     }
 
     this.appearanceId = config ? config.appearanceId : 'wagon';
+
+    const deep = this.persistDeep();
+    this.emit('init', Object.freeze(deep));
 
     return this;
   }
@@ -267,7 +270,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.renderer.update();
 
     const deep = this.persistDeep();
-    this.notify(Object.freeze(deep));
+    this.emit('update', Object.freeze(deep));
   }
 
   ///////////////////////////
