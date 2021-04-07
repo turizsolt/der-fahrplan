@@ -92,8 +92,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
         ray: null
     }); //this.persistData());//Object.freeze(deep));
 
-    setInterval(() => this.update(),1000);
-
     return this;
   }
 

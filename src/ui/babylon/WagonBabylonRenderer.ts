@@ -33,7 +33,6 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
   private inited: boolean = false;
 
   init(wagon: WagonData) {
-    console.log('init', wagon);
     this.meshProvider = this.meshProviderFactory();
 
     this.mesh = this.meshProvider.createWagonMesh(
@@ -62,10 +61,8 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
   }
 
   update(wagon: WagonData) {
-    console.log('update', wagon);
     if (!this.inited) return;
     if (!wagon.ray) return;
-    console.log('update2', wagon);
 
     if (false) {
       // when removed

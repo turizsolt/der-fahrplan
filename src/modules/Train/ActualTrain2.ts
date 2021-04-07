@@ -16,6 +16,7 @@ export class ActualTrain2 extends ActualBaseStorable implements Train2 {
     this.position = pot;
     this.wagons = wagons;
     this.alignAxles();
+    this.wagons.map(wagon => wagon.update());
     return this;
   }
 
@@ -30,6 +31,7 @@ export class ActualTrain2 extends ActualBaseStorable implements Train2 {
   addWagons(wagons: Wagon[]): void {
     this.wagons.push(...wagons);
     this.alignAxles();
+    this.wagons.map(wagon => wagon.update());
   }
 
   merge(otherTrain: Train2): void {
