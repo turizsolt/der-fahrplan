@@ -7,7 +7,6 @@ import {
   WagonWithSide,
   WagonIdWithSide
 } from '../../structs/Interfaces/WagonWithSide';
-import { WagonEnd } from '../../structs/Actuals/Wagon/WagonEnd';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { Trip } from '../../structs/Scheduling/Trip';
 
@@ -19,7 +18,7 @@ export interface Train extends BaseStorable {
   setWagonsWithSides(wagonsWithSides: WagonWithSide[]);
   stoppedAt(station: Station, platform: Platform): void;
   getFreeWagon(): Wagon;
-  mergeWith(thisEnd: WagonEnd, other: Train, otherEnd: WagonEnd): void;
+  mergeWith(thisEnd: any, other: Train, otherEnd: any): void;
   separateThese(wagons: Wagon[]): void;
   moveBoardedPassengers(): void;
   hasLocomotive(): boolean;
@@ -35,5 +34,5 @@ export interface Train extends BaseStorable {
 
   getWagonsWithSides(): WagonWithSide[];
   getWagonIdsWithSides(): WagonIdWithSide[];
-  whichEndIsOn(end: WagonEnd): WhichEnd;
+  whichEndIsOn(end: any): WhichEnd;
 }

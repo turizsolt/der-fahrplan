@@ -26,11 +26,19 @@ const ioc = new DependencyContainer(productionContainer);
 addCommonMaps(ioc);
 ioc.map<Land>(T.Land, ActualLand);
 ioc.sng<MeshProvider>(T.FactoryOfMeshProvider, T.MeshProvider, MeshProvider);
-ioc.map<WagonRenderer>(T.WagonRenderer, WagonBabylonRenderer);
 ioc.map<TrackRenderer>(T.TrackRenderer, TrackBabylonRenderer);
 ioc.map<TrackSwitchRenderer>(T.TrackSwitchRenderer, TrackSwitchBabylonRenderer);
 ioc.map<StationRenderer>(T.StationRenderer, StationBabylonRenderer);
 ioc.map<PlatformRenderer>(T.PlatformRenderer, PlatformBabylonRenderer);
 ioc.map<PassengerRenderer>(T.PassengerRenderer, PassengerBabylonRenderer);
 
-ioc.fm<TrackJointRenderer>(T.FactoryOfTrackJointRenderer, T.TrackJointRenderer, TrackJointBabylonRenderer);
+ioc.fm<TrackJointRenderer>(
+  T.FactoryOfTrackJointRenderer,
+  T.TrackJointRenderer,
+  TrackJointBabylonRenderer
+);
+ioc.fm<WagonRenderer>(
+  T.FactoryOfWagonRenderer,
+  T.WagonRenderer,
+  WagonBabylonRenderer
+);

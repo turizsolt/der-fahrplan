@@ -55,6 +55,8 @@ export class WagonAnnouncement {
   }
 
   platformsBeside(): Platform[] {
+      return [];
+      /*
     const platformsInvolved: Platform[] = [];
     const trackA = this.parent.getA().positionOnTrack.getTrack();
     platformsInvolved.push(
@@ -72,6 +74,7 @@ export class WagonAnnouncement {
         }
       });
     return platformsInvolved;
+    */
   }
 
   stoppedAt(platform: Platform): void {

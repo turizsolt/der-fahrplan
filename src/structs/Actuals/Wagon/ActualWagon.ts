@@ -1,14 +1,11 @@
 import { inject, injectable } from 'inversify';
-import { PositionOnTrack } from '../../../modules/Train/PositionOnTrack';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { WhichEnd, otherEnd } from '../../Interfaces/WhichEnd';
-import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
+import { Wagon } from '../../Interfaces/Wagon';
 import { Ray } from '../../Geometry/Ray';
 import { TYPES } from '../../../di/TYPES';
 import { WagonRenderer } from '../../Renderers/WagonRenderer';
-import { TrackBase } from '../../../modules/Track/TrackBase';
 import { TrackWorm } from '../../../modules/Train/TrackWorm';
-import { WagonEnd } from './WagonEnd';
 import { Store } from '../../Interfaces/Store';
 import { Platform } from '../../Interfaces/Platform';
 import { Passenger } from '../../Interfaces/Passenger';
@@ -16,7 +13,6 @@ import { Coordinate } from '../../Geometry/Coordinate';
 import { applyMixins } from '../../../mixins/ApplyMixins';
 import { ActualBaseBrick } from '../ActualBaseBrick';
 import { Train } from '../../../modules/Train/Train';
-import { WagonPosition } from './WagonPosition';
 import {
   BoardableWagon,
   PassengerArrangement
@@ -37,15 +33,15 @@ import { WagonAxles } from '../../../modules/Train/WagonAxles';
 import { ActualWagonAxles } from '../../../modules/Train/ActualWagonAxles';
 import { PositionOnTrack2 } from '../../../modules/Train/PositionOnTrack2';
 import { Emitable } from '../../../mixins/Emitable';
+import { LineSegment } from '../../Geometry/LineSegment';
+import { WagonData } from '../../../modules/Train/WagonData';
 
 export interface ActualWagon extends Emitable { }
 const doApply = () => applyMixins(ActualWagon, [Emitable]);
 @injectable()
 export class ActualWagon extends ActualBaseBrick implements Wagon {
-  private removed: boolean = false;
   protected worm: TrackWorm;
 
-  protected position: WagonPosition;
   protected boardable: BoardableWagon;
   protected announcement: WagonAnnouncement;
   protected speed: WagonSpeed;
@@ -59,7 +55,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   init(config?: WagonConfig, trainId?: string): Wagon {
     super.initStore(TYPES.Wagon);
 
-    this.position = new WagonPosition(this, config && config.length);
     this.axles = new ActualWagonAxles();
     this.boardable = new BoardableWagon(
       this,
@@ -81,17 +76,23 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     }
 
     if (!config || config.controlType === WagonControlType.Locomotive) {
-      this.control = new WagonControlLocomotive(this);
+      this.control = new WagonControlLocomotive();
     } else if (config.controlType === WagonControlType.ControlCar) {
-      this.control = new WagonControlControlCar(this);
+      this.control = new WagonControlControlCar();
     } else {
       this.control = new WagonControlNothing();
     }
 
     this.appearanceId = config ? config.appearanceId : 'wagon';
 
-    const deep = this.persistDeep();
-    this.emit('init', Object.freeze(deep));
+    // const deep = this.persistDeep();
+    this.emit('init', {
+        id: this.id,
+        appearanceId: this.getAppearanceId(),
+        ray: null
+    }); //this.persistData());//Object.freeze(deep));
+
+    setInterval(() => this.update(),1000);
 
     return this;
   }
@@ -116,7 +117,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   disconnect(whichEnd: WhichEnd): void {
     if (this.speed.getMovingState() === WagonMovingState.Moving) return;
 
-    this.getEnd(whichEnd).disconnect();
+    // this.getEnd(whichEnd).disconnect();
   }
 
   getMovingState(): WagonMovingState {
@@ -130,22 +131,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     } else {
       return controllingWagon.getMovingState();
     }
-  }
-
-  getLastWagon(whichEnd: WhichEnd): Wagon {
-    let end = this.getEnd(whichEnd);
-    while (end.hasConnectedEndOf()) {
-      end = end.getConnectedEnd().getOppositeEnd();
-    }
-    return end.getEndOf();
-  }
-
-  private getLastWagonEnd(whichEnd: WhichEnd): WagonEnd {
-    let end = this.getEnd(whichEnd);
-    while (end.hasConnectedEndOf()) {
-      end = end.getConnectedEnd().getOppositeEnd();
-    }
-    return end;
   }
 
   setControlingWagon(wagon: Wagon): void {
@@ -170,6 +155,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   tick(): void {
+      /*
     this.speed.tick();
     if (this.getSpeed() !== 0) {
       if (this.speed.getMovingState() === WagonMovingState.Shunting) {
@@ -191,7 +177,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       }
     } else {
       this.update();
-    }
+    } */
+    this.update();
   }
 
   
@@ -212,11 +199,11 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   detach(): void {
-    if (this.getControlType() === WagonControlType.Nothing) return;
-    if (!this.isOneFree()) return;
+    // if (this.getControlType() === WagonControlType.Nothing) return;
+    // if (!this.isOneFree()) return;
 
-    this.getA().disconnect();
-    this.getB().disconnect();
+    // this.getA().disconnect();
+    // this.getB().disconnect();
   }
 
   getMaxSpeed(): number {
@@ -252,14 +239,9 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   remove(): boolean {
-    this.removed = true;
     this.worm.checkoutAll();
-    this.position.remove();
-    this.update();
+    this.emit('remove', this.id);
     return true;
-  }
-  isRemoved(): boolean {
-    return this.removed;
   }
 
   getRenderer(): BaseRenderer {
@@ -267,10 +249,11 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   update() {
-    this.renderer.update();
+    //this.renderer.update();
 
     const deep = this.persistDeep();
-    this.emit('update', Object.freeze(deep));
+    this.emit('update', this.persistData());
+    this.emit('info', Object.freeze(deep));
   }
 
   ///////////////////////////
@@ -351,83 +334,34 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   ///////////////////////////
 
   getCenterPos(): Coordinate {
-    return this.position.getCenterPos();
+    return this.getAxlePosition(WhichEnd.A)
+      .getRay()
+      .coord.midpoint(this.getAxlePosition(WhichEnd.B).getRay().coord);
   }
 
   getCenterRay(): Ray {
-    return this.position.getCenterRay();
+    return new Ray(
+      this.getCenterPos(),
+      this.getAxlePosition(WhichEnd.A)
+        .getRay()
+        .coord.whichDir2d(this.getAxlePosition(WhichEnd.B).getRay().coord)
+    );
   }
 
   getLength(): number {
-    return this.position.getLength();
-  }
-
-  getA(): WagonEnd {
-    return this.position.getA();
-  }
-
-  getB(): WagonEnd {
-    return this.position.getB();
-  }
-
-  getEnd(whichEnd: WhichEnd): WagonEnd {
-    return this.position.getEnd(whichEnd);
-  }
-
-  isAFree(): boolean {
-    return !this.position.getA().hasConnectedEndOf();
-  }
-
-  isBFree(): boolean {
-    return !this.position.getB().hasConnectedEndOf();
-  }
-
-  isOneFree(): boolean {
-    return this.isAFree() !== this.isBFree(); // xor
-  }
-
-  putOnTrack(
-    track: TrackBase,
-    position: number = 0,
-    direction: number = 1
-  ): void {
-    this.worm = this.position.putOnTrack(track, position, direction);
-    this.renderer.init(this);
-    this.update();
+    return 14; // todo
   }
 
   getRay(): Ray {
-    return this.position.getRay();
-  }
-
-  moveTowardsWagon(whichEnd: WhichEnd, distance: number): void {
-    if (whichEnd === WhichEnd.A) {
-      this.moveTowardsWagonA(distance);
-    } else if (whichEnd === WhichEnd.B) {
-      this.moveTowardsWagonB(distance);
-    }
-  }
-
-  moveTowardsWagonB(distance: number): void {
-    this.position.moveTowardsWagonB(distance);
-    this.getTrain().moveBoardedPassengers();
-  }
-
-  pullToPos(pot: PositionOnTrack, dir: number) {
-    this.position.pullToPos(pot, dir);
-  }
-
-  moveTowardsWagonA(distance: number): void {
-    this.position.moveTowardsWagonA(distance);
-    this.getTrain().moveBoardedPassengers();
-  }
-
-  getNearestWagon(whichEnd: WhichEnd): NearestWagon {
-    return this.position.getNearestWagon(whichEnd);
+    const ls = LineSegment.fromTwoPoints(
+      this.getAxlePosition(WhichEnd.A).getRay().coord,
+      this.getAxlePosition(WhichEnd.B).getRay().coord
+    );
+    return ls.getPointAtHalfway();
   }
 
   swapEnds(): void {
-    this.position.swapEnds();
+    // todo
     this.update();
   }
 
@@ -475,8 +409,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
         }
       },
 
-      A: this.getA().persist(),
-      B: this.getB().persist(),
+      // A: this.getA().persist(),
+      // B: this.getB().persist(),
 
       ...this.announcement.persist()
     };
@@ -492,6 +426,14 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     };
   }
 
+  persistData(): WagonData {
+      return {
+          id: this.id,
+          appearanceId: this.getAppearanceId(),
+          ray: this.getCenterRay().persist()
+      }
+  }
+
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(obj.config);
@@ -499,22 +441,22 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.setSeatCount(obj.seatCount, obj.seatColumns);
     this.boardable.load(obj.seats, store);
 
-    this.getA().load(obj.A, store);
-    this.getB().load(obj.B, store);
+    // this.getA().load(obj.A, store);
+    // this.getB().load(obj.B, store);
 
-    const track = this.getA().positionOnTrack.getTrack();
-    const bTrack = this.getB().positionOnTrack.getTrack();
-    if (track === bTrack) {
-      this.worm = new TrackWorm([track], this);
-    } else {
-      this.worm = new TrackWorm([track, bTrack], this);
-    }
+    // const track = this.getA().positionOnTrack.getTrack();
+    // const bTrack = this.getB().positionOnTrack.getTrack();
+    // if (track === bTrack) {
+    //   this.worm = new TrackWorm([track], this);
+    // } else {
+    //   this.worm = new TrackWorm([track, bTrack], this);
+    // }
 
     if (obj.trip) {
       this.assignTrip(store.get(obj.trip) as Trip);
     }
 
-    this.renderer.init(this);
+    // this.renderer.init(this);
   }
 }
 

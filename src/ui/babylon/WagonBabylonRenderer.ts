@@ -10,13 +10,14 @@ import { MaterialName } from './MaterialName';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { WagonMovingState } from '../../structs/Actuals/Wagon/WagonMovingState';
 import { WagonControlType } from '../../structs/Actuals/Wagon/WagonControl/WagonControlType';
+import { WagonData } from '../../modules/Train/WagonData';
+import { Ray } from '../../structs/Geometry/Ray';
 
 @injectable()
 export class WagonBabylonRenderer extends BaseBabylonRenderer
   implements WagonRenderer {
   private mesh: BABYLON.AbstractMesh;
   private selectedMesh: BABYLON.AbstractMesh;
-  private wagon: Wagon;
   readonly scene: BABYLON.Scene;
 
   private endAMesh: BABYLON.AbstractMesh;
@@ -31,37 +32,43 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
 
   private inited: boolean = false;
 
-  init(engine: Wagon) {
+  init(wagon: WagonData) {
+    console.log('init', wagon);
     this.meshProvider = this.meshProviderFactory();
-    this.wagon = engine;
 
     this.mesh = this.meshProvider.createWagonMesh(
-      this.wagon.getAppearanceId(),
-      'clickable-wagon-' + this.wagon.getId()
+      wagon.appearanceId,
+      'clickable-wagon-' + wagon.id
     );
     this.mesh.setEnabled(true);
 
+    /*
     this.selectedMesh = this.meshProvider.createSelectorMesh();
     this.selectedMesh.setEnabled(false);
 
     this.endAMesh = this.meshProvider.createWagonEndMesh(
-      'clickable-wagon-' + this.wagon.getId() + '-endA'
+      'clickable-wagon-' + wagon.id + '-endA'
     );
     this.endBMesh = this.meshProvider.createWagonEndMesh(
-      'clickable-wagon-' + this.wagon.getId() + '-endB'
+      'clickable-wagon-' + wagon.id + '-endB'
     );
 
     this.selectedAMesh = this.meshProvider.createSelectorMesh();
     this.selectedBMesh = this.meshProvider.createSelectorMesh();
+    */
 
     this.inited = true;
-    this.update();
+    this.update(wagon);
   }
 
-  update() {
+  update(wagon: WagonData) {
+    console.log('update', wagon);
     if (!this.inited) return;
+    if (!wagon.ray) return;
+    console.log('update2', wagon);
 
-    if (this.wagon.isRemoved()) {
+    if (false) {
+      // when removed
       this.mesh.setEnabled(false);
       this.selectedMesh.setEnabled(false);
       this.selectedAMesh.setEnabled(false);
@@ -69,11 +76,17 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
       this.endAMesh.setEnabled(false);
       this.endBMesh.setEnabled(false);
     } else {
-      const ray = this.wagon.getRay();
+      const ray = Ray.from(
+        wagon.ray.x,
+        wagon.ray.y,
+        wagon.ray.z,
+        wagon.ray.dirXZ
+      );
       this.mesh.position = CoordinateToBabylonVector3(ray.coord);
       this.mesh.position.y = 4.2;
       this.mesh.rotation.y = ray.dirXZ + Math.PI / 2;
 
+      /*
       if (
         this.wagon.getControlType() !== WagonControlType.Nothing ||
         !this.wagon.isSelected()
@@ -170,10 +183,12 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.selectedBMesh.position.y = 10;
         this.selectedBMesh.material = this.meshProvider.getMaterial(matB);
       }
+      */
     }
   }
 
   process(command: string) {
+    /*
     switch (command) {
       case 'forward':
         this.wagon.accelerate();
@@ -219,5 +234,6 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
         this.wagon.remove();
         break;
     }
+    */
   }
 }

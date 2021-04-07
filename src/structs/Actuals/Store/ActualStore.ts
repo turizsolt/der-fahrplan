@@ -19,6 +19,7 @@ import { CommandLog } from './Command/CommandLog';
 import { TrackJointRenderer } from '../../Renderers/TrackJointRenderer';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { Emitable } from '../../../mixins/Emitable';
+import { WagonRenderer } from '../../Renderers/WagonRenderer';
 
 @injectable()
 export class ActualStore implements Store {
@@ -44,6 +45,8 @@ export class ActualStore implements Store {
   private TrackJointRendererFactory: () => TrackJointRenderer;
   @inject(TYPES.FactoryOfPlatform) private PlatformFactory: () => Platform;
   @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
+  @inject(TYPES.FactoryOfWagonRenderer)
+  private WagonRendererFactory: () => WagonRenderer;
 
   @inject(TYPES.FactoryOfPassengerGenerator)
   private PassengerGeneratorFactory: () => PassengerGenerator;
@@ -85,7 +88,8 @@ export class ActualStore implements Store {
     };
 
     this.renderers = {
-      [TYPES.TrackJoint]: [this.TrackJointRendererFactory]
+      [TYPES.TrackJoint]: [this.TrackJointRendererFactory],
+      [TYPES.Wagon]: [this.WagonRendererFactory]
     };
 
     shortid.characters(

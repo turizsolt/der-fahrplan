@@ -158,7 +158,7 @@ export class CommandProcessor {
     train.init(
       new PositionOnTrack2(
         track,
-        position,
+        position * track.getLength(),
         direction === 1 ? TrackDirection.AB : TrackDirection.BA
       ),
       [wagon]

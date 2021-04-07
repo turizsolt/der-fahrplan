@@ -1,9 +1,10 @@
 import { Coordinate } from './Coordinate';
 import { almost, almostDirection } from './Almost';
 import { WhichEnd } from '../Interfaces/WhichEnd';
+import { RayData } from './RayData';
 
 export class Ray {
-  constructor(public coord: Coordinate, public dirXZ: number) { }
+  constructor(public coord: Coordinate, public dirXZ: number) {}
 
   static from(x: number, y: number, z: number, dirXZ: number): Ray {
     return new Ray(new Coordinate(x, y, z), dirXZ);
@@ -22,13 +23,13 @@ export class Ray {
   equ() {
     return this.slope() !== Infinity
       ? {
-        a: this.slope(),
-        b: this.coord.x - this.slope() * this.coord.z
-      }
+          a: this.slope(),
+          b: this.coord.x - this.slope() * this.coord.z
+        }
       : {
-        a: this.slope(),
-        z: this.coord.z
-      };
+          a: this.slope(),
+          z: this.coord.z
+        };
   }
 
   computeMidpoint(otherRay: Ray): undefined | false | Coordinate {
@@ -102,7 +103,7 @@ export class Ray {
       : WhichEnd.A;
   }
 
-  persist(): Object {
+  persist(): RayData {
     return {
       x: this.coord.x,
       y: this.coord.y,

@@ -9,7 +9,6 @@ import { Passenger } from '../../structs/Interfaces/Passenger';
 import { WagonControlType } from '../../structs/Actuals/Wagon/WagonControl/WagonControlType';
 import { WagonWithSide, WagonIdWithSide } from '../../structs/Interfaces/WagonWithSide';
 import { WhichEnd, otherEnd } from '../../structs/Interfaces/WhichEnd';
-import { WagonEnd } from '../../structs/Actuals/Wagon/WagonEnd';
 import { Trip } from '../../structs/Scheduling/Trip';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
@@ -49,7 +48,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }));
   }
 
-  whichEndIsOn(end: WagonEnd): WhichEnd {
+  whichEndIsOn(end: any): WhichEnd {
     if (this.wagonsWithSides[0].wagon === end.getEndOf()) {
       if (this.wagonsWithSides[0].side === end.getWhichEnd()) {
         return WhichEnd.A;
@@ -66,7 +65,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return null;
   }
 
-  mergeWith(thisEnd: WagonEnd, other: Train, otherEnd: WagonEnd): void {
+  mergeWith(thisEnd: any, other: Train, otherEnd: any): void {
     const thisWhichEnd = this.whichEndIsOn(thisEnd);
     const otherWhichEnd = other.whichEndIsOn(otherEnd);
 

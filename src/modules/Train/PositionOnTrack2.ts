@@ -3,6 +3,7 @@ import { TrackDirection } from '../Track/TrackDirection';
 import { DirectedTrack } from '../Track/DirectedTrack';
 import { Circle } from '../../structs/Geometry/Circle';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { Ray } from '../../structs/Geometry/Ray';
 
 export class PositionOnTrack2 {
   private directedTrack: DirectedTrack;
@@ -23,6 +24,13 @@ export class PositionOnTrack2 {
         ? TrackDirection.AB
         : TrackDirection.BA
     );
+  }
+
+  getRay(): Ray {
+    return this.directedTrack
+      .getCurve()
+      .getBezier()
+      .getRay(this.position / this.directedTrack.getLength());
   }
 
   reverse(): void {

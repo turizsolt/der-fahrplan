@@ -1,7 +1,4 @@
-import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
 import { Ray } from '../Geometry/Ray';
-import { Track } from '../../modules/Track/Track';
-import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
 import { WhichEnd } from '../Interfaces/WhichEnd';
 import { Platform } from './Platform';
 import { BaseBrick } from './BaseBrick';
@@ -21,21 +18,12 @@ import { Emitable } from '../../mixins/Emitable';
 export interface Wagon extends Boardable, BaseBrick, Emitable {
   init(config?: WagonConfig, trainId?: string): Wagon;
   update(): void;
-  getA(): WagonEnd;
-  getB(): WagonEnd;
-  getEnd(whichEnd: WhichEnd): WagonEnd;
   getRay(): Ray;
-  remove(): boolean;
-  isRemoved(): boolean;
-  isAFree(): boolean;
-  isBFree(): boolean;
-  isOneFree(): boolean;
   onStocked(): void;
   getSelectedSide(): WhichEnd | null;
   swapSelectedSide(): void;
   accelerate(): void;
   break(): void;
-  getLastWagon(whichEnd: WhichEnd): Wagon;
 
   setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack2): void;
   getAxlePosition(whichEnd: WhichEnd): PositionOnTrack2;
@@ -52,16 +40,10 @@ export interface Wagon extends Boardable, BaseBrick, Emitable {
   getWorm(): TrackWorm;
   getCenterRay(): Ray;
 
-  putOnTrack(track: Track, position?: number, direction?: number): void;
-  moveTowardsWagon(whichEnd: WhichEnd, distance: number): void;
-  moveTowardsWagonB(distance: number): void;
-  moveTowardsWagonA(distance: number): void;
   stop(): void;
 
   getLength(): number;
-  getNearestWagon(end: WhichEnd): NearestWagon;
   swapEnds(): void;
-  pullToPos(pot: PositionOnTrack, dir: number): void;
 
   assignTrip(trip: Trip): void;
   setTrip(trip: Trip): void;
@@ -94,10 +76,4 @@ export interface Wagon extends Boardable, BaseBrick, Emitable {
   halt(): void;
 
   platformsBeside(): Platform[];
-}
-
-export interface NearestWagon {
-  distance: number;
-  wagon: Wagon;
-  end: WagonEnd;
 }
