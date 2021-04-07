@@ -20,6 +20,9 @@ export class Emitable {
   }
 
   emit(event: string, data: any) {
+    if (!this.updateCallbacks) {
+      this.updateCallbacks = {};
+    }
     if (this.updateCallbacks[event]) {
       this.updateCallbacks[event].map(cb => cb(data));
     }

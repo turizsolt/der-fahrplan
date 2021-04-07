@@ -10,6 +10,10 @@ import { WhichEnd } from '../../../Interfaces/WhichEnd';
 import { WagonConfig } from '../../Wagon/WagonConfig';
 import { CommandLog } from './CommandLog';
 import { Ray } from '../../../Geometry/Ray';
+import { Train2 } from '../../../../modules/Train/Train2';
+import { TrackDirection } from '../../../../modules/Track/TrackDirection';
+import { PositionOnTrack2 } from '../../../../modules/Train/PositionOnTrack2';
+import { ActualTrain2 } from '../../../../modules/Train/ActualTrain2';
 
 export class CommandProcessor {
   constructor(private store: Store, private logStore: CommandLog) {}
@@ -135,7 +139,7 @@ export class CommandProcessor {
     trackSwitch.remove();
   }
 
-  createWagon(
+  createTrain(
     wagonId: string,
     trainId: string,
     wagonConfig: WagonConfig,
@@ -143,15 +147,27 @@ export class CommandProcessor {
     position: number,
     direction: number
   ): Wagon {
+    const train = new ActualTrain2();
+    train.presetId(trainId);
+
     const wagon = this.store.create<Wagon>(TYPES.Wagon);
-    const track = this.store.get(trackId) as Track;
     wagon.presetId(wagonId);
-    wagon.init(wagonConfig, trainId);
-    wagon.putOnTrack(track, position, direction);
+    wagon.init(wagonConfig);
+
+    const track = this.store.get(trackId) as Track;
+    train.init(
+      new PositionOnTrack2(
+        track,
+        position,
+        direction === 1 ? TrackDirection.AB : TrackDirection.BA
+      ),
+      [wagon]
+    );
+
     return wagon;
   }
 
-  uncreateWagon(
+  uncreateTrain(
     wagonId: string,
     trainId: string,
     wagonConfig: WagonConfig,
@@ -159,7 +175,7 @@ export class CommandProcessor {
     position: number,
     direction: number
   ): void {
-    const wagon = this.store.get(wagonId) as Wagon;
-    wagon.remove();
+    const train = this.store.get(trainId) as Train2;
+    train.remove();
   }
 }

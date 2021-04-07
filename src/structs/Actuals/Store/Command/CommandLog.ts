@@ -1,7 +1,12 @@
 import { Store } from '../../../Interfaces/Store';
 import { Emitable } from '../../../../mixins/Emitable';
 import { applyMixins } from '../../../../mixins/ApplyMixins';
-import { AssertionCommand, Command, ProcessableCommand, StatementCommand } from './Command';
+import {
+  AssertionCommand,
+  Command,
+  ProcessableCommand,
+  StatementCommand
+} from './Command';
 import { InputController } from '../../../../ui/controllers/InputController';
 import { CommandProcessor } from './CommandProcessor';
 import { CommandResultWithValue } from './CommandResultWithValue';
@@ -9,7 +14,7 @@ import { CommandMode } from './CommandMode';
 
 export const GENERATE_ID = 'GENERATE_ID';
 
-export interface CommandLog extends Emitable { }
+export interface CommandLog extends Emitable {}
 const doApply = () => applyMixins(CommandLog, [Emitable]);
 export class CommandLog {
   private actions: Command[] = [];
@@ -26,7 +31,7 @@ export class CommandLog {
     this.processor = new CommandProcessor(this.store, this);
   }
 
-  init() { }
+  init() {}
 
   setMode(mode: CommandMode): void {
     this.mode = mode;
@@ -46,16 +51,18 @@ export class CommandLog {
     return Object.freeze([...this.actions]);
   }
 
-  persist(): { mode: CommandMode, actions: readonly Command[] } {
+  persist(): { mode: CommandMode; actions: readonly Command[] } {
     return {
       mode: this.mode,
       actions: this.getActions()
-    }
+    };
   }
 
   private generateIds(command: Command): Command {
     if ((command as any).params) {
-      (command as any).params = (command as any).params.map(x => x === GENERATE_ID ? this.store.generateId() : x);
+      (command as any).params = (command as any).params.map(x =>
+        x === GENERATE_ID ? this.store.generateId() : x
+      );
     }
     return command;
   }
@@ -109,8 +116,10 @@ export class CommandLog {
     do {
       returned = this.runAction(this.nextAction);
       this.nextAction++;
-    }
-    while (returned.result === 'succeded' && this.nextAction < this.actions.length);
+    } while (
+      returned.result === 'succeded' &&
+      this.nextAction < this.actions.length
+    );
     return returned;
   }
 
@@ -119,25 +128,24 @@ export class CommandLog {
     do {
       this.nextAction--;
       returned = this.unrunAction(this.nextAction);
-    }
-    while (returned.result === 'succeded' && this.nextAction > 0);
+    } while (returned.result === 'succeded' && this.nextAction > 0);
     return returned;
   }
 
   runAction(index: number): CommandResultWithValue {
     if (this.actions[index]) {
-      try {
-        const action = this.actions[index];
-        const { result, returnValue } = this.runner[action.type](action);
-        this.actions[index].result = result;
-        this.emit('updated', this.persist());
-        return { result, returnValue };
-      } catch (e) {
-        console.log(e);
-        this.actions[index].result = 'exception-raised';
-        this.emit('updated', this.persist());
-        return { result: 'exception-raised' };
-      }
+      // try {
+      const action = this.actions[index];
+      const { result, returnValue } = this.runner[action.type](action);
+      this.actions[index].result = result;
+      this.emit('updated', this.persist());
+      return { result, returnValue };
+      // } catch (e) {
+      //   console.log(e);
+      //   this.actions[index].result = 'exception-raised';
+      //   this.emit('updated', this.persist());
+      //   return { result: 'exception-raised' };
+      // }
     } else {
       return { result: null };
     }
@@ -147,7 +155,9 @@ export class CommandLog {
     if (this.actions[index]) {
       try {
         const action = this.actions[index];
-        const { result, returnValue } = this.runner[action.type](this.undo(action));
+        const { result, returnValue } = this.runner[action.type](
+          this.undo(action)
+        );
         this.actions[index].result = undefined;
         this.emit('updated', this.persist());
         return { result, returnValue };
@@ -167,7 +177,7 @@ export class CommandLog {
       const procCommand = { ...command } as ProcessableCommand;
       procCommand.function = procCommand.function.startsWith('un')
         ? procCommand.function.slice(2)
-        : 'un' + procCommand.function
+        : 'un' + procCommand.function;
       return procCommand;
     } else {
       return command;
@@ -177,42 +187,44 @@ export class CommandLog {
   private runStatement = (commandToRun: Command): CommandResultWithValue => {
     const action = commandToRun as StatementCommand;
     const obj = this.store.get(action.object);
-    const returnValue = obj[action.function](...action.params.map(p => this.processParam(p)));
+    const returnValue = obj[action.function](
+      ...action.params.map(p => this.processParam(p))
+    );
     return { result: 'succeded', returnValue };
-  }
+  };
 
   private runAssertion = (commandToRun: Command): CommandResultWithValue => {
     const action = commandToRun as AssertionCommand;
     const obj = this.store.get(action.object);
-    const returnValue = obj[action.function](...action.params.map(p => this.processParam(p)));
+    const returnValue = obj[action.function](
+      ...action.params.map(p => this.processParam(p))
+    );
 
     // todo this is just a value comparison, deep equals needed later on
     return {
-      result: (
-        returnValue === action.equalsTo
-          ? 'succeded'
-          : 'failed'
-      ),
+      result: returnValue === action.equalsTo ? 'succeded' : 'failed',
       returnValue
     };
-  }
+  };
 
   private runProcessable = (commandToRun: Command): CommandResultWithValue => {
     const action = commandToRun as ProcessableCommand;
-    const returnValue = this.processor[action.function](...action.params.map(p => this.processParam(p)));
+    const returnValue = this.processor[action.function](
+      ...action.params.map(p => this.processParam(p))
+    );
     return { result: 'succeded', returnValue };
-  }
+  };
 
   private runTick = (commandToRun: Command): CommandResultWithValue => {
     // todo
     return { result: 'succeded' };
-  }
+  };
 
   private runner = {
-    'assertion': this.runAssertion,
-    'statement': this.runStatement,
-    'processable': this.runProcessable,
-    'tick': this.runTick
+    assertion: this.runAssertion,
+    statement: this.runStatement,
+    processable: this.runProcessable,
+    tick: this.runTick
   };
 }
 doApply();
