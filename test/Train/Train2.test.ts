@@ -99,4 +99,19 @@ describe('Train2', () => {
     expect(train.getPosition()).equals(endPot);
     expect(train.getWagons()).deep.equals([wagon, wagon2]);
   });
+
+  it('train put it.s wagons to position', () => {
+    const { track } = createTrack(100);
+    const pot = new PositionOnTrack2(track, 100, TrackDirection.AB);
+    const wagon = store.create<Wagon>(TYPES.Wagon).init();
+    const wagon2 = store.create<Wagon>(TYPES.Wagon).init();
+    const wagon3 = store.create<Wagon>(TYPES.Wagon).init();
+    new ActualTrain2().init(pot, [wagon, wagon2, wagon3]);
+    expect(wagon.getAxlePosition(WhichEnd.A).getPosition()).equals(100);
+    expect(wagon.getAxlePosition(WhichEnd.B).getPosition()).equals(86);
+    expect(wagon2.getAxlePosition(WhichEnd.A).getPosition()).equals(85);
+    expect(wagon2.getAxlePosition(WhichEnd.B).getPosition()).equals(71);
+    expect(wagon3.getAxlePosition(WhichEnd.A).getPosition()).equals(70);
+    expect(wagon3.getAxlePosition(WhichEnd.B).getPosition()).equals(56);
+  });
 });

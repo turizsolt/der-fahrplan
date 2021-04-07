@@ -62,9 +62,13 @@ export class ActualTrain2 extends ActualBaseStorable implements Train2 {
     const pos: PositionOnTrack2 = this.position.clone();
     pos.reverse();
     for (let wagon of this.wagons) {
-      wagon.setAxlePosition(WhichEnd.A, pos.clone());
+      const pos1 = pos.clone();
+      pos1.reverse();
+      wagon.setAxlePosition(WhichEnd.A, pos1);
       pos.hop(14);
-      wagon.setAxlePosition(WhichEnd.B, pos.clone());
+      const pos2 = pos.clone();
+      pos2.reverse();
+      wagon.setAxlePosition(WhichEnd.B, pos2);
       pos.hop(1);
     }
   }
