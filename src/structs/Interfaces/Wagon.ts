@@ -16,6 +16,7 @@ import { PassengerArrangement } from '../../mixins/BoardableWagon';
 import { WagonConnectable } from '../Actuals/Wagon/WagonConnectable';
 import { WagonMovingState } from '../Actuals/Wagon/WagonMovingState';
 import { Trip } from '../Scheduling/Trip';
+import { PositionOnTrack2 } from '../../modules/Train/PositionOnTrack2';
 
 export interface Wagon extends Boardable, BaseBrick, Updatable {
   init(config?: WagonConfig, trainId?: string): Wagon;
@@ -35,6 +36,10 @@ export interface Wagon extends Boardable, BaseBrick, Updatable {
   accelerate(): void;
   break(): void;
   getLastWagon(whichEnd: WhichEnd): Wagon;
+
+  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack2): void;
+  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack2;
+  axleReverse(): void;
 
   getMaxSpeed(): number;
   getAccelerateBy(): number;

@@ -34,6 +34,9 @@ import { WagonControlNothing } from './WagonControl/WagonControlNothing';
 import WagonSpeedPassenger from './WagonSpeedPassenger';
 import { WagonMovingState } from './WagonMovingState';
 import { Trip } from '../../Scheduling/Trip';
+import { WagonAxles } from '../../../modules/Train/WagonAxles';
+import { ActualWagonAxles } from '../../../modules/Train/ActualWagonAxles';
+import { PositionOnTrack2 } from '../../../modules/Train/PositionOnTrack2';
 
 export interface ActualWagon extends Updatable { }
 const doApply = () => applyMixins(ActualWagon, [Updatable]);
@@ -47,6 +50,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   protected announcement: WagonAnnouncement;
   protected speed: WagonSpeed;
   protected control: WagonControl;
+  protected axles: WagonAxles;
 
   private appearanceId: string;
 
@@ -56,6 +60,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     super.initStore(TYPES.Wagon);
 
     this.position = new WagonPosition(this, config && config.length);
+    this.axles = new ActualWagonAxles();
     this.boardable = new BoardableWagon(
       this,
       config && config.passengerArrangement
@@ -86,6 +91,18 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.appearanceId = config ? config.appearanceId : 'wagon';
 
     return this;
+  }
+
+  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack2): void {
+    this.axles.setAxlePosition(whichEnd, pot);
+  }
+
+  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack2 {
+    return this.axles.getAxlePosition(whichEnd);
+  }
+
+  axleReverse(): void {
+    return this.axles.reverse();
   }
 
   halt(): void {

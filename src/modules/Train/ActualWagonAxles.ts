@@ -22,4 +22,13 @@ export class ActualWagonAxles implements WagonAxles {
   getFacing(): TrackDirection {
     return this.facing;
   }
+
+  reverse(): void {
+    this.facing =
+      this.facing === TrackDirection.AB ? TrackDirection.BA : TrackDirection.AB;
+    this.positions = {
+      A: this.positions[WhichEnd.B],
+      B: this.positions[WhichEnd.A]
+    };
+  }
 }

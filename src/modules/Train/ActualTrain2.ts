@@ -4,7 +4,7 @@ import { Wagon } from '../../structs/Interfaces/Wagon';
 import { Train2 } from './Train2';
 import { Store } from '../../structs/Interfaces/Store';
 import { PositionOnTrack2 } from './PositionOnTrack2';
-import { TrackDirection } from '../Track/TrackDirection';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 
 export class ActualTrain2 extends ActualBaseStorable implements Train2 {
   private position: PositionOnTrack2 = null;
@@ -15,6 +15,7 @@ export class ActualTrain2 extends ActualBaseStorable implements Train2 {
 
     this.position = pot;
     this.wagons = wagons;
+    this.alignAxles();
     return this;
   }
 
@@ -28,22 +29,17 @@ export class ActualTrain2 extends ActualBaseStorable implements Train2 {
 
   addWagons(wagons: Wagon[]): void {
     this.wagons.push(...wagons);
+    this.alignAxles();
   }
 
   merge(otherTrain: Train2): void {
     this.wagons.push(...otherTrain.getWagons());
     otherTrain.remove();
+    this.alignAxles();
   }
 
   separate(wagon: Wagon, newTrainId?: string): Train2 {
-    // todo need to hassle to convert PoT to PoT2
-    const oldPot = wagon.getA().getPositionOnTrack();
-    const newPot = new PositionOnTrack2(
-      oldPot.getTrack(),
-      oldPot.getPercentage() * oldPot.getTrack().getLength(),
-      oldPot.getDirection() === 1 ? TrackDirection.AB : TrackDirection.BA
-    );
-
+    const newPot = wagon.getAxlePosition(WhichEnd.A);
     const preWagonPos = this.wagons.findIndex(x => x === wagon);
     const wagonPos = preWagonPos === -1 ? this.wagons.length : preWagonPos;
     const newWagons = this.wagons.slice(wagonPos);
@@ -56,6 +52,21 @@ export class ActualTrain2 extends ActualBaseStorable implements Train2 {
 
   reverse(): void {
     this.wagons = this.wagons.reverse();
+    this.wagons.map(wagon => wagon.axleReverse());
+    this.position = this.wagons[0].getAxlePosition(WhichEnd.A);
+  }
+
+  private alignAxles(): void {
+    if (!this.position) return;
+
+    const pos: PositionOnTrack2 = this.position.clone();
+    pos.reverse();
+    for (let wagon of this.wagons) {
+      wagon.setAxlePosition(WhichEnd.A, pos.clone());
+      pos.hop(14);
+      wagon.setAxlePosition(WhichEnd.B, pos.clone());
+      pos.hop(1);
+    }
   }
 
   persist(): Object {

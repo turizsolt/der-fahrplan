@@ -15,6 +15,16 @@ export class PositionOnTrack2 {
     this.directedTrack = track.getDirected(direction);
   }
 
+  clone(): PositionOnTrack2 {
+    return new PositionOnTrack2(
+      this.getTrack(),
+      this.getPosition(),
+      this.getTrack().getDirected(TrackDirection.AB) === this.getDirectedTrack()
+        ? TrackDirection.AB
+        : TrackDirection.BA
+    );
+  }
+
   reverse(): void {
     this.directedTrack = this.directedTrack.reverse();
     this.position = this.directedTrack.getLength() - this.position;
