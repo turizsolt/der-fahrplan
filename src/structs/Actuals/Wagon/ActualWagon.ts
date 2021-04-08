@@ -40,7 +40,7 @@ export interface ActualWagon extends Emitable { }
 const doApply = () => applyMixins(ActualWagon, [Emitable]);
 @injectable()
 export class ActualWagon extends ActualBaseBrick implements Wagon {
-  protected worm: TrackWorm;
+  // protected worm: TrackWorm;
 
   protected boardable: BoardableWagon;
   protected announcement: WagonAnnouncement;
@@ -203,11 +203,11 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   getWorm(): TrackWorm {
-    return this.worm;
+    return null; //this.worm;
   }
 
   remove(): boolean {
-    this.worm.checkoutAll();
+    //this.worm.checkoutAll();
     this.emit('remove', this.id);
     return true;
   }

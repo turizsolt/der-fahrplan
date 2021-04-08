@@ -75,6 +75,11 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }
   }
 
+  remove(): void {
+    this.wagons.map(wagon => wagon.remove());
+    this.store.unregister(this);
+  }
+
   persist(): Object {
     return {};
   }

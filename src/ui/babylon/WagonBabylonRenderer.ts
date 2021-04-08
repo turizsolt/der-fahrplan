@@ -41,6 +41,7 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
     );
     this.mesh.setEnabled(true);
 
+    this.meshes = [this.mesh];
     /*
     this.selectedMesh = this.meshProvider.createSelectorMesh();
     this.selectedMesh.setEnabled(false);

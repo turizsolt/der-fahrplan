@@ -22,7 +22,7 @@ export class ActualTrackSegment implements TrackSegment {
 
     // dt
     this.AB = new ActualDirectedTrack(this, new ActualTrackCurve(segmentData.coordinates));
-    this.BA = new ActualDirectedTrack(this, new ActualTrackCurve(segmentData.coordinates.reverse()));
+    this.BA = new ActualDirectedTrack(this, new ActualTrackCurve([...segmentData.coordinates].reverse()));
     this.AB.setReverse(this.BA);
     this.BA.setReverse(this.AB);
 
