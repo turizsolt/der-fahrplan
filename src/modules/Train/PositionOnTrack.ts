@@ -4,6 +4,8 @@ import { DirectedTrack } from '../Track/DirectedTrack';
 import { Circle } from '../../structs/Geometry/Circle';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { Ray } from '../../structs/Geometry/Ray';
+import { PositionData } from './PositionData';
+import { Store } from '../../structs/Interfaces/Store';
 
 export class PositionOnTrack {
   private directedTrack: DirectedTrack;
@@ -90,5 +92,21 @@ export class PositionOnTrack {
 
   getDirectedTrack(): DirectedTrack {
     return this.directedTrack;
+  }
+
+  persist(): PositionData {
+    return {
+      trackId: this.directedTrack.getTrack().getId(),
+      direction: this.directedTrack.getDirection(),
+      position: this.position
+    };
+  }
+
+  static fromData(data: PositionData, store: Store): PositionOnTrack {
+    return new PositionOnTrack(
+      store.get(data.trackId) as TrackBase,
+      data.position,
+      data.direction
+    );
   }
 }

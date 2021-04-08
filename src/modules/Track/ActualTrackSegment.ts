@@ -20,9 +20,8 @@ export class ActualTrackSegment implements TrackSegment {
   constructor(track: TrackBase, segmentData: TrackSegmentData) {
     this.track = track;
 
-    // dt
-    this.AB = new ActualDirectedTrack(this, new ActualTrackCurve(segmentData.coordinates));
-    this.BA = new ActualDirectedTrack(this, new ActualTrackCurve([...segmentData.coordinates].reverse()));
+    this.AB = new ActualDirectedTrack(this, new ActualTrackCurve(segmentData.coordinates), TrackDirection.AB);
+    this.BA = new ActualDirectedTrack(this, new ActualTrackCurve([...segmentData.coordinates].reverse()), TrackDirection.BA);
     this.AB.setReverse(this.BA);
     this.BA.setReverse(this.AB);
 

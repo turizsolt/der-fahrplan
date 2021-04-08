@@ -5,6 +5,7 @@ import { Train } from './Train';
 import { Store } from '../../structs/Interfaces/Store';
 import { PositionOnTrack } from './PositionOnTrack';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
+import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
@@ -78,6 +79,26 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   remove(): void {
     this.wagons.map(wagon => wagon.remove());
     this.store.unregister(this);
+  }
+
+  setPosition(position: PositionOnTrack): void {
+    this.position = position.clone();
+    this.alignAxles();
+    this.wagons.map(wagon => wagon.update());
+  }
+
+  tick(): void {
+    const nextPosition = this.position.clone();
+    nextPosition.move(0.1);
+    this.store
+      .getCommandLog()
+      .addAction(
+        CommandCreator.moveTrain(
+          this.id,
+          this.position.persist(),
+          nextPosition.persist()
+        )
+      );
   }
 
   persist(): Object {

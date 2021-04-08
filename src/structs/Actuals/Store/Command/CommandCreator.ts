@@ -2,6 +2,7 @@ import { Coordinate } from '../../../Geometry/Coordinate';
 import { WhichEnd } from '../../../Interfaces/WhichEnd';
 import { WagonConfig } from '../../Wagon/WagonConfig';
 import { ProcessableCommand } from './Command';
+import { PositionData } from '../../../../modules/Train/PositionData';
 
 export class CommandCreator {
   static createTrackJoint(id, x, z, angle): ProcessableCommand {
@@ -97,6 +98,30 @@ export class CommandCreator {
       type: 'processable',
       function: 'uncreateTrain',
       params: [wagonId, trainId, wagonConfig, trackId, position, direction]
+    };
+  }
+
+  static moveTrain(
+    trainId: string,
+    posFrom: PositionData,
+    posTo: PositionData
+  ): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'moveTrain',
+      params: [trainId, posFrom, posTo]
+    };
+  }
+
+  static unmoveTrain(
+    trainId: string,
+    posFrom: PositionData,
+    posTo: PositionData
+  ): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'unmoveTrain',
+      params: [trainId, posFrom, posTo]
     };
   }
 }

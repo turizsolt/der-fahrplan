@@ -10,4 +10,6 @@ export interface Train extends BaseStorable {
   merge(otherTrain: Train): void;
   separate(wagon: Wagon, newTrainId?: string): Train;
   reverse(): void;
+  tick(): void;
+  setPosition(position: PositionOnTrack): void;
 }

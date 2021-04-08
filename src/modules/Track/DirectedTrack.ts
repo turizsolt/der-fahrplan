@@ -1,6 +1,7 @@
 import { TrackSegment } from './TrackSegment';
 import { TrackBase } from './TrackBase';
 import { TrackCurve } from './TrackCurve';
+import { TrackDirection } from './TrackDirection';
 
 export interface DirectedTrack {
   next(): DirectedTrack;
@@ -13,4 +14,5 @@ export interface DirectedTrack {
   getTrack(): TrackBase;
   getCurve(): TrackCurve;
   getLength(): number;
+  getDirection(): TrackDirection;
 }

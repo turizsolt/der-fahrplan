@@ -61,7 +61,8 @@ const mockDirectedTrack: DirectedTrack = {
   getSegment: () => mockTrackSegment,
   getCurve: () => null,
   getLength: () => null,
-  getTrack: () => null
+  getTrack: () => null,
+  getDirection: () => null
 };
 const mockDirectedTrack2: DirectedTrack = { ...mockDirectedTrack };
 

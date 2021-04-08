@@ -234,8 +234,8 @@ export class ActualStore implements Store {
     }
 
     for (let i = 0; i < this.tickSpeed; i++) {
-      this.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {
-        wagon.tick();
+      this.getAllOf(TYPES.Train).map((train: Train) => {
+        train.tick();
       });
 
       if ((this.getTickCount() + i) % 120 === 0) {

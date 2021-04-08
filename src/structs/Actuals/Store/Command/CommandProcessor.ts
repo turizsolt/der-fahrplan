@@ -13,6 +13,7 @@ import { Ray } from '../../../Geometry/Ray';
 import { Train } from '../../../../modules/Train/Train';
 import { TrackDirection } from '../../../../modules/Track/TrackDirection';
 import { PositionOnTrack } from '../../../../modules/Train/PositionOnTrack';
+import { PositionData } from '../../../../modules/Train/PositionData';
 
 export class CommandProcessor {
   constructor(private store: Store, private logStore: CommandLog) {}
@@ -176,5 +177,19 @@ export class CommandProcessor {
   ): void {
     const train = this.store.get(trainId) as Train;
     train.remove();
+  }
+
+  moveTrain(trainId: string, posFrom: PositionData, posTo: PositionData): void {
+    const train = this.store.get(trainId) as Train;
+    train.setPosition(PositionOnTrack.fromData(posTo, this.store));
+  }
+
+  unmoveTrain(
+    trainId: string,
+    posFrom: PositionData,
+    posTo: PositionData
+  ): void {
+    const train = this.store.get(trainId) as Train;
+    train.setPosition(PositionOnTrack.fromData(posFrom, this.store));
   }
 }
