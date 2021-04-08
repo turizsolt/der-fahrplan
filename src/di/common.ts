@@ -22,10 +22,10 @@ import { ActualPassenger } from '../structs/Actuals/ActualPassenger';
 import { PassengerGenerator } from '../structs/Actuals/PassengerGenerator';
 import { ActualPassengerGenerator } from '../structs/Actuals/ActualPassengerGenerator';
 import { DependencyContainer } from './DependencyContainer';
-import { Train } from '../modules/Train/Train';
-import { ActualTrain } from '../modules/Train/ActualTrain';
 import { Trip } from '../structs/Scheduling/Trip';
 import { ActualTrip } from '../structs/Scheduling/ActualTrip';
+import { Train } from '../modules/Train/Train';
+import { ActualTrain } from '../modules/Train/ActualTrain';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);

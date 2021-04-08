@@ -9,10 +9,10 @@ import { injectable, inject } from 'inversify';
 import { Station } from '../Scheduling/Station';
 import { Route } from '../Scheduling/Route';
 import { Color } from '../Color';
-import { Train } from '../../modules/Train/Train';
 import { Store } from '../Interfaces/Store';
 import { ShortestPath } from '../Scheduling/ShortestPath';
 import { RouteStop } from '../Scheduling/RouteStop';
+import { Train } from '../../modules/Train/Train';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
@@ -77,8 +77,10 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
       .findIndex(s => s.getStation() === station);
     const toIndex = trip.getStops().findIndex((s, ind) => ind > stationIndex && s.getStation() === this.nextStation);
 
+    // todo redo everything
+
     if (toIndex !== -1 && stationIndex !== -1 && stationIndex < toIndex) {
-      const wagon = train.getFreeWagon();
+      const wagon = train.getWagons()[0]; //train.getFreeWagon();
       if (wagon) {
         this.setPlace(wagon);
         this.renderer.update();

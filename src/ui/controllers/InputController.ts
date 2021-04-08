@@ -31,10 +31,9 @@ import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
 import { Trip } from '../../structs/Scheduling/Trip';
 import { TickInputProps } from './TickInputProps';
-import { PassengerGenerator } from '../../structs/Actuals/PassengerGenerator';
 import { VueViewbox } from './VueViewbox';
-import { Train } from '../../modules/Train/Train';
 import { VueTestPanel } from './VueTestPanel';
+import { Train } from '../../modules/Train/Train';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -395,7 +394,7 @@ export class InputController {
           const pivot = wagon?.getTrain()?.getId();
           const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
           const newIndex = (index + 1) % list.length;
-          this.select(list[newIndex].getLastControlingWagon());
+          this.select(list[newIndex].getWagons()[0]);
         }
         break;
 
@@ -406,7 +405,7 @@ export class InputController {
           const pivot = wagon?.getTrain()?.getId();
           const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
           const newIndex = (index - 1) < 0 ? list.length + index - 1 : index - 1;
-          this.select(list[newIndex].getLastControlingWagon());
+          this.select(list[newIndex].getWagons()[0]);
         }
         break;
     }

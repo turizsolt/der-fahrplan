@@ -120,8 +120,8 @@ export default class VueWagon extends Vue {
     if (this.selectedCount === 0 && !isPreDefinedTrip) {
       const train = getStorable(this.obj.train.id) as Train;
       const trip = getStorable(vTripId) as Trip;
-      train.assignTrip(null);
-      train.assignTrip(trip);
+      // todo train.assignTrip(null);
+      // todo train.assignTrip(trip);
 
       this.showTripList = false;
     } else {
@@ -137,7 +137,7 @@ export default class VueWagon extends Vue {
 
       const train = getStorable(this.obj.train.id) as Train;
       const trip = getStorable(vTripId) as Trip;
-      train.assignTrip(trip, wagons);
+      // todo train.assignTrip(trip, wagons);
 
       this.showTripList = false;
     }
@@ -147,7 +147,7 @@ export default class VueWagon extends Vue {
   clearTrip() {
     if (this.selectedCount === 0) {
       const train = getStorable(this.obj.train.id) as Train;
-      train.assignTrip(null);
+      // todo train.assignTrip(null);
 
       this.showTripList = false;
     } else {
@@ -160,7 +160,7 @@ export default class VueWagon extends Vue {
         }
       }
       const train = getStorable(this.obj.train.id) as Train;
-      train.assignTrip(null, wagons);
+      // todo train.assignTrip(null, wagons);
 
       this.showTripList = false;
     }

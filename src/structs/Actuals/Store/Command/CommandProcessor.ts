@@ -10,10 +10,9 @@ import { WhichEnd } from '../../../Interfaces/WhichEnd';
 import { WagonConfig } from '../../Wagon/WagonConfig';
 import { CommandLog } from './CommandLog';
 import { Ray } from '../../../Geometry/Ray';
-import { Train2 } from '../../../../modules/Train/Train2';
+import { Train } from '../../../../modules/Train/Train';
 import { TrackDirection } from '../../../../modules/Track/TrackDirection';
 import { PositionOnTrack } from '../../../../modules/Train/PositionOnTrack';
-import { ActualTrain2 } from '../../../../modules/Train/ActualTrain2';
 
 export class CommandProcessor {
   constructor(private store: Store, private logStore: CommandLog) {}
@@ -147,12 +146,12 @@ export class CommandProcessor {
     position: number,
     direction: number
   ): Wagon {
-    const train = new ActualTrain2();
+    const train = this.store.create<Train>(TYPES.Train);
     train.presetId(trainId);
 
     const wagon = this.store.create<Wagon>(TYPES.Wagon);
     wagon.presetId(wagonId);
-    wagon.init(wagonConfig);
+    wagon.init(wagonConfig, train);
 
     const track = this.store.get(trackId) as Track;
     train.init(
@@ -175,7 +174,7 @@ export class CommandProcessor {
     position: number,
     direction: number
   ): void {
-    const train = this.store.get(trainId) as Train2;
+    const train = this.store.get(trainId) as Train;
     train.remove();
   }
 }

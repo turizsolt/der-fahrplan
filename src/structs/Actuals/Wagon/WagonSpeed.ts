@@ -11,11 +11,11 @@ export default class WagonSpeed {
     private wagon: Wagon,
     private maxSpeed: number = 3,
     private accelerateBy: number = 0.015625
-  ) { }
+  ) {}
 
   halt(): void {
     this.speed = 0;
-    this.wagon.clearControlingWagon();
+    // this.wagon.clearControlingWagon();
     this.shunting = false;
   }
 
@@ -35,8 +35,8 @@ export default class WagonSpeed {
     if (this.canAccelerate() && this.speed < this.maxSpeed) {
       if (this.speed === 0) {
         // todo these seems duplicate entries for the same purpose
-        this.wagon.getTrain().setMovingness(true);
-        this.wagon.setControlingWagon(this.wagon);
+        // this.wagon.getTrain().setMovingness(true);
+        // this.wagon.setControlingWagon(this.wagon);
       }
 
       this.speed += this.accelerateBy;
@@ -48,8 +48,8 @@ export default class WagonSpeed {
       this.speed -= this.accelerateBy;
     } else {
       this.speed = 0;
-      this.wagon.getTrain().setMovingness(false);
-      this.wagon.clearControlingWagon();
+      // this.wagon.getTrain().setMovingness(false);
+      // this.wagon.clearControlingWagon();
     }
     this.shunting = false;
   }
@@ -57,8 +57,8 @@ export default class WagonSpeed {
   shountForward(): void {
     if (this.canShunt()) {
       if (this.speed === 0) {
-        this.wagon.getTrain().setMovingness(true);
-        this.wagon.setControlingWagon(this.wagon);
+        // this.wagon.getTrain().setMovingness(true);
+        // this.wagon.setControlingWagon(this.wagon);
       }
 
       this.speed = this.accelerateBy;
@@ -69,8 +69,8 @@ export default class WagonSpeed {
   shountBackward(): void {
     if (this.canShunt()) {
       if (this.speed === 0) {
-        this.wagon.getTrain().setMovingness(true);
-        this.wagon.setControlingWagon(this.wagon);
+        // this.wagon.getTrain().setMovingness(true);
+        // this.wagon.setControlingWagon(this.wagon);
       }
 
       this.speed = -this.accelerateBy;
@@ -94,28 +94,29 @@ export default class WagonSpeed {
 
   private canAccelerate(): boolean {
     return (
-      !this.emergencyBreakApplied &&
-      !this.shunting &&
+      !this.emergencyBreakApplied && !this.shunting
+      /* &&
       this.wagon.canThisWagonControl() &&
       (this.wagon.getControlType() !== WagonControlType.ControlCar ||
         this.wagon.getTrain().hasLocomotive())
+        */
     );
   }
 
   private canShunt(): boolean {
-    return (
-      !this.emergencyBreakApplied &&
+    return !this.emergencyBreakApplied;
+    /*&&
       this.wagon.canThisWagonControl() &&
       (this.speed === 0 || this.shunting) &&
       this.wagon.getTrain().hasLocomotive()
-    );
+      */
   }
 
   getMovingState(): WagonMovingState {
     return this.shunting
       ? WagonMovingState.Shunting
       : this.speed > 0
-        ? WagonMovingState.Moving
-        : WagonMovingState.Standing;
+      ? WagonMovingState.Moving
+      : WagonMovingState.Standing;
   }
 }

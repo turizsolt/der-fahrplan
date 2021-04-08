@@ -2,7 +2,6 @@ import { Ray } from '../Geometry/Ray';
 import { WhichEnd } from '../Interfaces/WhichEnd';
 import { Platform } from './Platform';
 import { BaseBrick } from './BaseBrick';
-import { Train } from '../../modules/Train/Train';
 import { TrackWorm } from '../../modules/Train/TrackWorm';
 import { Passenger } from './Passenger';
 import { Boardable } from '../../mixins/Boardable';
@@ -14,9 +13,10 @@ import { WagonMovingState } from '../Actuals/Wagon/WagonMovingState';
 import { Trip } from '../Scheduling/Trip';
 import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
 import { Emitable } from '../../mixins/Emitable';
+import { Train } from '../../modules/Train/Train';
 
 export interface Wagon extends Boardable, BaseBrick, Emitable {
-  init(config?: WagonConfig, trainId?: string): Wagon;
+  init(config?: WagonConfig, train?: Train): Wagon;
   update(): void;
   getRay(): Ray;
   onStocked(): void;
@@ -66,13 +66,7 @@ export interface Wagon extends Boardable, BaseBrick, Emitable {
   shuntForward(): void;
   shuntBackward(): void;
 
-  setControlingWagon(wagon: Wagon): void;
-  getControlingWagon(): Wagon;
-  clearControlingWagon(): void;
-  canThisWagonControl(): boolean;
-
   disconnect(whichEnd: WhichEnd): void;
-  getMovingState(): WagonMovingState;
   halt(): void;
 
   platformsBeside(): Platform[];

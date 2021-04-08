@@ -12,7 +12,6 @@ import { Route } from '../../Scheduling/Route';
 import { Store } from '../../Interfaces/Store';
 import { Wagon } from '../../Interfaces/Wagon';
 import { Passenger } from '../../Interfaces/Passenger';
-import { Train } from '../../../modules/Train/Train';
 import { Trip } from '../../Scheduling/Trip';
 import { PassengerGenerator } from '../PassengerGenerator';
 import { CommandLog } from './Command/CommandLog';
@@ -20,6 +19,7 @@ import { TrackJointRenderer } from '../../Renderers/TrackJointRenderer';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { Emitable } from '../../../mixins/Emitable';
 import { WagonRenderer } from '../../Renderers/WagonRenderer';
+import { Train } from '../../../modules/Train/Train';
 
 @injectable()
 export class ActualStore implements Store {

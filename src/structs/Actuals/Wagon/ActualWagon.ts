@@ -12,7 +12,6 @@ import { Passenger } from '../../Interfaces/Passenger';
 import { Coordinate } from '../../Geometry/Coordinate';
 import { applyMixins } from '../../../mixins/ApplyMixins';
 import { ActualBaseBrick } from '../ActualBaseBrick';
-import { Train } from '../../../modules/Train/Train';
 import {
   BoardableWagon,
   PassengerArrangement
@@ -35,6 +34,7 @@ import { PositionOnTrack } from '../../../modules/Train/PositionOnTrack';
 import { Emitable } from '../../../mixins/Emitable';
 import { LineSegment } from '../../Geometry/LineSegment';
 import { WagonData } from '../../../modules/Train/WagonData';
+import { Train } from '../../../modules/Train/Train';
 
 export interface ActualWagon extends Emitable { }
 const doApply = () => applyMixins(ActualWagon, [Emitable]);
@@ -52,7 +52,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
-  init(config?: WagonConfig, trainId?: string): Wagon {
+  init(config?: WagonConfig, train?: Train): Wagon {
     super.initStore(TYPES.Wagon);
 
     this.axles = new ActualWagonAxles();
@@ -60,7 +60,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       this,
       config && config.passengerArrangement
     );
-    this.announcement = new WagonAnnouncement(this, this.store, trainId);
+    this.announcement = new WagonAnnouncement(this, this.store, train);
     if (config && config.controlType === WagonControlType.Nothing) {
       this.speed = new WagonSpeedPassenger(
         this,
@@ -116,36 +116,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     if (this.speed.getMovingState() === WagonMovingState.Moving) return;
 
     // this.getEnd(whichEnd).disconnect();
-  }
-
-  getMovingState(): WagonMovingState {
-    if (!this.getTrain().getControlingWagon()) {
-      return WagonMovingState.Standing;
-    }
-    const controllingWagon = this.getTrain().getControlingWagon();
-
-    if (controllingWagon === this) {
-      return this.speed.getMovingState();
-    } else {
-      return controllingWagon.getMovingState();
-    }
-  }
-
-  setControlingWagon(wagon: Wagon): void {
-    this.getTrain().setControlingWagon(wagon);
-  }
-
-  getControlingWagon(): Wagon {
-    return this.getTrain().getControlingWagon();
-  }
-
-  clearControlingWagon(): void {
-    this.getTrain().clearControlingWagon();
-  }
-
-  canThisWagonControl(): boolean {
-    const controlingWagon = this.getTrain().getControlingWagon();
-    return !controlingWagon || controlingWagon === this;
   }
 
   getSpeed(): number {
