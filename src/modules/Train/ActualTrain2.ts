@@ -3,14 +3,14 @@ import { TYPES } from '../../di/TYPES';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 import { Train2 } from './Train2';
 import { Store } from '../../structs/Interfaces/Store';
-import { PositionOnTrack2 } from './PositionOnTrack2';
+import { PositionOnTrack } from './PositionOnTrack';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 
 export class ActualTrain2 extends ActualBaseStorable implements Train2 {
-  private position: PositionOnTrack2 = null;
+  private position: PositionOnTrack = null;
   private wagons: Wagon[] = [];
 
-  init(pot: PositionOnTrack2, wagons: Wagon[]): Train2 {
+  init(pot: PositionOnTrack, wagons: Wagon[]): Train2 {
     // super.initStore(TYPES.Train);
 
     this.position = pot;
@@ -20,7 +20,7 @@ export class ActualTrain2 extends ActualBaseStorable implements Train2 {
     return this;
   }
 
-  getPosition(): PositionOnTrack2 {
+  getPosition(): PositionOnTrack {
     return this.position;
   }
 
@@ -61,7 +61,7 @@ export class ActualTrain2 extends ActualBaseStorable implements Train2 {
   private alignAxles(): void {
     if (!this.position) return;
 
-    const pos: PositionOnTrack2 = this.position.clone();
+    const pos: PositionOnTrack = this.position.clone();
     pos.reverse();
     for (let wagon of this.wagons) {
       const pos1 = pos.clone();

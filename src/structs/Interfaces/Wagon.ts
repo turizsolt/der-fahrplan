@@ -12,7 +12,7 @@ import { PassengerArrangement } from '../../mixins/BoardableWagon';
 import { WagonConnectable } from '../Actuals/Wagon/WagonConnectable';
 import { WagonMovingState } from '../Actuals/Wagon/WagonMovingState';
 import { Trip } from '../Scheduling/Trip';
-import { PositionOnTrack2 } from '../../modules/Train/PositionOnTrack2';
+import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
 import { Emitable } from '../../mixins/Emitable';
 
 export interface Wagon extends Boardable, BaseBrick, Emitable {
@@ -25,8 +25,8 @@ export interface Wagon extends Boardable, BaseBrick, Emitable {
   accelerate(): void;
   break(): void;
 
-  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack2): void;
-  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack2;
+  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack): void;
+  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack;
   axleReverse(): void;
 
   getMaxSpeed(): number;

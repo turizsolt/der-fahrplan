@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { PositionOnTrack2 } from '../../../src/modules/Train/PositionOnTrack2';
+import { PositionOnTrack } from '../../../src/modules/Train/PositionOnTrack';
 import { TrackDirection } from '../../../src/modules/Track/TrackDirection';
 import {
   createTrack,
@@ -13,16 +13,16 @@ chai.use(chaiAlmost());
 const AB = TrackDirection.AB;
 const BA = TrackDirection.BA;
 
-describe('PositionOnTrack2', () => {
+describe('PositionOnTrack', () => {
   it('create a PoT', () => {
     const { track } = createTrack();
-    const pot = new PositionOnTrack2(track, 0, AB);
+    const pot = new PositionOnTrack(track, 0, AB);
     expect(pot).not.equals(null);
   });
 
   it('reverse a PoT', () => {
     const { track } = createTrack();
-    const pot = new PositionOnTrack2(track, 0, AB);
+    const pot = new PositionOnTrack(track, 0, AB);
     expect(pot.getPosition()).equals(0);
     expect(pot.getDirectedTrack()).equals(track.getDirected(AB));
     pot.reverse();
@@ -32,7 +32,7 @@ describe('PositionOnTrack2', () => {
 
   it('reverse of reverse is idempotent', () => {
     const { track } = createTrack();
-    const pot = new PositionOnTrack2(track, 0, AB);
+    const pot = new PositionOnTrack(track, 0, AB);
     pot.reverse();
     pot.reverse();
     expect(pot.getPosition()).equals(0);
@@ -41,7 +41,7 @@ describe('PositionOnTrack2', () => {
 
   it('moving a PoT inside a track', () => {
     const { track } = createTrack();
-    const pot = new PositionOnTrack2(track, 0, AB);
+    const pot = new PositionOnTrack(track, 0, AB);
     expect(pot.getPosition()).equals(0);
     pot.move(10);
     expect(pot.getPosition()).equals(10);
@@ -51,7 +51,7 @@ describe('PositionOnTrack2', () => {
     const {
       track: [track1, track2, track3]
     } = createTrackLine(4, 10);
-    const pot = new PositionOnTrack2(track1, 5, AB);
+    const pot = new PositionOnTrack(track1, 5, AB);
     expect(pot.getPosition()).equals(5);
     expect(pot.getTrack()).equals(track1);
     pot.move(21);
@@ -63,7 +63,7 @@ describe('PositionOnTrack2', () => {
     const {
       track: [track1, track2]
     } = createTrackLine(3, 10);
-    const pot = new PositionOnTrack2(track1, 5, AB);
+    const pot = new PositionOnTrack(track1, 5, AB);
     expect(pot.getPosition()).equals(5);
     expect(pot.getTrack()).equals(track1);
     pot.move(100);
@@ -73,7 +73,7 @@ describe('PositionOnTrack2', () => {
 
   it('hoping a PoT inside a track', () => {
     const { track } = createTrack();
-    const pot = new PositionOnTrack2(track, 0, AB);
+    const pot = new PositionOnTrack(track, 0, AB);
     expect(pot.getPosition()).equals(0);
     pot.hop(10);
     expect(pot.getPosition()).equals(10);
@@ -83,7 +83,7 @@ describe('PositionOnTrack2', () => {
     const {
       track: [track1, track2, track3]
     } = createTrackLine(4, 10);
-    const pot = new PositionOnTrack2(track1, 5, AB);
+    const pot = new PositionOnTrack(track1, 5, AB);
     expect(pot.getPosition()).equals(5);
     expect(pot.getTrack()).equals(track1);
     pot.hop(21);
@@ -95,7 +95,7 @@ describe('PositionOnTrack2', () => {
     const {
       track: [track1, track2]
     } = createTrackLine(3, 10);
-    const pot = new PositionOnTrack2(track1, 5, AB);
+    const pot = new PositionOnTrack(track1, 5, AB);
     expect(pot.getPosition()).equals(5);
     expect(pot.getTrack()).equals(track1);
     pot.hop(100);
@@ -107,7 +107,7 @@ describe('PositionOnTrack2', () => {
     const {
       track: [track1, track2]
     } = createCurlyZigZagTrackLine(3, 100);
-    const pot = new PositionOnTrack2(track1, 140, AB);
+    const pot = new PositionOnTrack(track1, 140, AB);
     expect(pot.getPosition()).equals(140);
     expect(pot.getTrack()).equals(track1);
     pot.hop(30);
@@ -119,7 +119,7 @@ describe('PositionOnTrack2', () => {
     const {
       track: [track1, track2]
     } = createAlternatingTrackLine(3, 10);
-    const pot = new PositionOnTrack2(track1, 5, AB);
+    const pot = new PositionOnTrack(track1, 5, AB);
     expect(pot.getPosition()).equals(5);
     expect(pot.getTrack()).equals(track1);
     pot.hop(11);

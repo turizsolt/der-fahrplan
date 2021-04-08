@@ -1,13 +1,13 @@
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { TrackDirection } from '../Track/TrackDirection';
-import { PositionOnTrack2 } from './PositionOnTrack2';
+import { PositionOnTrack } from './PositionOnTrack';
 import { WagonAxles } from './WagonAxles';
 
 export class ActualWagonAxles implements WagonAxles {
-  private positions: Record<WhichEnd, PositionOnTrack2> = { A: null, B: null };
+  private positions: Record<WhichEnd, PositionOnTrack> = { A: null, B: null };
   private facing: TrackDirection = TrackDirection.AB;
 
-  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack2): void {
+  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack): void {
     this.positions[whichEnd] = pot;
   }
 
@@ -15,7 +15,7 @@ export class ActualWagonAxles implements WagonAxles {
     this.facing = facing;
   }
 
-  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack2 {
+  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack {
     return this.positions[whichEnd];
   }
 

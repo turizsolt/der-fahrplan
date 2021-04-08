@@ -1,11 +1,11 @@
 import { TrackDirection } from '../Track/TrackDirection';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
-import { PositionOnTrack2 } from './PositionOnTrack2';
+import { PositionOnTrack } from './PositionOnTrack';
 
 export interface WagonAxles {
-  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack2): void;
+  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack): void;
   setFacing(facing: TrackDirection): void;
-  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack2;
+  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack;
   getFacing(): TrackDirection;
   reverse(): void;
 }

@@ -12,7 +12,7 @@ import { CommandLog } from './CommandLog';
 import { Ray } from '../../../Geometry/Ray';
 import { Train2 } from '../../../../modules/Train/Train2';
 import { TrackDirection } from '../../../../modules/Track/TrackDirection';
-import { PositionOnTrack2 } from '../../../../modules/Train/PositionOnTrack2';
+import { PositionOnTrack } from '../../../../modules/Train/PositionOnTrack';
 import { ActualTrain2 } from '../../../../modules/Train/ActualTrain2';
 
 export class CommandProcessor {
@@ -156,7 +156,7 @@ export class CommandProcessor {
 
     const track = this.store.get(trackId) as Track;
     train.init(
-      new PositionOnTrack2(
+      new PositionOnTrack(
         track,
         position * track.getLength(),
         direction === 1 ? TrackDirection.AB : TrackDirection.BA

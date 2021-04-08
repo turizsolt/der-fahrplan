@@ -31,7 +31,7 @@ import { WagonMovingState } from './WagonMovingState';
 import { Trip } from '../../Scheduling/Trip';
 import { WagonAxles } from '../../../modules/Train/WagonAxles';
 import { ActualWagonAxles } from '../../../modules/Train/ActualWagonAxles';
-import { PositionOnTrack2 } from '../../../modules/Train/PositionOnTrack2';
+import { PositionOnTrack } from '../../../modules/Train/PositionOnTrack';
 import { Emitable } from '../../../mixins/Emitable';
 import { LineSegment } from '../../Geometry/LineSegment';
 import { WagonData } from '../../../modules/Train/WagonData';
@@ -95,11 +95,11 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this;
   }
 
-  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack2): void {
+  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack): void {
     this.axles.setAxlePosition(whichEnd, pot);
   }
 
-  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack2 {
+  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack {
     return this.axles.getAxlePosition(whichEnd);
   }
 

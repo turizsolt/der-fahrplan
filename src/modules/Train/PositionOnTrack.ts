@@ -1,242 +1,94 @@
 import { TrackBase } from '../Track/TrackBase';
-import { Platform } from '../../structs/Interfaces/Platform';
-import { Ray } from '../../structs/Geometry/Ray';
+import { TrackDirection } from '../Track/TrackDirection';
+import { DirectedTrack } from '../Track/DirectedTrack';
 import { Circle } from '../../structs/Geometry/Circle';
-import { Store } from '../../structs/Interfaces/Store';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { Ray } from '../../structs/Geometry/Ray';
 
 export class PositionOnTrack {
-  private percentage: number;
+  private directedTrack: DirectedTrack;
+
   constructor(
-    private track: TrackBase,
-    private position: number = 0,
-    private direction: number = 1
+    track: TrackBase,
+    private position: number,
+    direction: TrackDirection
   ) {
-    this.percentage = position;
-    this.position = position * track.getCurve().getLength();
+    this.directedTrack = track.getDirected(direction);
   }
 
-  persist(): Object {
-    return {
-      track: this.track && this.track.getId(),
-      position: this.position,
-      percentage: this.percentage,
-      direction: this.direction
-    };
-  }
-
-  load(obj: any, store: Store): void {
-    this.track = store.get(obj.track) as TrackBase;
-    this.position = obj.position;
-    this.percentage = obj.percentage;
-    this.direction = obj.direction;
-  }
-
-  swapDirection() {
-    this.direction = -this.direction;
-  }
-
-  copyFrom(other: PositionOnTrack) {
-    this.percentage = other.percentage;
-    this.track = other.track;
-    this.direction = other.direction;
-  }
-
-  getTrack() {
-    return this.track;
+  clone(): PositionOnTrack {
+    return new PositionOnTrack(
+      this.getTrack(),
+      this.getPosition(),
+      this.getTrack().getDirected(TrackDirection.AB) === this.getDirectedTrack()
+        ? TrackDirection.AB
+        : TrackDirection.BA
+    );
   }
 
   getRay(): Ray {
-    return this.track
+    return this.directedTrack
       .getCurve()
       .getBezier()
-      .getRay(this.getPercentage());
+      .getRay(this.position / this.directedTrack.getLength());
   }
 
-  getDirection(): number {
-    return this.direction;
+  reverse(): void {
+    this.directedTrack = this.directedTrack.reverse();
+    this.position = this.directedTrack.getLength() - this.position;
   }
 
-  getConstantAngle(): number {
-    const dir = this.getRay().dirXZ;
-    if (this.direction === 1) {
-      return dir;
+  move(distance: number): void {
+    if (this.position + distance > this.directedTrack.getLength()) {
+      if (this.directedTrack.next()) {
+        const tillEnd = this.directedTrack.getLength() - this.position;
+        this.directedTrack = this.directedTrack.next();
+        this.position = 0;
+        this.move(distance - tillEnd);
+      } else {
+        this.position = this.directedTrack.getLength();
+      }
     } else {
-      if (dir > 0) return dir - Math.PI;
-      return dir + Math.PI;
+      this.position += distance;
     }
   }
 
-  isBeside(platform: Platform): boolean {
-    return platform.isBeside(this.position);
-  }
-
-  getPercentage(): number {
-    return this.percentage;
-    //return this.position / this.track.getLength();
-  }
-
-  setPercentage(percentage: number): void {
-    this.percentage = percentage;
-    this.position = this.track.getLength() * percentage;
-  }
-
-  move(distance: number) {
-    const product = this.direction * distance;
-    if (product !== 0) {
-      if (product > 0) {
-        this.moveTowardsB();
-      } else {
-        this.moveTowardsA();
-      }
-    }
-  }
-
-  hop(distance: number): TrackBase[] {
-    const product = this.direction * distance;
-    if (product !== 0) {
-      if (product > 0) {
-        return this.hopTowardsB(Math.abs(distance));
-      } else {
-        return this.hopTowardsA(Math.abs(distance));
-      }
-    }
-    return [this.track];
-  }
-
-  private moveTowardsA(): void {
-    this.position -= 1;
-
-    // if (this.position < 0) {
-    //   const end = this.track.getA();
-    //   if (end.hasConnectedEndOf()) {
-    //     this.moveNextOnA(end);
-    //   } else {
-    //     this.stopOnA();
-    //   }
-    // }
-  }
-
-  private moveTowardsB(): void {
-    this.position += 1;
-
-    const trackLength = this.track.getLength();
-    // if (this.position > trackLength) {
-    //   const end = this.track.getB();
-    //   if (end.hasConnectedEndOf()) {
-    //     this.moveNextOnB(end, trackLength);
-    //   } else {
-    //     this.stopOnB();
-    //   }
-    // }
-  }
-
-  private hopTowardsB(distance): TrackBase[] {
-    const ret = [this.track];
-    const lastPoint = this.track.getCurve().getLastPoint();
-
-    let bezier = this.track.getCurve().getBezier();
-    const point = bezier.getPoint(this.getPercentage());
-    let fun = t => t > this.getPercentage();
-
-    // if (lastPoint.distance2d(point) < distance) {
-    //   if (this.track.getB().hasConnectedEndOf()) {
-    //     if (!this.track.getB().isSwitchingEnds()) {
-    //       this.direction = -this.direction;
-    //     }
-    //     const nextTrack = this.moveToNextTrack(this.track.getB());
-    //     ret.push(nextTrack);
-    //     bezier = this.track.getCurve().getBezier();
-    //     fun = t => true;
-    //   } else {
-    //     this.setPercentage(1);
-    //     return ret;
-    //   }
-    // }
-
+  hop(distance: number, prevPoint?: Coordinate): void {
+    const lastPoint = this.directedTrack.getCurve().getLastPoint();
+    const bezier = this.directedTrack.getCurve().getBezier();
+    const point =
+      prevPoint ||
+      bezier.getPoint(this.position / this.getDirectedTrack().getLength());
     const circle = new Circle(point, distance);
-    const vals = bezier.intersectWithCircle(circle).filter(fun);
-    this.setPercentage(vals[0]);
-    return ret;
+
+    if (lastPoint.distance2d(point) < distance) {
+      if (this.directedTrack.next()) {
+        this.directedTrack = this.directedTrack.next();
+        this.position = 0;
+        this.hop(distance, point);
+      } else {
+        this.position = this.directedTrack.getLength();
+      }
+    } else {
+      const intersectionPoints = bezier
+        .intersectWithCircle(circle)
+        .map(t => t * this.getDirectedTrack().getLength())
+        .filter(t => t > this.position);
+      this.position = intersectionPoints[0];
+    }
   }
 
-  private hopTowardsA(distance): TrackBase[] {
-    const ret = [this.track];
-    const firstPoint = this.track.getCurve().getFirstPoint();
+  // getters
 
-    let bezier = this.track.getCurve().getBezier();
-    const point = bezier.getPoint(this.getPercentage());
-    let fun = t => t < this.getPercentage();
-
-    // if (firstPoint.distance2d(point) < distance) {
-    //   if (this.track.getA().hasConnectedEndOf()) {
-    //     if (!this.track.getA().isSwitchingEnds()) {
-    //       this.direction = -this.direction;
-    //     }
-    //     const nextTrack = this.moveToNextTrack(this.track.getA());
-    //     ret.push(nextTrack);
-    //     bezier = this.track.getCurve().getBezier();
-    //     fun = t => true;
-    //   } else {
-    //     this.setPercentage(0);
-    //     return ret;
-    //   }
-    // }
-
-    const circle = new Circle(point, distance);
-    const vals = bezier.intersectWithCircle(circle);
-    const vals2 = vals.filter(fun);
-    this.setPercentage(vals2[0]);
-    return ret;
+  getPosition(): number {
+    return this.position;
   }
 
-  //   private moveNextOnA(end: TrackEnd) {
-  //     this.moveToNextTrack(end);
-  //     if (end.isSwitchingEnds()) {
-  //       this.movePositionAB();
-  //     } else {
-  //       this.movePositionAA();
-  //     }
-  //   }
-
-  //   private moveNextOnB(end: TrackEnd, oldTrackLength: number) {
-  //     this.moveToNextTrack(end);
-  //     if (end.isSwitchingEnds()) {
-  //       this.movePositionBA(oldTrackLength);
-  //     } else {
-  //       this.movePositionBB(oldTrackLength);
-  //     }
-  //   }
-
-  //   private moveToNextTrack(end: TrackEnd) {
-  //     this.track = end.getConnectedEndOf();
-  //     return this.track;
-  //   }
-
-  private movePositionAA() {
-    const overRun = -this.position;
-    this.position = overRun;
-    this.direction = -this.direction;
+  getTrack(): TrackBase {
+    return this.directedTrack.getTrack();
   }
 
-  private movePositionAB() {
-    this.position += this.track.getLength();
-  }
-
-  private movePositionBA(oldTrackLength: number) {
-    this.position -= oldTrackLength;
-  }
-
-  private movePositionBB(oldTrackLength: number) {
-    const overRun = this.position - oldTrackLength;
-    this.position = this.track.getLength() - overRun;
-    this.direction = -this.direction;
-  }
-
-  private stopOnA() {
-    this.position = 0;
-  }
-
-  private stopOnB() {
-    this.position = this.track.getLength();
+  getDirectedTrack(): DirectedTrack {
+    return this.directedTrack;
   }
 }
