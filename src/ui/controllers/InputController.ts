@@ -35,6 +35,7 @@ import { VueViewbox } from './VueViewbox';
 import { VueTestPanel } from './VueTestPanel';
 import { Train } from '../../modules/Train/Train';
 import { SpeedPedal } from '../../modules/Train/SpeedPedal';
+import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -416,14 +417,28 @@ export class InputController {
     switch (key) {
       case 'ArrowUp':
         if (this.getSelected().getType() === TYPES.Wagon) {
-            (this.getSelected() as Wagon).getTrain().getSpeed().setPedal(SpeedPedal.Throttle);
+            const train = ((this.getSelected() as Wagon).getTrain());
+            this.store.getCommandLog().addAction(
+                CommandCreator.pedalTrain(
+                    train.getId(),
+                    train.getSpeed().getPedal(),
+                    SpeedPedal.Throttle
+                )
+            );
         }
         break;
 
       case 'ArrowDown':
-        if (this.getSelected().getType() === TYPES.Wagon) {
-          (this.getSelected() as Wagon).getTrain().getSpeed().setPedal(SpeedPedal.Brake);
-        }
+      if (this.getSelected().getType() === TYPES.Wagon) {
+        const train = ((this.getSelected() as Wagon).getTrain());
+        this.store.getCommandLog().addAction(
+            CommandCreator.pedalTrain(
+                train.getId(),
+                train.getSpeed().getPedal(),
+                SpeedPedal.Brake
+            )
+        );
+    }
         break;
   
     }
@@ -531,7 +546,14 @@ export class InputController {
       case 'ArrowUp':
       case 'ArrowDown':
         if (this.getSelected().getType() === TYPES.Wagon) {
-            (this.getSelected() as Wagon).getTrain().getSpeed().setPedal(SpeedPedal.Neutral);
+            const train = ((this.getSelected() as Wagon).getTrain());
+            this.store.getCommandLog().addAction(
+                CommandCreator.pedalTrain(
+                    train.getId(),
+                    train.getSpeed().getPedal(),
+                    SpeedPedal.Neutral
+                )
+            );
         }
         break;
 

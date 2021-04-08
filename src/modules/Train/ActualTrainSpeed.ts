@@ -28,6 +28,10 @@ export class ActualTrainSpeed implements TrainSpeed {
     return this.speed;
   }
 
+  getPedal(): SpeedPedal {
+    return this.pedal;
+  }
+
   tick(): void {
     switch (this.pedal) {
       case SpeedPedal.Throttle:

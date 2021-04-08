@@ -18,6 +18,7 @@ describe('TrainSpeed', () => {
     speed.setPedal(SpeedPedal.Throttle);
     speed.tick();
     expect(speed.getSpeed()).gt(0);
+    expect(speed.getPedal()).equals(SpeedPedal.Throttle);
     speed.setShunting(true);
     expect(speed.isShunting()).is.false;
     speed.setPedal(SpeedPedal.Brake);

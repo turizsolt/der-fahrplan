@@ -3,6 +3,7 @@ import { WhichEnd } from '../../../Interfaces/WhichEnd';
 import { WagonConfig } from '../../Wagon/WagonConfig';
 import { ProcessableCommand } from './Command';
 import { PositionData } from '../../../../modules/Train/PositionData';
+import { SpeedPedal } from '../../../../modules/Train/SpeedPedal';
 
 export class CommandCreator {
   static createTrackJoint(id, x, z, angle): ProcessableCommand {
@@ -122,6 +123,30 @@ export class CommandCreator {
       type: 'processable',
       function: 'unmoveTrain',
       params: [trainId, posFrom, posTo]
+    };
+  }
+
+  static pedalTrain(
+    trainId: string,
+    pedalFrom: SpeedPedal,
+    pedalTo: SpeedPedal
+  ): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'pedalTrain',
+      params: [trainId, pedalFrom, pedalTo]
+    };
+  }
+
+  static unpedalTrain(
+    trainId: string,
+    pedalFrom: SpeedPedal,
+    pedalTo: SpeedPedal
+  ): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'unpedalTrain',
+      params: [trainId, pedalFrom, pedalTo]
     };
   }
 }
