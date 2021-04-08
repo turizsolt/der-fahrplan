@@ -34,6 +34,7 @@ import { TickInputProps } from './TickInputProps';
 import { VueViewbox } from './VueViewbox';
 import { VueTestPanel } from './VueTestPanel';
 import { Train } from '../../modules/Train/Train';
+import { SpeedPedal } from '../../modules/Train/SpeedPedal';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -409,6 +410,23 @@ export class InputController {
         }
         break;
     }
+
+    if (!this.getSelected()) return;
+
+    switch (key) {
+      case 'ArrowUp':
+        if (this.getSelected().getType() === TYPES.Wagon) {
+            (this.getSelected() as Wagon).getTrain().getSpeed().setPedal(SpeedPedal.Throttle);
+        }
+        break;
+
+      case 'ArrowDown':
+        if (this.getSelected().getType() === TYPES.Wagon) {
+          (this.getSelected() as Wagon).getTrain().getSpeed().setPedal(SpeedPedal.Brake);
+        }
+        break;
+  
+    }
   }
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
@@ -510,6 +528,14 @@ export class InputController {
         }
         break;
 
+      case 'ArrowUp':
+      case 'ArrowDown':
+        if (this.getSelected().getType() === TYPES.Wagon) {
+            (this.getSelected() as Wagon).getTrain().getSpeed().setPedal(SpeedPedal.Neutral);
+        }
+        break;
+
+
       case 'Z':
         this.getSelectedBrick()
           .getRenderer()
@@ -566,18 +592,6 @@ export class InputController {
         this.getSelectedBrick()
           .getRenderer()
           .process('shuntBackward');
-        break;
-
-      case 'ArrowUp':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('forward');
-        break;
-
-      case 'ArrowDown':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('backward');
         break;
     }
   }

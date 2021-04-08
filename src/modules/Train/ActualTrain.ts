@@ -6,10 +6,13 @@ import { Store } from '../../structs/Interfaces/Store';
 import { PositionOnTrack } from './PositionOnTrack';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
+import { TrainSpeed } from './TrainSpeed';
+import { ActualTrainSpeed } from './ActualTrainSpeed';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
   private wagons: Wagon[] = [];
+  private speed: TrainSpeed = null;
 
   init(pot: PositionOnTrack, wagons: Wagon[]): Train {
     super.initStore(TYPES.Train);
@@ -18,7 +21,13 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.wagons = wagons;
     this.alignAxles();
     this.wagons.map(wagon => wagon.update());
+
+    this.speed = new ActualTrainSpeed();
     return this;
+  }
+
+  getSpeed(): TrainSpeed {
+    return this.speed;
   }
 
   getPosition(): PositionOnTrack {
@@ -88,8 +97,11 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   tick(): void {
+    this.speed.tick();
+    if (this.speed.getSpeed() === 0) return;
+
     const nextPosition = this.position.clone();
-    nextPosition.move(0.1);
+    nextPosition.move(this.speed.getSpeed());
     this.store
       .getCommandLog()
       .addAction(

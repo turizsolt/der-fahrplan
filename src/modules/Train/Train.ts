@@ -1,6 +1,7 @@
 import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 import { PositionOnTrack } from './PositionOnTrack';
+import { TrainSpeed } from './TrainSpeed';
 
 export interface Train extends BaseStorable {
   init(pot: PositionOnTrack, wagons: Wagon[]): Train;
@@ -12,4 +13,5 @@ export interface Train extends BaseStorable {
   reverse(): void;
   tick(): void;
   setPosition(position: PositionOnTrack): void;
+  getSpeed(): TrainSpeed;
 }
