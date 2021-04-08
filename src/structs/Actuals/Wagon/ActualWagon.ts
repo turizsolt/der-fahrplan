@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { WhichEnd, otherEnd } from '../../Interfaces/WhichEnd';
+import { WhichEnd } from '../../Interfaces/WhichEnd';
 import { Wagon } from '../../Interfaces/Wagon';
 import { Ray } from '../../Geometry/Ray';
 import { TYPES } from '../../../di/TYPES';
@@ -17,7 +17,6 @@ import {
   PassengerArrangement
 } from '../../../mixins/BoardableWagon';
 import { WagonAnnouncement } from './WagonAnnouncement';
-import WagonSpeed from './WagonSpeed';
 import { WagonControlType } from './WagonControl/WagonControlType';
 import { WagonConnectable } from './WagonConnectable';
 import { WagonConfig } from './WagonConfig';
@@ -25,8 +24,6 @@ import { WagonControl } from './WagonControl/WagonControl';
 import { WagonControlLocomotive } from './WagonControl/WagonControlLocomotive';
 import { WagonControlControlCar } from './WagonControl/WagonControlControlCar';
 import { WagonControlNothing } from './WagonControl/WagonControlNothing';
-import WagonSpeedPassenger from './WagonSpeedPassenger';
-import { WagonMovingState } from './WagonMovingState';
 import { Trip } from '../../Scheduling/Trip';
 import { WagonAxles } from '../../../modules/Train/WagonAxles';
 import { ActualWagonAxles } from '../../../modules/Train/ActualWagonAxles';
@@ -44,7 +41,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   protected boardable: BoardableWagon;
   protected announcement: WagonAnnouncement;
-  protected speed: WagonSpeed;
   protected control: WagonControl;
   protected axles: WagonAxles;
 
@@ -61,19 +57,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       config && config.passengerArrangement
     );
     this.announcement = new WagonAnnouncement(this, this.store, train);
-    if (config && config.controlType === WagonControlType.Nothing) {
-      this.speed = new WagonSpeedPassenger(
-        this,
-        (config && config.maxSpeed) || undefined,
-        (config && config.accelerateBy) || undefined
-      );
-    } else {
-      this.speed = new WagonSpeed(
-        this,
-        (config && config.maxSpeed) || undefined,
-        (config && config.accelerateBy) || undefined
-      );
-    }
 
     if (!config || config.controlType === WagonControlType.Locomotive) {
       this.control = new WagonControlLocomotive();
@@ -107,21 +90,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.axles.reverse();
   }
 
-  halt(): void {
-    this.speed.halt();
-    this.update();
-  }
-
-  disconnect(whichEnd: WhichEnd): void {
-    if (this.speed.getMovingState() === WagonMovingState.Moving) return;
-
-    // this.getEnd(whichEnd).disconnect();
-  }
-
-  getSpeed(): number {
-    return this.speed.getSpeed();
-  }
-
   tick(): void {
       /*
     this.speed.tick();
@@ -147,39 +115,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       this.update();
     } */
     this.update();
-  }
-
-  
-  accelerate(): void {
-    this.speed.accelerate();
-  }
-
-  break(): void {
-    this.speed.break();
-  }
-
-  shuntForward(): void {
-    this.speed.shountForward();
-  }
-
-  shuntBackward(): void {
-    this.speed.shountBackward();
-  }
-
-  detach(): void {
-    // if (this.getControlType() === WagonControlType.Nothing) return;
-    // if (!this.isOneFree()) return;
-
-    // this.getA().disconnect();
-    // this.getB().disconnect();
-  }
-
-  getMaxSpeed(): number {
-    return this.speed.getMaxSpeed();
-  }
-
-  getAccelerateBy(): number {
-    return this.speed.getAcceleateBy();
   }
 
   getControlType(): WagonControlType {
@@ -365,8 +300,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       ...this.boardable.persist(),
 
       config: {
-        maxSpeed: this.getMaxSpeed(),
-        accelerateBy: this.getAccelerateBy(),
         controlType: this.getControlType(),
         passengerArrangement: this.getPassengerArrangement(),
         appearanceId: this.getAppearanceId(),
@@ -388,7 +321,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return {
       id: this.id,
       type: 'Wagon',
-      speed: this.getSpeed(),
+      speed: this.getTrain()?.getSpeed()?.getSpeed(),
       train: this.getTrain()?.persistDeep(),
       trip: this.getTrip()?.persistDeep()
     };

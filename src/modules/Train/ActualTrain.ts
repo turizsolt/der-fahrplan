@@ -96,9 +96,12 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.wagons.map(wagon => wagon.update());
   }
 
+  private lastSpeed: number = -1;
+
   tick(): void {
     this.speed.tick();
-    if (this.speed.getSpeed() === 0) return;
+    if (this.speed.getSpeed() === 0 && this.lastSpeed === 0) return;
+    this.lastSpeed = this.speed.getSpeed();
 
     const nextPosition = this.position.clone();
     nextPosition.move(this.speed.getSpeed());

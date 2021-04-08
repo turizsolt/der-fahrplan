@@ -9,7 +9,6 @@ import { WagonConfig } from '../Actuals/Wagon/WagonConfig';
 import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
 import { PassengerArrangement } from '../../mixins/BoardableWagon';
 import { WagonConnectable } from '../Actuals/Wagon/WagonConnectable';
-import { WagonMovingState } from '../Actuals/Wagon/WagonMovingState';
 import { Trip } from '../Scheduling/Trip';
 import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
 import { Emitable } from '../../mixins/Emitable';
@@ -22,15 +21,11 @@ export interface Wagon extends Boardable, BaseBrick, Emitable {
   onStocked(): void;
   getSelectedSide(): WhichEnd | null;
   swapSelectedSide(): void;
-  accelerate(): void;
-  break(): void;
 
   setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack): void;
   getAxlePosition(whichEnd: WhichEnd): PositionOnTrack;
   axleReverse(): void;
 
-  getMaxSpeed(): number;
-  getAccelerateBy(): number;
   getControlType(): WagonControlType;
   getPassengerArrangement(): PassengerArrangement;
   getPassengerCount(): number;
@@ -59,15 +54,7 @@ export interface Wagon extends Boardable, BaseBrick, Emitable {
   setTrain(train: Train): void;
 
   getBoardedPassengers(): Passenger[];
-  detach(): void;
   tick(): void;
-  getSpeed(): number;
-
-  shuntForward(): void;
-  shuntBackward(): void;
-
-  disconnect(whichEnd: WhichEnd): void;
-  halt(): void;
 
   platformsBeside(): Platform[];
 }
