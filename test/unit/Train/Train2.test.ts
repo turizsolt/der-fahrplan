@@ -1,14 +1,14 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { ActualTrain2 } from '../../src/modules/Train/ActualTrain2';
-import { PositionOnTrack2 } from '../../src/modules/Train/PositionOnTrack2';
+import { ActualTrain2 } from '../../../src/modules/Train/ActualTrain2';
+import { PositionOnTrack2 } from '../../../src/modules/Train/PositionOnTrack2';
 import { createTrack } from '../Track/util';
-import { TrackDirection } from '../../src/modules/Track/TrackDirection';
-import { getTestStore } from '../getTestStore';
-import { Wagon } from '../../src/structs/Interfaces/Wagon';
-import { TYPES } from '../../src/di/TYPES';
-import { Track } from '../../src/modules/Track/Track';
-import { WhichEnd } from '../../src/structs/Interfaces/WhichEnd';
+import { TrackDirection } from '../../../src/modules/Track/TrackDirection';
+import { getTestStore } from '../../getTestStore';
+import { Wagon } from '../../../src/structs/Interfaces/Wagon';
+import { TYPES } from '../../../src/di/TYPES';
+import { Track } from '../../../src/modules/Track/Track';
+import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
 chai.use(chaiAlmost());
 
 const store = getTestStore();

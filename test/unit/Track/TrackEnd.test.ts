@@ -1,15 +1,15 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { DirectedTrack } from '../../src/modules/Track/DirectedTrack';
-import { TrackSegment } from '../../src/modules/Track/TrackSegment';
-import { ActualTrackEnd } from '../../src/modules/Track/ActualTrackEnd';
-import { WhichEnd } from '../../src/structs/Interfaces/WhichEnd';
-import { TrackBase } from '../../src/modules/Track/TrackBase';
-import { TrackJointEnd } from '../../src/modules/Track/TrackJoint/TrackJointEnd';
-import { getTestStore } from '../getTestStore';
-import { TrackJoint } from '../../src/modules/Track/TrackJoint/TrackJoint';
-import { TYPES } from '../../src/di/TYPES';
-import { Ray } from '../../src/structs/Geometry/Ray';
+import { DirectedTrack } from '../../../src/modules/Track/DirectedTrack';
+import { TrackSegment } from '../../../src/modules/Track/TrackSegment';
+import { ActualTrackEnd } from '../../../src/modules/Track/ActualTrackEnd';
+import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
+import { TrackBase } from '../../../src/modules/Track/TrackBase';
+import { TrackJointEnd } from '../../../src/modules/Track/TrackJoint/TrackJointEnd';
+import { getTestStore } from '../../getTestStore';
+import { TrackJoint } from '../../../src/modules/Track/TrackJoint/TrackJoint';
+import { TYPES } from '../../../src/di/TYPES';
+import { Ray } from '../../../src/structs/Geometry/Ray';
 chai.use(chaiAlmost());
 
 const store = getTestStore();

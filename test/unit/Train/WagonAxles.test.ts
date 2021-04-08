@@ -1,12 +1,12 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { PositionOnTrack2 } from '../../src/modules/Train/PositionOnTrack2';
+import { PositionOnTrack2 } from '../../../src/modules/Train/PositionOnTrack2';
 import { createTrack } from '../Track/util';
-import { TrackDirection } from '../../src/modules/Track/TrackDirection';
-import { getTestStore } from '../getTestStore';
-import { WagonAxles } from '../../src/modules/Train/WagonAxles';
-import { ActualWagonAxles } from '../../src/modules/Train/ActualWagonAxles';
-import { WhichEnd } from '../../src/structs/Interfaces/WhichEnd';
+import { TrackDirection } from '../../../src/modules/Track/TrackDirection';
+import { getTestStore } from '../../getTestStore';
+import { WagonAxles } from '../../../src/modules/Train/WagonAxles';
+import { ActualWagonAxles } from '../../../src/modules/Train/ActualWagonAxles';
+import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
 chai.use(chaiAlmost());
 
 const store = getTestStore();

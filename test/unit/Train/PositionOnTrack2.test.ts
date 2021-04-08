@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { PositionOnTrack2 } from '../../src/modules/Train/PositionOnTrack2';
-import { TrackDirection } from '../../src/modules/Track/TrackDirection';
+import { PositionOnTrack2 } from '../../../src/modules/Train/PositionOnTrack2';
+import { TrackDirection } from '../../../src/modules/Track/TrackDirection';
 import {
   createTrack,
   createTrackLine,

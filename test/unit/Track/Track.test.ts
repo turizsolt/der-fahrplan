@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { getTestStore } from '../getTestStore';
+import { getTestStore } from '../../getTestStore';
 import { createTrack } from './util';
 chai.use(chaiAlmost());
 

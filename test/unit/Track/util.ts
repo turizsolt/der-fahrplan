@@ -1,11 +1,11 @@
-import { TrackJoint } from '../../src/modules/Track/TrackJoint/TrackJoint';
-import { TrackBase } from '../../src/modules/Track/TrackBase';
-import { Ray } from '../../src/structs/Geometry/Ray';
-import { Track } from '../../src/modules/Track/Track';
-import { TYPES } from '../../src/di/TYPES';
-import { Coordinate } from '../../src/structs/Geometry/Coordinate';
-import { WhichEnd } from '../../src/structs/Interfaces/WhichEnd';
-import { getTestStore } from '../getTestStore';
+import { TrackJoint } from '../../../src/modules/Track/TrackJoint/TrackJoint';
+import { TrackBase } from '../../../src/modules/Track/TrackBase';
+import { Ray } from '../../../src/structs/Geometry/Ray';
+import { Track } from '../../../src/modules/Track/Track';
+import { TYPES } from '../../../src/di/TYPES';
+import { Coordinate } from '../../../src/structs/Geometry/Coordinate';
+import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
+import { getTestStore } from '../../getTestStore';
 
 const store = getTestStore();
 

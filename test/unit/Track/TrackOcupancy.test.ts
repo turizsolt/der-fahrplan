@@ -1,9 +1,9 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { ActualTrackOcupancy } from '../../src/modules/Track/ActualTrackOcupancy';
-import { Wagon } from '../../src/structs/Interfaces/Wagon';
-import { getTestStore } from '../getTestStore';
-import { TYPES } from '../../src/di/TYPES';
+import { ActualTrackOcupancy } from '../../../src/modules/Track/ActualTrackOcupancy';
+import { Wagon } from '../../../src/structs/Interfaces/Wagon';
+import { getTestStore } from '../../getTestStore';
+import { TYPES } from '../../../src/di/TYPES';
 chai.use(chaiAlmost());
 
 const store = getTestStore();
