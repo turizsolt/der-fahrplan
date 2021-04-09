@@ -11,6 +11,9 @@ export class Nearest {
       distance += iter.getLength();
       segmentCount++;
     }
-    return { distance, segmentCount };
+    return {
+      end: { distance, segmentCount },
+      train: { distance, segmentCount }
+    };
   }
 }

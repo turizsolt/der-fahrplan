@@ -1,4 +1,6 @@
+import { NearestData } from './NearestData';
+
 export interface NearestResult {
-  distance: number;
-  segmentCount: number;
+  end: NearestData;
+  train: NearestData;
 }

@@ -10,7 +10,7 @@ describe('Nearest', () => {
   it('nearest end is here', () => {
     const { track } = createTrack(100);
     const pot = new PositionOnTrack(track, 100, TrackDirection.AB);
-    expect(Nearest.find(pot)).deep.equals({
+    expect(Nearest.find(pot).end).deep.equals({
       distance: 0,
       segmentCount: 1
     });
@@ -19,7 +19,7 @@ describe('Nearest', () => {
   it('nearest end is inside the track', () => {
     const { track } = createTrack(100);
     const pot = new PositionOnTrack(track, 80, TrackDirection.AB);
-    expect(Nearest.find(pot)).deep.equals({
+    expect(Nearest.find(pot).end).deep.equals({
       distance: 20,
       segmentCount: 1
     });
@@ -30,7 +30,7 @@ describe('Nearest', () => {
       track: [track1]
     } = createTrackLine(4, 100);
     const pot = new PositionOnTrack(track1, 80, TrackDirection.AB);
-    expect(Nearest.find(pot)).deep.equals({
+    expect(Nearest.find(pot).end).deep.equals({
       distance: 220,
       segmentCount: 3
     });
