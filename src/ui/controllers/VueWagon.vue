@@ -3,7 +3,9 @@
     <div class="item-type">🚂 Mozdony</div>
     <div class="item-id">{{ idt }}</div>
     <div class="item-id">
-      Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "???" }}
+      Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "???" }}<br />
+      NE: {{ Math.round(obj.nearestEnd * 10) }}<br />
+      NT: {{ Math.round(obj.nearestTrain * 10) }}
     </div>
 
     <!-- train -->

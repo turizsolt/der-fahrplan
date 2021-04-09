@@ -146,4 +146,7 @@ describe('Nearest', () => {
       train
     });
   });
+
+  // todo eset a korkoros utvonal esetere
+  // todo szomszedos trackre atlogo esetek?
 });

@@ -8,6 +8,9 @@ import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
 import { TrainSpeed } from './TrainSpeed';
 import { ActualTrainSpeed } from './ActualTrainSpeed';
+import { Nearest } from './Nearest';
+import { NearestData } from './NearestData';
+import { WAGON_GAP } from '../../structs/Actuals/Wagon/WagonGap';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
@@ -68,7 +71,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.position = this.wagons[0].getAxlePosition(WhichEnd.A);
   }
 
-  private getEndPosition(): PositionOnTrack {
+  getEndPosition(): PositionOnTrack {
     return this.wagons[this.wagons.length - 1]
       .getAxlePosition(WhichEnd.B)
       ?.clone();
@@ -124,6 +127,17 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   private lastSpeed: number = -1;
 
+  private nearestEnd: NearestData = null;
+  private nearestTrain: NearestData = null;
+
+  getNearestEnd(): NearestData {
+    return this.nearestEnd;
+  }
+
+  getNearestTrain(): NearestData {
+    return this.nearestTrain;
+  }
+
   tick(): void {
     this.speed.tick();
     if (this.speed.getSpeed() === 0 && this.lastSpeed === 0) return;
@@ -131,6 +145,14 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
     const nextPosition = this.position.clone();
     nextPosition.move(this.speed.getSpeed());
+
+    this.nearestEnd = Nearest.end(nextPosition);
+    this.nearestTrain = Nearest.train(nextPosition);
+
+    if(this.nearestTrain.distance < WAGON_GAP) {
+        console.log('Proximity warning!');
+    }
+
     this.store
       .getCommandLog()
       .addAction(

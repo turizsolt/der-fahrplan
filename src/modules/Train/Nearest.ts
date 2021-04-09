@@ -9,14 +9,19 @@ export class Nearest {
     let segmentCount = 1;
     let distance = pot.getTrack().getLength() - pot.getPosition();
     let iter = pot.getDirectedTrack();
+    let ttl = 100;
 
-    while (iter.next()) {
+    while (iter.next() && ttl) {
       iter = iter.next();
       distance += iter.getLength();
       segmentCount++;
+      ttl--;
     }
 
-    return { distance, segmentCount };
+    return {
+      distance: ttl ? distance : Number.POSITIVE_INFINITY,
+      segmentCount
+    };
   }
 
   static train(pot: PositionOnTrack, train?: Train): NearestData {
@@ -25,6 +30,7 @@ export class Nearest {
     let trainFound: Train = null;
     let iter = pot.getDirectedTrack();
     let position = pot.getPosition();
+    let ttl = 100;
 
     do {
       const { train: trainX, distance: distX } = Nearest.findInsideTrack(
@@ -37,7 +43,8 @@ export class Nearest {
       position = 0;
       segmentCount++;
       iter = iter.next();
-    } while (iter && !trainFound);
+      ttl--;
+    } while (iter && !trainFound && ttl);
 
     return {
       distance: trainFound ? distance : Number.POSITIVE_INFINITY,
