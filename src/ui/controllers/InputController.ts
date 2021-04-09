@@ -262,6 +262,9 @@ export class InputController {
         if (storedBrick) {
           if (command) {
             storedBrick.getRenderer().process(command);
+            if(command === 'endB') {
+                console.log('endB', id);
+            }
           } else if (event.button === 2) {
             storedBrick.getRenderer().process('switch');
           } else {
@@ -278,7 +281,11 @@ export class InputController {
               this.vueSidebar.setData('selected', null);
               this.vueSidebar.setData('type', null);
               this.vueSidebar.setData('opts', []);
+              storedObj.deselect();
             } else {
+              if(this.store.getSelected()){
+                  this.store.getSelected().deselect();
+              }
               this.select(storedBrick);
             }
           }

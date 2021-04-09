@@ -31,6 +31,7 @@ import { Emitable } from '../../../mixins/Emitable';
 import { LineSegment } from '../../Geometry/LineSegment';
 import { WagonData } from '../../../modules/Train/WagonData';
 import { Train } from '../../../modules/Train/Train';
+import { Util } from '../../Util';
 
 export interface ActualWagon extends Emitable { }
 const doApply = () => applyMixins(ActualWagon, [Emitable]);
@@ -316,7 +317,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       type: 'Wagon',
       speed: this.getTrain()?.getSpeed()?.getSpeed(),
       train: this.getTrain()?.persistDeep(),
-      trip: this.getTrip()?.persistDeep()
+      trip: this.getTrip()?.persistDeep(),
     };
   }
 
@@ -324,8 +325,23 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       return {
           id: this.id,
           appearanceId: this.getAppearanceId(),
-          ray: this.getCenterRay().persist()
+          ray: this.getCenterRay().persist(),
+          rayA: this.getAxlePosition(WhichEnd.A).getRay().persist(),
+          rayB: this.getAxlePosition(WhichEnd.B).getRay().persist(),
+          isTrainSelected: this.isSelected(),
+          isFirst: this === Util.first(this.getTrain().getWagons()),
+          isLast: this === Util.last(this.getTrain().getWagons()),
       }
+  }
+
+  select(): void {
+      super.select();
+      this.update();
+  }
+
+  deselect(): void {
+    super.deselect();
+    this.update();
   }
 
   load(obj: any, store: Store): void {

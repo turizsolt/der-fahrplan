@@ -10,6 +10,10 @@ export class Ray {
     return new Ray(new Coordinate(x, y, z), dirXZ);
   }
 
+  static fromData(ray: RayData): Ray {
+    return new Ray(new Coordinate(ray.x, ray.y, ray.z), ray.dirXZ);
+  }
+
   slope() {
     if (
       almost(this.dirXZ % Math.PI, Math.PI / 2) ||
