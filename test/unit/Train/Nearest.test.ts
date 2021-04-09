@@ -13,11 +13,13 @@ chai.use(chaiAlmost());
 
 const store = getTestStore();
 
+// todo train and wagon creator helper needed here
+
 describe('Nearest', () => {
   it('nearest end is here', () => {
     const { track } = createTrack(100);
     const pot = new PositionOnTrack(track, 100, TrackDirection.AB);
-    expect(Nearest.find(pot).end).deep.equals({
+    expect(Nearest.end(pot)).deep.equals({
       distance: 0,
       segmentCount: 1
     });
@@ -26,7 +28,7 @@ describe('Nearest', () => {
   it('nearest end is inside the track', () => {
     const { track } = createTrack(100);
     const pot = new PositionOnTrack(track, 80, TrackDirection.AB);
-    expect(Nearest.find(pot).end).deep.equals({
+    expect(Nearest.end(pot)).deep.equals({
       distance: 20,
       segmentCount: 1
     });
@@ -37,7 +39,7 @@ describe('Nearest', () => {
       track: [track1]
     } = createTrackLine(4, 100);
     const pot = new PositionOnTrack(track1, 80, TrackDirection.AB);
-    expect(Nearest.find(pot).end).deep.equals({
+    expect(Nearest.end(pot)).deep.equals({
       distance: 220,
       segmentCount: 3
     });
@@ -46,7 +48,7 @@ describe('Nearest', () => {
   it('no nearest train', () => {
     const { track } = createTrack(100);
     const pot = new PositionOnTrack(track, 20, TrackDirection.AB);
-    expect(Nearest.find(pot).train).deep.equals({
+    expect(Nearest.train(pot)).deep.equals({
       distance: Number.POSITIVE_INFINITY,
       segmentCount: 1,
       train: null
@@ -62,7 +64,7 @@ describe('Nearest', () => {
       .create<Wagon>(TYPES.Wagon)
       .init(getPredefinedWagonConfig('wagon'), train);
     train.init(potTrain, [wagon]);
-    expect(Nearest.find(pot).train).deep.equals({
+    expect(Nearest.train(pot)).deep.equals({
       distance: 26,
       segmentCount: 1,
       train
@@ -78,7 +80,7 @@ describe('Nearest', () => {
       .create<Wagon>(TYPES.Wagon)
       .init(getPredefinedWagonConfig('wagon'), train);
     train.init(potTrain, [wagon]);
-    expect(Nearest.find(pot).train).deep.equals({
+    expect(Nearest.train(pot)).deep.equals({
       distance: Number.POSITIVE_INFINITY,
       segmentCount: 1,
       train: null
@@ -104,9 +106,43 @@ describe('Nearest', () => {
       .init(getPredefinedWagonConfig('wagon'), train2);
     train2.init(potTrain2, [wagon2]);
 
-    expect(Nearest.find(pot).train).deep.equals({
+    expect(Nearest.train(pot)).deep.equals({
       distance: 186,
       segmentCount: 3,
+      train
+    });
+  });
+
+  it('nearest train is inside the track, but opposite facing', () => {
+    const { track } = createTrack(100);
+    const pot = new PositionOnTrack(track, 0, TrackDirection.AB);
+    const potTrain = new PositionOnTrack(track, 20, TrackDirection.BA);
+    const train = store.create<Train>(TYPES.Train);
+    const wagon = store
+      .create<Wagon>(TYPES.Wagon)
+      .init(getPredefinedWagonConfig('wagon'), train);
+    train.init(potTrain, [wagon]);
+
+    expect(Nearest.train(pot)).deep.equals({
+      distance: 80,
+      segmentCount: 1,
+      train
+    });
+  });
+
+  it('nearest train is inside the track, but opposite facing, wrong number order', () => {
+    const { track } = createTrack(100);
+    const pot = new PositionOnTrack(track, 40, TrackDirection.AB);
+    const potTrain = new PositionOnTrack(track, 20, TrackDirection.BA);
+    const train = store.create<Train>(TYPES.Train);
+    const wagon = store
+      .create<Wagon>(TYPES.Wagon)
+      .init(getPredefinedWagonConfig('wagon'), train);
+    train.init(potTrain, [wagon]);
+
+    expect(Nearest.train(pot)).deep.equals({
+      distance: 40,
+      segmentCount: 1,
       train
     });
   });
