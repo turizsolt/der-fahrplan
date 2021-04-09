@@ -7,8 +7,8 @@ import { Train } from '../../../src/modules/Train/Train';
 chai.use(chaiAlmost());
 
 const store = getTestStore();
-const train: Train = store.create<Train>(TYPES.Train).init(null, null);
-const train2: Train = store.create<Train>(TYPES.Train).init(null, null);
+const train: Train = store.create<Train>(TYPES.Train).init(null, []);
+const train2: Train = store.create<Train>(TYPES.Train).init(null, []);
 
 describe('TrackOcupancy', () => {
   it('create, checkin, checkout, isempty, get', () => {

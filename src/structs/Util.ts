@@ -13,10 +13,10 @@ export class Util {
   }
 
   public static first<T>(arr: T[]): T {
-    return arr[0];
+    return arr?.[0];
   }
 
   public static last<T>(arr: T[]): T {
-    return arr[arr.length - 1];
+    return arr?.[arr.length - 1];
   }
 }

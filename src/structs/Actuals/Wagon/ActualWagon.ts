@@ -329,8 +329,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
           rayA: this.getAxlePosition(WhichEnd.A).getRay().persist(),
           rayB: this.getAxlePosition(WhichEnd.B).getRay().persist(),
           isTrainSelected: this.isSelected(),
-          isFirst: this === Util.first(this.getTrain().getWagons()),
-          isLast: this === Util.last(this.getTrain().getWagons()),
+          isFirst: this === Util.first(this.getTrain()?.getWagons()),
+          isLast: this === Util.last(this.getTrain()?.getWagons()),
       }
   }
 
