@@ -1,22 +1,22 @@
-import { Wagon } from '../../structs/Interfaces/Wagon';
 import { TrackOcupancy } from './TrackOcupancy';
+import { Train } from '../Train/Train';
 
 export class ActualTrackOcupancy implements TrackOcupancy {
-  protected checkedList: Wagon[] = [];
+  protected checkedList: Train[] = [];
 
-  checkin(engine: Wagon) {
-    this.checkedList.push(engine);
+  checkin(train: Train) {
+    this.checkedList.push(train);
   }
 
-  checkout(engine: Wagon) {
-    this.checkedList = this.checkedList.filter(elem => elem !== engine);
+  checkout(train: Train) {
+    this.checkedList = this.checkedList.filter(elem => elem !== train);
   }
 
   isEmpty(): boolean {
     return this.checkedList.length === 0;
   }
 
-  getCheckedList(): Wagon[] {
+  getCheckedList(): Train[] {
     return this.checkedList;
   }
 }

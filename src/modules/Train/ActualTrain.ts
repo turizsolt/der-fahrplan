@@ -68,8 +68,25 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.position = this.wagons[0].getAxlePosition(WhichEnd.A);
   }
 
+  private getEndPosition(): PositionOnTrack {
+    return this.wagons[this.wagons.length - 1]
+      .getAxlePosition(WhichEnd.B)
+      ?.clone();
+  }
+
   private alignAxles(): void {
     if (!this.position) return;
+
+    // checkouts
+    let iter = this.getEndPosition()?.getDirectedTrack();
+    if(iter) {
+    const start = this.position.getDirectedTrack();
+      while (iter !== start) {
+        iter.getTrack().checkout(this);
+        iter = iter.next();
+      }
+      iter.getTrack().checkout(this);
+    }
 
     const pos: PositionOnTrack = this.position.clone();
     pos.reverse();
@@ -83,6 +100,15 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       wagon.setAxlePosition(WhichEnd.B, pos2);
       pos.hop(1);
     }
+
+    // checkins
+    iter = this.getEndPosition().getDirectedTrack();
+    const start2 = this.position.getDirectedTrack();
+    while (iter !== start2) {
+      iter.getTrack().checkin(this);
+      iter = iter.next();
+    }
+    iter.getTrack().checkin(this);
   }
 
   remove(): void {
