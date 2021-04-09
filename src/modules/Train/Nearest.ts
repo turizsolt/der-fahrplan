@@ -4,7 +4,7 @@ import { NearestResult } from './NearestResult';
 export class Nearest {
   static find(pot: PositionOnTrack): NearestResult {
     return {
-      distance: 0,
+      distance: pot.getTrack().getLength() - pot.getPosition(),
       segmentCount: 1
     };
   }

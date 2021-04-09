@@ -15,4 +15,13 @@ describe('Nearest', () => {
       segmentCount: 1
     });
   });
+
+  it('nearest end is inside the track', () => {
+    const { track } = createTrack(100);
+    const pot = new PositionOnTrack(track, 80, TrackDirection.AB);
+    expect(Nearest.find(pot)).deep.equals({
+      distance: 20,
+      segmentCount: 1
+    });
+  });
 });
