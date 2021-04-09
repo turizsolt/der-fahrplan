@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import { PositionOnTrack } from '../../../src/modules/Train/PositionOnTrack';
-import { createTrack } from '../Track/util';
+import { createTrack, createTrackLine } from '../Track/util';
 import { TrackDirection } from '../../../src/modules/Track/TrackDirection';
 import { Nearest } from '../../../src/modules/Train/Nearest';
 chai.use(chaiAlmost());
@@ -22,6 +22,17 @@ describe('Nearest', () => {
     expect(Nearest.find(pot)).deep.equals({
       distance: 20,
       segmentCount: 1
+    });
+  });
+
+  it('nearest end is far away', () => {
+    const {
+      track: [track1]
+    } = createTrackLine(4, 100);
+    const pot = new PositionOnTrack(track1, 80, TrackDirection.AB);
+    expect(Nearest.find(pot)).deep.equals({
+      distance: 220,
+      segmentCount: 3
     });
   });
 });
