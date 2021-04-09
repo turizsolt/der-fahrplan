@@ -5,7 +5,6 @@ import { Wagon } from '../../Interfaces/Wagon';
 import { Ray } from '../../Geometry/Ray';
 import { TYPES } from '../../../di/TYPES';
 import { WagonRenderer } from '../../Renderers/WagonRenderer';
-import { TrackWorm } from '../../../modules/Train/TrackWorm';
 import { Store } from '../../Interfaces/Store';
 import { Platform } from '../../Interfaces/Platform';
 import { Passenger } from '../../Interfaces/Passenger';
@@ -37,7 +36,6 @@ export interface ActualWagon extends Emitable { }
 const doApply = () => applyMixins(ActualWagon, [Emitable]);
 @injectable()
 export class ActualWagon extends ActualBaseBrick implements Wagon {
-  // protected worm: TrackWorm;
 
   protected boardable: BoardableWagon;
   protected announcement: WagonAnnouncement;
@@ -137,12 +135,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return WagonConnectable.Connectable;
   }
 
-  getWorm(): TrackWorm {
-    return null; //this.worm;
-  }
-
   remove(): boolean {
-    //this.worm.checkoutAll();
     this.emit('remove', this.id);
     return true;
   }
@@ -341,17 +334,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
     this.setSeatCount(obj.seatCount, obj.seatColumns);
     this.boardable.load(obj.seats, store);
-
-    // this.getA().load(obj.A, store);
-    // this.getB().load(obj.B, store);
-
-    // const track = this.getA().positionOnTrack.getTrack();
-    // const bTrack = this.getB().positionOnTrack.getTrack();
-    // if (track === bTrack) {
-    //   this.worm = new TrackWorm([track], this);
-    // } else {
-    //   this.worm = new TrackWorm([track, bTrack], this);
-    // }
 
     if (obj.trip) {
       this.assignTrip(store.get(obj.trip) as Trip);

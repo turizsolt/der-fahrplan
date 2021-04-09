@@ -90,8 +90,8 @@ export class BoardableWagon extends ActualBoardable {
   }
 
   private seatOffset(seatNo) {
-    if (!this.parent.getWorm() || this.parent.getWorm().getAll().length === 0)
-      return null;
+    // if (!this.parent.getWorm() || this.parent.getWorm().getAll().length === 0)
+    //   return null;
 
     const colSize = 1.2;
     const rowSize = 1.2;

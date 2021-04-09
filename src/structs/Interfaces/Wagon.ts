@@ -2,7 +2,6 @@ import { Ray } from '../Geometry/Ray';
 import { WhichEnd } from '../Interfaces/WhichEnd';
 import { Platform } from './Platform';
 import { BaseBrick } from './BaseBrick';
-import { TrackWorm } from '../../modules/Train/TrackWorm';
 import { Passenger } from './Passenger';
 import { Boardable } from '../../mixins/Boardable';
 import { WagonConfig } from '../Actuals/Wagon/WagonConfig';
@@ -32,7 +31,6 @@ export interface Wagon extends Boardable, BaseBrick, Emitable {
   getAppearanceId(): string;
   getConnectable(A: WhichEnd): WagonConnectable;
 
-  getWorm(): TrackWorm;
   getCenterRay(): Ray;
 
   stop(): void;
