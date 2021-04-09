@@ -148,5 +148,5 @@ describe('Nearest', () => {
   });
 
   // todo eset a korkoros utvonal esetere
-  // todo szomszedos trackre atlogo esetek?
+  // todo szomszedos trackre atlogo esetek? a sin allasat nezzuk, de a szerelvenyt nem
 });
