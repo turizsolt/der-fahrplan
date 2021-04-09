@@ -6,6 +6,7 @@ import { TrainSpeed } from './TrainSpeed';
 export interface Train extends BaseStorable {
   init(pot: PositionOnTrack, wagons: Wagon[]): Train;
   getPosition(): PositionOnTrack;
+  getEndPosition(): PositionOnTrack;
   getWagons(): Wagon[];
   addWagons(wagons: Wagon[]): void;
   merge(otherTrain: Train): void;
