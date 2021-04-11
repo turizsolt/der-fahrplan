@@ -30,4 +30,19 @@ describe('DirectedTrack.Markers', () => {
       expect(marker.marker).equals(myMarker2);
     }
   });
+
+  it('track markers always ordered', () => {
+    const dt = createDirectedTrack();
+    const myMarker: TrackMarker = { type: 'Train', train: null };
+    const myMarker2: TrackMarker = { type: 'Train', train: undefined };
+    const myMarker3: TrackMarker = { type: 'Train', train: null };
+    dt.addMarker(11, myMarker3);
+    dt.addMarker(7, myMarker);
+    dt.addMarker(9, myMarker2);
+    expect(dt.getMarkers().map(x => x.marker)).deep.equals([
+      myMarker,
+      myMarker2,
+      myMarker3
+    ]);
+  });
 });

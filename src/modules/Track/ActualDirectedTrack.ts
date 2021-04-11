@@ -56,6 +56,7 @@ export class ActualDirectedTrack implements DirectedTrack {
 
   addMarker(position: number, marker: TrackMarker): void {
     this.markers.push({ position, marker });
+    this.markers.sort((a, b) => a.position - b.position);
   }
 
   removeMarker(marker: TrackMarker): void {
