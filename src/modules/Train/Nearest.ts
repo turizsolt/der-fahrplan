@@ -7,7 +7,7 @@ export class Nearest {
     let segmentCount = 1;
     let distance = pot.getTrack().getLength() - pot.getPosition();
     let iter = pot.getDirectedTrack();
-    let ttl = 100;
+    let ttl = 99;
 
     while (iter.next() && ttl) {
       iter = iter.next();
@@ -30,10 +30,7 @@ export class Nearest {
     let foundTrain: Train = null;
 
     for (let marker of iter.getMarkers()) {
-      if (
-        marker.position > pot.getPosition() &&
-        marker.marker.type === 'Train'
-      ) {
+      if (marker.position > pot.getPosition()) {
         distance = marker.position - pot.getPosition();
         foundTrain = marker.marker.train;
         break;
@@ -43,11 +40,9 @@ export class Nearest {
     iter = iter.next();
     while (iter && !foundTrain && ttl) {
       for (let marker of iter.getMarkers()) {
-        if (marker.marker.type === 'Train') {
-          distance += marker.position;
-          foundTrain = marker.marker.train;
-          break;
-        }
+        distance += marker.position;
+        foundTrain = marker.marker.train;
+        break;
       }
 
       if (!foundTrain) {

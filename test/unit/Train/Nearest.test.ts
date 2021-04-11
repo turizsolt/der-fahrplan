@@ -147,6 +147,14 @@ describe('Nearest', () => {
     });
   });
 
-  // todo eset a korkoros utvonal esetere
-  // todo szomszedos trackre atlogo esetek? a sin allasat nezzuk, de a szerelvenyt nem
+  it('nearest end is too far away', () => {
+    const {
+      track: [track0]
+    } = createTrackLine(102, 100);
+    const pot = new PositionOnTrack(track0, 40, TrackDirection.AB);
+    expect(Nearest.end(pot)).deep.equals({
+      distance: Number.POSITIVE_INFINITY,
+      segmentCount: 100
+    });
+  });
 });
