@@ -58,6 +58,10 @@ export class ActualDirectedTrack implements DirectedTrack {
     this.markers.push({ position, marker });
   }
 
+  removeMarker(marker: TrackMarker): void {
+    this.markers = this.markers.filter(x => x.marker !== marker);
+  }
+
   getMarkers(): PositionedTrackMarker[] {
     return this.markers;
   }

@@ -15,7 +15,19 @@ describe('DirectedTrack.Markers', () => {
     const myMarker: TrackMarker = { type: 'Train', train: null };
     dt.addMarker(7, myMarker);
     for (let marker of dt.getMarkers()) {
-      expect(marker.marker).deep.equals(myMarker);
+      expect(marker.marker).equals(myMarker);
+    }
+  });
+
+  it('remove a track marker', () => {
+    const dt = createDirectedTrack();
+    const myMarker: TrackMarker = { type: 'Train', train: null };
+    const myMarker2: TrackMarker = { type: 'Train', train: null };
+    dt.addMarker(7, myMarker);
+    dt.addMarker(9, myMarker2);
+    dt.removeMarker(myMarker);
+    for (let marker of dt.getMarkers()) {
+      expect(marker.marker).equals(myMarker2);
     }
   });
 });
