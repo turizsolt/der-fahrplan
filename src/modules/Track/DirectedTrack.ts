@@ -20,5 +20,7 @@ export interface DirectedTrack {
 
   addMarker(position: number, marker: TrackMarker): void;
   removeMarker(marker: TrackMarker): void;
+  addMarkerBothDirections(position: number, marker: TrackMarker): void;
+  removeMarkerBothDirections(marker: TrackMarker): void;
   getMarkers(): PositionedTrackMarker[];
 }

@@ -45,4 +45,28 @@ describe('DirectedTrack.Markers', () => {
       myMarker3
     ]);
   });
+
+  it('track marker on both directions', () => {
+    const dt = createDirectedTrack();
+    const dt2 = createDirectedTrack();
+    dt.setReverse(dt2);
+
+    const myMarker: TrackMarker = { type: 'Train', train: null };
+    dt.addMarkerBothDirections(7, myMarker);
+    expect(dt.getMarkers().map(x => x.marker)).deep.equals([myMarker]);
+    expect(dt2.getMarkers().map(x => x.marker)).deep.equals([myMarker]);
+    dt.removeMarkerBothDirections(myMarker);
+    expect(dt.getMarkers().map(x => x.marker)).deep.equals([]);
+    expect(dt2.getMarkers().map(x => x.marker)).deep.equals([]);
+  });
+
+  it('track marker on both directions, without reverse', () => {
+    const dt = createDirectedTrack();
+
+    const myMarker: TrackMarker = { type: 'Train', train: null };
+    dt.addMarkerBothDirections(7, myMarker);
+    expect(dt.getMarkers().map(x => x.marker)).deep.equals([myMarker]);
+    dt.removeMarkerBothDirections(myMarker);
+    expect(dt.getMarkers().map(x => x.marker)).deep.equals([]);
+  });
 });
