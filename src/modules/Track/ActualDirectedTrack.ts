@@ -60,7 +60,7 @@ export class ActualDirectedTrack implements DirectedTrack {
   }
 
   removeMarker(marker: TrackMarker): void {
-    this.markers = this.markers.filter(x => x.marker !== marker);
+    this.markers = this.markers.filter(x => x.marker.train !== marker.train);
   }
 
   addMarkerBothDirections(position: number, marker: TrackMarker): void {
