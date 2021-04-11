@@ -49,8 +49,10 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   merge(otherTrain: Train): void {
     this.wagons.push(...otherTrain.getWagons());
-    otherTrain.remove();
+    otherTrain.getWagons().map(wagon => wagon.setTrain(this));
+    otherTrain.removeAndKeepWagons();
     this.alignAxles();
+    this.wagons.map(wagon => wagon.update());
   }
 
   separate(wagon: Wagon, newTrainId?: string): Train {
@@ -61,6 +63,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.wagons = this.wagons.slice(0, wagonPos);
     const newTrain = this.store.create<Train>(TYPES.Train);
     newTrain.presetId(newTrainId);
+    newWagons.map(wagon => wagon.setTrain(newTrain));
     newTrain.init(newPot, newWagons);
     return newTrain;
   }
@@ -125,6 +128,10 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   remove(): void {
     this.wagons.map(wagon => wagon.remove());
+    this.removeAndKeepWagons();
+  }
+
+  removeAndKeepWagons(): void {
     this.store.unregister(this);
   }
 
@@ -149,9 +156,13 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   tick(): void {
     this.speed.tick();
-    if (this.speed.getSpeed() === 0 && this.lastSpeed === 0) return;
+    if(this.speed.getSpeed() === 0 && this.lastSpeed === 0) {
+      this.wagons.map(wagon => wagon.update());
+    }
     this.lastSpeed = this.speed.getSpeed();
 
+    if (this.speed.getSpeed() === 0) return;
+    
     const nextPosition = this.position.clone();
     nextPosition.move(this.speed.getSpeed());
 
@@ -159,18 +170,24 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.nearestTrain = Nearest.train(nextPosition);
 
     if(this.nearestTrain.distance < WAGON_GAP) {
-        console.log('Proximity warning!');
-    }
-
-    this.store
-      .getCommandLog()
-      .addAction(
-        CommandCreator.moveTrain(
-          this.id,
-          this.position.persist(),
-          nextPosition.persist()
+      console.log('Proximity warning!');
+      // todo masikat megforditani, ha kell
+      this.store.getCommandLog().addAction(CommandCreator.mergeTrain(
+        this.nearestTrain.train.getId(),
+        this.getId(),
+        this.getWagons()[0].getId(),
+      ));
+    } else {
+      this.store
+        .getCommandLog()
+        .addAction(
+          CommandCreator.moveTrain(
+            this.id,
+            this.position.persist(),
+            nextPosition.persist()
         )
       );
+    }
   }
 
   persist(): Object {

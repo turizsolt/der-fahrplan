@@ -211,4 +211,16 @@ export class CommandProcessor {
     const train = this.store.get(trainId) as Train;
     train.getSpeed().setPedal(pedalFrom);
   }
+
+  mergeTrain(train1Id: string, train2Id: string, wagonId: string): void {
+    const train1 = this.store.get(train1Id) as Train;
+    const train2 = this.store.get(train2Id) as Train;
+    train1.merge(train2);
+  }
+
+  unmergeTrain(train1Id: string, train2Id: string, wagonId: string): void {
+    const train1 = this.store.get(train1Id) as Train;
+    const wagon = this.store.get(wagonId) as Wagon;
+    train1.separate(wagon, train2Id);
+  }
 }

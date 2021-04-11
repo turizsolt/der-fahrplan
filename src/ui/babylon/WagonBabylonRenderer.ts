@@ -15,7 +15,7 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
   private mesh: BABYLON.AbstractMesh;
   readonly scene: BABYLON.Scene;
 
-  private endBMesh: BABYLON.AbstractMesh;
+  private endAMesh: BABYLON.AbstractMesh;
   private selectedAMesh: BABYLON.AbstractMesh;
 
   @inject(TYPES.FactoryOfMeshProvider)
@@ -33,11 +33,11 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
     );
     this.mesh.setEnabled(true);
     this.selectedAMesh = this.meshProvider.createSelectorMesh();
-    this.endBMesh = this.meshProvider.createWagonEndMesh(
-      'clickable-wagon-' + wagon.id + '-endB'
+    this.endAMesh = this.meshProvider.createWagonEndMesh(
+      'clickable-wagon-' + wagon.id + '-endA'
     );
 
-    this.meshes = [this.mesh, this.selectedAMesh, this.endBMesh];
+    this.meshes = [this.mesh, this.selectedAMesh, this.endAMesh];
 
     this.inited = true;
     this.update(wagon);
@@ -52,29 +52,26 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
     this.mesh.position.y = 4.2;
     this.mesh.rotation.y = ray.dirXZ + Math.PI / 2;
 
+    const rayA = Ray.fromData(wagon.rayA);
     if (wagon.isFirst) {
-      const rayA = Ray.fromData(wagon.rayA);
       const matA = wagon.isTrainSelected
         ? MaterialName.SelectorRed
         : MaterialName.BedGray;
       this.selectedAMesh.position = CoordinateToBabylonVector3(rayA.coord);
       this.selectedAMesh.position.y = 10;
       this.selectedAMesh.material = this.meshProvider.getMaterial(matA);
-      this.selectedAMesh.setEnabled(true);
-    } else {
-      this.selectedAMesh.setEnabled(false);
-    }
 
-    if (!wagon.isLast) {
-      const rayB = Ray.fromData(wagon.rayB);
-      this.endBMesh.position = CoordinateToBabylonVector3(rayB.coord);
-      this.endBMesh.position.y = 10;
-      this.endBMesh.material = this.meshProvider.getMaterial(
+      this.selectedAMesh.setEnabled(true);
+      this.endAMesh.setEnabled(false);
+    } else {
+      this.endAMesh.position = CoordinateToBabylonVector3(rayA.coord);
+      this.endAMesh.position.y = 10;
+      this.endAMesh.material = this.meshProvider.getMaterial(
         MaterialName.SelectorRed
       );
-      this.endBMesh.setEnabled(true);
-    } else {
-      this.endBMesh.setEnabled(false);
+
+      this.endAMesh.setEnabled(true);
+      this.selectedAMesh.setEnabled(false);
     }
   }
 }

@@ -16,6 +16,7 @@ export interface Train extends BaseStorable {
   tick(): void;
   setPosition(position: PositionOnTrack): void;
   getSpeed(): TrainSpeed;
+  removeAndKeepWagons(): void;
 
   getNearestEnd(): NearestData;
   getNearestTrain(): NearestData;

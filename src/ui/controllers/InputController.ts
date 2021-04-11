@@ -36,6 +36,7 @@ import { VueTestPanel } from './VueTestPanel';
 import { Train } from '../../modules/Train/Train';
 import { SpeedPedal } from '../../modules/Train/SpeedPedal';
 import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
+import { GENERATE_ID } from '../../structs/Actuals/Store/Command/CommandLog';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -254,7 +255,6 @@ export class InputController {
       if (meshId.includes('.')) {
         meshId = meshId.slice(0, meshId.indexOf('.'));
       }
-      //   console.log(meshId);
       if (meshId.startsWith('clickable-')) {
         const [_, type, id, command] = meshId.split('-');
         const storedObj = this.store.get(id);
@@ -262,8 +262,13 @@ export class InputController {
         if (storedBrick) {
           if (command) {
             storedBrick.getRenderer().process(command);
-            if(command === 'endB') {
-                console.log('endB', id);
+            if(command === 'endA') {
+                const wagon = storedBrick as Wagon;
+                this.store.getCommandLog().addAction(CommandCreator.unmergeTrain(
+                    wagon.getTrain().getId(),
+                    GENERATE_ID,
+                    wagon.getId(),
+                ));
             }
           } else if (event.button === 2) {
             storedBrick.getRenderer().process('switch');

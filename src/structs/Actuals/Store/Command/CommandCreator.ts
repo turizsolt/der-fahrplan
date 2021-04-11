@@ -149,4 +149,28 @@ export class CommandCreator {
       params: [trainId, pedalFrom, pedalTo]
     };
   }
+
+  static mergeTrain(
+    train1Id: string,
+    train2Id: string,
+    wagonId: string
+  ): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'mergeTrain',
+      params: [train1Id, train2Id, wagonId]
+    };
+  }
+
+  static unmergeTrain(
+    train1Id: string,
+    train2Id: string,
+    wagonId: string
+  ): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'unmergeTrain',
+      params: [train1Id, train2Id, wagonId]
+    };
+  }
 }
