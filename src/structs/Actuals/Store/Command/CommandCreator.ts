@@ -205,4 +205,20 @@ export class CommandCreator {
       params: [wagonId]
     };
   }
+
+  static shuntingTrain(trainId: string): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'shuntingTrain',
+      params: [trainId]
+    };
+  }
+
+  static unshuntingTrain(trainId: string): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'unshuntingTrain',
+      params: [trainId]
+    };
+  }
 }

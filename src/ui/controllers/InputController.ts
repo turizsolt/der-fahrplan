@@ -572,10 +572,29 @@ export class InputController {
 
 
       case 'Z':
-      const wagon = this.getSelected() as Wagon;
-      this.store.getCommandLog().addAction(CommandCreator.reverseWagonFacing(
+      if (this.getSelected().getType() === TYPES.Wagon) {
+        const wagon = this.getSelected() as Wagon;
+        this.store.getCommandLog().addAction(CommandCreator.reverseWagonFacing(
           wagon.getId(),
-      ));
+        ));
+      }
+        break;
+
+      case 'M':
+      if (this.getSelected().getType() === TYPES.Wagon) {
+        const wagon = this.getSelected() as Wagon;
+        const isShunting = wagon.getTrain().getSpeed().isShunting();
+        this.store.getCommandLog().addAction(
+          isShunting ?
+            CommandCreator.unshuntingTrain(
+              wagon.getTrain().getId(),
+            ) :
+            CommandCreator.shuntingTrain(
+              wagon.getTrain().getId(),
+            )
+        );
+        wagon.getTrain().getWagons().map(wagon => wagon.update());
+      }
         break;
 
       case '/':

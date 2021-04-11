@@ -59,7 +59,9 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
     const rayA = Ray.fromData(wagon.rayA);
     if (wagon.isFirst) {
       const matA = wagon.isTrainSelected
-        ? MaterialName.SelectorRed
+        ? wagon.isShunting
+          ? MaterialName.ShuntingRed
+          : MaterialName.SelectorRed
         : MaterialName.BedGray;
       this.selectedAMesh.position = CoordinateToBabylonVector3(rayA.coord);
       this.selectedAMesh.position.y = 10;

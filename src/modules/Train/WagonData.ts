@@ -10,4 +10,5 @@ export interface WagonData {
   rayB: RayData;
   isTrainSelected: boolean;
   isFirst: boolean;
+  isShunting: boolean;
 }

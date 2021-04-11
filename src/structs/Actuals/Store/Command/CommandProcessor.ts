@@ -241,4 +241,14 @@ export class CommandProcessor {
   unreverseWagonFacing(wagonId: string): void {
     this.reverseWagonFacing(wagonId);
   }
+
+  shuntingTrain(trainId: string): void {
+    const train = this.store.get(trainId) as Train;
+    train.getSpeed().setShunting(true);
+  }
+
+  unshuntingTrain(trainId: string): void {
+    const train = this.store.get(trainId) as Train;
+    train.getSpeed().setShunting(false);
+  }
 }
