@@ -30,5 +30,7 @@ export class ActualWagonAxles implements WagonAxles {
       A: this.positions[WhichEnd.B],
       B: this.positions[WhichEnd.A]
     };
+    this.positions.A.reverse();
+    this.positions.B.reverse();
   }
 }

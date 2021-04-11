@@ -549,9 +549,10 @@ export class InputController {
     switch (key) {
       case 'ArrowRight':
         if (this.getSelected().getType() === TYPES.Wagon) {
-          this.getSelectedBrick()
-            .getRenderer()
-            .process('swapSide');
+            const wagon = this.getSelected() as Wagon;
+            this.store.getCommandLog().addAction(CommandCreator.reverseTrain(
+                wagon.getTrain().getId(),
+            ));
         }
         break;
 

@@ -69,6 +69,8 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   reverse(): void {
+    if(this.speed.getSpeed() !== 0) return;
+    
     this.wagons = this.wagons.reverse();
     this.wagons.map(wagon => wagon.axleReverse());
     this.position = this.wagons[0].getAxlePosition(WhichEnd.A);
@@ -78,6 +80,20 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return this.wagons[this.wagons.length - 1]
       .getAxlePosition(WhichEnd.B)
       ?.clone();
+  }
+
+  private setMarkers(): void {
+    const start = this.position.getDirectedTrack();
+    const end = this.getEndPosition().getDirectedTrack();
+    start.addMarkerBothDirections(this.position.getPosition(), {type: 'Train', train: this});
+    end.addMarkerBothDirections(this.getEndPosition().getPosition(), {type: 'Train', train: this});
+  }
+
+  private clearMarkers(): void {
+    const start = this.position.getDirectedTrack();
+    const end = this.getEndPosition().getDirectedTrack();
+    start.removeMarkerBothDirections({type: 'Train', train: this});
+    end.removeMarkerBothDirections({type: 'Train', train: this});
   }
 
   private alignAxles(): void {
@@ -94,8 +110,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       }
       iter.getTrack().checkout(this);
 
-      start.removeMarkerBothDirections({type: 'Train', train: this});
-      end.removeMarkerBothDirections({type: 'Train', train: this});
+      this.clearMarkers();
     }
 
     const pos: PositionOnTrack = this.position.clone();
@@ -120,10 +135,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }
     iter.getTrack().checkin(this);
 
-    const start = this.position.getDirectedTrack();
-    const end = this.getEndPosition().getDirectedTrack();
-    start.addMarkerBothDirections(this.position.getPosition(), {type: 'Train', train: this});
-    end.addMarkerBothDirections(this.getEndPosition().getPosition(), {type: 'Train', train: this});
+    this.setMarkers();
   }
 
   remove(): void {
@@ -132,6 +144,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   removeAndKeepWagons(): void {
+    this.clearMarkers();
     this.store.unregister(this);
   }
 

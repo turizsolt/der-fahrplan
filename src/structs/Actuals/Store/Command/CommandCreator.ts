@@ -173,4 +173,20 @@ export class CommandCreator {
       params: [train1Id, train2Id, wagonId]
     };
   }
+
+  static reverseTrain(trainId: string): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'reverseTrain',
+      params: [trainId]
+    };
+  }
+
+  static unreverseTrain(trainId: string): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'unreverseTrain',
+      params: [trainId]
+    };
+  }
 }

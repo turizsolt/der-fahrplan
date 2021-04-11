@@ -86,7 +86,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   axleReverse(): void {
-    return this.axles.reverse();
+    this.axles.reverse();
+    this.update();
   }
 
   tick(): void {

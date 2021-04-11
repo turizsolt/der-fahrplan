@@ -223,4 +223,13 @@ export class CommandProcessor {
     const wagon = this.store.get(wagonId) as Wagon;
     train1.separate(wagon, train2Id);
   }
+
+  reverseTrain(trainId: string): void {
+    const train = this.store.get(trainId) as Train;
+    train.reverse();
+  }
+
+  unreverseTrain(trainId: string): void {
+    this.reverseTrain(trainId);
+  }
 }
