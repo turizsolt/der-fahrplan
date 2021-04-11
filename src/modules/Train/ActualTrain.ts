@@ -102,8 +102,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     // checkouts
     let iter = this.getEndPosition()?.getDirectedTrack();
     if(iter) {
-    const start = this.position.getDirectedTrack();
-    const end = this.getEndPosition().getDirectedTrack();
+      const start = this.position.getDirectedTrack();
       while (iter !== start) {
         iter.getTrack().checkout(this);
         iter = iter.next();
@@ -183,8 +182,12 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.nearestTrain = Nearest.train(nextPosition);
 
     if(this.nearestTrain.distance < WAGON_GAP) {
-      console.log('Proximity warning!');
-      // todo masikat megforditani, ha kell
+      const frontDist = this.nearestTrain.train.getPosition().getRay().coord.distance2d(this.position.getRay().coord);
+      const rearDist = this.nearestTrain.train.getEndPosition().getRay().coord.distance2d(this.position.getRay().coord);
+      if(frontDist < rearDist) {
+        this.nearestTrain.train.reverse();
+      }
+
       this.store.getCommandLog().addAction(CommandCreator.mergeTrain(
         this.nearestTrain.train.getId(),
         this.getId(),
