@@ -2,6 +2,8 @@ import { TrackSegment } from './TrackSegment';
 import { TrackBase } from './TrackBase';
 import { TrackCurve } from './TrackCurve';
 import { TrackDirection } from './TrackDirection';
+import { TrackMarker } from './TrackMarker';
+import { PositionedTrackMarker } from '../PositionedTrackMarker';
 
 export interface DirectedTrack {
   next(): DirectedTrack;
@@ -15,4 +17,7 @@ export interface DirectedTrack {
   getCurve(): TrackCurve;
   getLength(): number;
   getDirection(): TrackDirection;
+
+  addMarker(position: number, marker: TrackMarker): void;
+  getMarkers(): PositionedTrackMarker[];
 }

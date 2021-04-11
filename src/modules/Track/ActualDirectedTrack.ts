@@ -3,6 +3,8 @@ import { DirectedTrack } from './DirectedTrack';
 import { TrackBase } from './TrackBase';
 import { TrackCurve } from './TrackCurve';
 import { TrackDirection } from './TrackDirection';
+import { TrackMarker } from './TrackMarker';
+import { PositionedTrackMarker } from '../PositionedTrackMarker';
 
 export class ActualDirectedTrack implements DirectedTrack {
   private nextTrack: DirectedTrack = null;
@@ -48,5 +50,15 @@ export class ActualDirectedTrack implements DirectedTrack {
 
   getDirection(): TrackDirection {
     return this.trackDirection;
+  }
+
+  private markers: PositionedTrackMarker[] = [];
+
+  addMarker(position: number, marker: TrackMarker): void {
+    this.markers.push({ position, marker });
+  }
+
+  getMarkers(): PositionedTrackMarker[] {
+    return this.markers;
   }
 }
