@@ -65,7 +65,7 @@ export class ActualDirectedTrack implements DirectedTrack {
 
   addMarkerBothDirections(position: number, marker: TrackMarker): void {
     this.addMarker(position, marker);
-    this.reverseTrack?.addMarker(position, marker);
+    this.reverseTrack?.addMarker(this.getLength() - position, marker);
   }
 
   removeMarkerBothDirections(marker: TrackMarker): void {

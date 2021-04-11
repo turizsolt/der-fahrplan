@@ -84,11 +84,15 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     let iter = this.getEndPosition()?.getDirectedTrack();
     if(iter) {
     const start = this.position.getDirectedTrack();
+    const end = this.getEndPosition().getDirectedTrack();
       while (iter !== start) {
         iter.getTrack().checkout(this);
         iter = iter.next();
       }
       iter.getTrack().checkout(this);
+
+      start.removeMarkerBothDirections({type: 'Train', train: this});
+      end.removeMarkerBothDirections({type: 'Train', train: this});
     }
 
     const pos: PositionOnTrack = this.position.clone();
@@ -112,6 +116,11 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       iter = iter.next();
     }
     iter.getTrack().checkin(this);
+
+    const start = this.position.getDirectedTrack();
+    const end = this.getEndPosition().getDirectedTrack();
+    start.addMarkerBothDirections(this.position.getPosition(), {type: 'Train', train: this});
+    end.addMarkerBothDirections(this.getEndPosition().getPosition(), {type: 'Train', train: this});
   }
 
   remove(): void {

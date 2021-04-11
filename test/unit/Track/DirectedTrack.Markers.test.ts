@@ -50,6 +50,7 @@ describe('DirectedTrack.Markers', () => {
     const dt = createDirectedTrack();
     const dt2 = createDirectedTrack();
     dt.setReverse(dt2);
+    dt.getLength = () => 100;
 
     const myMarker: TrackMarker = { type: 'Train', train: null };
     dt.addMarkerBothDirections(7, myMarker);
