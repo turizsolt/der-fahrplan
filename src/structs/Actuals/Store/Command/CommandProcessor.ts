@@ -232,4 +232,13 @@ export class CommandProcessor {
   unreverseTrain(trainId: string): void {
     this.reverseTrain(trainId);
   }
+
+  reverseWagonFacing(wagonId: string): void {
+    const wagon = this.store.get(wagonId) as Wagon;
+    wagon.swapEnds();
+  }
+
+  unreverseWagonFacing(wagonId: string): void {
+    this.reverseWagonFacing(wagonId);
+  }
 }

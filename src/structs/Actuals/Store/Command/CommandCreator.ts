@@ -189,4 +189,20 @@ export class CommandCreator {
       params: [trainId]
     };
   }
+
+  static reverseWagonFacing(wagonId: string): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'reverseWagonFacing',
+      params: [wagonId]
+    };
+  }
+
+  static unreverseWagonFacing(wagonId: string): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'unreverseWagonFacing',
+      params: [wagonId]
+    };
+  }
 }

@@ -5,8 +5,8 @@ import { testContainer } from '../../../src/di/test.config';
 import { TYPES } from '../../../src/di/TYPES';
 import { Wagon } from '../../../src/structs/Interfaces/Wagon';
 import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
-import { WagonControlType } from '../../../src/structs/Actuals/Wagon/WagonControl/WagonControlType';
 import { WagonConnectable } from '../../../src/structs/Actuals/Wagon/WagonConnectable';
+import { TrackDirection } from '../../../src/modules/Track/TrackDirection';
 chai.use(chaiAlmost());
 
 const store: Store = testContainer
@@ -21,8 +21,6 @@ describe('WagonConfig', () => {
 
     // expect(wagon.getMaxSpeed()).equals(3);
     // expect(wagon.getAccelerateBy()).equals(0.25);
-
-    expect(wagon.getControlType()).equals(WagonControlType.Locomotive);
 
     expect(wagon.getPassengerArrangement()).deep.equals({ rows: 7, seats: 3 }); // ???
 
@@ -41,7 +39,12 @@ describe('WagonConfig', () => {
     const wagon: Wagon = WagonFactory().init({
       maxSpeed: 5,
       accelerateBy: 0.5,
-      controlType: WagonControlType.Nothing,
+      control: {
+        A: false,
+        B: false
+      },
+      engine: false,
+      appearanceFacing: TrackDirection.AB,
       passengerArrangement: { rows: 5, seats: 2 },
       appearanceId: 'utas',
       length: 15,
@@ -53,8 +56,6 @@ describe('WagonConfig', () => {
 
     // expect(wagon.getMaxSpeed()).equals(5);
     // expect(wagon.getAccelerateBy()).equals(0.5);
-
-    expect(wagon.getControlType()).equals(WagonControlType.Nothing);
 
     expect(wagon.getPassengerArrangement()).deep.equals({ rows: 5, seats: 2 });
 

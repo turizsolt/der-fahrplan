@@ -7,6 +7,7 @@ import { getTestStore } from '../../getTestStore';
 import { WagonAxles } from '../../../src/modules/Train/WagonAxles';
 import { ActualWagonAxles } from '../../../src/modules/Train/ActualWagonAxles';
 import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
+import { getPredefinedWagonConfig } from '../../../src/structs/Actuals/Wagon/ActualWagonConfigs';
 chai.use(chaiAlmost());
 
 const store = getTestStore();
@@ -16,7 +17,9 @@ describe('WagonAxles', () => {
     const { track } = createTrack();
     const pot = new PositionOnTrack(track, 14, TrackDirection.AB);
     const pot2 = new PositionOnTrack(track, 0, TrackDirection.AB);
-    const wagonAxles: WagonAxles = new ActualWagonAxles();
+    const wagonAxles: WagonAxles = new ActualWagonAxles(
+      getPredefinedWagonConfig('wagon')
+    );
     wagonAxles.setAxlePosition(WhichEnd.A, pot);
     wagonAxles.setAxlePosition(WhichEnd.B, pot2);
     wagonAxles.setFacing(TrackDirection.AB);

@@ -8,6 +8,7 @@ import { WagonRenderer } from '../../structs/Renderers/WagonRenderer';
 import { MaterialName } from './MaterialName';
 import { WagonData } from '../../modules/Train/WagonData';
 import { Ray } from '../../structs/Geometry/Ray';
+import { TrackDirection } from '../../modules/Track/TrackDirection';
 
 @injectable()
 export class WagonBabylonRenderer extends BaseBabylonRenderer
@@ -50,7 +51,10 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
     const ray = Ray.fromData(wagon.ray);
     this.mesh.position = CoordinateToBabylonVector3(ray.coord);
     this.mesh.position.y = 4.2;
-    this.mesh.rotation.y = ray.dirXZ + Math.PI / 2;
+    this.mesh.rotation.y =
+      ray.dirXZ +
+      Math.PI / 2 +
+      (wagon.appearanceFacing === TrackDirection.BA ? Math.PI : 0);
 
     const rayA = Ray.fromData(wagon.rayA);
     if (wagon.isFirst) {

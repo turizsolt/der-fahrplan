@@ -16,13 +16,8 @@ import {
   PassengerArrangement
 } from '../../../mixins/BoardableWagon';
 import { WagonAnnouncement } from './WagonAnnouncement';
-import { WagonControlType } from './WagonControl/WagonControlType';
 import { WagonConnectable } from './WagonConnectable';
 import { WagonConfig } from './WagonConfig';
-import { WagonControl } from './WagonControl/WagonControl';
-import { WagonControlLocomotive } from './WagonControl/WagonControlLocomotive';
-import { WagonControlControlCar } from './WagonControl/WagonControlControlCar';
-import { WagonControlNothing } from './WagonControl/WagonControlNothing';
 import { Trip } from '../../Scheduling/Trip';
 import { WagonAxles } from '../../../modules/Train/WagonAxles';
 import { ActualWagonAxles } from '../../../modules/Train/ActualWagonAxles';
@@ -32,6 +27,7 @@ import { LineSegment } from '../../Geometry/LineSegment';
 import { WagonData } from '../../../modules/Train/WagonData';
 import { Train } from '../../../modules/Train/Train';
 import { Util } from '../../Util';
+import { TrackDirection } from '../../../modules/Track/TrackDirection';
 
 export interface ActualWagon extends Emitable { }
 const doApply = () => applyMixins(ActualWagon, [Emitable]);
@@ -40,7 +36,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
   protected boardable: BoardableWagon;
   protected announcement: WagonAnnouncement;
-  protected control: WagonControl;
   protected axles: WagonAxles;
 
   private appearanceId: string;
@@ -50,20 +45,12 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   init(config?: WagonConfig, train?: Train): Wagon {
     super.initStore(TYPES.Wagon);
 
-    this.axles = new ActualWagonAxles();
+    this.axles = new ActualWagonAxles(config);
     this.boardable = new BoardableWagon(
       this,
       config && config.passengerArrangement
     );
     this.announcement = new WagonAnnouncement(this, this.store, train);
-
-    if (!config || config.controlType === WagonControlType.Locomotive) {
-      this.control = new WagonControlLocomotive();
-    } else if (config.controlType === WagonControlType.ControlCar) {
-      this.control = new WagonControlControlCar();
-    } else {
-      this.control = new WagonControlNothing();
-    }
 
     this.appearanceId = config ? config.appearanceId : 'wagon';
 
@@ -88,37 +75,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   axleReverse(): void {
     this.axles.reverse();
     this.update();
-  }
-
-  tick(): void {
-      /*
-    this.speed.tick();
-    if (this.getSpeed() !== 0) {
-      if (this.speed.getMovingState() === WagonMovingState.Shunting) {
-        const whichEnd = this.getSelectedSide() || WhichEnd.A;
-        const shuntingTo = this.getSpeed() < 0 ? otherEnd(whichEnd) : whichEnd;
-        const headingWagonEnd = this.getLastWagonEnd(shuntingTo);
-        const headingWagon = headingWagonEnd.getEndOf();
-        const headingWhichEnd = headingWagonEnd.getWhichEnd();
-        headingWagon.moveTowardsWagon(
-          headingWhichEnd,
-          Math.abs(this.getSpeed())
-        );
-      } else {
-        if (this.getSelectedSide() === WhichEnd.A) {
-          this.moveTowardsWagonA(this.getSpeed());
-        } else if (this.getSelectedSide() === WhichEnd.B) {
-          this.moveTowardsWagonB(this.getSpeed());
-        }
-      }
-    } else {
-      this.update();
-    } */
-    this.update();
-  }
-
-  getControlType(): WagonControlType {
-    return this.control.getControlType();
   }
 
   getPassengerArrangement(): PassengerArrangement {
@@ -259,28 +215,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   swapEnds(): void {
-    // todo
+    this.axles.setFacing(this.axles.getFacing() === TrackDirection.AB ? TrackDirection.BA :TrackDirection.AB);
     this.update();
-  }
-
-  ///////////////////////
-  // control
-  ///////////////////////
-
-  getSelectedSide(): WhichEnd | null {
-    return this.control.getSelectedSide();
-  }
-
-  onSelectChanged(selected: boolean): void {
-    this.control.onSelected(selected);
-  }
-
-  swapSelectedSide(): void {
-    this.control.swapSelectedSide();
-  }
-
-  onStocked(): void {
-    this.control.onStocked();
   }
 
   ///////////////////////
@@ -295,7 +231,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       ...this.boardable.persist(),
 
       config: {
-        controlType: this.getControlType(),
         passengerArrangement: this.getPassengerArrangement(),
         appearanceId: this.getAppearanceId(),
         length: this.getLength(),
@@ -328,6 +263,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       return {
           id: this.id,
           appearanceId: this.getAppearanceId(),
+          appearanceFacing: this.axles.getFacing(),
           ray: this.getCenterRay().persist(),
           rayA: this.getAxlePosition(WhichEnd.A).getRay().persist(),
           rayB: this.getAxlePosition(WhichEnd.B).getRay().persist(),

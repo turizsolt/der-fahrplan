@@ -5,7 +5,6 @@ import { BaseBrick } from './BaseBrick';
 import { Passenger } from './Passenger';
 import { Boardable } from '../../mixins/Boardable';
 import { WagonConfig } from '../Actuals/Wagon/WagonConfig';
-import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
 import { PassengerArrangement } from '../../mixins/BoardableWagon';
 import { WagonConnectable } from '../Actuals/Wagon/WagonConnectable';
 import { Trip } from '../Scheduling/Trip';
@@ -17,15 +16,11 @@ export interface Wagon extends Boardable, BaseBrick, Emitable {
   init(config?: WagonConfig, train?: Train): Wagon;
   update(): void;
   getRay(): Ray;
-  onStocked(): void;
-  getSelectedSide(): WhichEnd | null;
-  swapSelectedSide(): void;
 
   setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack): void;
   getAxlePosition(whichEnd: WhichEnd): PositionOnTrack;
   axleReverse(): void;
 
-  getControlType(): WagonControlType;
   getPassengerArrangement(): PassengerArrangement;
   getPassengerCount(): number;
   getAppearanceId(): string;
@@ -52,7 +47,6 @@ export interface Wagon extends Boardable, BaseBrick, Emitable {
   setTrain(train: Train): void;
 
   getBoardedPassengers(): Passenger[];
-  tick(): void;
 
   platformsBeside(): Platform[];
 }

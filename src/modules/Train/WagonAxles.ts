@@ -7,5 +7,7 @@ export interface WagonAxles {
   setFacing(facing: TrackDirection): void;
   getAxlePosition(whichEnd: WhichEnd): PositionOnTrack;
   getFacing(): TrackDirection;
+  hasControl(whichEnd: WhichEnd): boolean;
+  hasEngine(): boolean;
   reverse(): void;
 }

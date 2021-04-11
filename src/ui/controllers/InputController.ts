@@ -572,9 +572,10 @@ export class InputController {
 
 
       case 'Z':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('swapEnds');
+      const wagon = this.getSelected() as Wagon;
+      this.store.getCommandLog().addAction(CommandCreator.reverseWagonFacing(
+          wagon.getId(),
+      ));
         break;
 
       case '/':
