@@ -215,7 +215,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   swapEnds(): void {
-    this.axles.setFacing(this.axles.getFacing() === TrackDirection.AB ? TrackDirection.BA :TrackDirection.AB);
+    this.axles.swapEnds();
     this.update();
   }
 

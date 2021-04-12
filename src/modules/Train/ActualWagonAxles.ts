@@ -41,17 +41,21 @@ export class ActualWagonAxles implements WagonAxles {
   }
 
   reverse(): void {
-    this.facing =
-      this.facing === TrackDirection.AB ? TrackDirection.BA : TrackDirection.AB;
     this.positions = {
       A: this.positions[WhichEnd.B],
       B: this.positions[WhichEnd.A]
     };
     this.positions.A.reverse();
     this.positions.B.reverse();
+    this.swapEnds();
+  }
+
+  swapEnds(): void {
+    this.facing =
+      this.facing === TrackDirection.AB ? TrackDirection.BA : TrackDirection.AB;
     this.controls = {
-        A: this.controls.B,
-        B: this.controls.A
+      A: this.controls.B,
+      B: this.controls.A
     }
   }
 }

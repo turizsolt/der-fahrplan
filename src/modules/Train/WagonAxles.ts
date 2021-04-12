@@ -10,4 +10,5 @@ export interface WagonAxles {
   hasControl(whichEnd: WhichEnd): boolean;
   hasEngine(): boolean;
   reverse(): void;
+  swapEnds(): void;
 }
