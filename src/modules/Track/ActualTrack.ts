@@ -12,6 +12,8 @@ import { TrackCurve } from './TrackCurve';
 import { TrackSegmentData } from './TrackSegmentData';
 import { TrackDirection } from './TrackDirection';
 import { DirectedTrack } from './DirectedTrack';
+import { TrackJoint } from './TrackJoint/TrackJoint';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
@@ -70,14 +72,27 @@ export class ActualTrack extends ActualTrackBase implements Track {
   persist(): Object {
     return {
       id: this.getId(),
-      type: 'Track'
-
-      // segment: this.curve.persist()
+      type: 'Track',
+      segmentData: this.segment.persist()
     };
   }
 
   load(obj: any, store: Store): void {
-    // this.presetId(obj.id);
-    // this.init(obj.segment.map(a => new Coordinate(a.x, a.y, a.z)));
+    this.presetId(obj.id);
+    this.init(toSegmentData(obj.segmentData, store));
   }
+}
+
+export function toSegmentData(data: any, store: Store): TrackSegmentData {
+  return {
+    startJointEnd: {
+      end: data.startJointEnd.end,
+      joint: store.get(data.startJointEnd.joint) as TrackJoint
+    },
+    endJointEnd: {
+      end: data.startJointEnd.end,
+      joint: store.get(data.startJointEnd.joint) as TrackJoint
+    },
+    coordinates: data.coordinates.map(c => new Coordinate(c.x, c.y, c.z))
+  };
 }

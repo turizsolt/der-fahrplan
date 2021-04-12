@@ -48,6 +48,20 @@ export class ActualTrainSpeed implements TrainSpeed {
     }
   }
 
+  persist(): any {
+    return {
+      speed: this.speed,
+      shunting: this.shunting,
+      pedal: this.pedal
+    };
+  }
+
+  load(data: any): void {
+    this.speed = data.speed;
+    this.shunting = data.shunting;
+    this.pedal = data.pedal;
+  }
+
   private accelerate(): void {
     this.speed = Math.min(this.allowedSpeed, this.speed + this.accelerateBy);
   }

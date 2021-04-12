@@ -145,6 +145,7 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
 
     //   sleeperPointsE.map(x => ballon(x.setY(1.2).coord, BABYLON.Color3.White));
     //   sleeperPointsF.map(x => ballon(x.setY(1.2).coord, BABYLON.Color3.White));
+    this.update();
   }
 
   private lastSelected: boolean = false;
@@ -198,7 +199,6 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
     }
   }
 
-  // todo needs only for rendering, not for the model
   naturalSplitPoints(): Ray[] {
     const chainE = this.trackSwitch.getSegmentLeft().getLineSegmentChain();
     const chainF = this.trackSwitch.getSegmentRight().getLineSegmentChain();

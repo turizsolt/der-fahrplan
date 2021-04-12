@@ -7,4 +7,6 @@ export interface TrainSpeed {
   setPedal(pedal: SpeedPedal): void;
   getPedal(): SpeedPedal;
   tick(): void;
+  persist(): any;
+  load(data: any): void;
 }

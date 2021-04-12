@@ -11,4 +11,5 @@ export interface TrackEnd {
   getJointEnd(): TrackJointEnd;
   connect(): void;
   disconnect(): void;
+  persist(): any;
 }

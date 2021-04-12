@@ -77,9 +77,9 @@ export class ActualStore implements Store {
       [TYPES.RouteStop]: 11,
       [TYPES.Route]: 10,
       [TYPES.Trip]: 8,
+      [TYPES.TrackJoint]: 5,
       [TYPES.Track]: 4,
       [TYPES.TrackSwitch]: 3,
-      [TYPES.TrackJoint]: 2,
       [TYPES.Platform]: 1,
       // skip zero, cos it is falsy
       [TYPES.Wagon]: -1,

@@ -51,7 +51,8 @@ const mockTrackSegment: TrackSegment = {
   getTrack: () => mockTrackBase,
   remove: () => {},
   getDirected: () => null,
-  getLength: () => null
+  getLength: () => null,
+  persist: () => null
 };
 const mockDirectedTrack: DirectedTrack = {
   next: () => null,

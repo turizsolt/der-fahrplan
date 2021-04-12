@@ -11,6 +11,7 @@ import { ActualTrainSpeed } from './ActualTrainSpeed';
 import { Nearest } from './Nearest';
 import { NearestData } from './NearestData';
 import { WAGON_GAP } from '../../structs/Actuals/Wagon/WagonGap';
+import { PositionData } from './PositionData';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
@@ -214,8 +215,41 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   persist(): Object {
-    return {};
+    return {
+        id: this.id,
+        type: 'Train',
+        position: this.position?.persist(),
+        speed: this.speed?.persist(),
+        wagons: this.wagons.map(wagon => wagon.getId())
+    };
   }
 
-  load(obj: Object, store: Store): void {}
+  persistDeep(): Object {
+    return {
+      id: this.id,
+      type: 'Train',
+      wagons: this.wagons.map(x => ({
+        id: x.getId(),
+        appearanceId: x.getAppearanceId(),
+        tripId: x.getTrip()?.getId(),
+        tripNo: 1, // todo trip, this.trips.findIndex(y => x.trip === y) + 1,
+        trip: x.getTrip()?.persistDeep(),
+        side: WhichEnd.A,
+      })),
+      trips: [] // todo trip, this.trips.map(t => t.persistDeep())
+    };
+  }
+
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(
+      PositionOnTrack.fromData(obj.position as PositionData, store), 
+      obj.wagons.map(id => store.get(id) as Wagon)
+    );
+    this.speed.load(obj.speed);
+    this.wagons.map(wagon => {
+        wagon.setTrain(this);
+        wagon.update();
+    });
+  }
 }

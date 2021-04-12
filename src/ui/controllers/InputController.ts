@@ -498,7 +498,7 @@ export class InputController {
         const data = {
           data: this.store.persistAll(),
           camera: this.saveCamera(),
-          _version: 1,
+          _version: 2,
           _format: 'fahrplan'
         };
 

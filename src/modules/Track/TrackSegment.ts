@@ -14,4 +14,5 @@ export interface TrackSegment {
   getCurve(): TrackCurve;
   connect(): void;
   disconnect(): void;
+  persist(): any;
 }

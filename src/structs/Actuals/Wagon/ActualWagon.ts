@@ -245,11 +245,14 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
         connectable: {
           A: this.getConnectable(WhichEnd.A),
           B: this.getConnectable(WhichEnd.B)
-        }
+        },
+        control: {
+            A: this.hasControl(WhichEnd.A),
+            B: this.hasControl(WhichEnd.B),
+        },
+        engine: this.hasEngine(),
+        appearanceFacing: this.axles.getFacing()
       },
-
-      // A: this.getA().persist(),
-      // B: this.getB().persist(),
 
       ...this.announcement.persist()
     };
@@ -294,15 +297,13 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(obj.config);
-
+    
     this.setSeatCount(obj.seatCount, obj.seatColumns);
     this.boardable.load(obj.seats, store);
 
     if (obj.trip) {
       this.assignTrip(store.get(obj.trip) as Trip);
     }
-
-    // this.renderer.init(this);
   }
 }
 

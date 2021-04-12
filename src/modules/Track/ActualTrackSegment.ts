@@ -64,4 +64,12 @@ export class ActualTrackSegment implements TrackSegment {
     this.A.disconnect();
     this.B.disconnect();
   }
+
+  persist(): any {
+    return {
+        startJointEnd: this.A.persist(),
+        endJointEnd: this.B.persist(),
+        coordinates: this.AB.getCurve().persist()
+    };
+  }
 }
