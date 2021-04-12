@@ -547,6 +547,7 @@ export class InputController {
     if (!this.getSelected()) return;
 
     switch (key) {
+      case 'ArrowLeft':
       case 'ArrowRight':
         if (this.getSelected().getType() === TYPES.Wagon) {
             const wagon = this.getSelected() as Wagon;
