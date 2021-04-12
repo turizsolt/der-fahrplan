@@ -8,14 +8,17 @@ import { Wagon } from '../../../src/structs/Interfaces/Wagon';
 import { TYPES } from '../../../src/di/TYPES';
 import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
 import { Train } from '../../../src/modules/Train/Train';
+import { getPredefinedWagonConfig } from '../../../src/structs/Actuals/Wagon/ActualWagonConfigs';
 chai.use(chaiAlmost());
 
 const store = getTestStore();
+const wagonConfig = getPredefinedWagonConfig('wagon');
+const createWagon = () => store.create<Wagon>(TYPES.Wagon).init(wagonConfig);
 
 describe('Train', () => {
   it('create a Train and get basic props', () => {
     const { track } = createTrack(100);
-    const wagon = store.create<Wagon>(TYPES.Wagon).init();
+    const wagon = createWagon();
     const pot = new PositionOnTrack(track, 100, TrackDirection.AB);
     const train = store.create<Train>(TYPES.Train).init(pot, [wagon]);
     expect(train).not.equals(null);
@@ -25,8 +28,8 @@ describe('Train', () => {
 
   it('add wagons to train', () => {
     const { track } = createTrack(100);
-    const wagon = store.create<Wagon>(TYPES.Wagon).init();
-    const wagon2 = store.create<Wagon>(TYPES.Wagon).init();
+    const wagon = createWagon();
+    const wagon2 = createWagon();
     const pot = new PositionOnTrack(track, 100, TrackDirection.AB);
     const train = store.create<Train>(TYPES.Train).init(pot, [wagon]);
     train.addWagons([wagon2]);
@@ -35,8 +38,8 @@ describe('Train', () => {
 
   it('merge two trains', () => {
     const { track } = createTrack(100);
-    const wagon = store.create<Wagon>(TYPES.Wagon).init();
-    const wagon2 = store.create<Wagon>(TYPES.Wagon).init();
+    const wagon = createWagon();
+    const wagon2 = createWagon();
     const pot = new PositionOnTrack(track, 100, TrackDirection.AB);
     const pot2 = new PositionOnTrack(track, 85, TrackDirection.AB);
     const train = store.create<Train>(TYPES.Train).init(pot, [wagon]);
@@ -50,8 +53,8 @@ describe('Train', () => {
   it('separate a train into two', () => {
     const { track } = createTrack(100);
     const pot = new PositionOnTrack(track, 100, TrackDirection.AB);
-    const wagon = store.create<Wagon>(TYPES.Wagon).init();
-    const wagon2 = store.create<Wagon>(TYPES.Wagon).init();
+    const wagon = createWagon();
+    const wagon2 = createWagon();
     const train = store.create<Train>(TYPES.Train).init(pot, [wagon, wagon2]);
     const train2 = train.separate(wagon2);
     expect(train.getWagons()).deep.equals([wagon]);
@@ -61,9 +64,9 @@ describe('Train', () => {
   it('separate a train into two, but wagon is not present', () => {
     const { track } = createTrack(100);
     const pot = new PositionOnTrack(track, 100, TrackDirection.AB);
-    const wagon = store.create<Wagon>(TYPES.Wagon).init();
-    const wagon2 = store.create<Wagon>(TYPES.Wagon).init();
-    const wagon3 = store.create<Wagon>(TYPES.Wagon).init();
+    const wagon = createWagon();
+    const wagon2 = createWagon();
+    const wagon3 = createWagon();
     const train = store.create<Train>(TYPES.Train).init(pot, [wagon, wagon2]);
     const train2 = train.separate(wagon3);
     expect(train.getWagons()).deep.equals([wagon, wagon2]);
@@ -73,8 +76,8 @@ describe('Train', () => {
   it('reverse a train', () => {
     const { track } = createTrack(100);
     const pot = new PositionOnTrack(track, 100, TrackDirection.AB);
-    const wagon = store.create<Wagon>(TYPES.Wagon).init();
-    const wagon2 = store.create<Wagon>(TYPES.Wagon).init();
+    const wagon = createWagon();
+    const wagon2 = createWagon();
 
     const train = store.create<Train>(TYPES.Train).init(pot, [wagon, wagon2]);
     const endPot = wagon2.getAxlePosition(WhichEnd.B);
@@ -87,8 +90,8 @@ describe('Train', () => {
   it('reverse a train twice', () => {
     const { track } = createTrack(100);
     const pot = new PositionOnTrack(track, 100, TrackDirection.AB);
-    const wagon = store.create<Wagon>(TYPES.Wagon).init();
-    const wagon2 = store.create<Wagon>(TYPES.Wagon).init();
+    const wagon = createWagon();
+    const wagon2 = createWagon();
 
     const train = store.create<Train>(TYPES.Train).init(pot, [wagon, wagon2]);
     const endPot = wagon.getAxlePosition(WhichEnd.A);
@@ -102,9 +105,9 @@ describe('Train', () => {
   it('train put it.s wagons to position', () => {
     const { track } = createTrack(100);
     const pot = new PositionOnTrack(track, 100, TrackDirection.AB);
-    const wagon = store.create<Wagon>(TYPES.Wagon).init();
-    const wagon2 = store.create<Wagon>(TYPES.Wagon).init();
-    const wagon3 = store.create<Wagon>(TYPES.Wagon).init();
+    const wagon = createWagon();
+    const wagon2 = createWagon();
+    const wagon3 = createWagon();
     store.create<Train>(TYPES.Train).init(pot, [wagon, wagon2, wagon3]);
     expect(wagon.getAxlePosition(WhichEnd.A).getPosition()).equals(100);
     expect(wagon.getAxlePosition(WhichEnd.B).getPosition()).equals(86);

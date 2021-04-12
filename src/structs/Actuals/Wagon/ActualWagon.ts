@@ -219,6 +219,14 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.update();
   }
 
+  hasControl(whichEnd: WhichEnd):boolean {
+      return this.axles.hasControl(whichEnd);
+  }
+
+  hasEngine():boolean {
+    return this.axles.hasEngine();
+  }
+
   ///////////////////////
   // persist
   ///////////////////////

@@ -25,8 +25,15 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.alignAxles();
     this.wagons.map(wagon => wagon.update());
 
-    this.speed = new ActualTrainSpeed();
+    this.speed = new ActualTrainSpeed(() => this.canAccelerate());
     return this;
+  }
+
+  private canAccelerate(): boolean {
+    return (
+      (this.getWagons()[0].hasControl(WhichEnd.A) || this.getSpeed().isShunting()) &&
+      !!this.getWagons().find(wagon => wagon.hasEngine())
+    );
   }
 
   getSpeed(): TrainSpeed {

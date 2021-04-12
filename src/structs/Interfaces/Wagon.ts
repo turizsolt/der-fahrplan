@@ -49,4 +49,7 @@ export interface Wagon extends Boardable, BaseBrick, Emitable {
   getBoardedPassengers(): Passenger[];
 
   platformsBeside(): Platform[];
+
+  hasControl(whichEnd: WhichEnd): boolean;
+  hasEngine(): boolean;
 }

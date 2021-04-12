@@ -4,9 +4,11 @@ import { ActualTrainSpeed } from '../../../src/modules/Train/ActualTrainSpeed';
 import { SpeedPedal } from '../../../src/modules/Train/SpeedPedal';
 chai.use(chaiAlmost());
 
+const canAccelerate = () => true;
+
 describe('TrainSpeed', () => {
   it('shunting', () => {
-    const speed = new ActualTrainSpeed();
+    const speed = new ActualTrainSpeed(canAccelerate);
     speed.setShunting(true);
     expect(speed.isShunting()).is.true;
     speed.setShunting(false);
@@ -14,7 +16,7 @@ describe('TrainSpeed', () => {
   });
 
   it('pedal', () => {
-    const speed = new ActualTrainSpeed();
+    const speed = new ActualTrainSpeed(canAccelerate);
     speed.setPedal(SpeedPedal.Throttle);
     speed.tick();
     expect(speed.getSpeed()).gt(0);

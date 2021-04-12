@@ -10,6 +10,8 @@ export class ActualTrainSpeed implements TrainSpeed {
   private shunting: boolean = false;
   private pedal: SpeedPedal = SpeedPedal.Neutral;
 
+  constructor(private canAccelerate: () => boolean) {}
+
   setShunting(shunting: boolean): void {
     if (this.speed !== 0) return;
     this.shunting = shunting;
@@ -35,7 +37,9 @@ export class ActualTrainSpeed implements TrainSpeed {
   tick(): void {
     switch (this.pedal) {
       case SpeedPedal.Throttle:
-        this.accelerate();
+        if (this.canAccelerate()) {
+          this.accelerate();
+        }
         break;
 
       case SpeedPedal.Brake:
