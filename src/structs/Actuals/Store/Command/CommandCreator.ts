@@ -221,4 +221,20 @@ export class CommandCreator {
       params: [trainId]
     };
   }
+
+  static switchTrack(switchId: string): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'switchTrack',
+      params: [switchId]
+    };
+  }
+
+  static unswitchTrack(switchId: string): ProcessableCommand {
+    return {
+      type: 'processable',
+      function: 'unswitchTrack',
+      params: [switchId]
+    };
+  }
 }

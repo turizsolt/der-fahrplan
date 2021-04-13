@@ -271,7 +271,11 @@ export class InputController {
                 ));
             }
           } else if (event.button === 2) {
-            storedBrick.getRenderer().process('switch');
+            if (
+                storedBrick.getType() === Symbol.for('TrackSwitch')
+              ) {
+                this.store.getCommandLog().addAction(CommandCreator.switchTrack(storedBrick.getId()));
+            }
           } else {
             let selected: BaseStorable = this.store.getSelected();
             if (storedObj.isSelected()) {
@@ -617,9 +621,7 @@ export class InputController {
         break;
 
       case 'S':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('switch');
+        this.store.getCommandLog().addAction(CommandCreator.switchTrack(this.getSelectedBrick().getId()));
         break;
 
       case 'Home':

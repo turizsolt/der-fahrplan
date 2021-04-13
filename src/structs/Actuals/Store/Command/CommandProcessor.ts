@@ -251,4 +251,13 @@ export class CommandProcessor {
     const train = this.store.get(trainId) as Train;
     train.getSpeed().setShunting(false);
   }
+
+  switchTrack(switchId: string): void {
+    const switchTrack = this.store.get(switchId) as TrackSwitch;
+    switchTrack.switch();
+  }
+
+  unswitchTrack(switchId: string): void {
+    this.switchTrack(switchId);
+  }
 }
