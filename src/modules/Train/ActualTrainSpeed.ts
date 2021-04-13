@@ -30,6 +30,12 @@ export class ActualTrainSpeed implements TrainSpeed {
     return this.speed;
   }
 
+  getStoppingDistance(): number {
+    return (
+      ((this.speed / this.accelerateBy) * (this.speed - this.accelerateBy)) / 2
+    );
+  }
+
   getPedal(): SpeedPedal {
     return this.pedal;
   }

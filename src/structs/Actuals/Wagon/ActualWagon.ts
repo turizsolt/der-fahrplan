@@ -263,6 +263,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       id: this.id,
       type: 'Wagon',
       speed: this.getTrain()?.getSpeed()?.getSpeed(),
+      stoppingDistance: this.getTrain()?.getSpeed()?.getStoppingDistance(),
       train: this.getTrain()?.persistDeep(),
       trip: this.getTrip()?.persistDeep(),
       nearestEnd: this.getTrain()?.getNearestEnd()?.distance,
