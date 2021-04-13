@@ -37,6 +37,9 @@ import { Train } from '../../modules/Train/Train';
 import { SpeedPedal } from '../../modules/Train/SpeedPedal';
 import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
 import { GENERATE_ID } from '../../structs/Actuals/Store/Command/CommandLog';
+import { CreateSignalInputHandler } from './CreateSignalInputHandler';
+import { Signal } from '../../modules/Signaling/Signal';
+import { SignalSignal } from '../../modules/Signaling/SignalSignal';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -44,7 +47,8 @@ export enum InputMode {
   CREATE_TRACK = 'CREATE_TRACK',
   CREATE_PLATFORM = 'CREATE_PLATFORM',
   CREATE_ENGINE = 'CREATE_ENGINE',
-  CREATE_STATION = 'CREATE_STATION'
+  CREATE_STATION = 'CREATE_STATION',
+  CREATE_SIGNAL = 'CREATE_SIGNAL',
 }
 
 export class InputController {
@@ -93,7 +97,8 @@ export class InputController {
       [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(this.store),
       [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(),
       [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(),
-      [InputMode.CREATE_STATION]: new CreateStationInputHandler()
+      [InputMode.CREATE_STATION]: new CreateStationInputHandler(),
+      [InputMode.CREATE_SIGNAL]: new CreateSignalInputHandler(),
     };
 
     const modeNames = {
@@ -102,7 +107,8 @@ export class InputController {
       [InputMode.CREATE_TRACK]: '+Trac',
       [InputMode.CREATE_PLATFORM]: '+Plat',
       [InputMode.CREATE_ENGINE]: '+Eng',
-      [InputMode.CREATE_STATION]: '+Stat'
+      [InputMode.CREATE_STATION]: '+Stat',
+      [InputMode.CREATE_SIGNAL]: '+Sign',
     };
 
     for (let mode of Object.keys(this.inputHandlers)) {
@@ -272,16 +278,21 @@ export class InputController {
             }
           } else if (event.button === 2) {
             if (
-                storedBrick.getType() === Symbol.for('TrackSwitch')
+                storedBrick.getType() === TYPES.TrackSwitch
               ) {
                 this.store.getCommandLog().addAction(CommandCreator.switchTrack(storedBrick.getId()));
+            } else if (
+                storedBrick.getType() === TYPES.Signal
+              ) {
+                const signal = (storedBrick as Signal);
+                signal.setSignal(signal.getSignal() === SignalSignal.Red ? SignalSignal.Green : SignalSignal.Red);
             }
           } else {
             let selected: BaseStorable = this.store.getSelected();
             if (storedObj.isSelected()) {
               if (
                 this.selectCallback &&
-                selected.getType() === Symbol.for('Wagon')
+                selected.getType() === TYPES.Wagon
               ) {
                 (selected as Wagon).off('info', this.selectCallback);
               }

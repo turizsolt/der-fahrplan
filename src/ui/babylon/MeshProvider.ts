@@ -18,6 +18,7 @@ export class MeshProvider {
   private railBlack: BABYLON.StandardMaterial;
   private selectorRed: BABYLON.StandardMaterial;
   private shuntingRed: BABYLON.StandardMaterial;
+  private allowingGreen: BABYLON.StandardMaterial;
 
   public getMaterial(name: MaterialName) {
     return this.materials[name];
@@ -83,12 +84,20 @@ export class MeshProvider {
       0 / 255
     );
 
+    this.allowingGreen = new BABYLON.StandardMaterial('allowingGreen', null);
+    this.allowingGreen.diffuseColor = new BABYLON.Color3(
+      0 / 255,
+      255 / 255,
+      0 / 255
+    );
+
     this.materials = {
       [MaterialName.BedGray]: this.bedGray,
       [MaterialName.RailBlack]: this.railBlack,
       [MaterialName.SleeperBrown]: this.sleeperBrown,
       [MaterialName.SelectorRed]: this.selectorRed,
-      [MaterialName.ShuntingRed]: this.shuntingRed
+      [MaterialName.ShuntingRed]: this.shuntingRed,
+      [MaterialName.AllowingGreen]: this.allowingGreen
     };
   }
 
@@ -149,6 +158,30 @@ export class MeshProvider {
     mesh.position = CoordinateToBabylonVector3(ray.setY(1.05).coord);
     mesh.rotation.y = ray.dirXZ;
     mesh.material = this.sleeperBrown;
+    return mesh;
+  }
+
+  createSignalMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateBox(
+      name,
+      { height: 5, width: 2.5, depth: 0.5 },
+      this.scene
+    );
+    mesh.position = CoordinateToBabylonVector3(ray.setY(2.5).coord);
+    mesh.rotation.y = ray.dirXZ;
+    mesh.material = this.railBlack;
+    return mesh;
+  }
+
+  createSignalLight(ray: Ray, name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateBox(
+      name,
+      { height: 1.5, width: 1.5, depth: 0.5 },
+      this.scene
+    );
+    mesh.position = CoordinateToBabylonVector3(ray.setY(3.75).coord);
+    mesh.rotation.y = ray.dirXZ;
+    mesh.material = this.railBlack;
     return mesh;
   }
 
