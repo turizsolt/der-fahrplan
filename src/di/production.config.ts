@@ -20,6 +20,8 @@ import { addCommonMaps } from './common';
 import { ActualLand } from '../structs/Actuals/ActualLand';
 import { Land } from '../structs/Interfaces/Land';
 import { MeshProvider } from '../ui/babylon/MeshProvider';
+import { SignalRenderer } from '../structs/Renderers/SignalRenderer';
+import { SignalBabylonRenderer } from '../ui/babylon/SignalBabylonRenderer';
 
 export const productionContainer = new Container();
 const ioc = new DependencyContainer(productionContainer);
@@ -41,4 +43,9 @@ ioc.fm<WagonRenderer>(
   T.FactoryOfWagonRenderer,
   T.WagonRenderer,
   WagonBabylonRenderer
+);
+ioc.fm<SignalRenderer>(
+  T.FactoryOfSignalRenderer,
+  T.SignalRenderer,
+  SignalBabylonRenderer
 );

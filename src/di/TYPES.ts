@@ -53,5 +53,10 @@ export const TYPES = {
 
   Station: Symbol.for('Station'),
   StationRenderer: Symbol.for('StationRenderer'),
-  FactoryOfStation: Symbol.for('Factory<Station>')
+  FactoryOfStation: Symbol.for('Factory<Station>'),
+
+  Signal: Symbol.for('Signal'),
+  SignalRenderer: Symbol.for('SignalRenderer'),
+  FactoryOfSignal: Symbol.for('Factory<Signal>'),
+  FactoryOfSignalRenderer: Symbol.for('Factory<SignalRenderer>')
 };

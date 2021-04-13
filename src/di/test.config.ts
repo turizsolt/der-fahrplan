@@ -17,6 +17,8 @@ import { StationRenderer } from '../structs/Renderers/StationRenderer';
 import { StationDummyRenderer } from '../../test/dummies/StationDummyRenderer';
 import { addCommonMaps } from './common';
 import { DependencyContainer } from './DependencyContainer';
+import { SignalRenderer } from '../structs/Renderers/SignalRenderer';
+import { SignalDummyRenderer } from '../../test/dummies/SignalDummyRenderer';
 
 export const testContainer = new Container();
 const ioc = new DependencyContainer(testContainer);
@@ -36,4 +38,9 @@ ioc.fm<WagonRenderer>(
   T.FactoryOfWagonRenderer,
   T.WagonRenderer,
   WagonDummyRenderer
+);
+ioc.fm<SignalRenderer>(
+  T.FactoryOfSignalRenderer,
+  T.SignalRenderer,
+  SignalDummyRenderer
 );
