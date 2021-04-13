@@ -17,6 +17,10 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
   init(position: PositionOnTrack): Signal {
     this.initStore(TYPES.Signal);
     this.position = position;
+    this.position.getDirectedTrack().addMarker(this.position.getPosition(), {
+      type: 'Signal',
+      signal: this
+    });
     this.emit('init', this.persist());
     return this;
   }

@@ -20,4 +20,5 @@ export interface Train extends BaseStorable {
 
   getNearestEnd(): NearestData;
   getNearestTrain(): NearestData;
+  getNearestSignal(): NearestData;
 }

@@ -5,7 +5,7 @@ import { SignalRenderer } from '../../structs/Renderers/SignalRenderer';
 import { TYPES } from '../../di/TYPES';
 import { MeshProvider } from './MeshProvider';
 import { Ray } from '../../structs/Geometry/Ray';
-import { Left } from '../../structs/Geometry/Directions';
+import { Right } from '../../structs/Geometry/Directions';
 import { MaterialName } from './MaterialName';
 import { SignalSignal } from '../../modules/Signaling/SignalSignal';
 
@@ -22,9 +22,9 @@ export class SignalBabylonRenderer extends BaseBabylonRenderer
 
   init(data: any): void {
     this.meshProvider = this.meshProviderFactory();
-    const rayPost = Ray.fromData(data.ray).fromHere(Left, 4);
-    const rayRed = rayPost.fromHere(0, 0.5);
-    const rayGreen = rayPost.fromHere(0, 0.5);
+    const rayPost = Ray.fromData(data.ray).fromHere(Right, 4);
+    const rayRed = rayPost.fromHere(0, -0.5);
+    const rayGreen = rayPost.fromHere(0, -0.5);
     this.postMesh = this.meshProvider.createSignalMesh(
       rayPost,
       'clickable-signal-' + data.id // + '-post'

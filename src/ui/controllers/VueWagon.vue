@@ -6,7 +6,8 @@
       Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "???" }}<br />
       SD: {{ Math.round(obj.stoppingDistance * 10) }}<br />
       NE: {{ Math.round(obj.nearestEnd * 10) }}<br />
-      NT: {{ Math.round(obj.nearestTrain * 10) }}
+      NT: {{ Math.round(obj.nearestTrain * 10) }}<br />
+      NS: {{ Math.round(obj.nearestSignal * 10) }} ({{obj.nearestSignalSignal}})
     </div>
 
     <!-- train -->

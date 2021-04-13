@@ -165,6 +165,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   private nearestEnd: NearestData = null;
   private nearestTrain: NearestData = null;
+  private nearestSignal: NearestData = null;
 
   getNearestEnd(): NearestData {
     return this.nearestEnd;
@@ -172,6 +173,10 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   getNearestTrain(): NearestData {
     return this.nearestTrain;
+  }
+
+  getNearestSignal(): NearestData {
+    return this.nearestSignal;
   }
 
   tick(): void {
@@ -188,6 +193,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
     this.nearestEnd = Nearest.end(nextPosition);
     this.nearestTrain = Nearest.train(nextPosition);
+    this.nearestSignal = Nearest.signal(nextPosition);
 
     if(this.nearestTrain.distance < WAGON_GAP) {
       const frontDist = this.nearestTrain.train.getPosition().getRay().coord.distance2d(this.position.getRay().coord);
