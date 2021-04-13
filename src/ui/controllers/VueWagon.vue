@@ -3,6 +3,7 @@
     <div class="item-type">🚂 Mozdony</div>
     <div class="item-id">{{ idt }}</div>
     <div class="item-id">
+      Mode: {{obj.autoMode ? 'AUTO' : 'Manual'}}<br />
       Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "???" }}<br />
       SD: {{ Math.round(obj.stoppingDistance * 10) }}<br />
       NE: {{ Math.round(obj.nearestEnd * 10) }}<br />

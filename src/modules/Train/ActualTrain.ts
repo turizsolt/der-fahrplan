@@ -12,6 +12,8 @@ import { Nearest } from './Nearest';
 import { NearestData } from './NearestData';
 import { WAGON_GAP } from '../../structs/Actuals/Wagon/WagonGap';
 import { PositionData } from './PositionData';
+import { SignalSignal } from '../Signaling/SignalSignal';
+import { SpeedPedal } from './SpeedPedal';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
@@ -161,6 +163,16 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.wagons.map(wagon => wagon.update());
   }
 
+  private autoMode:boolean = true;
+
+  setAutoMode(autoMode: boolean): void {
+    this.autoMode = autoMode;
+  }
+
+  getAutoMode(): boolean {
+      return this.autoMode;
+  }
+
   private lastSpeed: number = -1;
 
   private nearestEnd: NearestData = null;
@@ -180,6 +192,22 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   tick(): void {
+    const nextPosition = this.position.clone();
+    
+    this.nearestEnd = Nearest.end(nextPosition);
+    this.nearestTrain = Nearest.train(nextPosition);
+    this.nearestSignal = Nearest.signal(nextPosition);
+
+    if(this.autoMode && this.nearestSignal.signal) {
+        if(this.nearestSignal.signal.getSignal() === SignalSignal.Red &&
+        (this.speed.getStoppingDistance() + 5) >= this.nearestSignal.distance) {
+            this.speed.setPedal(SpeedPedal.Brake);
+        } else {
+        // if(this.nearestSignal.signal.getSignal() === SignalSignal.Green) {
+            this.speed.setPedal(SpeedPedal.Throttle);
+        }
+    }
+
     this.speed.tick();
     if(this.speed.getSpeed() === 0 && this.lastSpeed === 0) {
       this.wagons.map(wagon => wagon.update());
@@ -188,12 +216,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
     if (this.speed.getSpeed() === 0) return;
     
-    const nextPosition = this.position.clone();
-    nextPosition.move(this.speed.getSpeed());
+    
 
-    this.nearestEnd = Nearest.end(nextPosition);
-    this.nearestTrain = Nearest.train(nextPosition);
-    this.nearestSignal = Nearest.signal(nextPosition);
+    nextPosition.move(this.speed.getSpeed());
 
     if(this.nearestTrain.distance < WAGON_GAP) {
       const frontDist = this.nearestTrain.train.getPosition().getRay().coord.distance2d(this.position.getRay().coord);

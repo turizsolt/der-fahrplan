@@ -4,9 +4,9 @@ import { TrainSpeed } from './TrainSpeed';
 export class ActualTrainSpeed implements TrainSpeed {
   private speed: number = 0;
   private accelerateBy: number = 0.015625;
-  private topSpeed: number = 3;
+  private topSpeed: number = 1; // 3
   private shuntingSpeed: number = 1;
-  private allowedSpeed: number = 3;
+  private allowedSpeed: number = 1; // 3
   private shunting: boolean = false;
   private pedal: SpeedPedal = SpeedPedal.Neutral;
 

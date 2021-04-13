@@ -613,6 +613,13 @@ export class InputController {
       }
         break;
 
+        case 'A':
+          if (this.getSelected().getType() === TYPES.Wagon) {
+            const wagon = this.getSelected() as Wagon;
+            wagon.getTrain().setAutoMode(!wagon.getTrain().getAutoMode());
+          }
+        break;
+
       case '/':
         this.getSelectedBrick()
           .getRenderer()
