@@ -97,27 +97,13 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     return {
       id: this.getId(),
       type: 'TrackJoint',
-
       ray: this.ray.persist()
-      // A
-      // B
     };
   }
 
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(Ray.from(obj.ray.x, obj.ray.y, obj.ray.z, obj.ray.dirXZ));
-
-    const trA: TrackBase = obj.A ? (store.get(obj.A.track) as TrackBase) : null;
-    const trB: TrackBase = obj.B ? (store.get(obj.B.track) as TrackBase) : null;
-
-    // if (obj.A) {
-    //   this.setOneEnd(WhichEnd.A, trA.getEnd(obj.A.whichEnd));
-    // }
-
-    // if (obj.B) {
-    //   this.setOneEnd(WhichEnd.B, trB.getEnd(obj.B.whichEnd));
-    // }
   }
 }
 

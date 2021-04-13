@@ -1,8 +1,8 @@
-import { Wagon } from '../../structs/Interfaces/Wagon';
+import { Train } from '../Train/Train';
 
 export interface TrackOcupancy {
-  checkin(engine: Wagon);
-  checkout(engine: Wagon);
+  checkin(train: Train): void;
+  checkout(train: Train): void;
   isEmpty(): boolean;
-  getCheckedList(): Wagon[];
+  getCheckedList(): Train[];
 }

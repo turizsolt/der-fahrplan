@@ -3,7 +3,9 @@
     <div class="item-type">🚂 Mozdony</div>
     <div class="item-id">{{ idt }}</div>
     <div class="item-id">
-      Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "???" }}
+      Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "???" }}<br />
+      NE: {{ Math.round(obj.nearestEnd * 10) }}<br />
+      NT: {{ Math.round(obj.nearestTrain * 10) }}
     </div>
 
     <!-- train -->
@@ -87,7 +89,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { Wagon } from "../../structs/Interfaces/Wagon";
 import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
-import { Train } from "../../structs/Scheduling/Train";
+import { Train } from "../../modules/Train/Train";
 import { Trip } from "../../structs/Scheduling/Trip";
 
 @Component
@@ -120,8 +122,8 @@ export default class VueWagon extends Vue {
     if (this.selectedCount === 0 && !isPreDefinedTrip) {
       const train = getStorable(this.obj.train.id) as Train;
       const trip = getStorable(vTripId) as Trip;
-      train.assignTrip(null);
-      train.assignTrip(trip);
+      // todo train.assignTrip(null);
+      // todo train.assignTrip(trip);
 
       this.showTripList = false;
     } else {
@@ -137,7 +139,7 @@ export default class VueWagon extends Vue {
 
       const train = getStorable(this.obj.train.id) as Train;
       const trip = getStorable(vTripId) as Trip;
-      train.assignTrip(trip, wagons);
+      // todo train.assignTrip(trip, wagons);
 
       this.showTripList = false;
     }
@@ -147,7 +149,7 @@ export default class VueWagon extends Vue {
   clearTrip() {
     if (this.selectedCount === 0) {
       const train = getStorable(this.obj.train.id) as Train;
-      train.assignTrip(null);
+      // todo train.assignTrip(null);
 
       this.showTripList = false;
     } else {
@@ -160,7 +162,7 @@ export default class VueWagon extends Vue {
         }
       }
       const train = getStorable(this.obj.train.id) as Train;
-      train.assignTrip(null, wagons);
+      // todo train.assignTrip(null, wagons);
 
       this.showTripList = false;
     }

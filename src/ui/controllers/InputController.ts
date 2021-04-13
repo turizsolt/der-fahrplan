@@ -31,10 +31,12 @@ import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
 import { Trip } from '../../structs/Scheduling/Trip';
 import { TickInputProps } from './TickInputProps';
-import { PassengerGenerator } from '../../structs/Actuals/PassengerGenerator';
 import { VueViewbox } from './VueViewbox';
-import { Train } from '../../structs/Scheduling/Train';
 import { VueTestPanel } from './VueTestPanel';
+import { Train } from '../../modules/Train/Train';
+import { SpeedPedal } from '../../modules/Train/SpeedPedal';
+import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
+import { GENERATE_ID } from '../../structs/Actuals/Store/Command/CommandLog';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -253,7 +255,6 @@ export class InputController {
       if (meshId.includes('.')) {
         meshId = meshId.slice(0, meshId.indexOf('.'));
       }
-      //   console.log(meshId);
       if (meshId.startsWith('clickable-')) {
         const [_, type, id, command] = meshId.split('-');
         const storedObj = this.store.get(id);
@@ -261,8 +262,20 @@ export class InputController {
         if (storedBrick) {
           if (command) {
             storedBrick.getRenderer().process(command);
+            if(command === 'endA') {
+                const wagon = storedBrick as Wagon;
+                this.store.getCommandLog().addAction(CommandCreator.unmergeTrain(
+                    wagon.getTrain().getId(),
+                    GENERATE_ID,
+                    wagon.getId(),
+                ));
+            }
           } else if (event.button === 2) {
-            storedBrick.getRenderer().process('switch');
+            if (
+                storedBrick.getType() === Symbol.for('TrackSwitch')
+              ) {
+                this.store.getCommandLog().addAction(CommandCreator.switchTrack(storedBrick.getId()));
+            }
           } else {
             let selected: BaseStorable = this.store.getSelected();
             if (storedObj.isSelected()) {
@@ -270,14 +283,18 @@ export class InputController {
                 this.selectCallback &&
                 selected.getType() === Symbol.for('Wagon')
               ) {
-                (selected as Wagon).unsubscribeToUpdates(this.selectCallback);
+                (selected as Wagon).off('info', this.selectCallback);
               }
 
               this.store.clearSelected();
               this.vueSidebar.setData('selected', null);
               this.vueSidebar.setData('type', null);
               this.vueSidebar.setData('opts', []);
+              storedObj.deselect();
             } else {
+              if(this.store.getSelected()){
+                  this.store.getSelected().deselect();
+              }
               this.select(storedBrick);
             }
           }
@@ -302,7 +319,7 @@ export class InputController {
         this.selectCallback &&
         this.getSelected().getType() === Symbol.for('Wagon')
       ) {
-        (this.getSelected() as Wagon).unsubscribeToUpdates(this.selectCallback);
+        (this.getSelected() as Wagon).off('info', this.selectCallback);
       }
     }
 
@@ -312,7 +329,7 @@ export class InputController {
       this.selectCallback = (obj: Object): void => {
         this.vueSidebar.setData('selected', obj);
       };
-      (this.getSelected() as Wagon).subscribeToUpdates(this.selectCallback);
+      (this.getSelected() as Wagon).on('info', this.selectCallback);
     }
     this.vueSidebar.setData('selected', Object.freeze(storedObj.persistDeep()));
     this.vueSidebar.setData(
@@ -395,7 +412,7 @@ export class InputController {
           const pivot = wagon?.getTrain()?.getId();
           const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
           const newIndex = (index + 1) % list.length;
-          this.select(list[newIndex].getLastControlingWagon());
+          this.select(list[newIndex].getWagons()[0]);
         }
         break;
 
@@ -406,9 +423,40 @@ export class InputController {
           const pivot = wagon?.getTrain()?.getId();
           const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
           const newIndex = (index - 1) < 0 ? list.length + index - 1 : index - 1;
-          this.select(list[newIndex].getLastControlingWagon());
+          this.select(list[newIndex].getWagons()[0]);
         }
         break;
+    }
+
+    if (!this.getSelected()) return;
+
+    switch (key) {
+      case 'ArrowUp':
+        if (this.getSelected().getType() === TYPES.Wagon) {
+            const train = ((this.getSelected() as Wagon).getTrain());
+            this.store.getCommandLog().addAction(
+                CommandCreator.pedalTrain(
+                    train.getId(),
+                    train.getSpeed().getPedal(),
+                    SpeedPedal.Throttle
+                )
+            );
+        }
+        break;
+
+      case 'ArrowDown':
+      if (this.getSelected().getType() === TYPES.Wagon) {
+        const train = ((this.getSelected() as Wagon).getTrain());
+        this.store.getCommandLog().addAction(
+            CommandCreator.pedalTrain(
+                train.getId(),
+                train.getSpeed().getPedal(),
+                SpeedPedal.Brake
+            )
+        );
+    }
+        break;
+  
     }
   }
 
@@ -454,7 +502,7 @@ export class InputController {
         const data = {
           data: this.store.persistAll(),
           camera: this.saveCamera(),
-          _version: 1,
+          _version: 2,
           _format: 'fahrplan'
         };
 
@@ -503,18 +551,55 @@ export class InputController {
     if (!this.getSelected()) return;
 
     switch (key) {
+      case 'ArrowLeft':
       case 'ArrowRight':
         if (this.getSelected().getType() === TYPES.Wagon) {
-          this.getSelectedBrick()
-            .getRenderer()
-            .process('swapSide');
+            const wagon = this.getSelected() as Wagon;
+            this.store.getCommandLog().addAction(CommandCreator.reverseTrain(
+                wagon.getTrain().getId(),
+            ));
         }
         break;
 
+      case 'ArrowUp':
+      case 'ArrowDown':
+        if (this.getSelected().getType() === TYPES.Wagon) {
+            const train = ((this.getSelected() as Wagon).getTrain());
+            this.store.getCommandLog().addAction(
+                CommandCreator.pedalTrain(
+                    train.getId(),
+                    train.getSpeed().getPedal(),
+                    SpeedPedal.Neutral
+                )
+            );
+        }
+        break;
+
+
       case 'Z':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('swapEnds');
+      if (this.getSelected().getType() === TYPES.Wagon) {
+        const wagon = this.getSelected() as Wagon;
+        this.store.getCommandLog().addAction(CommandCreator.reverseWagonFacing(
+          wagon.getId(),
+        ));
+      }
+        break;
+
+      case 'M':
+      if (this.getSelected().getType() === TYPES.Wagon) {
+        const wagon = this.getSelected() as Wagon;
+        const isShunting = wagon.getTrain().getSpeed().isShunting();
+        this.store.getCommandLog().addAction(
+          isShunting ?
+            CommandCreator.unshuntingTrain(
+              wagon.getTrain().getId(),
+            ) :
+            CommandCreator.shuntingTrain(
+              wagon.getTrain().getId(),
+            )
+        );
+        wagon.getTrain().getWagons().map(wagon => wagon.update());
+      }
         break;
 
       case '/':
@@ -536,9 +621,7 @@ export class InputController {
         break;
 
       case 'S':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('switch');
+        this.store.getCommandLog().addAction(CommandCreator.switchTrack(this.getSelectedBrick().getId()));
         break;
 
       case 'Home':
@@ -567,18 +650,6 @@ export class InputController {
         this.getSelectedBrick()
           .getRenderer()
           .process('shuntBackward');
-        break;
-
-      case 'ArrowUp':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('forward');
-        break;
-
-      case 'ArrowDown':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('backward');
         break;
     }
   }

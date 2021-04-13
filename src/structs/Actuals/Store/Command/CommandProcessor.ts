@@ -10,6 +10,11 @@ import { WhichEnd } from '../../../Interfaces/WhichEnd';
 import { WagonConfig } from '../../Wagon/WagonConfig';
 import { CommandLog } from './CommandLog';
 import { Ray } from '../../../Geometry/Ray';
+import { Train } from '../../../../modules/Train/Train';
+import { TrackDirection } from '../../../../modules/Track/TrackDirection';
+import { PositionOnTrack } from '../../../../modules/Train/PositionOnTrack';
+import { PositionData } from '../../../../modules/Train/PositionData';
+import { SpeedPedal } from '../../../../modules/Train/SpeedPedal';
 
 export class CommandProcessor {
   constructor(private store: Store, private logStore: CommandLog) {}
@@ -135,7 +140,7 @@ export class CommandProcessor {
     trackSwitch.remove();
   }
 
-  createWagon(
+  createTrain(
     wagonId: string,
     trainId: string,
     wagonConfig: WagonConfig,
@@ -143,15 +148,27 @@ export class CommandProcessor {
     position: number,
     direction: number
   ): Wagon {
+    const train = this.store.create<Train>(TYPES.Train);
+    train.presetId(trainId);
+
     const wagon = this.store.create<Wagon>(TYPES.Wagon);
-    const track = this.store.get(trackId) as Track;
     wagon.presetId(wagonId);
-    wagon.init(wagonConfig, trainId);
-    wagon.putOnTrack(track, position, direction);
+    wagon.init(wagonConfig, train);
+
+    const track = this.store.get(trackId) as Track;
+    train.init(
+      new PositionOnTrack(
+        track,
+        position * track.getLength(),
+        direction === 1 ? TrackDirection.AB : TrackDirection.BA
+      ),
+      [wagon]
+    );
+
     return wagon;
   }
 
-  uncreateWagon(
+  uncreateTrain(
     wagonId: string,
     trainId: string,
     wagonConfig: WagonConfig,
@@ -159,7 +176,88 @@ export class CommandProcessor {
     position: number,
     direction: number
   ): void {
+    const train = this.store.get(trainId) as Train;
+    train.remove();
+  }
+
+  moveTrain(trainId: string, posFrom: PositionData, posTo: PositionData): void {
+    const train = this.store.get(trainId) as Train;
+    train.setPosition(PositionOnTrack.fromData(posTo, this.store));
+  }
+
+  unmoveTrain(
+    trainId: string,
+    posFrom: PositionData,
+    posTo: PositionData
+  ): void {
+    const train = this.store.get(trainId) as Train;
+    train.setPosition(PositionOnTrack.fromData(posFrom, this.store));
+  }
+
+  pedalTrain(
+    trainId: string,
+    pedalFrom: SpeedPedal,
+    pedalTo: SpeedPedal
+  ): void {
+    const train = this.store.get(trainId) as Train;
+    train.getSpeed().setPedal(pedalTo);
+  }
+
+  unpedalTrain(
+    trainId: string,
+    pedalFrom: SpeedPedal,
+    pedalTo: SpeedPedal
+  ): void {
+    const train = this.store.get(trainId) as Train;
+    train.getSpeed().setPedal(pedalFrom);
+  }
+
+  mergeTrain(train1Id: string, train2Id: string, wagonId: string): void {
+    const train1 = this.store.get(train1Id) as Train;
+    const train2 = this.store.get(train2Id) as Train;
+    train1.merge(train2);
+  }
+
+  unmergeTrain(train1Id: string, train2Id: string, wagonId: string): void {
+    const train1 = this.store.get(train1Id) as Train;
     const wagon = this.store.get(wagonId) as Wagon;
-    wagon.remove();
+    train1.separate(wagon, train2Id);
+  }
+
+  reverseTrain(trainId: string): void {
+    const train = this.store.get(trainId) as Train;
+    train.reverse();
+  }
+
+  unreverseTrain(trainId: string): void {
+    this.reverseTrain(trainId);
+  }
+
+  reverseWagonFacing(wagonId: string): void {
+    const wagon = this.store.get(wagonId) as Wagon;
+    wagon.swapEnds();
+  }
+
+  unreverseWagonFacing(wagonId: string): void {
+    this.reverseWagonFacing(wagonId);
+  }
+
+  shuntingTrain(trainId: string): void {
+    const train = this.store.get(trainId) as Train;
+    train.getSpeed().setShunting(true);
+  }
+
+  unshuntingTrain(trainId: string): void {
+    const train = this.store.get(trainId) as Train;
+    train.getSpeed().setShunting(false);
+  }
+
+  switchTrack(switchId: string): void {
+    const switchTrack = this.store.get(switchId) as TrackSwitch;
+    switchTrack.switch();
+  }
+
+  unswitchTrack(switchId: string): void {
+    this.switchTrack(switchId);
   }
 }

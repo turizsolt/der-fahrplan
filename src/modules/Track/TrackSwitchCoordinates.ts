@@ -25,8 +25,8 @@ export class TrackSwitchCoordinates {
     } else if (
       segmentData1.coordinates[last1].equalsTo(segmentData2.coordinates[last2])
     ) {
-      tempE = new ActualTrackCurve(segmentData1.coordinates.reverse());
-      tempF = new ActualTrackCurve(segmentData2.coordinates.reverse());
+      tempE = new ActualTrackCurve([...segmentData1.coordinates].reverse());
+      tempF = new ActualTrackCurve([...segmentData2.coordinates].reverse());
       tj = [
         segmentData1.endJointEnd,
         segmentData1.startJointEnd,
@@ -37,7 +37,7 @@ export class TrackSwitchCoordinates {
       segmentData1.coordinates[0].equalsTo(segmentData2.coordinates[last2])
     ) {
       tempE = new ActualTrackCurve(segmentData1.coordinates);
-      tempF = new ActualTrackCurve(segmentData2.coordinates.reverse());
+      tempF = new ActualTrackCurve([...segmentData2.coordinates].reverse());
       tj = [
         segmentData1.startJointEnd,
         segmentData1.endJointEnd,
@@ -47,7 +47,7 @@ export class TrackSwitchCoordinates {
     } else if (
       segmentData1.coordinates[last1].equalsTo(segmentData2.coordinates[0])
     ) {
-      tempE = new ActualTrackCurve(segmentData1.coordinates.reverse());
+      tempE = new ActualTrackCurve([...segmentData1.coordinates].reverse());
       tempF = new ActualTrackCurve(segmentData2.coordinates);
       tj = [
         segmentData1.endJointEnd,

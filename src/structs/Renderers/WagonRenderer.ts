@@ -1,6 +1,6 @@
 import { BaseRenderer } from './BaseRenderer';
-import { Wagon } from '../Interfaces/Wagon';
+import { WagonData } from '../../modules/Train/WagonData';
 
 export interface WagonRenderer extends BaseRenderer {
-  init(wagon: Wagon): void;
+  init(wagon: WagonData): void;
 }

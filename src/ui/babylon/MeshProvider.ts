@@ -17,6 +17,7 @@ export class MeshProvider {
   private bedGray: BABYLON.StandardMaterial;
   private railBlack: BABYLON.StandardMaterial;
   private selectorRed: BABYLON.StandardMaterial;
+  private shuntingRed: BABYLON.StandardMaterial;
 
   public getMaterial(name: MaterialName) {
     return this.materials[name];
@@ -75,15 +76,23 @@ export class MeshProvider {
       209 / 255
     );
 
+    this.shuntingRed = new BABYLON.StandardMaterial('shuntingRed', null);
+    this.shuntingRed.diffuseColor = new BABYLON.Color3(
+      255 / 255,
+      0 / 255,
+      0 / 255
+    );
+
     this.materials = {
       [MaterialName.BedGray]: this.bedGray,
       [MaterialName.RailBlack]: this.railBlack,
       [MaterialName.SleeperBrown]: this.sleeperBrown,
-      [MaterialName.SelectorRed]: this.selectorRed
+      [MaterialName.SelectorRed]: this.selectorRed,
+      [MaterialName.ShuntingRed]: this.shuntingRed
     };
   }
 
-  createWagonMesh(id:string, name: string): BABYLON.AbstractMesh {
+  createWagonMesh(id: string, name: string): BABYLON.AbstractMesh {
     const clone = this.library[id].clone(name, null);
     return clone;
   }

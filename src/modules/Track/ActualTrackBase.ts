@@ -3,10 +3,12 @@ import { TrackBase } from './TrackBase';
 import { injectable } from 'inversify';
 import { ActualBaseBrick } from '../../structs/Actuals/ActualBaseBrick';
 import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
-import { Wagon } from '../../structs/Interfaces/Wagon';
 import { TrackCurve } from './TrackCurve';
 import { TrackOcupancy } from './TrackOcupancy';
 import { ActualTrackOcupancy } from './ActualTrackOcupancy';
+import { TrackDirection } from './TrackDirection';
+import { DirectedTrack } from './DirectedTrack';
+import { Train } from '../Train/Train';
 
 @injectable()
 export abstract class ActualTrackBase extends ActualBaseBrick
@@ -24,6 +26,10 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     return this.getCurve().getLength();
   }
 
+  getDirected(direction: TrackDirection): DirectedTrack {
+    throw new Error('Method not implemented.');
+  }
+
   addPlatform(platform: Platform) {
     this.platformsBeside.push(platform);
   }
@@ -32,13 +38,13 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     return this.platformsBeside;
   }
 
-  checkin(engine: Wagon) {
-    this.ocupancy.checkin(engine);
+  checkin(train: Train) {
+    this.ocupancy.checkin(train);
     this.update();
   }
 
-  checkout(engine: Wagon) {
-    this.ocupancy.checkout(engine);
+  checkout(train: Train) {
+    this.ocupancy.checkout(train);
     this.update();
   }
 
@@ -46,7 +52,7 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     return this.ocupancy.isEmpty();
   }
 
-  getCheckedList(): Wagon[] {
+  getCheckedList(): Train[] {
     return this.ocupancy.getCheckedList();
   }
 

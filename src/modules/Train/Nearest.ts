@@ -1,92 +1,62 @@
-import { NearestWagon, Wagon } from '../../structs/Interfaces/Wagon';
-import { WagonEnd } from '../../structs/Actuals/Wagon/WagonEnd';
-import { TrackBase } from '../Track/TrackBase';
+import { PositionOnTrack } from './PositionOnTrack';
+import { Train } from './Train';
+import { NearestData } from './NearestData';
 
 export class Nearest {
-  static getWagonClosest(
-    track: TrackBase,
-    from: number,
-    to: number,
-    excludeWagon: Wagon,
-    ttl: number,
-    initDist: number = 0
-  ): NearestWagon {
-    return null;
+  static end(pot: PositionOnTrack): NearestData {
+    let segmentCount = 1;
+    let distance = pot.getTrack().getLength() - pot.getPosition();
+    let iter = pot.getDirectedTrack();
+    let ttl = 99;
 
-    // if (ttl === 0) return null;
+    while (iter.next() && ttl) {
+      iter = iter.next();
+      distance += iter.getLength();
+      segmentCount++;
+      ttl--;
+    }
 
-    // let sign = Math.sign(to - from); // 1 to B, -1 to A
-
-    // let ret: NearestWagon = {
-    //   distance: Infinity,
-    //   wagon: null,
-    //   end: null
-    // };
-
-    // for (let wagon of track.getCheckedList()) {
-    //   if (wagon === excludeWagon) continue;
-
-    //   ret = this.handleWagonEnd(ret, from, to, sign, wagon.getA());
-    //   ret = this.handleWagonEnd(ret, from, to, sign, wagon.getB());
-    // }
-
-    // if (ret.distance === Infinity) {
-    //   if (sign === 1) {
-    //     const nextTrack = track.getB().getConnectedEndOf();
-    //     if (!nextTrack) return null;
-    //     const [newFrom, newTo] = track.getB().isSwitchingEnds()
-    //       ? [0, 1]
-    //       : [1, 0];
-    //     return Nearest.getWagonClosest(
-    //       nextTrack,
-    //       newFrom,
-    //       newTo,
-    //       excludeWagon,
-    //       ttl - 1,
-    //       initDist + Math.abs(to - from)
-    //     );
-    //   } else {
-    //     const nextTrack = track.getA().getConnectedEndOf();
-    //     if (!nextTrack) return null;
-    //     const [newFrom, newTo] = track.getA().isSwitchingEnds()
-    //       ? [1, 0]
-    //       : [0, 1];
-    //     return Nearest.getWagonClosest(
-    //       nextTrack,
-    //       newFrom,
-    //       newTo,
-    //       excludeWagon,
-    //       ttl - 1,
-    //       initDist + Math.abs(from - to)
-    //     );
-    //   }
-    //   return null;
-    // } else {
-    //   ret.distance += initDist;
-    //   return ret;
-    // }
+    return {
+      distance: ttl ? distance : Number.POSITIVE_INFINITY,
+      segmentCount
+    };
   }
 
-  static handleWagonEnd(
-    ret: NearestWagon,
-    from: number,
-    to: number,
-    sign: number,
-    end: WagonEnd
-  ) {
-    const dist = end.positionOnTrack.getPercentage() - from;
-    if (dist * sign < 0) {
-      return ret;
+  static train(pot: PositionOnTrack, train?: Train): NearestData {
+    let segmentCount = 1;
+    let distance = pot.getTrack().getLength() - pot.getPosition();
+    let iter = pot.getDirectedTrack();
+    let ttl = 100;
+    let foundTrain: Train = null;
+
+    for (let marker of iter.getMarkers()) {
+      if (marker.position > pot.getPosition()) {
+        distance = marker.position - pot.getPosition();
+        foundTrain = marker.marker.train;
+        break;
+      }
     }
-    if (Math.abs(dist) < ret.distance) {
-      const ret2 = {
-        distance: Math.abs(dist),
-        wagon: end.getEndOf(),
-        end: end
-      };
-      return ret2;
-    } else {
-      return ret;
+
+    iter = iter.next();
+    while (iter && !foundTrain && ttl) {
+      for (let marker of iter.getMarkers()) {
+        distance += marker.position;
+        foundTrain = marker.marker.train;
+        break;
+      }
+
+      if (!foundTrain) {
+        distance += iter.getLength();
+      }
+      segmentCount++;
+      ttl--;
+      iter = iter.next();
     }
+
+    return {
+      distance: foundTrain ? distance : Number.POSITIVE_INFINITY,
+      segmentCount,
+      train: foundTrain
+    };
   }
 }

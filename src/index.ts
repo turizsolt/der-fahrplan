@@ -125,15 +125,15 @@ window.addEventListener('DOMContentLoaded', () => {
     inputController.move(e);
   });
 
-  canvas.addEventListener('pointerenter', () => { });
+  canvas.addEventListener('pointerenter', () => {});
 
   canvas.addEventListener('pointerleave', e => {
     inputController.up(e);
   });
 
-  canvas.addEventListener('focus', () => { });
+  canvas.addEventListener('focus', () => {});
 
-  canvas.addEventListener('blur', () => { });
+  canvas.addEventListener('blur', () => {});
 
   window.addEventListener('wheel', e => {
     inputController.wheel(e);
@@ -145,7 +145,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   document.addEventListener(
     'dragover',
-    function (event) {
+    function(event) {
       event.preventDefault();
     },
     false
@@ -153,7 +153,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener(
     'drop',
-    function (event) {
+    function(event) {
       // cancel default actions
       event.preventDefault();
 
@@ -163,13 +163,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
       for (; i < len; i++) {
         var reader = new FileReader();
-        reader.onload = function (event) {
+        reader.onload = function(event) {
           var contents = (event.target as any).result;
 
           try {
             const obj = JSON.parse(contents);
 
             if (!obj._version) throw new Error();
+            if (obj._version != 2) throw new Error();
             if (!obj._format || obj._format !== 'fahrplan') throw new Error();
             inputController.load(obj.data);
             if (obj.camera) {
@@ -180,7 +181,7 @@ window.addEventListener('DOMContentLoaded', () => {
           }
         };
 
-        reader.onerror = function (event) {
+        reader.onerror = function(event) {
           console.error(
             'File could not be read! Code ' + (event.target as any).error.code
           );

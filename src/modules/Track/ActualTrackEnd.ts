@@ -38,4 +38,11 @@ export class ActualTrackEnd implements TrackEnd {
   disconnect(): void {
     this.jointEnd.joint.removeEnd(this);
   }
+
+  persist(): Object {
+    return {
+      end: this.jointEnd.end,
+      joint: this.jointEnd.joint.getId()
+    };
+  }
 }

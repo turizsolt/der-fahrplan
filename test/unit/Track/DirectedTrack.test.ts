@@ -1,8 +1,8 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { DirectedTrack } from '../../src/modules/Track/DirectedTrack';
-import { ActualDirectedTrack } from '../../src/modules/Track/ActualDirectedTrack';
-import { TrackSegment } from '../../src/modules/Track/TrackSegment';
+import { DirectedTrack } from '../../../src/modules/Track/DirectedTrack';
+import { ActualDirectedTrack } from '../../../src/modules/Track/ActualDirectedTrack';
+import { TrackSegment } from '../../../src/modules/Track/TrackSegment';
 chai.use(chaiAlmost());
 
 const mockTrackSegment: TrackSegment = {
@@ -11,10 +11,13 @@ const mockTrackSegment: TrackSegment = {
   getCurve: () => null,
   getEnd: () => null,
   getTrack: () => null,
-  remove: () => {}
+  remove: () => {},
+  getDirected: () => null,
+  getLength: () => null,
+  persist: () => null
 };
 const createDirectedTrack = (segment?: TrackSegment): DirectedTrack =>
-  new ActualDirectedTrack(segment);
+  new ActualDirectedTrack(segment, null, null);
 
 describe('DirectedTrack', () => {
   it('create a dt', () => {

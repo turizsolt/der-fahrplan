@@ -4,7 +4,7 @@ import { testContainer } from '../../../src/di/test.config';
 import { TYPES } from '../../../src/di/TYPES';
 import { Wagon } from '../../../src/structs/Interfaces/Wagon';
 import { Store } from '../../../src/structs/Interfaces/Store';
-import { Train } from '../../../src/structs/Scheduling/Train';
+import { Train } from '../../../src/modules/Train/Train';
 import { Coordinate } from '../../../src/structs/Geometry/Coordinate';
 import { Track } from '../../../src/modules/Track/Track';
 chai.use(chaiAlmost());

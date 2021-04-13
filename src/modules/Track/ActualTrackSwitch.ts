@@ -1,4 +1,3 @@
-import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { TrackSwitchRenderer } from '../../structs/Renderers/TrackSwitchRenderer';
 import { TYPES } from '../../di/TYPES';
 import { TrackSwitch } from './TrackSwitch';
@@ -11,6 +10,9 @@ import { TrackSwitchCoordinates } from './TrackSwitchCoordinates';
 import { TrackCurve } from './TrackCurve';
 import { TrackSegment } from './TrackSegment';
 import { TrackSegmentData } from './TrackSegmentData';
+import { TrackDirection } from './TrackDirection';
+import { DirectedTrack } from './DirectedTrack';
+import { toSegmentData } from './ActualTrack';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
@@ -62,6 +64,10 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     this.renderer.update();
   }
 
+  getDirected(direction: TrackDirection): DirectedTrack {
+    return this.activeSegment.getDirected(direction);
+  }
+
   getCurve(): TrackCurve {
     return this.activeSegment.getCurve();
   }
@@ -97,18 +103,20 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   persist(): Object {
     return {
       id: this.getId(),
-      type: 'TrackSwitch'
-
-      // segmentE: this.segmentE.persist(),
-      // segmentF: this.segmentF.persist()
+      type: 'TrackSwitch',
+      segmentLeftData: this.segmentLeft.persist(),
+      segmentRightData: this.segmentRight.persist(),
+      state: this.getState()
     };
   }
 
   load(obj: any, store: Store): void {
-    // this.presetId(obj.id);
-    // this.init(
-    //  obj.segmentE.map(a => new Coordinate(a.x, a.y, a.z)),
-    //  obj.segmentF.map(a => new Coordinate(a.x, a.y, a.z))
-    // );
+    this.presetId(obj.id);
+    this.init(
+      toSegmentData(obj.segmentLeftData, store),
+      toSegmentData(obj.segmentRightData, store)
+    );
+    this.state = obj.state;
+    this.update();
   }
 }

@@ -1,25 +1,24 @@
-import { ActualBaseStorable } from '../Actuals/ActualStorable';
-import { Store } from '../Interfaces/Store';
+import { ActualBaseStorable } from '../../structs/Actuals/ActualStorable';
+import { Store } from '../../structs/Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
-import { Train } from './Train';
-import { Wagon } from '../Interfaces/Wagon';
-import { Platform } from '../Interfaces/Platform';
-import { Station } from './Station';
-import { Passenger } from '../Interfaces/Passenger';
-import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
-import { WagonWithSide, WagonIdWithSide } from '../Interfaces/WagonWithSide';
-import { WhichEnd, otherEnd } from '../Interfaces/WhichEnd';
-import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
-import { Trip } from './Trip';
+import { Old_Train } from './Old_Train';
+import { Wagon } from '../../structs/Interfaces/Wagon';
+import { Platform } from '../../structs/Interfaces/Platform';
+import { Station } from '../../structs/Scheduling/Station';
+import { Passenger } from '../../structs/Interfaces/Passenger';
+import { WagonControlType } from '../../structs/Actuals/Wagon/WagonControl/WagonControlType';
+import { WagonWithSide, WagonIdWithSide } from '../../structs/Interfaces/WagonWithSide';
+import { WhichEnd, otherEnd } from '../../structs/Interfaces/WhichEnd';
+import { Trip } from '../../structs/Scheduling/Trip';
 
-export class ActualTrain extends ActualBaseStorable implements Train {
+export class OldActualTrain extends ActualBaseStorable implements Old_Train {
   private wagonsWithSides: WagonWithSide[] = [];
   private trips: Trip[] = [];
   private controlingWagon: Wagon = null;
   private lastControlingWagon: Wagon = null;
   private removed: boolean = false;
 
-  init(first: Wagon): Train {
+  init(first: Wagon): Old_Train {
     super.initStore(TYPES.Train);
     this.wagonsWithSides = [{ wagon: first, side: WhichEnd.A }];
     return this;
@@ -49,7 +48,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }));
   }
 
-  whichEndIsOn(end: WagonEnd): WhichEnd {
+  whichEndIsOn(end: any): WhichEnd {
     if (this.wagonsWithSides[0].wagon === end.getEndOf()) {
       if (this.wagonsWithSides[0].side === end.getWhichEnd()) {
         return WhichEnd.A;
@@ -66,7 +65,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return null;
   }
 
-  mergeWith(thisEnd: WagonEnd, other: Train, otherEnd: WagonEnd): void {
+  mergeWith(thisEnd: any, other: Old_Train, otherEnd: any): void {
     const thisWhichEnd = this.whichEndIsOn(thisEnd);
     const otherWhichEnd = other.whichEndIsOn(otherEnd);
 
@@ -112,7 +111,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     const newWagonsWithSides = this.wagonsWithSides.filter(x =>
       wagons.includes(x.wagon)
     );
-    const newTrain = this.store.create<Train>(TYPES.Train).init(wagons[0]);
+    const newTrain = this.store.create<Old_Train>(TYPES.Train).init(wagons[0]);
     newTrain.setWagonsWithSides(newWagonsWithSides);
     newWagonsWithSides.map(x => {
       x.wagon.setTrain(newTrain);

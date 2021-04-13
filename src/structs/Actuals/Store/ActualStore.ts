@@ -12,13 +12,14 @@ import { Route } from '../../Scheduling/Route';
 import { Store } from '../../Interfaces/Store';
 import { Wagon } from '../../Interfaces/Wagon';
 import { Passenger } from '../../Interfaces/Passenger';
-import { Train } from '../../Scheduling/Train';
 import { Trip } from '../../Scheduling/Trip';
 import { PassengerGenerator } from '../PassengerGenerator';
 import { CommandLog } from './Command/CommandLog';
 import { TrackJointRenderer } from '../../Renderers/TrackJointRenderer';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { Emitable } from '../../../mixins/Emitable';
+import { WagonRenderer } from '../../Renderers/WagonRenderer';
+import { Train } from '../../../modules/Train/Train';
 
 @injectable()
 export class ActualStore implements Store {
@@ -44,6 +45,8 @@ export class ActualStore implements Store {
   private TrackJointRendererFactory: () => TrackJointRenderer;
   @inject(TYPES.FactoryOfPlatform) private PlatformFactory: () => Platform;
   @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
+  @inject(TYPES.FactoryOfWagonRenderer)
+  private WagonRendererFactory: () => WagonRenderer;
 
   @inject(TYPES.FactoryOfPassengerGenerator)
   private PassengerGeneratorFactory: () => PassengerGenerator;
@@ -74,9 +77,9 @@ export class ActualStore implements Store {
       [TYPES.RouteStop]: 11,
       [TYPES.Route]: 10,
       [TYPES.Trip]: 8,
+      [TYPES.TrackJoint]: 5,
       [TYPES.Track]: 4,
       [TYPES.TrackSwitch]: 3,
-      [TYPES.TrackJoint]: 2,
       [TYPES.Platform]: 1,
       // skip zero, cos it is falsy
       [TYPES.Wagon]: -1,
@@ -85,7 +88,8 @@ export class ActualStore implements Store {
     };
 
     this.renderers = {
-      [TYPES.TrackJoint]: [this.TrackJointRendererFactory]
+      [TYPES.TrackJoint]: [this.TrackJointRendererFactory],
+      [TYPES.Wagon]: [this.WagonRendererFactory]
     };
 
     shortid.characters(
@@ -230,8 +234,8 @@ export class ActualStore implements Store {
     }
 
     for (let i = 0; i < this.tickSpeed; i++) {
-      this.getAllOf(TYPES.Wagon).map((wagon: Wagon) => {
-        wagon.tick();
+      this.getAllOf(TYPES.Train).map((train: Train) => {
+        train.tick();
       });
 
       if ((this.getTickCount() + i) % 120 === 0) {

@@ -1,214 +1,80 @@
 import { inject, injectable } from 'inversify';
-import { PositionOnTrack } from '../../../modules/Track/PositionOnTrack';
 import { BaseRenderer } from '../../Renderers/BaseRenderer';
-import { WhichEnd, otherEnd } from '../../Interfaces/WhichEnd';
-import { Wagon, NearestWagon } from '../../Interfaces/Wagon';
+import { WhichEnd } from '../../Interfaces/WhichEnd';
+import { Wagon } from '../../Interfaces/Wagon';
 import { Ray } from '../../Geometry/Ray';
 import { TYPES } from '../../../di/TYPES';
 import { WagonRenderer } from '../../Renderers/WagonRenderer';
-import { TrackBase } from '../../../modules/Track/TrackBase';
-import { TrackWorm } from '../../../modules/Track/TrackWorm';
-import { WagonEnd } from './WagonEnd';
 import { Store } from '../../Interfaces/Store';
 import { Platform } from '../../Interfaces/Platform';
 import { Passenger } from '../../Interfaces/Passenger';
 import { Coordinate } from '../../Geometry/Coordinate';
-import { Updatable } from '../../../mixins/Updatable';
 import { applyMixins } from '../../../mixins/ApplyMixins';
 import { ActualBaseBrick } from '../ActualBaseBrick';
-import { Train } from '../../Scheduling/Train';
-import { WagonPosition } from './WagonPosition';
 import {
   BoardableWagon,
   PassengerArrangement
 } from '../../../mixins/BoardableWagon';
 import { WagonAnnouncement } from './WagonAnnouncement';
-import WagonSpeed from './WagonSpeed';
-import { WagonControlType } from './WagonControl/WagonControlType';
 import { WagonConnectable } from './WagonConnectable';
 import { WagonConfig } from './WagonConfig';
-import { WagonControl } from './WagonControl/WagonControl';
-import { WagonControlLocomotive } from './WagonControl/WagonControlLocomotive';
-import { WagonControlControlCar } from './WagonControl/WagonControlControlCar';
-import { WagonControlNothing } from './WagonControl/WagonControlNothing';
-import WagonSpeedPassenger from './WagonSpeedPassenger';
-import { WagonMovingState } from './WagonMovingState';
 import { Trip } from '../../Scheduling/Trip';
+import { WagonAxles } from '../../../modules/Train/WagonAxles';
+import { ActualWagonAxles } from '../../../modules/Train/ActualWagonAxles';
+import { PositionOnTrack } from '../../../modules/Train/PositionOnTrack';
+import { Emitable } from '../../../mixins/Emitable';
+import { LineSegment } from '../../Geometry/LineSegment';
+import { WagonData } from '../../../modules/Train/WagonData';
+import { Train } from '../../../modules/Train/Train';
+import { Util } from '../../Util';
+import { TrackDirection } from '../../../modules/Track/TrackDirection';
 
-export interface ActualWagon extends Updatable { }
-const doApply = () => applyMixins(ActualWagon, [Updatable]);
+export interface ActualWagon extends Emitable { }
+const doApply = () => applyMixins(ActualWagon, [Emitable]);
 @injectable()
 export class ActualWagon extends ActualBaseBrick implements Wagon {
-  private removed: boolean = false;
-  protected worm: TrackWorm;
 
-  protected position: WagonPosition;
   protected boardable: BoardableWagon;
   protected announcement: WagonAnnouncement;
-  protected speed: WagonSpeed;
-  protected control: WagonControl;
+  protected axles: WagonAxles;
 
   private appearanceId: string;
 
   @inject(TYPES.WagonRenderer) private renderer: WagonRenderer;
 
-  init(config?: WagonConfig, trainId?: string): Wagon {
+  init(config?: WagonConfig, train?: Train): Wagon {
     super.initStore(TYPES.Wagon);
 
-    this.position = new WagonPosition(this, config && config.length);
+    this.axles = new ActualWagonAxles(config);
     this.boardable = new BoardableWagon(
       this,
       config && config.passengerArrangement
     );
-    this.announcement = new WagonAnnouncement(this, this.store, trainId);
-    if (config && config.controlType === WagonControlType.Nothing) {
-      this.speed = new WagonSpeedPassenger(
-        this,
-        (config && config.maxSpeed) || undefined,
-        (config && config.accelerateBy) || undefined
-      );
-    } else {
-      this.speed = new WagonSpeed(
-        this,
-        (config && config.maxSpeed) || undefined,
-        (config && config.accelerateBy) || undefined
-      );
-    }
-
-    if (!config || config.controlType === WagonControlType.Locomotive) {
-      this.control = new WagonControlLocomotive(this);
-    } else if (config.controlType === WagonControlType.ControlCar) {
-      this.control = new WagonControlControlCar(this);
-    } else {
-      this.control = new WagonControlNothing();
-    }
+    this.announcement = new WagonAnnouncement(this, this.store, train);
 
     this.appearanceId = config ? config.appearanceId : 'wagon';
+
+    // const deep = this.persistDeep();
+    this.emit('init', {
+        id: this.id,
+        appearanceId: this.getAppearanceId(),
+        ray: null
+    }); //this.persistData());//Object.freeze(deep));
 
     return this;
   }
 
-  halt(): void {
-    this.speed.halt();
+  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack): void {
+    this.axles.setAxlePosition(whichEnd, pot);
+  }
+
+  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack {
+    return this.axles.getAxlePosition(whichEnd);
+  }
+
+  axleReverse(): void {
+    this.axles.reverse();
     this.update();
-  }
-
-  disconnect(whichEnd: WhichEnd): void {
-    if (this.speed.getMovingState() === WagonMovingState.Moving) return;
-
-    this.getEnd(whichEnd).disconnect();
-  }
-
-  getMovingState(): WagonMovingState {
-    if (!this.getTrain().getControlingWagon()) {
-      return WagonMovingState.Standing;
-    }
-    const controllingWagon = this.getTrain().getControlingWagon();
-
-    if (controllingWagon === this) {
-      return this.speed.getMovingState();
-    } else {
-      return controllingWagon.getMovingState();
-    }
-  }
-
-  getLastWagon(whichEnd: WhichEnd): Wagon {
-    let end = this.getEnd(whichEnd);
-    while (end.hasConnectedEndOf()) {
-      end = end.getConnectedEnd().getOppositeEnd();
-    }
-    return end.getEndOf();
-  }
-
-  private getLastWagonEnd(whichEnd: WhichEnd): WagonEnd {
-    let end = this.getEnd(whichEnd);
-    while (end.hasConnectedEndOf()) {
-      end = end.getConnectedEnd().getOppositeEnd();
-    }
-    return end;
-  }
-
-  setControlingWagon(wagon: Wagon): void {
-    this.getTrain().setControlingWagon(wagon);
-  }
-
-  getControlingWagon(): Wagon {
-    return this.getTrain().getControlingWagon();
-  }
-
-  clearControlingWagon(): void {
-    this.getTrain().clearControlingWagon();
-  }
-
-  canThisWagonControl(): boolean {
-    const controlingWagon = this.getTrain().getControlingWagon();
-    return !controlingWagon || controlingWagon === this;
-  }
-
-  getSpeed(): number {
-    return this.speed.getSpeed();
-  }
-
-  tick(): void {
-    this.speed.tick();
-    if (this.getSpeed() !== 0) {
-      if (this.speed.getMovingState() === WagonMovingState.Shunting) {
-        const whichEnd = this.getSelectedSide() || WhichEnd.A;
-        const shuntingTo = this.getSpeed() < 0 ? otherEnd(whichEnd) : whichEnd;
-        const headingWagonEnd = this.getLastWagonEnd(shuntingTo);
-        const headingWagon = headingWagonEnd.getEndOf();
-        const headingWhichEnd = headingWagonEnd.getWhichEnd();
-        headingWagon.moveTowardsWagon(
-          headingWhichEnd,
-          Math.abs(this.getSpeed())
-        );
-      } else {
-        if (this.getSelectedSide() === WhichEnd.A) {
-          this.moveTowardsWagonA(this.getSpeed());
-        } else if (this.getSelectedSide() === WhichEnd.B) {
-          this.moveTowardsWagonB(this.getSpeed());
-        }
-      }
-    } else {
-      this.update();
-    }
-  }
-
-  
-  accelerate(): void {
-    this.speed.accelerate();
-  }
-
-  break(): void {
-    this.speed.break();
-  }
-
-  shuntForward(): void {
-    this.speed.shountForward();
-  }
-
-  shuntBackward(): void {
-    this.speed.shountBackward();
-  }
-
-  detach(): void {
-    if (this.getControlType() === WagonControlType.Nothing) return;
-    if (!this.isOneFree()) return;
-
-    this.getA().disconnect();
-    this.getB().disconnect();
-  }
-
-  getMaxSpeed(): number {
-    return this.speed.getMaxSpeed();
-  }
-
-  getAccelerateBy(): number {
-    return this.speed.getAcceleateBy();
-  }
-
-  getControlType(): WagonControlType {
-    return this.control.getControlType();
   }
 
   getPassengerArrangement(): PassengerArrangement {
@@ -227,19 +93,9 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return WagonConnectable.Connectable;
   }
 
-  getWorm(): TrackWorm {
-    return this.worm;
-  }
-
   remove(): boolean {
-    this.removed = true;
-    this.worm.checkoutAll();
-    this.position.remove();
-    this.update();
+    this.emit('remove', this.id);
     return true;
-  }
-  isRemoved(): boolean {
-    return this.removed;
   }
 
   getRenderer(): BaseRenderer {
@@ -247,10 +103,11 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   update() {
-    this.renderer.update();
+    //this.renderer.update();
 
     const deep = this.persistDeep();
-    this.notify(Object.freeze(deep));
+    this.emit('update', this.persistData());
+    this.emit('info', Object.freeze(deep));
   }
 
   ///////////////////////////
@@ -331,104 +188,43 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   ///////////////////////////
 
   getCenterPos(): Coordinate {
-    return this.position.getCenterPos();
+    return this.getAxlePosition(WhichEnd.A)
+      .getRay()
+      .coord.midpoint(this.getAxlePosition(WhichEnd.B).getRay().coord);
   }
 
   getCenterRay(): Ray {
-    return this.position.getCenterRay();
+    return new Ray(
+      this.getCenterPos(),
+      this.getAxlePosition(WhichEnd.A)
+        .getRay()
+        .coord.whichDir2d(this.getAxlePosition(WhichEnd.B).getRay().coord)
+    );
   }
 
   getLength(): number {
-    return this.position.getLength();
-  }
-
-  getA(): WagonEnd {
-    return this.position.getA();
-  }
-
-  getB(): WagonEnd {
-    return this.position.getB();
-  }
-
-  getEnd(whichEnd: WhichEnd): WagonEnd {
-    return this.position.getEnd(whichEnd);
-  }
-
-  isAFree(): boolean {
-    return !this.position.getA().hasConnectedEndOf();
-  }
-
-  isBFree(): boolean {
-    return !this.position.getB().hasConnectedEndOf();
-  }
-
-  isOneFree(): boolean {
-    return this.isAFree() !== this.isBFree(); // xor
-  }
-
-  putOnTrack(
-    track: TrackBase,
-    position: number = 0,
-    direction: number = 1
-  ): void {
-    this.worm = this.position.putOnTrack(track, position, direction);
-    this.renderer.init(this);
-    this.update();
+    return 14; // todo
   }
 
   getRay(): Ray {
-    return this.position.getRay();
-  }
-
-  moveTowardsWagon(whichEnd: WhichEnd, distance: number): void {
-    if (whichEnd === WhichEnd.A) {
-      this.moveTowardsWagonA(distance);
-    } else if (whichEnd === WhichEnd.B) {
-      this.moveTowardsWagonB(distance);
-    }
-  }
-
-  moveTowardsWagonB(distance: number): void {
-    this.position.moveTowardsWagonB(distance);
-    this.getTrain().moveBoardedPassengers();
-  }
-
-  pullToPos(pot: PositionOnTrack, dir: number) {
-    this.position.pullToPos(pot, dir);
-  }
-
-  moveTowardsWagonA(distance: number): void {
-    this.position.moveTowardsWagonA(distance);
-    this.getTrain().moveBoardedPassengers();
-  }
-
-  getNearestWagon(whichEnd: WhichEnd): NearestWagon {
-    return this.position.getNearestWagon(whichEnd);
+    const ls = LineSegment.fromTwoPoints(
+      this.getAxlePosition(WhichEnd.A).getRay().coord,
+      this.getAxlePosition(WhichEnd.B).getRay().coord
+    );
+    return ls.getPointAtHalfway();
   }
 
   swapEnds(): void {
-    this.position.swapEnds();
+    this.axles.swapEnds();
     this.update();
   }
 
-  ///////////////////////
-  // control
-  ///////////////////////
-
-  getSelectedSide(): WhichEnd | null {
-    return this.control.getSelectedSide();
+  hasControl(whichEnd: WhichEnd):boolean {
+      return this.axles.hasControl(whichEnd);
   }
 
-  onSelectChanged(selected: boolean): void {
-    this.control.onSelected(selected);
-  }
-
-  swapSelectedSide(): void {
-    this.control.swapSelectedSide();
-  }
-
-  onStocked(): void {
-    this.control.onStocked();
+  hasEngine():boolean {
+    return this.axles.hasEngine();
   }
 
   ///////////////////////
@@ -443,20 +239,20 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       ...this.boardable.persist(),
 
       config: {
-        maxSpeed: this.getMaxSpeed(),
-        accelerateBy: this.getAccelerateBy(),
-        controlType: this.getControlType(),
         passengerArrangement: this.getPassengerArrangement(),
         appearanceId: this.getAppearanceId(),
         length: this.getLength(),
         connectable: {
           A: this.getConnectable(WhichEnd.A),
           B: this.getConnectable(WhichEnd.B)
-        }
+        },
+        control: {
+            A: this.hasControl(WhichEnd.A),
+            B: this.hasControl(WhichEnd.B),
+        },
+        engine: this.hasEngine(),
+        appearanceFacing: this.axles.getFacing()
       },
-
-      A: this.getA().persist(),
-      B: this.getB().persist(),
 
       ...this.announcement.persist()
     };
@@ -466,35 +262,48 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return {
       id: this.id,
       type: 'Wagon',
-      speed: this.getSpeed(),
-      train: this.getTrain().persistDeep(),
-      trip: this.getTrip()?.persistDeep()
+      speed: this.getTrain()?.getSpeed()?.getSpeed(),
+      train: this.getTrain()?.persistDeep(),
+      trip: this.getTrip()?.persistDeep(),
+      nearestEnd: this.getTrain()?.getNearestEnd()?.distance,
+      nearestTrain: this.getTrain()?.getNearestTrain()?.distance,
     };
+  }
+
+  persistData(): WagonData {
+      return {
+          id: this.id,
+          appearanceId: this.getAppearanceId(),
+          appearanceFacing: this.axles.getFacing(),
+          ray: this.getCenterRay().persist(),
+          rayA: this.getAxlePosition(WhichEnd.A).getRay().persist(),
+          rayB: this.getAxlePosition(WhichEnd.B).getRay().persist(),
+          isTrainSelected: this.isSelected(),
+          isFirst: this === Util.first(this.getTrain()?.getWagons()),
+          isShunting: this.getTrain()?.getSpeed()?.isShunting()
+      }
+  }
+
+  select(): void {
+      super.select();
+      this.update();
+  }
+
+  deselect(): void {
+    super.deselect();
+    this.update();
   }
 
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(obj.config);
-
+    
     this.setSeatCount(obj.seatCount, obj.seatColumns);
     this.boardable.load(obj.seats, store);
-
-    this.getA().load(obj.A, store);
-    this.getB().load(obj.B, store);
-
-    const track = this.getA().positionOnTrack.getTrack();
-    const bTrack = this.getB().positionOnTrack.getTrack();
-    if (track === bTrack) {
-      this.worm = new TrackWorm([track], this);
-    } else {
-      this.worm = new TrackWorm([track, bTrack], this);
-    }
 
     if (obj.trip) {
       this.assignTrip(store.get(obj.trip) as Trip);
     }
-
-    this.renderer.init(this);
   }
 }
 

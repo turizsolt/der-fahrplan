@@ -64,7 +64,7 @@ export class CreateEngineInputHandler implements InputHandler {
       this.store
         .getCommandLog()
         .addAction(
-          CommandCreator.createWagon(
+          CommandCreator.createTrain(
             GENERATE_ID,
             GENERATE_ID,
             getPredefinedWagonConfig(downProps.wagonType),

@@ -1,15 +1,15 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
-import { DirectedTrack } from '../../src/modules/Track/DirectedTrack';
-import { TrackSegment } from '../../src/modules/Track/TrackSegment';
-import { ActualTrackEnd } from '../../src/modules/Track/ActualTrackEnd';
-import { WhichEnd } from '../../src/structs/Interfaces/WhichEnd';
-import { TrackBase } from '../../src/modules/Track/TrackBase';
-import { TrackJointEnd } from '../../src/modules/Track/TrackJoint/TrackJointEnd';
-import { getTestStore } from '../getTestStore';
-import { TrackJoint } from '../../src/modules/Track/TrackJoint/TrackJoint';
-import { TYPES } from '../../src/di/TYPES';
-import { Ray } from '../../src/structs/Geometry/Ray';
+import { DirectedTrack } from '../../../src/modules/Track/DirectedTrack';
+import { TrackSegment } from '../../../src/modules/Track/TrackSegment';
+import { ActualTrackEnd } from '../../../src/modules/Track/ActualTrackEnd';
+import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
+import { TrackBase } from '../../../src/modules/Track/TrackBase';
+import { TrackJointEnd } from '../../../src/modules/Track/TrackJoint/TrackJointEnd';
+import { getTestStore } from '../../getTestStore';
+import { TrackJoint } from '../../../src/modules/Track/TrackJoint/TrackJoint';
+import { TYPES } from '../../../src/di/TYPES';
+import { Ray } from '../../../src/structs/Geometry/Ray';
 chai.use(chaiAlmost());
 
 const store = getTestStore();
@@ -39,7 +39,8 @@ const mockTrackBase: TrackBase = {
   removeSelect: () => {},
   select: () => {},
   toggleSelect: () => {},
-  update: () => {}
+  update: () => {},
+  getDirected: () => null
 };
 
 const mockTrackSegment: TrackSegment = {
@@ -48,14 +49,26 @@ const mockTrackSegment: TrackSegment = {
   getCurve: () => null,
   getEnd: () => null,
   getTrack: () => mockTrackBase,
-  remove: () => {}
+  remove: () => {},
+  getDirected: () => null,
+  getLength: () => null,
+  persist: () => null
 };
 const mockDirectedTrack: DirectedTrack = {
   next: () => null,
   reverse: () => null,
   setNext: () => {},
   setReverse: () => {},
-  getSegment: () => mockTrackSegment
+  getSegment: () => mockTrackSegment,
+  getCurve: () => null,
+  getLength: () => null,
+  getTrack: () => null,
+  getDirection: () => null,
+  addMarkerBothDirections: () => {},
+  getMarkers: () => null,
+  removeMarker: () => {},
+  removeMarkerBothDirections: () => {},
+  addMarker: () => {}
 };
 const mockDirectedTrack2: DirectedTrack = { ...mockDirectedTrack };
 
