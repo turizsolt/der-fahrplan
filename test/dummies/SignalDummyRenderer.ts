@@ -1,15 +1,14 @@
 import { injectable } from 'inversify';
-import { WagonRenderer } from '../../src/structs/Renderers/WagonRenderer';
-import { WagonData } from '../../src/modules/Train/WagonData';
+import { SignalRenderer } from '../../src/structs/Renderers/SignalRenderer';
 
 @injectable()
-export class SignalDummyRenderer implements WagonRenderer {
+export class SignalDummyRenderer implements SignalRenderer {
   setSelected(selected: boolean): void {}
   isSelected(): boolean {
     return null;
   }
   process(command: string): void {}
-  init(_: WagonData) {}
-  update() {}
+  init(_: any): void {}
+  update(_: any): void {}
   remove(): void {}
 }

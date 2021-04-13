@@ -6,5 +6,6 @@ import { SignalRenderer } from '../../structs/Renderers/SignalRenderer';
 @injectable()
 export class SignalBabylonRenderer extends BaseBabylonRenderer
   implements SignalRenderer {
-  init(signal: any): void {}
+  init(data: any): void {}
+  update(data: any): void {}
 }
