@@ -28,6 +28,12 @@ export class PositionOnTrack {
     );
   }
 
+  opposition(): PositionOnTrack {
+    const op = this.clone();
+    op.reverse();
+    return op;
+  }
+
   getRay(): Ray {
     return this.directedTrack
       .getCurve()

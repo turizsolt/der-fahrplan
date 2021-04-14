@@ -40,6 +40,7 @@ import { GENERATE_ID } from '../../structs/Actuals/Store/Command/CommandLog';
 import { CreateSignalInputHandler } from './CreateSignalInputHandler';
 import { Signal } from '../../modules/Signaling/Signal';
 import { SignalSignal } from '../../modules/Signaling/SignalSignal';
+import { CreateBlockJointInputHandler } from './CreateBlockJointInputHandler';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -49,6 +50,7 @@ export enum InputMode {
   CREATE_ENGINE = 'CREATE_ENGINE',
   CREATE_STATION = 'CREATE_STATION',
   CREATE_SIGNAL = 'CREATE_SIGNAL',
+  CREATE_BLOCK_JOINT = 'CREATE_BLOCK_JOINT'
 }
 
 export class InputController {
@@ -99,6 +101,7 @@ export class InputController {
       [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(),
       [InputMode.CREATE_STATION]: new CreateStationInputHandler(),
       [InputMode.CREATE_SIGNAL]: new CreateSignalInputHandler(),
+      [InputMode.CREATE_BLOCK_JOINT]: new CreateBlockJointInputHandler(),
     };
 
     const modeNames = {
@@ -109,6 +112,7 @@ export class InputController {
       [InputMode.CREATE_ENGINE]: '+Eng',
       [InputMode.CREATE_STATION]: '+Stat',
       [InputMode.CREATE_SIGNAL]: '+Sign',
+      [InputMode.CREATE_BLOCK_JOINT]: '+BJnt',
     };
 
     for (let mode of Object.keys(this.inputHandlers)) {

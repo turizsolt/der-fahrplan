@@ -1,0 +1,87 @@
+import * as BABYLON from 'babylonjs';
+import { InputHandler } from './InputHandler';
+import { InputProps } from './InputProps';
+import { CoordinateToBabylonVector3 } from '../babylon/converters/CoordinateToBabylonVector3';
+import { ActualTrack } from '../../modules/Track/ActualTrack';
+import { productionContainer } from '../../di/production.config';
+import { TYPES } from '../../di/TYPES';
+import { Track } from '../../modules/Track/Track';
+import { getPredefinedWagonConfig } from '../../structs/Actuals/Wagon/ActualWagonConfigs';
+import { Store } from '../../structs/Interfaces/Store';
+import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
+import { GENERATE_ID } from '../../structs/Actuals/Store/Command/CommandLog';
+import { Signal } from '../../modules/Signaling/Signal';
+import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
+import { TrackDirection } from '../../modules/Track/TrackDirection';
+import { BlockJoint } from '../../modules/Signaling/BlockJoint';
+
+export class CreateBlockJointInputHandler implements InputHandler {
+  private fromMesh: BABYLON.Mesh;
+
+  private store: Store;
+
+  constructor() {
+    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
+
+    const mat = new BABYLON.StandardMaterial('boxMat', null);
+    mat.diffuseColor = new BABYLON.Color3(0, 1, 1);
+
+    this.fromMesh = BABYLON.MeshBuilder.CreateCylinder(
+      'placeholder-1',
+      {
+        diameter: 3,
+        tessellation: 24,
+        height: 10,
+        updatable: true
+      },
+      null
+    );
+    this.fromMesh.material = mat;
+    this.fromMesh.setEnabled(false);
+    this.fromMesh.isPickable = false;
+  }
+
+  down(props: InputProps, event: PointerEvent): void {}
+
+  roam(props: InputProps, event: PointerEvent): void {
+    const pot = props.snappedPositionOnTrack;
+    if (pot && pot.track.constructor.name === ActualTrack.name) {
+      this.fromMesh.position = CoordinateToBabylonVector3(
+        pot.track
+          .getCurve()
+          .getBezier()
+          .getPoint(pot.position)
+      );
+
+      this.fromMesh.setEnabled(!!pot);
+    } else {
+      this.fromMesh.setEnabled(false);
+    }
+  }
+
+  move(downProps: InputProps, props: InputProps, event: PointerEvent): void {}
+
+  click(downProps: InputProps, event: PointerEvent): void {
+    const dpot = downProps.snappedPositionOnTrack;
+
+    if (dpot && dpot.track.constructor.name === ActualTrack.name) {
+      const blockJoint = this.store
+        .create<BlockJoint>(TYPES.BlockJoint)
+        .init(
+          new PositionOnTrack(
+            dpot.track,
+            dpot.track.getLength() * dpot.position,
+            TrackDirection.AB
+          )
+        );
+    }
+
+    this.fromMesh.setEnabled(false);
+  }
+
+  up(downProps: InputProps, props: InputProps, event: PointerEvent): void {}
+
+  cancel(): void {
+    this.fromMesh.setEnabled(false);
+  }
+}
