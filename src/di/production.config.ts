@@ -28,8 +28,8 @@ import { BlockJointRenderer } from '../structs/Renderers/BlockJointRenderer';
 import { BlockJointBabylonRenderer } from '../ui/babylon/BlockJointBabylonRenderer';
 import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
 import { PathBlockBabylonRenderer } from '../ui/babylon/PathBlockBabylonRenderer';
-import { SegmentRenderer } from '../structs/Renderers/SegmentRenderer';
-import { SegmentBabylonRenderer } from '../ui/babylon/SegmentBabylonRenderer';
+import { SectionRenderer } from '../structs/Renderers/SectionRenderer';
+import { SectionBabylonRenderer } from '../ui/babylon/SectionBabylonRenderer';
 
 export const productionContainer = new Container();
 const ioc = new DependencyContainer(productionContainer);
@@ -72,8 +72,8 @@ ioc.fm<PathBlockRenderer>(
   T.PathBlockRenderer,
   PathBlockBabylonRenderer
 );
-ioc.fm<SegmentRenderer>(
-  T.FactoryOfSegmentRenderer,
-  T.SegmentRenderer,
-  SegmentBabylonRenderer
+ioc.fm<SectionRenderer>(
+  T.FactoryOfSectionRenderer,
+  T.SectionRenderer,
+  SectionBabylonRenderer
 );

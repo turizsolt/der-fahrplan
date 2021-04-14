@@ -75,8 +75,8 @@ export const TYPES = {
   FactoryOfPathBlock: Symbol.for('Factory<PathBlock>'),
   FactoryOfPathBlockRenderer: Symbol.for('Factory<PathBlockRenderer>'),
 
-  Segment: Symbol.for('Segment'),
-  SegmentRenderer: Symbol.for('SegmentRenderer'),
-  FactoryOfSegment: Symbol.for('Factory<Segment>'),
-  FactoryOfSegmentRenderer: Symbol.for('Factory<SegmentRenderer>')
+  Section: Symbol.for('Section'),
+  SectionRenderer: Symbol.for('SectionRenderer'),
+  FactoryOfSection: Symbol.for('Factory<Section>'),
+  FactoryOfSectionRenderer: Symbol.for('Factory<SectionRenderer>')
 };

@@ -4,13 +4,13 @@ import { Store } from '../../structs/Interfaces/Store';
 import { Emitable } from '../../mixins/Emitable';
 import { applyMixins } from '../../mixins/ApplyMixins';
 import { TYPES } from '../../di/TYPES';
-import { Segment } from './Segment';
+import { Section } from './Section';
 
-export interface ActualSegment extends Emitable {}
-const doApply = () => applyMixins(ActualSegment, [Emitable]);
-export class ActualSegment extends ActualBaseBrick implements Segment {
-  init(): Segment {
-    this.initStore(TYPES.Segment);
+export interface ActualSection extends Emitable {}
+const doApply = () => applyMixins(ActualSection, [Emitable]);
+export class ActualSection extends ActualBaseBrick implements Section {
+  init(): Section {
+    this.initStore(TYPES.Section);
     this.emit('init', this.persist());
     return this;
   }

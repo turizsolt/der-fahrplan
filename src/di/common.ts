@@ -31,11 +31,11 @@ import { ActualSignal } from '../modules/Signaling/ActualSignal';
 import { Block } from '../modules/Signaling/Block';
 import { BlockJoint } from '../modules/Signaling/BlockJoint';
 import { PathBlock } from '../modules/Signaling/PathBlock';
-import { Segment } from '../modules/Signaling/Segment';
+import { Section } from '../modules/Signaling/Section';
 import { ActualBlock } from '../modules/Signaling/ActualBlock';
 import { ActualBlockJoint } from '../modules/Signaling/ActualBlockJoint';
 import { ActualPathBlock } from '../modules/Signaling/ActualPathBlock';
-import { ActualSegment } from '../modules/Signaling/ActualSegment';
+import { ActualSection } from '../modules/Signaling/ActualSegment';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
@@ -60,5 +60,5 @@ export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.fm<Block>(T.FactoryOfBlock, T.Block, ActualBlock);
   ioc.fm<BlockJoint>(T.FactoryOfBlockJoint, T.BlockJoint, ActualBlockJoint);
   ioc.fm<PathBlock>(T.FactoryOfPathBlock, T.PathBlock, ActualPathBlock);
-  ioc.fm<Segment>(T.FactoryOfSegment, T.Segment, ActualSegment);
+  ioc.fm<Section>(T.FactoryOfSection, T.Section, ActualSection);
 };

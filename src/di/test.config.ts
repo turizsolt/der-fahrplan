@@ -25,8 +25,8 @@ import { BlockJointRenderer } from '../structs/Renderers/BlockJointRenderer';
 import { BlockJointDummyRenderer } from '../../test/dummies/BlockJointDummyRenderer';
 import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
 import { PathBlockDummyRenderer } from '../../test/dummies/PathBlockDummyRenderer';
-import { SegmentRenderer } from '../structs/Renderers/SegmentRenderer';
-import { SegmentDummyRenderer } from '../../test/dummies/SegmentDummyRenderer';
+import { SectionRenderer } from '../structs/Renderers/SectionRenderer';
+import { SectionDummyRenderer } from '../../test/dummies/SectionDummyRenderer';
 
 export const testContainer = new Container();
 const ioc = new DependencyContainer(testContainer);
@@ -67,8 +67,8 @@ ioc.fm<PathBlockRenderer>(
   T.PathBlockRenderer,
   PathBlockDummyRenderer
 );
-ioc.fm<SegmentRenderer>(
-  T.FactoryOfSegmentRenderer,
-  T.SegmentRenderer,
-  SegmentDummyRenderer
+ioc.fm<SectionRenderer>(
+  T.FactoryOfSectionRenderer,
+  T.SectionRenderer,
+  SectionDummyRenderer
 );

@@ -3,11 +3,11 @@ import { injectable, inject } from 'inversify';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
 import { TYPES } from '../../di/TYPES';
 import { MeshProvider } from './MeshProvider';
-import { SegmentRenderer } from '../../structs/Renderers/SegmentRenderer';
+import { SectionRenderer } from '../../structs/Renderers/SectionRenderer';
 
 @injectable()
-export class SegmentBabylonRenderer extends BaseBabylonRenderer
-  implements SegmentRenderer {
+export class SectionBabylonRenderer extends BaseBabylonRenderer
+  implements SectionRenderer {
   @inject(TYPES.FactoryOfMeshProvider)
   private meshProviderFactory: () => MeshProvider;
   private meshProvider: MeshProvider;

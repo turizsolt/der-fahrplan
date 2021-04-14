@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
-import { SegmentRenderer } from '../../src/structs/Renderers/SegmentRenderer';
+import { SectionRenderer } from '../../src/structs/Renderers/SectionRenderer';
 
 @injectable()
-export class SegmentDummyRenderer implements SegmentRenderer {
+export class SectionDummyRenderer implements SectionRenderer {
   setSelected(selected: boolean): void {}
   isSelected(): boolean {
     return null;
