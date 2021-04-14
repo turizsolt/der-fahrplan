@@ -58,5 +58,25 @@ export const TYPES = {
   Signal: Symbol.for('Signal'),
   SignalRenderer: Symbol.for('SignalRenderer'),
   FactoryOfSignal: Symbol.for('Factory<Signal>'),
-  FactoryOfSignalRenderer: Symbol.for('Factory<SignalRenderer>')
+  FactoryOfSignalRenderer: Symbol.for('Factory<SignalRenderer>'),
+
+  Block: Symbol.for('Block'),
+  BlockRenderer: Symbol.for('BlockRenderer'),
+  FactoryOfBlock: Symbol.for('Factory<Block>'),
+  FactoryOfBlockRenderer: Symbol.for('Factory<BlockRenderer>'),
+
+  BlockJoint: Symbol.for('BlockJoint'),
+  BlockJointRenderer: Symbol.for('BlockJointRenderer'),
+  FactoryOfBlockJoint: Symbol.for('Factory<BlockJoint>'),
+  FactoryOfBlockJointRenderer: Symbol.for('Factory<BlockJointRenderer>'),
+
+  PathBlock: Symbol.for('PathBlock'),
+  PathBlockRenderer: Symbol.for('PathBlockRenderer'),
+  FactoryOfPathBlock: Symbol.for('Factory<PathBlock>'),
+  FactoryOfPathBlockRenderer: Symbol.for('Factory<PathBlockRenderer>'),
+
+  Segment: Symbol.for('Segment'),
+  SegmentRenderer: Symbol.for('SegmentRenderer'),
+  FactoryOfSegment: Symbol.for('Factory<Segment>'),
+  FactoryOfSegmentRenderer: Symbol.for('Factory<SegmentRenderer>')
 };

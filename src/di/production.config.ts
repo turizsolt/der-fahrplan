@@ -22,6 +22,14 @@ import { Land } from '../structs/Interfaces/Land';
 import { MeshProvider } from '../ui/babylon/MeshProvider';
 import { SignalRenderer } from '../structs/Renderers/SignalRenderer';
 import { SignalBabylonRenderer } from '../ui/babylon/SignalBabylonRenderer';
+import { BlockRenderer } from '../structs/Renderers/BlockRenderer';
+import { BlockBabylonRenderer } from '../ui/babylon/BlockBabylonRenderer';
+import { BlockJointRenderer } from '../structs/Renderers/BlockJointRenderer';
+import { BlockJointBabylonRenderer } from '../ui/babylon/BlockJointBabylonRenderer';
+import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
+import { PathBlockBabylonRenderer } from '../ui/babylon/PathBlockBabylonRenderer';
+import { SegmentRenderer } from '../structs/Renderers/SegmentRenderer';
+import { SegmentBabylonRenderer } from '../ui/babylon/SegmentBabylonRenderer';
 
 export const productionContainer = new Container();
 const ioc = new DependencyContainer(productionContainer);
@@ -48,4 +56,24 @@ ioc.fm<SignalRenderer>(
   T.FactoryOfSignalRenderer,
   T.SignalRenderer,
   SignalBabylonRenderer
+);
+ioc.fm<BlockRenderer>(
+  T.FactoryOfBlockRenderer,
+  T.BlockRenderer,
+  BlockBabylonRenderer
+);
+ioc.fm<BlockJointRenderer>(
+  T.FactoryOfBlockJointRenderer,
+  T.BlockJointRenderer,
+  BlockJointBabylonRenderer
+);
+ioc.fm<PathBlockRenderer>(
+  T.FactoryOfPathBlockRenderer,
+  T.PathBlockRenderer,
+  PathBlockBabylonRenderer
+);
+ioc.fm<SegmentRenderer>(
+  T.FactoryOfSegmentRenderer,
+  T.SegmentRenderer,
+  SegmentBabylonRenderer
 );

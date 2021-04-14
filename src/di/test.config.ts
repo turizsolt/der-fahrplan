@@ -19,6 +19,14 @@ import { addCommonMaps } from './common';
 import { DependencyContainer } from './DependencyContainer';
 import { SignalRenderer } from '../structs/Renderers/SignalRenderer';
 import { SignalDummyRenderer } from '../../test/dummies/SignalDummyRenderer';
+import { BlockRenderer } from '../structs/Renderers/BlockRenderer';
+import { BlockDummyRenderer } from '../../test/dummies/BlockDummyRenderer';
+import { BlockJointRenderer } from '../structs/Renderers/BlockJointRenderer';
+import { BlockJointDummyRenderer } from '../../test/dummies/BlockJointDummyRenderer';
+import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
+import { PathBlockDummyRenderer } from '../../test/dummies/PathBlockDummyRenderer';
+import { SegmentRenderer } from '../structs/Renderers/SegmentRenderer';
+import { SegmentDummyRenderer } from '../../test/dummies/SegmentDummyRenderer';
 
 export const testContainer = new Container();
 const ioc = new DependencyContainer(testContainer);
@@ -43,4 +51,24 @@ ioc.fm<SignalRenderer>(
   T.FactoryOfSignalRenderer,
   T.SignalRenderer,
   SignalDummyRenderer
+);
+ioc.fm<BlockRenderer>(
+  T.FactoryOfBlockRenderer,
+  T.BlockRenderer,
+  BlockDummyRenderer
+);
+ioc.fm<BlockJointRenderer>(
+  T.FactoryOfBlockJointRenderer,
+  T.BlockJointRenderer,
+  BlockJointDummyRenderer
+);
+ioc.fm<PathBlockRenderer>(
+  T.FactoryOfPathBlockRenderer,
+  T.PathBlockRenderer,
+  PathBlockDummyRenderer
+);
+ioc.fm<SegmentRenderer>(
+  T.FactoryOfSegmentRenderer,
+  T.SegmentRenderer,
+  SegmentDummyRenderer
 );

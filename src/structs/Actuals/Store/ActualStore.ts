@@ -22,6 +22,14 @@ import { WagonRenderer } from '../../Renderers/WagonRenderer';
 import { Train } from '../../../modules/Train/Train';
 import { Signal } from '../../../modules/Signaling/Signal';
 import { SignalRenderer } from '../../Renderers/SignalRenderer';
+import { Block } from '../../../modules/Signaling/Block';
+import { BlockJoint } from '../../../modules/Signaling/BlockJoint';
+import { PathBlock } from '../../../modules/Signaling/PathBlock';
+import { Segment } from '../../../modules/Signaling/Segment';
+import { BlockRenderer } from '../../Renderers/BlockRenderer';
+import { BlockJointRenderer } from '../../Renderers/BlockJointRenderer';
+import { PathBlockRenderer } from '../../Renderers/PathBlockRenderer';
+import { SegmentRenderer } from '../../Renderers/SegmentRenderer';
 
 @injectable()
 export class ActualStore implements Store {
@@ -37,6 +45,11 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
   @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
   @inject(TYPES.FactoryOfSignal) private SignalFactory: () => Signal;
+  @inject(TYPES.FactoryOfBlock) private BlockFactory: () => Block;
+  @inject(TYPES.FactoryOfBlockJoint)
+  private BlockJointFactory: () => BlockJoint;
+  @inject(TYPES.FactoryOfPathBlock) private PathBlockFactory: () => PathBlock;
+  @inject(TYPES.FactoryOfSegment) private SegmentFactory: () => Segment;
 
   @inject(TYPES.FactoryOfTrain) private TrainFactory: () => Train;
   @inject(TYPES.FactoryOfTrack) private TrackFactory: () => Track;
@@ -52,6 +65,15 @@ export class ActualStore implements Store {
   private WagonRendererFactory: () => WagonRenderer;
   @inject(TYPES.FactoryOfSignalRenderer)
   private SignalRendererFactory: () => SignalRenderer;
+
+  @inject(TYPES.FactoryOfBlockRenderer)
+  private BlockRendererFactory: () => BlockRenderer;
+  @inject(TYPES.FactoryOfBlockJointRenderer)
+  private BlockJointRendererFactory: () => BlockJointRenderer;
+  @inject(TYPES.FactoryOfSignalRenderer)
+  private PathBlockRendererFactory: () => PathBlockRenderer;
+  @inject(TYPES.FactoryOfSegmentRenderer)
+  private SegmentRendererFactory: () => SegmentRenderer;
 
   @inject(TYPES.FactoryOfPassengerGenerator)
   private PassengerGeneratorFactory: () => PassengerGenerator;
@@ -76,7 +98,11 @@ export class ActualStore implements Store {
       [TYPES.Platform]: this.PlatformFactory,
       [TYPES.Train]: this.TrainFactory,
       [TYPES.Wagon]: this.WagonFactory,
-      [TYPES.Signal]: this.SignalFactory
+      [TYPES.Signal]: this.SignalFactory,
+      [TYPES.Block]: this.BlockFactory,
+      [TYPES.BlockJoint]: this.BlockJointFactory,
+      [TYPES.PathBlock]: this.PathBlockFactory,
+      [TYPES.Segment]: this.SegmentFactory
     };
     this.typeOrder = {
       [TYPES.Station]: 12,
@@ -91,13 +117,21 @@ export class ActualStore implements Store {
       [TYPES.Wagon]: -1,
       [TYPES.Train]: -2,
       [TYPES.Passenger]: -3,
-      [TYPES.Signal]: -10
+      [TYPES.Signal]: -10,
+      [TYPES.Block]: -11,
+      [TYPES.BlockJoint]: -12,
+      [TYPES.PathBlock]: -13,
+      [TYPES.Segment]: -14
     };
 
     this.renderers = {
       [TYPES.TrackJoint]: [this.TrackJointRendererFactory],
       [TYPES.Wagon]: [this.WagonRendererFactory],
-      [TYPES.Signal]: [this.SignalRendererFactory]
+      [TYPES.Signal]: [this.SignalRendererFactory],
+      [TYPES.Block]: [this.BlockRendererFactory],
+      [TYPES.BlockJoint]: [this.BlockJointRendererFactory],
+      [TYPES.PathBlock]: [this.PathBlockRendererFactory],
+      [TYPES.Segment]: [this.SegmentRendererFactory]
     };
 
     shortid.characters(
