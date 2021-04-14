@@ -6,6 +6,7 @@ import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { Ray } from '../../structs/Geometry/Ray';
 import { PositionData } from './PositionData';
 import { Store } from '../../structs/Interfaces/Store';
+import { TrackMarker } from '../Track/TrackMarker';
 
 export class PositionOnTrack {
   private directedTrack: DirectedTrack;
@@ -32,6 +33,10 @@ export class PositionOnTrack {
     const op = this.clone();
     op.reverse();
     return op;
+  }
+
+  addMarker(marker: TrackMarker): void {
+    this.directedTrack.addMarker(this.position, marker);
   }
 
   getRay(): Ray {
