@@ -9,24 +9,18 @@ import { Store } from '../../structs/Interfaces/Store';
 import { TrackMarker } from '../Track/TrackMarker';
 
 export class PositionOnTrack {
-  private directedTrack: DirectedTrack;
+  constructor(private directedTrack: DirectedTrack, private position: number) {}
 
-  constructor(
+  static fromTrack(
     track: TrackBase,
-    private position: number,
+    position: number,
     direction: TrackDirection
-  ) {
-    this.directedTrack = track.getDirected(direction);
+  ): PositionOnTrack {
+    return new PositionOnTrack(track.getDirected(direction), position);
   }
 
   clone(): PositionOnTrack {
-    return new PositionOnTrack(
-      this.getTrack(),
-      this.getPosition(),
-      this.getTrack().getDirected(TrackDirection.AB) === this.getDirectedTrack()
-        ? TrackDirection.AB
-        : TrackDirection.BA
-    );
+    return new PositionOnTrack(this.getDirectedTrack(), this.getPosition());
   }
 
   opposition(): PositionOnTrack {
@@ -114,7 +108,7 @@ export class PositionOnTrack {
   }
 
   static fromData(data: PositionData, store: Store): PositionOnTrack {
-    return new PositionOnTrack(
+    return PositionOnTrack.fromTrack(
       store.get(data.trackId) as TrackBase,
       data.position,
       data.direction

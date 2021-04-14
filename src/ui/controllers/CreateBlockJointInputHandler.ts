@@ -63,7 +63,7 @@ export class CreateBlockJointInputHandler implements InputHandler {
     const dpot = downProps.snappedPositionOnTrack;
 
     if (dpot && dpot.track.constructor.name === ActualTrack.name) {
-      const position = new PositionOnTrack(
+      const position = PositionOnTrack.fromTrack(
         dpot.track,
         dpot.track.getLength() * dpot.position,
         TrackDirection.AB

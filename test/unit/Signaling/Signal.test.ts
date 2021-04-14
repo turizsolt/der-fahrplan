@@ -11,7 +11,7 @@ chai.use(chaiAlmost());
 
 const store = getTestStore();
 const { track } = createTrack(100);
-const pos = new PositionOnTrack(track, 0, TrackDirection.AB);
+const pos = PositionOnTrack.fromTrack(track, 0, TrackDirection.AB);
 
 describe('Signal', () => {
   it('gets a SignalSignal', () => {

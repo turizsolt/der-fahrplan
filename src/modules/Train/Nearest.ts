@@ -125,7 +125,7 @@ export class Nearest {
       ) {
         distance = marker.position - pot.getPosition();
         foundBlockJoint = marker.marker.blockJoint;
-        foundPosition = new PositionOnTrack(
+        foundPosition = PositionOnTrack.fromTrack(
           iter.getTrack(),
           marker.position,
           iter.getDirection()
@@ -140,7 +140,7 @@ export class Nearest {
         if (marker.marker.type === 'BlockJoint') {
           distance += marker.position;
           foundBlockJoint = marker.marker.blockJoint;
-          foundPosition = new PositionOnTrack(
+          foundPosition = PositionOnTrack.fromTrack(
             iter.getTrack(),
             marker.position,
             iter.getDirection()

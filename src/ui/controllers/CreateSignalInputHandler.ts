@@ -79,7 +79,7 @@ export class CreateSignalInputHandler implements InputHandler {
       const signal = this.store
         .create<Signal>(TYPES.Signal)
         .init(
-          new PositionOnTrack(
+          PositionOnTrack.fromTrack(
             dpot.track,
             dpot.track.getLength() * dpot.position,
             TrackDirection.AB
@@ -88,7 +88,7 @@ export class CreateSignalInputHandler implements InputHandler {
       const signal2 = this.store
         .create<Signal>(TYPES.Signal)
         .init(
-          new PositionOnTrack(
+          PositionOnTrack.fromTrack(
             dpot.track,
             dpot.track.getLength() * (1 - dpot.position),
             TrackDirection.BA

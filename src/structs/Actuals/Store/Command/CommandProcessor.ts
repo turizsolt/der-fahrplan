@@ -157,7 +157,7 @@ export class CommandProcessor {
 
     const track = this.store.get(trackId) as Track;
     train.init(
-      new PositionOnTrack(
+      PositionOnTrack.fromTrack(
         track,
         position * track.getLength(),
         direction === 1 ? TrackDirection.AB : TrackDirection.BA

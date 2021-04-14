@@ -18,7 +18,7 @@ const store = getTestStore();
 describe('Nearest', () => {
   it('nearest end is here', () => {
     const { track } = createTrack(100);
-    const pot = new PositionOnTrack(track, 100, TrackDirection.AB);
+    const pot = PositionOnTrack.fromTrack(track, 100, TrackDirection.AB);
     expect(Nearest.end(pot)).deep.equals({
       distance: 0,
       segmentCount: 1
@@ -27,7 +27,7 @@ describe('Nearest', () => {
 
   it('nearest end is inside the track', () => {
     const { track } = createTrack(100);
-    const pot = new PositionOnTrack(track, 80, TrackDirection.AB);
+    const pot = PositionOnTrack.fromTrack(track, 80, TrackDirection.AB);
     expect(Nearest.end(pot)).deep.equals({
       distance: 20,
       segmentCount: 1
@@ -38,7 +38,7 @@ describe('Nearest', () => {
     const {
       track: [track1]
     } = createTrackLine(4, 100);
-    const pot = new PositionOnTrack(track1, 80, TrackDirection.AB);
+    const pot = PositionOnTrack.fromTrack(track1, 80, TrackDirection.AB);
     expect(Nearest.end(pot)).deep.equals({
       distance: 220,
       segmentCount: 3
@@ -47,7 +47,7 @@ describe('Nearest', () => {
 
   it('no nearest train', () => {
     const { track } = createTrack(100);
-    const pot = new PositionOnTrack(track, 20, TrackDirection.AB);
+    const pot = PositionOnTrack.fromTrack(track, 20, TrackDirection.AB);
     expect(Nearest.train(pot)).deep.equals({
       distance: Number.POSITIVE_INFINITY,
       segmentCount: 1,
@@ -57,8 +57,8 @@ describe('Nearest', () => {
 
   it('nearest train is inside the track', () => {
     const { track } = createTrack(100);
-    const pot = new PositionOnTrack(track, 20, TrackDirection.AB);
-    const potTrain = new PositionOnTrack(track, 60, TrackDirection.AB);
+    const pot = PositionOnTrack.fromTrack(track, 20, TrackDirection.AB);
+    const potTrain = PositionOnTrack.fromTrack(track, 60, TrackDirection.AB);
     const train = store.create<Train>(TYPES.Train);
     const wagon = store
       .create<Wagon>(TYPES.Wagon)
@@ -73,8 +73,8 @@ describe('Nearest', () => {
 
   it('nearest train is behind us, inside the track', () => {
     const { track } = createTrack(100);
-    const pot = new PositionOnTrack(track, 60, TrackDirection.AB);
-    const potTrain = new PositionOnTrack(track, 20, TrackDirection.AB);
+    const pot = PositionOnTrack.fromTrack(track, 60, TrackDirection.AB);
+    const potTrain = PositionOnTrack.fromTrack(track, 20, TrackDirection.AB);
     const train = store.create<Train>(TYPES.Train);
     const wagon = store
       .create<Wagon>(TYPES.Wagon)
@@ -91,15 +91,15 @@ describe('Nearest', () => {
     const {
       track: [track1, track2, track3]
     } = createTrackLine(5, 100);
-    const pot = new PositionOnTrack(track1, 20, TrackDirection.AB);
-    const potTrain = new PositionOnTrack(track3, 20, TrackDirection.AB);
+    const pot = PositionOnTrack.fromTrack(track1, 20, TrackDirection.AB);
+    const potTrain = PositionOnTrack.fromTrack(track3, 20, TrackDirection.AB);
     const train = store.create<Train>(TYPES.Train);
     const wagon = store
       .create<Wagon>(TYPES.Wagon)
       .init(getPredefinedWagonConfig('wagon'), train);
     train.init(potTrain, [wagon]);
 
-    const potTrain2 = new PositionOnTrack(track3, 60, TrackDirection.AB);
+    const potTrain2 = PositionOnTrack.fromTrack(track3, 60, TrackDirection.AB);
     const train2 = store.create<Train>(TYPES.Train);
     const wagon2 = store
       .create<Wagon>(TYPES.Wagon)
@@ -115,8 +115,8 @@ describe('Nearest', () => {
 
   it('nearest train is inside the track, but opposite facing', () => {
     const { track } = createTrack(100);
-    const pot = new PositionOnTrack(track, 0, TrackDirection.AB);
-    const potTrain = new PositionOnTrack(track, 20, TrackDirection.BA);
+    const pot = PositionOnTrack.fromTrack(track, 0, TrackDirection.AB);
+    const potTrain = PositionOnTrack.fromTrack(track, 20, TrackDirection.BA);
     const train = store.create<Train>(TYPES.Train);
     const wagon = store
       .create<Wagon>(TYPES.Wagon)
@@ -132,8 +132,8 @@ describe('Nearest', () => {
 
   it('nearest train is inside the track, but opposite facing, wrong number order', () => {
     const { track } = createTrack(100);
-    const pot = new PositionOnTrack(track, 40, TrackDirection.AB);
-    const potTrain = new PositionOnTrack(track, 20, TrackDirection.BA);
+    const pot = PositionOnTrack.fromTrack(track, 40, TrackDirection.AB);
+    const potTrain = PositionOnTrack.fromTrack(track, 20, TrackDirection.BA);
     const train = store.create<Train>(TYPES.Train);
     const wagon = store
       .create<Wagon>(TYPES.Wagon)
@@ -151,7 +151,7 @@ describe('Nearest', () => {
     const {
       track: [track0]
     } = createTrackLine(102, 100);
-    const pot = new PositionOnTrack(track0, 40, TrackDirection.AB);
+    const pot = PositionOnTrack.fromTrack(track0, 40, TrackDirection.AB);
     expect(Nearest.end(pot)).deep.equals({
       distance: Number.POSITIVE_INFINITY,
       segmentCount: 100
