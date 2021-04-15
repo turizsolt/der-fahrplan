@@ -7,20 +7,32 @@ import { applyMixins } from '../../mixins/ApplyMixins';
 import { SignalSignal } from './SignalSignal';
 import { PositionOnTrack } from '../Train/PositionOnTrack';
 import { TYPES } from '../../di/TYPES';
+import { Block } from './Block';
 
 export interface ActualSignal extends Emitable {}
 const doApply = () => applyMixins(ActualSignal, [Emitable]);
 export class ActualSignal extends ActualBaseBrick implements Signal {
-  private signal: SignalSignal = SignalSignal.Red;
+  private signal: SignalSignal = SignalSignal.Green;
   private position: PositionOnTrack = null;
+  private block: Block = null;
+  private blockSubscribe: (data: any) => void;
 
-  init(position: PositionOnTrack): Signal {
+  init(position: PositionOnTrack, block?: Block): Signal {
     this.initStore(TYPES.Signal);
     this.position = position;
     this.position.getDirectedTrack().addMarker(this.position.getPosition(), {
       type: 'Signal',
       signal: this
     });
+
+    this.blockSubscribe = (data: any) => {
+      this.setSignal(data.isFree ? SignalSignal.Green : SignalSignal.Red);
+    };
+    this.blockSubscribe.bind(this);
+
+    this.block = block;
+    this.block?.on('update', this.blockSubscribe);
+
     this.emit('init', this.persist());
     return this;
   }
@@ -47,6 +59,11 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
   }
   load(obj: Object, store: Store): void {
     throw new Error('Method not implemented.');
+  }
+
+  remove() {
+    super.remove();
+    this.block?.off('update', this.blockSubscribe);
   }
 }
 doApply();

@@ -12,6 +12,7 @@ import { BlockJoint } from '../../modules/Signaling/BlockJoint';
 import { Nearest } from '../../modules/Train/Nearest';
 import { Block } from '../../modules/Signaling/Block';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
+import { Signal } from '../../modules/Signaling/Signal';
 
 export class CreateBlockJointInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
@@ -92,6 +93,14 @@ export class CreateBlockJointInputHandler implements InputHandler {
             joint: nearestForward.blockJoint
           }
         });
+
+        nearestForward.position.reverse();
+        const signal = this.store
+          .create<Signal>(TYPES.Signal)
+          .init(position, block);
+        const signal2 = this.store
+          .create<Signal>(TYPES.Signal)
+          .init(nearestForward.position, block);
       }
 
       if (nearestBackward.distance < Number.POSITIVE_INFINITY) {
@@ -107,6 +116,14 @@ export class CreateBlockJointInputHandler implements InputHandler {
             joint: nearestBackward.blockJoint
           }
         });
+
+        nearestBackward.position.reverse();
+        const signal = this.store
+          .create<Signal>(TYPES.Signal)
+          .init(opposition, block);
+        const signal2 = this.store
+          .create<Signal>(TYPES.Signal)
+          .init(nearestBackward.position, block);
       }
     }
 
