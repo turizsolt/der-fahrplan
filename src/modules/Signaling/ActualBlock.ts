@@ -78,11 +78,15 @@ export class ActualBlock extends ActualBaseBrick implements Block {
 
     const lsc: LineSegmentChain[] = [];
     let iter = start.getDirectedTrack();
+    const { s, e } =
+      start.getPosition() < end.getPosition()
+        ? { s: start, e: end }
+        : { s: end, e: start };
     const line = iter
       .getCurve()
       .getLineSegmentChain()
-      .getChainFromPoint(start.getRay().coord)
-      .getChainToPoint(end.getRay().coord);
+      .getChainFromPoint(s.getRay().coord)
+      .getChainToPoint(e.getRay().coord);
     lsc.push(line);
 
     return lsc;
