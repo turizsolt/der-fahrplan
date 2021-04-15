@@ -57,6 +57,10 @@ export class MarkerIterator {
     this.currentIndex++;
     while (markers && this.currentIndex >= markers.length) {
       this.currentIndex = 0;
+      // stop on the last dt
+      if(this.currentDirectedTrack === this.endDirectedTrack) {
+        return undefined;
+      }
       this.currentDirectedTrack = this.currentDirectedTrack.next();
       markers = this.currentDirectedTrack?.getMarkers();
     }
@@ -84,5 +88,5 @@ export class MarkerIterator {
         value,
         directedTrack: this.currentDirectedTrack
     };
-}
+  }
 }
