@@ -8,6 +8,7 @@ import { Ray } from '../../structs/Geometry/Ray';
 import { CoordinateToBabylonVector3 } from './converters/CoordinateToBabylonVector3';
 import { MaterialName } from './MaterialName';
 import { Right } from '../../structs/Geometry/Directions';
+import { curveToTube2 } from './TrackBabylonRenderer';
 
 @injectable()
 export class BlockBabylonRenderer extends BaseBabylonRenderer
@@ -17,6 +18,7 @@ export class BlockBabylonRenderer extends BaseBabylonRenderer
   private meshProvider: MeshProvider;
   private meshA: BABYLON.AbstractMesh;
   private meshB: BABYLON.AbstractMesh;
+  private pathMesh: BABYLON.AbstractMesh;
   private inited = false;
 
   init(data: any): void {
@@ -39,7 +41,17 @@ export class BlockBabylonRenderer extends BaseBabylonRenderer
     this.meshB.position = CoordinateToBabylonVector3(rayB.coord);
     this.meshB.position.y = 0.15;
 
-    this.meshes = [this.meshA, this.meshB];
+    this.pathMesh = curveToTube2(
+      data.coords.map(a => CoordinateToBabylonVector3({ ...a, y: 1.5 })),
+      false,
+      this.pathMesh,
+      data.id
+    );
+    this.pathMesh.material = this.meshProvider.getMaterial(
+      MaterialName.BedGray
+    );
+
+    this.meshes = [this.meshA, this.meshB, this.pathMesh];
     this.inited = true;
     this.update(data);
   }
@@ -52,5 +64,6 @@ export class BlockBabylonRenderer extends BaseBabylonRenderer
       : MaterialName.ShuntingRed;
     this.meshA.material = this.meshProvider.getMaterial(matName);
     this.meshB.material = this.meshProvider.getMaterial(matName);
+    this.pathMesh.material = this.meshProvider.getMaterial(matName);
   }
 }
