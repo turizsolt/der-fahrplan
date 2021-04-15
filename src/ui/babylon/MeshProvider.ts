@@ -185,6 +185,36 @@ export class MeshProvider {
     return mesh;
   }
 
+  createBlockJointMesh(name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateCylinder(
+      name,
+      {
+        diameterTop: 12,
+        diameterBottom: 12,
+        tessellation: 6,
+        height: 0.1
+      },
+      null
+    );
+    mesh.material = this.allowingGreen;
+    return mesh;
+  }
+
+  createBlockMesh(name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateCylinder(
+      name,
+      {
+        diameterTop: 4,
+        diameterBottom: 4,
+        tessellation: 6,
+        height: 0.1
+      },
+      null
+    );
+    mesh.material = this.bedGray;
+    return mesh;
+  }
+
   createSleeperJointMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
     const mesh = BABYLON.MeshBuilder.CreateBox(
       name,

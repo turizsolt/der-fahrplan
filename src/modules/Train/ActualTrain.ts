@@ -14,6 +14,11 @@ import { WAGON_GAP } from '../../structs/Actuals/Wagon/WagonGap';
 import { PositionData } from './PositionData';
 import { SignalSignal } from '../Signaling/SignalSignal';
 import { SpeedPedal } from './SpeedPedal';
+import { Util } from '../../structs/Util';
+import { MarkerIterator } from './MarkerIterator';
+import { TrackMarker } from '../Track/TrackMarker';
+import { DirectedTrack } from '../Track/DirectedTrack';
+import { TrackDirection } from '../Track/TrackDirection';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
@@ -109,6 +114,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private alignAxles(): void {
     if (!this.position) return;
 
+    const formerStart = Util.first(this.wagons).getAxlePosition(WhichEnd.A);
+    const formerEnd = Util.last(this.wagons).getAxlePosition(WhichEnd.B);
+
     // checkouts
     let iter = this.getEndPosition()?.getDirectedTrack();
     if(iter) {
@@ -121,6 +129,8 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
       this.clearMarkers();
     }
+
+    // todo remove the lot of clonings
 
     const pos: PositionOnTrack = this.position.clone();
     pos.reverse();
@@ -145,6 +155,38 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     iter.getTrack().checkin(this);
 
     this.setMarkers();
+
+    const currentStart = Util.first(this.wagons).getAxlePosition(WhichEnd.A);
+    const currentEnd = Util.last(this.wagons).getAxlePosition(WhichEnd.B);
+
+    // block checkout
+
+    if(formerEnd) {
+        const iter = MarkerIterator.fromPositionOnTrack(formerEnd, currentEnd);
+        let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
+        while(next && next.value) {
+          const bjend = next.value.blockJoint.getEnd(convert2(next.directedTrack.getDirection()));
+          if(bjend) {
+            const block = bjend.getBlock();
+            block.checkout(this);
+          }
+          next = iter.nextOfFull('BlockJoint');
+        }
+    }
+    
+    // block checkin
+    if(formerStart) {
+        const iter = MarkerIterator.fromPositionOnTrack(formerStart, currentStart);
+        let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
+        while(next && next.value) {
+          const bjend = next.value.blockJoint.getEnd(convert(next.directedTrack.getDirection()));
+          if(bjend) {
+            const block = bjend.getBlock();
+            block.checkin(this);
+          }
+          next = iter.nextOfFull('BlockJoint');
+        }
+    }
   }
 
   remove(): void {
@@ -284,3 +326,15 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     });
   }
 }
+
+function convert2(t: TrackDirection): WhichEnd {
+    if (t === TrackDirection.AB) return WhichEnd.B;
+    if (t === TrackDirection.BA) return WhichEnd.A;
+    return null;
+  }
+  
+  function convert(t: TrackDirection): WhichEnd {
+    if (t === TrackDirection.AB) return WhichEnd.A;
+    if (t === TrackDirection.BA) return WhichEnd.B;
+    return null;
+  }

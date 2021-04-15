@@ -1,6 +1,7 @@
 import { DirectedBlock } from './DirectedBlock';
 import { BlockEnd } from './BlockEnd';
 import { BlockJointEnd } from './BlockJointEnd';
+import { Block } from './Block';
 
 export class ActualBlockEnd implements BlockEnd {
   constructor(
@@ -15,6 +16,10 @@ export class ActualBlockEnd implements BlockEnd {
 
   getEnd(): DirectedBlock {
     return this.end;
+  }
+
+  getBlock(): Block {
+    return this.start.getBlock();
   }
 
   getJointEnd(): BlockJointEnd {

@@ -8,4 +8,5 @@ export interface BlockJoint extends BaseBrick {
   setOneEnd(jointEnd: WhichEnd, blockEnd: BlockEnd): void;
   removeEnd(blockEnd: BlockEnd): void;
   getEnd(whichEnd: WhichEnd): BlockEnd;
+  getPosition(): PositionOnTrack;
 }

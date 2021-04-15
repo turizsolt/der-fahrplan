@@ -62,6 +62,10 @@ export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
     return this.ends[whichEnd];
   }
 
+  getPosition(): PositionOnTrack {
+    return this.position;
+  }
+
   getRenderer(): BaseRenderer {
     throw new Error('Method not implemented.');
   }
@@ -69,7 +73,8 @@ export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
   persist(): Object {
     return {
       id: this.id,
-      type: 'BlockJoint'
+      type: 'BlockJoint',
+      ray: this.position.getRay().persist()
     };
   }
 

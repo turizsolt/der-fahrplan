@@ -8,13 +8,22 @@ export class MarkerIterator {
   private currentIndex: number;
 
   constructor (
-      private startDirectedTrack: DirectedTrack, 
-      private startPosition?: number, 
-      private endDirectedTrack?: DirectedTrack, 
-      private endPosition?: number
+    private startDirectedTrack: DirectedTrack, 
+    private startPosition?: number, 
+    private endDirectedTrack?: DirectedTrack, 
+    private endPosition?: number
   ) {
     this.currentDirectedTrack = startDirectedTrack;
     this.currentIndex = -1;
+  }
+
+  static fromPositionOnTrack(startPoT: PositionOnTrack, endPoT?: PositionOnTrack): MarkerIterator {
+    return new MarkerIterator(
+      startPoT.getDirectedTrack(), 
+      startPoT.getPosition(), 
+      endPoT?.getDirectedTrack(), 
+      endPoT?.getPosition()
+    );
   }
 
   next(): TrackMarker {
@@ -43,7 +52,7 @@ export class MarkerIterator {
       return true;
   }
 
-  innerNext(): PositionedTrackMarker {
+  private innerNext(): PositionedTrackMarker {
     let markers = this.currentDirectedTrack?.getMarkers();
     this.currentIndex++;
     while (markers && this.currentIndex >= markers.length) {
@@ -63,4 +72,17 @@ export class MarkerIterator {
 
       return value;
   }
+
+  nextOfFull(type: string): {value: TrackMarker, directedTrack: DirectedTrack} {
+    let value:TrackMarker = null;
+    do {
+      value = this.next();
+    }
+    while(value && value.type !== type);
+
+    return {
+        value,
+        directedTrack: this.currentDirectedTrack
+    };
+}
 }

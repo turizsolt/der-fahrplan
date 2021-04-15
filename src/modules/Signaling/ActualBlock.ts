@@ -8,6 +8,8 @@ import { Block } from './Block';
 import { BlockSegmentData } from './BlockSegmentData';
 import { BlockSegment } from './BlockSegment';
 import { ActualBlockSegment } from './ActualBlockSegment';
+import { Train } from '../Train/Train';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 
 export interface ActualBlock extends Emitable {}
 const doApply = () => applyMixins(ActualBlock, [Emitable]);
@@ -23,6 +25,22 @@ export class ActualBlock extends ActualBaseBrick implements Block {
     return this;
   }
 
+  private checkedTrains: Train[] = [];
+
+  checkin(train: Train): void {
+    this.checkedTrains.push(train);
+    this.emit('update', this.persist());
+  }
+
+  checkout(train: Train): void {
+    this.checkedTrains = this.checkedTrains.filter(x => x !== train);
+    this.emit('update', this.persist());
+  }
+
+  isFree(): boolean {
+    return this.checkedTrains.length === 0;
+  }
+
   getRenderer(): BaseRenderer {
     throw new Error('Method not implemented.');
   }
@@ -30,7 +48,20 @@ export class ActualBlock extends ActualBaseBrick implements Block {
   persist(): Object {
     return {
       id: this.id,
-      type: 'Block'
+      type: 'Block',
+      isFree: this.isFree(),
+      rayA: this.segment
+        .getEnd(WhichEnd.A)
+        .getJointEnd()
+        .joint.getPosition()
+        .getRay()
+        .persist(),
+      rayB: this.segment
+        .getEnd(WhichEnd.B)
+        .getJointEnd()
+        .joint.getPosition()
+        .getRay()
+        .persist()
     };
   }
 
