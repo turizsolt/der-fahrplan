@@ -19,6 +19,8 @@ export class MeshProvider {
   private selectorRed: BABYLON.StandardMaterial;
   private shuntingRed: BABYLON.StandardMaterial;
   private allowingGreen: BABYLON.StandardMaterial;
+  private amber: BABYLON.StandardMaterial;
+  private blue: BABYLON.StandardMaterial;
 
   public getMaterial(name: MaterialName) {
     return this.materials[name];
@@ -91,13 +93,21 @@ export class MeshProvider {
       0 / 255
     );
 
+    this.amber = new BABYLON.StandardMaterial('amber', null);
+    this.amber.diffuseColor = new BABYLON.Color3(255 / 255, 255 / 255, 0 / 255);
+
+    this.blue = new BABYLON.StandardMaterial('blue', null);
+    this.blue.diffuseColor = new BABYLON.Color3(0 / 255, 0 / 255, 255 / 255);
+
     this.materials = {
       [MaterialName.BedGray]: this.bedGray,
       [MaterialName.RailBlack]: this.railBlack,
       [MaterialName.SleeperBrown]: this.sleeperBrown,
       [MaterialName.SelectorRed]: this.selectorRed,
       [MaterialName.ShuntingRed]: this.shuntingRed,
-      [MaterialName.AllowingGreen]: this.allowingGreen
+      [MaterialName.AllowingGreen]: this.allowingGreen,
+      [MaterialName.Amber]: this.amber,
+      [MaterialName.Blue]: this.blue
     };
   }
 
@@ -189,10 +199,10 @@ export class MeshProvider {
     const mesh = BABYLON.MeshBuilder.CreateCylinder(
       name,
       {
-        diameterTop: 12,
-        diameterBottom: 12,
-        tessellation: 6,
-        height: 0.1
+        diameterTop: 2,
+        diameterBottom: 2,
+        tessellation: 3,
+        height: 2
       },
       null
     );

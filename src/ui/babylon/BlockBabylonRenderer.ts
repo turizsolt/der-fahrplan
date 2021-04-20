@@ -51,6 +51,9 @@ export class BlockBabylonRenderer extends BaseBabylonRenderer
       MaterialName.BedGray
     );
 
+    this.meshA.setEnabled(false);
+    this.meshB.setEnabled(false);
+
     this.meshes = [this.meshA, this.meshB, this.pathMesh];
     this.inited = true;
     this.update(data);
