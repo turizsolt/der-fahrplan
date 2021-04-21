@@ -129,7 +129,21 @@ export class ActualBlock extends ActualBaseBrick implements Block {
         .joint.getPosition()
         .getRay()
         .persist(),
-      coords: this.coords
+      coords: this.coords,
+      endA:
+        this.segment
+          .getEnd(WhichEnd.A)
+          .getJointEnd()
+          .joint.getId() +
+        '-' +
+        this.segment.getEnd(WhichEnd.A).getJointEnd().end,
+      endB:
+        this.segment
+          .getEnd(WhichEnd.B)
+          .getJointEnd()
+          .joint.getId() +
+        '-' +
+        this.segment.getEnd(WhichEnd.B).getJointEnd().end
     };
   }
 

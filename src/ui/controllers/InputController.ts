@@ -41,6 +41,7 @@ import { CreateSignalInputHandler } from './CreateSignalInputHandler';
 import { Signal } from '../../modules/Signaling/Signal';
 import { SignalSignal } from '../../modules/Signaling/SignalSignal';
 import { CreateBlockJointInputHandler } from './CreateBlockJointInputHandler';
+import { Block } from '../../modules/Signaling/Block';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -309,6 +310,13 @@ export class InputController {
             } else {
               if(this.store.getSelected()){
                   this.store.getSelected().deselect();
+              }
+              // todo temp
+              console.log(storedBrick.getId());
+              if(storedBrick.getType() === TYPES.Block) {
+                const block = storedBrick as Block;
+                const p = block.persist() as any;
+                console.log(block.getId(), p.endA, p.endB);
               }
               this.select(storedBrick);
             }
