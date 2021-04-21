@@ -24,10 +24,10 @@ export class BlockJointBabylonRenderer extends BaseBabylonRenderer
       'clickable-blockjoint-' + data.id
     );
     this.meshA = this.meshProvider.createBlockJointMesh(
-      'clickable-blockjoint-' + data.id
+      'clickable-blockjoint-' + data.id + '-jointA'
     );
     this.meshB = this.meshProvider.createBlockJointMesh(
-      'clickable-blockjoint-' + data.id
+      'clickable-blockjoint-' + data.id + '-jointB'
     );
     const ray = Ray.fromData(data.ray);
     this.mesh.position = CoordinateToBabylonVector3(ray.coord);

@@ -42,6 +42,7 @@ import { Signal } from '../../modules/Signaling/Signal';
 import { SignalSignal } from '../../modules/Signaling/SignalSignal';
 import { CreateBlockJointInputHandler } from './CreateBlockJointInputHandler';
 import { Block } from '../../modules/Signaling/Block';
+import { CreateBlockInputHandler } from './CreateBlockInputHandler';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -51,7 +52,8 @@ export enum InputMode {
   CREATE_ENGINE = 'CREATE_ENGINE',
   CREATE_STATION = 'CREATE_STATION',
   CREATE_SIGNAL = 'CREATE_SIGNAL',
-  CREATE_BLOCK_JOINT = 'CREATE_BLOCK_JOINT'
+  CREATE_BLOCK_JOINT = 'CREATE_BLOCK_JOINT',
+  CREATE_BLOCK = 'CREATE_BLOCK'
 }
 
 export class InputController {
@@ -103,9 +105,10 @@ export class InputController {
       [InputMode.CREATE_STATION]: new CreateStationInputHandler(),
       [InputMode.CREATE_SIGNAL]: new CreateSignalInputHandler(),
       [InputMode.CREATE_BLOCK_JOINT]: new CreateBlockJointInputHandler(),
+      [InputMode.CREATE_BLOCK]: new CreateBlockInputHandler()
     };
 
-    const modeNames = {
+    const modeNames: Record<InputMode, string> = {
       [InputMode.CAMERA]: 'Cam',
       [InputMode.SELECT]: 'Sel',
       [InputMode.CREATE_TRACK]: '+Trac',
@@ -114,6 +117,7 @@ export class InputController {
       [InputMode.CREATE_STATION]: '+Stat',
       [InputMode.CREATE_SIGNAL]: '+Sign',
       [InputMode.CREATE_BLOCK_JOINT]: '+BJnt',
+      [InputMode.CREATE_BLOCK]: '+Blck'
     };
 
     for (let mode of Object.keys(this.inputHandlers)) {
@@ -243,7 +247,7 @@ export class InputController {
       //(props.point &&
       //  this.downProps.point.coord.equalsTo(props.point.coord)))
     ) {
-      let ready = this.selectIfPossible(event);
+      let ready = this.mode === InputMode.CREATE_BLOCK ? false : this.selectIfPossible(event);
       if (ready) {
         this.inputHandler.cancel();
       } else {
@@ -271,8 +275,8 @@ export class InputController {
         const storedObj = this.store.get(id);
         const storedBrick = storedObj as BaseBrick;
         if (storedBrick) {
-          if (command) {
-            storedBrick.getRenderer().process(command);
+          if (command && !command.startsWith('joint')) {
+            // storedBrick.getRenderer().process(command);
             if(command === 'endA') {
                 const wagon = storedBrick as Wagon;
                 this.store.getCommandLog().addAction(CommandCreator.unmergeTrain(

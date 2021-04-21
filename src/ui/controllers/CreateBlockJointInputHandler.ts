@@ -74,6 +74,7 @@ export class CreateBlockJointInputHandler implements InputHandler {
         .create<BlockJoint>(TYPES.BlockJoint)
         .init(position);
 
+      /* todo put back auto block creator
       const nearestForward = Nearest.blockJoint(position);
       const nearestBackward = Nearest.blockJoint(opposition);
 
@@ -125,6 +126,7 @@ export class CreateBlockJointInputHandler implements InputHandler {
           .create<Signal>(TYPES.Signal)
           .init(nearestBackward.position, block);
       }
+      */
     }
 
     this.fromMesh.setEnabled(false);
