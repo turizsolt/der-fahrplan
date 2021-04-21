@@ -5,12 +5,19 @@ import { Emitable } from '../../mixins/Emitable';
 import { applyMixins } from '../../mixins/ApplyMixins';
 import { TYPES } from '../../di/TYPES';
 import { PathBlock } from './PathBlock';
+import { BlockJointEnd } from './BlockJointEnd';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
 export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
-  init(): PathBlock {
+  private jointEnds: BlockJointEnd[] = [];
+
+  init(jointEnds: BlockJointEnd[]): PathBlock {
     this.initStore(TYPES.PathBlock);
+
+    this.jointEnds = jointEnds;
+    console.log('pathblock created', jointEnds);
+
     this.emit('init', this.persist());
     return this;
   }
@@ -20,7 +27,10 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
   }
 
   persist(): Object {
-    throw new Error('Method not implemented.');
+    return {
+      id: this.getId(),
+      type: 'PathBlock'
+    };
   }
 
   load(obj: Object, store: Store): void {

@@ -7,6 +7,7 @@ import { BlockJoint } from '../../modules/Signaling/BlockJoint';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { BlockJointEnd } from '../../modules/Signaling/BlockJointEnd';
 import { Block } from '../../modules/Signaling/Block';
+import { PathBlock } from '../../modules/Signaling/PathBlock';
 
 export class CreateBlockInputHandler implements InputHandler {
   private store: Store;
@@ -35,11 +36,15 @@ export class CreateBlockInputHandler implements InputHandler {
         const end: WhichEnd = command === 'jointA' ? WhichEnd.A : WhichEnd.B;
 
         this.jointEnds.push({ joint, end });
-        if (this.jointEnds.length === 2) {
-          this.store.create<Block>(TYPES.Block).init({
-            startJointEnd: this.jointEnds[0],
-            endJointEnd: this.jointEnds[1]
-          });
+        if (event.button === 2) {
+          if (this.jointEnds.length === 2) {
+            this.store.create<Block>(TYPES.Block).init({
+              startJointEnd: this.jointEnds[0],
+              endJointEnd: this.jointEnds[1]
+            });
+          } else if (this.jointEnds.length > 2) {
+            this.store.create<PathBlock>(TYPES.PathBlock).init(this.jointEnds);
+          }
           this.jointEnds = [];
         }
       }
