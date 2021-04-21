@@ -70,7 +70,7 @@ export class ActualStore implements Store {
   private BlockRendererFactory: () => BlockRenderer;
   @inject(TYPES.FactoryOfBlockJointRenderer)
   private BlockJointRendererFactory: () => BlockJointRenderer;
-  @inject(TYPES.FactoryOfSignalRenderer)
+  @inject(TYPES.FactoryOfPathBlockRenderer)
   private PathBlockRendererFactory: () => PathBlockRenderer;
   @inject(TYPES.FactoryOfSectionRenderer)
   private SectionRendererFactory: () => SectionRenderer;
