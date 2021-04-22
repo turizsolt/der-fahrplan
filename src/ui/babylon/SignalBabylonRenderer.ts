@@ -38,14 +38,18 @@ export class SignalBabylonRenderer extends BaseBabylonRenderer
       'clickable-signal-' + data.id // + '-green'
     );
     this.greenMesh.position.y = 1.25;
+
+    /*
     this.redMesh.material = this.meshProvider.getMaterial(
       MaterialName.ShuntingRed
     );
     this.greenMesh.material = this.meshProvider.getMaterial(
       MaterialName.RailBlack
     );
+    */
 
     this.meshes = [this.postMesh, this.redMesh, this.greenMesh];
+    this.update(data);
   }
 
   update(data: any): void {
