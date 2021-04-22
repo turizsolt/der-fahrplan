@@ -2,6 +2,7 @@ import { DirectedBlock } from './DirectedBlock';
 import { BlockEnd } from './BlockEnd';
 import { BlockJointEnd } from './BlockJointEnd';
 import { Block } from './Block';
+import { TYPES } from '../../di/TYPES';
 
 export class ActualBlockEnd implements BlockEnd {
   constructor(
@@ -39,5 +40,9 @@ export class ActualBlockEnd implements BlockEnd {
       end: this.jointEnd.end,
       joint: this.jointEnd.joint.getId()
     };
+  }
+
+  getType(): Symbol {
+    return TYPES.BlockEnd;
   }
 }

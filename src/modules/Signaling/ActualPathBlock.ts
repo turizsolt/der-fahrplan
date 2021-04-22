@@ -6,16 +6,19 @@ import { applyMixins } from '../../mixins/ApplyMixins';
 import { TYPES } from '../../di/TYPES';
 import { PathBlock } from './PathBlock';
 import { BlockJointEnd } from './BlockJointEnd';
+import { PathBlockEnd } from './PathBlockEnd';
+import { ActualPathBlockEnd } from './ActualPathBlockEnd';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
 export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
-  private jointEnds: BlockJointEnd[] = [];
+  private pathBlockEnds: PathBlockEnd[] = [];
 
   init(jointEnds: BlockJointEnd[]): PathBlock {
     this.initStore(TYPES.PathBlock);
 
-    this.jointEnds = jointEnds;
+    this.pathBlockEnds = jointEnds.map(je => new ActualPathBlockEnd(je, this));
+    this.pathBlockEnds.map(pbe => pbe.pathConnect());
     console.log('pathblock created', jointEnds);
 
     this.emit('init', this.persist());

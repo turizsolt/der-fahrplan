@@ -10,4 +10,5 @@ export interface BlockEnd {
   connect(): void;
   disconnect(): void;
   persist(): any;
+  getType(): Symbol;
 }

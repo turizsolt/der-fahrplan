@@ -43,6 +43,7 @@ import { SignalSignal } from '../../modules/Signaling/SignalSignal';
 import { CreateBlockJointInputHandler } from './CreateBlockJointInputHandler';
 import { Block } from '../../modules/Signaling/Block';
 import { CreateBlockInputHandler } from './CreateBlockInputHandler';
+import { AllowPathInputHandler } from './AllowPathInputHandler';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -53,7 +54,8 @@ export enum InputMode {
   CREATE_STATION = 'CREATE_STATION',
   CREATE_SIGNAL = 'CREATE_SIGNAL',
   CREATE_BLOCK_JOINT = 'CREATE_BLOCK_JOINT',
-  CREATE_BLOCK = 'CREATE_BLOCK'
+  CREATE_BLOCK = 'CREATE_BLOCK',
+  ALLOW_PATH = 'ALLOW_PATH'
 }
 
 export class InputController {
@@ -105,7 +107,8 @@ export class InputController {
       [InputMode.CREATE_STATION]: new CreateStationInputHandler(),
       [InputMode.CREATE_SIGNAL]: new CreateSignalInputHandler(),
       [InputMode.CREATE_BLOCK_JOINT]: new CreateBlockJointInputHandler(),
-      [InputMode.CREATE_BLOCK]: new CreateBlockInputHandler()
+      [InputMode.CREATE_BLOCK]: new CreateBlockInputHandler(),
+      [InputMode.ALLOW_PATH]: new AllowPathInputHandler()
     };
 
     const modeNames: Record<InputMode, string> = {
@@ -117,7 +120,8 @@ export class InputController {
       [InputMode.CREATE_STATION]: '+Stat',
       [InputMode.CREATE_SIGNAL]: '+Sign',
       [InputMode.CREATE_BLOCK_JOINT]: '+BJnt',
-      [InputMode.CREATE_BLOCK]: '+Blck'
+      [InputMode.CREATE_BLOCK]: '+Blck',
+      [InputMode.ALLOW_PATH]: 'Allow'
     };
 
     for (let mode of Object.keys(this.inputHandlers)) {
@@ -247,7 +251,7 @@ export class InputController {
       //(props.point &&
       //  this.downProps.point.coord.equalsTo(props.point.coord)))
     ) {
-      let ready = this.mode === InputMode.CREATE_BLOCK ? false : this.selectIfPossible(event);
+      let ready = (this.mode === InputMode.CREATE_BLOCK || this.mode === InputMode.ALLOW_PATH) ? false : this.selectIfPossible(event);
       if (ready) {
         this.inputHandler.cancel();
       } else {

@@ -78,5 +78,8 @@ export const TYPES = {
   Section: Symbol.for('Section'),
   SectionRenderer: Symbol.for('SectionRenderer'),
   FactoryOfSection: Symbol.for('Factory<Section>'),
-  FactoryOfSectionRenderer: Symbol.for('Factory<SectionRenderer>')
+  FactoryOfSectionRenderer: Symbol.for('Factory<SectionRenderer>'),
+
+  PathBlockEnd: Symbol.for('PathBlockEnd'),
+  BlockEnd: Symbol.for('BlockEnd')
 };
