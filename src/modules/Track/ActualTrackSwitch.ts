@@ -69,6 +69,10 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     return this.activeSegment.getDirected(direction);
   }
 
+  getActiveSegment(): TrackSegment {
+    return this.activeSegment;
+  }
+
   getCurve(): TrackCurve {
     return this.activeSegment.getCurve();
   }

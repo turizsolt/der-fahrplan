@@ -14,6 +14,7 @@ import { TrackDirection } from './TrackDirection';
 import { DirectedTrack } from './DirectedTrack';
 import { TrackJoint } from './TrackJoint/TrackJoint';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { TrackSegment } from './TrackSegment';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
@@ -33,6 +34,10 @@ export class ActualTrack extends ActualTrackBase implements Track {
 
   getDirected(direction: TrackDirection): DirectedTrack {
     return this.segment.getDirected(direction);
+  }
+
+  getActiveSegment(): TrackSegment {
+    return this.segment;
   }
 
   getCurve(): TrackCurve {

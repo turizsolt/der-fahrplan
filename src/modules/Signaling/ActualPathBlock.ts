@@ -9,6 +9,7 @@ import { BlockJointEnd } from './BlockJointEnd';
 import { PathBlockEnd } from './PathBlockEnd';
 import { ActualPathBlockEnd } from './ActualPathBlockEnd';
 import { DirectedTrack } from '../Track/DirectedTrack';
+import { TrackSwitch } from '../Track/TrackSwitch';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -61,7 +62,19 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
 
     if (backFromHere) {
       let next: DirectedTrack = backFromHere;
-      while ((next = info[next.getHash()])) {}
+      this.handle(next);
+      while ((next = info[next.getHash()])) {
+        this.handle(next);
+      }
+    }
+  }
+
+  private handle(dt: DirectedTrack): void {
+    const track = dt.getTrack();
+    if (track.getType() === TYPES.TrackSwitch) {
+      if (track.getActiveSegment() !== dt.getSegment()) {
+        (track as TrackSwitch).switch();
+      }
     }
   }
 

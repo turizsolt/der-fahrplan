@@ -40,7 +40,8 @@ const mockTrackBase: TrackBase = {
   select: () => {},
   toggleSelect: () => {},
   update: () => {},
-  getDirected: () => null
+  getDirected: () => null,
+  getActiveSegment: () => null
 };
 
 const mockTrackSegment: TrackSegment = {
