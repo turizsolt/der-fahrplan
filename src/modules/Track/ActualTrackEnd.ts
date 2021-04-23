@@ -39,6 +39,14 @@ export class ActualTrackEnd implements TrackEnd {
     this.jointEnd.joint.removeEnd(this);
   }
 
+  permaConnect(): void {
+    this.jointEnd.joint.setPermaOneEnd(this.jointEnd.end, this);
+  }
+
+  permaDisconnect(): void {
+    this.jointEnd.joint.removePermaEnd(this);
+  }
+
   persist(): Object {
     return {
       end: this.jointEnd.end,

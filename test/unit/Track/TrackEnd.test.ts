@@ -68,7 +68,10 @@ const mockDirectedTrack: DirectedTrack = {
   getMarkers: () => null,
   removeMarker: () => {},
   removeMarkerBothDirections: () => {},
-  addMarker: () => {}
+  addMarker: () => {},
+  getHash: () => null,
+  permaNexts: () => null,
+  setPermaNexts: () => {}
 };
 const mockDirectedTrack2: DirectedTrack = { ...mockDirectedTrack };
 

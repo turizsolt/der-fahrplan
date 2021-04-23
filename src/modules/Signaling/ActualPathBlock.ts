@@ -8,6 +8,7 @@ import { PathBlock } from './PathBlock';
 import { BlockJointEnd } from './BlockJointEnd';
 import { PathBlockEnd } from './PathBlockEnd';
 import { ActualPathBlockEnd } from './ActualPathBlockEnd';
+import { DirectedTrack } from '../Track/DirectedTrack';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -23,6 +24,45 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
 
     this.emit('init', this.persist());
     return this;
+  }
+
+  allow(startPBE: PathBlockEnd, endPBE: PathBlockEnd, count: number = 1): void {
+    const startDt: DirectedTrack = startPBE
+      .getJointEnd()
+      .joint.getPosition()
+      .getDirectedTrack();
+    const endDt: DirectedTrack = endPBE
+      .getJointEnd()
+      .joint.getPosition()
+      .getDirectedTrack();
+
+    const queue: DirectedTrack[] = [];
+    const info: Record<string, any> = {};
+    queue.push(startDt);
+    queue.push(startDt.reverse());
+    info[startDt.getHash()] = null;
+    info[startDt.reverse().getHash()] = null;
+
+    let backFromHere: DirectedTrack = null;
+
+    while (queue.length > 0) {
+      const dt = queue.shift();
+
+      if (dt === endDt || dt === endDt.reverse()) {
+        backFromHere = dt;
+        break;
+      }
+
+      for (let next of dt.permaNexts()) {
+        queue.push(next);
+        info[next.getHash()] = dt;
+      }
+    }
+
+    if (backFromHere) {
+      let next: DirectedTrack = backFromHere;
+      while ((next = info[next.getHash()])) {}
+    }
   }
 
   getRenderer(): BaseRenderer {

@@ -7,8 +7,9 @@ import { TrackMarker } from './TrackMarker';
 import { PositionedTrackMarker } from '../PositionedTrackMarker';
 
 export class ActualDirectedTrack implements DirectedTrack {
-  private nextTrack: DirectedTrack = null;
-  private reverseTrack: DirectedTrack = null;
+    private nextTrack: DirectedTrack = null;
+    private permaNextTracks: DirectedTrack[] = [];
+    private reverseTrack: DirectedTrack = null;
 
   constructor(
     private segment: TrackSegment,
@@ -22,6 +23,14 @@ export class ActualDirectedTrack implements DirectedTrack {
 
   setNext(nextTrack: DirectedTrack): void {
     this.nextTrack = nextTrack;
+  }
+
+  permaNexts(): DirectedTrack[] {
+    return this.permaNextTracks;
+  }
+
+  setPermaNexts(permaNextTracks: DirectedTrack[]): void {
+    this.permaNextTracks = permaNextTracks;
   }
 
   reverse(): DirectedTrack {
@@ -76,4 +85,9 @@ export class ActualDirectedTrack implements DirectedTrack {
   getMarkers(): PositionedTrackMarker[] {
     return this.markers;
   }
+
+  getHash(): string {
+      return this.getTrack().getId() + '-' + this.getDirection();
+  }
+
 }
