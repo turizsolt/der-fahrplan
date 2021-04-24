@@ -127,4 +127,51 @@ describe('TrackSwitch', () => {
         .getCoordinates()
     ).deep.equals([joint1.getPosition(), corner, joint8.getPosition()]);
   });
+
+  it('create 1->8, 1->2', () => {
+    const {
+      joint1,
+      joint2,
+      joint8,
+      corner,
+      track01,
+      track23,
+      track89
+    } = initJointsAndTracks();
+
+    const trackSwitch128 = store.create<TrackSwitch>(TYPES.TrackSwitch);
+    trackSwitch128.presetId('trackSwitch128');
+    trackSwitch128.init(
+      {
+        startJointEnd: { joint: joint1, end: WhichEnd.B },
+        endJointEnd: { joint: joint8, end: WhichEnd.A },
+        coordinates: [joint1.getPosition(), corner, joint8.getPosition()]
+      },
+      {
+        startJointEnd: { joint: joint1, end: WhichEnd.B },
+        endJointEnd: { joint: joint2, end: WhichEnd.A },
+        coordinates: [joint1.getPosition(), joint2.getPosition()]
+      }
+    );
+
+    expectNextOf(track01, AB, trackSwitch128, AB);
+    expectNextOf(trackSwitch128, AB, track23, AB);
+    expect(
+      trackSwitch128
+        .getActiveSegment()
+        .getCurve()
+        .getCoordinates()
+    ).deep.equals([joint1.getPosition(), joint2.getPosition()]);
+
+    trackSwitch128.switch();
+
+    expectNextOf(track01, AB, trackSwitch128, AB);
+    expectNextOf(trackSwitch128, AB, track89, AB);
+    expect(
+      trackSwitch128
+        .getActiveSegment()
+        .getCurve()
+        .getCoordinates()
+    ).deep.equals([joint1.getPosition(), corner, joint8.getPosition()]);
+  });
 });

@@ -9,8 +9,19 @@ export class TrackSwitchCoordinates {
     segmentData1: TrackSegmentData,
     segmentData2: TrackSegmentData
   ): TrackSegmentData[] {
-    return [segmentData1, segmentData2];
+    const tempE = new ActualTrackCurve(segmentData1.coordinates);
+    const tempF = new ActualTrackCurve(segmentData2.coordinates);
 
+    if (
+      tempE
+        .getLineSegmentChain()
+        .copyMove(Right, 1)
+        .isIntersectsWithChain(tempF.getLineSegmentChain().copyMove(Left, 1))
+    ) {
+      return [segmentData1, segmentData2];
+    } else {
+      return [segmentData2, segmentData1];
+    }
     /*
     const last1 = segmentData1.coordinates.length - 1;
     const last2 = segmentData2.coordinates.length - 1;
