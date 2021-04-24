@@ -28,7 +28,6 @@ export class ActualTrackSegment implements TrackSegment {
     this.A = new ActualTrackEnd(this.AB, this.BA, segmentData.startJointEnd);
     this.B = new ActualTrackEnd(this.BA, this.AB, segmentData.endJointEnd);
 
-    this.connect();
     this.permaConnect();
   }
 

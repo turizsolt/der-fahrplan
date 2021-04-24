@@ -26,6 +26,7 @@ export class ActualTrack extends ActualTrackBase implements Track {
     super.initStore(TYPES.Track);
 
     this.segment = new ActualTrackSegment(this, segmentData);
+    this.segment.connect();
 
     // todo emit
     this.renderer.init(this);
