@@ -21,8 +21,8 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
   private selectableMeshes: BABYLON.AbstractMesh[];
   private leftMeshes: BABYLON.AbstractMesh[];
   private rightMeshes: BABYLON.AbstractMesh[];
-  private left: number = 1;
-  private right: number = 0;
+  private left: number = 0;
+  private right: number = 1;
 
   init(trackSwitch: TrackSwitch): void {
     this.trackSwitch = trackSwitch;
