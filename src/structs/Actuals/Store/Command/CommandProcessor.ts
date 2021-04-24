@@ -55,9 +55,6 @@ export class CommandProcessor {
       endJointEnd: { joint: other, end: whichEnd2 }
     });
 
-    // one.setOneEnd(whichEnd1, track.getAx());
-    // other.setOneEnd(whichEnd2, track.getBx());
-
     return track;
   }
 
@@ -70,12 +67,6 @@ export class CommandProcessor {
     whichEnd2: WhichEnd
   ): void {
     const track = this.store.get(trackId) as Track;
-    // const one = this.store.get(jointId1) as TrackJoint;
-    // const other = this.store.get(jointId2) as TrackJoint;
-
-    // one.removeEnd(track.getAx());
-    // other.removeEnd(track.getBx());
-
     track.remove();
   }
 
@@ -109,11 +100,6 @@ export class CommandProcessor {
       }
     );
 
-    // todo redo
-    // one.setOneEnd(whichEnd1, trackSwitch.getA());
-    // other.setOneEnd(whichEnd2, trackSwitch.getE());
-    // third.setOneEnd(whichEnd3, trackSwitch.getF());
-
     return trackSwitch;
   }
 
@@ -133,10 +119,6 @@ export class CommandProcessor {
     const other = this.store.get(jointId2) as TrackJoint;
     const third = this.store.get(jointId3) as TrackJoint;
 
-    // todo redo
-    // one.removeEnd(trackSwitch.getA());
-    // other.removeEnd(trackSwitch.getE());
-    // third.removeEnd(trackSwitch.getF());
     trackSwitch.remove();
   }
 
