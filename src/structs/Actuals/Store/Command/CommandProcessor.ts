@@ -79,13 +79,16 @@ export class CommandProcessor {
     jointId2: string,
     whichEnd2: WhichEnd,
     jointId3: string,
-    whichEnd3: WhichEnd
+    whichEnd3: WhichEnd,
+    jointId4: string,
+    whichEnd4: WhichEnd
   ): TrackBase {
     const trackSwitch = this.store.create<TrackSwitch>(TYPES.TrackSwitch);
     trackSwitch.presetId(trackId);
     const one = this.store.get(jointId1) as TrackJoint;
     const other = this.store.get(jointId2) as TrackJoint;
     const third = this.store.get(jointId3) as TrackJoint;
+    const fourth = this.store.get(jointId4) as TrackJoint;
 
     trackSwitch.init(
       {
@@ -95,8 +98,8 @@ export class CommandProcessor {
       },
       {
         coordinates,
-        startJointEnd: { joint: one, end: whichEnd1 },
-        endJointEnd: { joint: third, end: whichEnd3 }
+        startJointEnd: { joint: third, end: whichEnd3 },
+        endJointEnd: { joint: fourth, end: whichEnd4 }
       }
     );
 
@@ -112,13 +115,11 @@ export class CommandProcessor {
     jointId2: string,
     whichEnd2: WhichEnd,
     jointId3: string,
-    whichEnd3: WhichEnd
+    whichEnd3: WhichEnd,
+    jointId4: string,
+    whichEnd4: WhichEnd
   ): void {
     const trackSwitch = this.store.get(trackId) as TrackSwitch;
-    const one = this.store.get(jointId1) as TrackJoint;
-    const other = this.store.get(jointId2) as TrackJoint;
-    const third = this.store.get(jointId3) as TrackJoint;
-
     trackSwitch.remove();
   }
 
