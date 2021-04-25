@@ -3,6 +3,7 @@ import { BlockEnd } from './BlockEnd';
 import { BlockJointEnd } from './BlockJointEnd';
 import { Block } from './Block';
 import { TYPES } from '../../di/TYPES';
+import { Train } from '../Train/Train';
 
 export class ActualBlockEnd implements BlockEnd {
   constructor(
@@ -33,6 +34,16 @@ export class ActualBlockEnd implements BlockEnd {
 
   disconnect(): void {
     this.jointEnd.joint.removeEnd(this);
+  }
+
+  checkin(train: Train): void {
+    console.log('block checkin', this.getBlock()?.getId());
+    this.getBlock()?.checkin(train);
+  }
+
+  checkout(train: Train): void {
+    console.log('block checkout', this.getBlock()?.getId());
+    this.getBlock()?.checkout(train);
   }
 
   persist(): Object {

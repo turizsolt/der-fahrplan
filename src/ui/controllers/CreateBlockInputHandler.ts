@@ -38,10 +38,11 @@ export class CreateBlockInputHandler implements InputHandler {
         this.jointEnds.push({ joint, end });
         if (event.button === 2) {
           if (this.jointEnds.length === 2) {
-            this.store.create<Block>(TYPES.Block).init({
+            const block = this.store.create<Block>(TYPES.Block).init({
               startJointEnd: this.jointEnds[0],
               endJointEnd: this.jointEnds[1]
             });
+            block.getSegment().connect();
           } else if (this.jointEnds.length > 2) {
             this.store.create<PathBlock>(TYPES.PathBlock).init(this.jointEnds);
           }

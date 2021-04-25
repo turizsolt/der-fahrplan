@@ -12,6 +12,7 @@ import { Train } from '../Train/Train';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { LineSegmentChain } from '../../structs/Geometry/LineSegmentChain';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { BlockEnd } from './BlockEnd';
 
 export interface ActualBlock extends Emitable {}
 const doApply = () => applyMixins(ActualBlock, [Emitable]);
@@ -145,6 +146,14 @@ export class ActualBlock extends ActualBaseBrick implements Block {
         '-' +
         this.segment.getEnd(WhichEnd.B).getJointEnd().end
     };
+  }
+
+  getSegment(): BlockSegment {
+    return this.segment;
+  }
+
+  getEnd(whichEnd: WhichEnd): BlockEnd {
+    return this.segment.getEnd(whichEnd);
   }
 
   load(obj: Object, store: Store): void {

@@ -37,22 +37,22 @@ export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
   setOneEnd(jointEnd: WhichEnd, blockEnd: BlockEnd): void {
     this.ends[jointEnd] = blockEnd;
     if (this.ends.A && this.ends.B) {
-      this.ends.A.getEnd().setNext(this.ends.B.getStart());
-      this.ends.B.getEnd().setNext(this.ends.A.getStart());
+      this.ends.A.getEnd()?.setNext(this.ends.B.getStart());
+      this.ends.B.getEnd()?.setNext(this.ends.A.getStart());
     }
   }
 
   removeEnd(blockEnd: BlockEnd) {
     if (this.ends.A === blockEnd) {
       if (this.ends.A && this.ends.B) {
-        this.ends.A.getEnd().setNext(null);
-        this.ends.B.getEnd().setNext(null);
+        this.ends.A.getEnd()?.setNext(null);
+        this.ends.B.getEnd()?.setNext(null);
       }
       this.ends.A = null;
     } else if (this.ends.B === blockEnd) {
       if (this.ends.A && this.ends.B) {
-        this.ends.A.getEnd().setNext(null);
-        this.ends.B.getEnd().setNext(null);
+        this.ends.A.getEnd()?.setNext(null);
+        this.ends.B.getEnd()?.setNext(null);
       }
       this.ends.B = null;
     }

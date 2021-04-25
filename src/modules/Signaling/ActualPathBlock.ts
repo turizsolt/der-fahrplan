@@ -10,6 +10,8 @@ import { PathBlockEnd } from './PathBlockEnd';
 import { ActualPathBlockEnd } from './ActualPathBlockEnd';
 import { DirectedTrack } from '../Track/DirectedTrack';
 import { TrackSwitch } from '../Track/TrackSwitch';
+import { Block } from './Block';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -66,6 +68,15 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
       while ((next = info[next.getHash()])) {
         this.handle(next);
       }
+
+      const block = this.store.create<Block>(TYPES.Block).init({
+        startJointEnd: startPBE.getJointEnd(),
+        endJointEnd: endPBE.getJointEnd()
+      });
+      startPBE.setBlockEnd(block.getEnd(WhichEnd.A));
+      endPBE.setBlockEnd(block.getEnd(WhichEnd.B));
+      startPBE.pathConnect();
+      endPBE.pathConnect();
     }
   }
 

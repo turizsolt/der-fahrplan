@@ -27,8 +27,6 @@ export class ActualBlockSegment implements BlockSegment {
 
     this.A = new ActualBlockEnd(this.AB, this.BA, segmentData.startJointEnd);
     this.B = new ActualBlockEnd(this.BA, this.AB, segmentData.endJointEnd);
-
-    this.connect();
   }
 
   remove(): void {

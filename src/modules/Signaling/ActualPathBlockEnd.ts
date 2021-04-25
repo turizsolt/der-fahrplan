@@ -5,6 +5,7 @@ import { Block } from './Block';
 import { PathBlockEnd } from './PathBlockEnd';
 import { PathBlock } from './PathBlock';
 import { TYPES } from '../../di/TYPES';
+import { Train } from '../Train/Train';
 
 export class ActualPathBlockEnd implements PathBlockEnd {
   private blockEnd: BlockEnd = null;
@@ -48,6 +49,18 @@ export class ActualPathBlockEnd implements PathBlockEnd {
 
   disconnect(): void {
     this.jointEnd.joint.removeEnd(this.blockEnd);
+  }
+
+  checkin(train: Train): void {
+    console.log('PBE checkin', this.getBlock()?.getId());
+    //this.getBlock()?.checkin(train);
+    this.blockEnd?.checkin(train);
+  }
+
+  checkout(train: Train): void{
+    console.log('PBE checkout', this.getBlock()?.getId());
+    //this.getBlock()?.checkout(train);
+    this.blockEnd?.checkout(train);
   }
 
   persist(): Object {

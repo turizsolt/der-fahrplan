@@ -1,6 +1,7 @@
 import { DirectedBlock } from './DirectedBlock';
 import { BlockJointEnd } from './BlockJointEnd';
 import { Block } from './Block';
+import { Train } from '../Train/Train';
 
 export interface BlockEnd {
   getStart(): DirectedBlock;
@@ -11,4 +12,6 @@ export interface BlockEnd {
   disconnect(): void;
   persist(): any;
   getType(): Symbol;
+  checkin(train: Train): void;
+  checkout(train: Train): void;
 }

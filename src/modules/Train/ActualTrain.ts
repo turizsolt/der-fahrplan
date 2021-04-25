@@ -167,8 +167,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         while(next && next.value) {
           const bjend = next.value.blockJoint.getEnd(convert2(next.directedTrack.getDirection()));
           if(bjend) {
-            const block = bjend.getBlock();
-            block.checkout(this);
+            bjend.checkout(this);
           }
           next = iter.nextOfFull('BlockJoint');
         }
@@ -181,8 +180,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         while(next && next.value) {
           const bjend = next.value.blockJoint.getEnd(convert(next.directedTrack.getDirection()));
           if(bjend) {
-            const block = bjend.getBlock();
-            block.checkin(this);
+            bjend.checkin(this);
           }
           next = iter.nextOfFull('BlockJoint');
         }
