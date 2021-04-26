@@ -9,6 +9,9 @@ export interface TrackSwitch extends TrackBase {
   ): TrackSwitch;
   switch();
   getState(): number;
+  lock(): void;
+  unlock(): void;
+  isLocked(): boolean;
 
   getSegmentLeft(): TrackCurve;
   getSegmentRight(): TrackCurve;

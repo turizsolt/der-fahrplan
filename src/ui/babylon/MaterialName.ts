@@ -6,5 +6,6 @@ export enum MaterialName {
   ShuntingRed = 'ShuntingRed',
   AllowingGreen = 'AllowingGreen',
   Amber = 'Amber',
-  Blue = 'Blue'
+  Blue = 'Blue',
+  White = 'White'
 }

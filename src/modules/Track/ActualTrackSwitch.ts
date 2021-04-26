@@ -20,6 +20,7 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   private segmentRight: TrackSegment; // A-C
   private activeSegment: TrackSegment;
   private state: number;
+  private locked: boolean = false;
 
   @inject(TYPES.TrackSwitchRenderer) private renderer: TrackSwitchRenderer;
 
@@ -53,6 +54,7 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
   switch() {
     if (!this.isEmpty()) return;
+    if (this.locked) return;
 
     this.state = 1 - this.state;
 
@@ -62,6 +64,24 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
 
     // todo emit
     this.renderer.update();
+  }
+
+  lock(): void {
+    this.locked = true;
+
+    // todo emit
+    this.renderer.update();
+  }
+
+  unlock(): void {
+    this.locked = false;
+
+    // todo emit
+    this.renderer.update();
+  }
+
+  isLocked(): boolean {
+    return this.locked;
   }
 
   getDirected(direction: TrackDirection): DirectedTrack {
@@ -110,7 +130,8 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
       type: 'TrackSwitch',
       segmentLeftData: this.segmentLeft.persist(),
       segmentRightData: this.segmentRight.persist(),
-      state: this.getState()
+      state: this.getState(),
+      isLocked: this.locked
     };
   }
 

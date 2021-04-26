@@ -658,6 +658,12 @@ export class InputController {
           .process('stop');
         break;
 
+        case 'D':
+        this.getSelectedBrick()
+          .getRenderer()
+          .process('lock');
+        break;
+
       case 'S':
         this.store.getCommandLog().addAction(CommandCreator.switchTrack(this.getSelectedBrick().getId()));
         break;

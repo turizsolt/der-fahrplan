@@ -21,6 +21,7 @@ export class MeshProvider {
   private allowingGreen: BABYLON.StandardMaterial;
   private amber: BABYLON.StandardMaterial;
   private blue: BABYLON.StandardMaterial;
+  private white: BABYLON.StandardMaterial;
 
   public getMaterial(name: MaterialName) {
     return this.materials[name];
@@ -99,6 +100,9 @@ export class MeshProvider {
     this.blue = new BABYLON.StandardMaterial('blue', null);
     this.blue.diffuseColor = new BABYLON.Color3(0 / 255, 0 / 255, 255 / 255);
 
+    this.white = new BABYLON.StandardMaterial('white', null);
+    this.white.diffuseColor = new BABYLON.Color3(255 / 255, 255 / 255, 255 / 255);
+
     this.materials = {
       [MaterialName.BedGray]: this.bedGray,
       [MaterialName.RailBlack]: this.railBlack,
@@ -107,7 +111,8 @@ export class MeshProvider {
       [MaterialName.ShuntingRed]: this.shuntingRed,
       [MaterialName.AllowingGreen]: this.allowingGreen,
       [MaterialName.Amber]: this.amber,
-      [MaterialName.Blue]: this.blue
+      [MaterialName.Blue]: this.blue,
+      [MaterialName.White]: this.white
     };
   }
 

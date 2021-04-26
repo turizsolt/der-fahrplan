@@ -21,6 +21,7 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
   private selectableMeshes: BABYLON.AbstractMesh[];
   private leftMeshes: BABYLON.AbstractMesh[];
   private rightMeshes: BABYLON.AbstractMesh[];
+  private ballonMesh: BABYLON.AbstractMesh;
   private left: number = 0;
   private right: number = 1;
 
@@ -120,7 +121,7 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
       .getRayPairsToPoint(peakPoint.coord)
       .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
-    const ballonMesh = ballon(peak2.setY(1.2).coord, BABYLON.Color3.White);
+    this.ballonMesh = ballon(peak2.setY(1.2).coord, BABYLON.Color3.White);
 
     this.meshes = [
       ...bedSegmentMeshesE,
@@ -134,7 +135,7 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
       ...sleeperMeshesF,
       ...this.leftMeshes,
       ...this.rightMeshes,
-      ballonMesh
+      this.ballonMesh
     ];
 
     this.selectableMeshes = [
@@ -185,6 +186,12 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
     const state = this.trackSwitch.getState();
     this.leftMeshes.map(x => x.setEnabled(state === this.left));
     this.rightMeshes.map(x => x.setEnabled(state === this.right));
+
+    this.ballonMesh.material = this.meshProvider.getMaterial(
+      this.trackSwitch.isLocked()
+        ? MaterialName.ShuntingRed
+        : MaterialName.White
+    );
   }
 
   process(command: string) {
@@ -195,6 +202,11 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
 
       case 'delete':
         this.trackSwitch.remove();
+        break;
+
+      case 'lock':
+        if (this.trackSwitch.isLocked()) this.trackSwitch.unlock();
+        else this.trackSwitch.lock();
         break;
     }
   }
