@@ -60,6 +60,7 @@ export class ActualPathBlockEnd implements PathBlockEnd {
   checkout(train: Train): void{
     console.log('PBE checkout', this.getBlock()?.getId());
     //this.getBlock()?.checkout(train);
+    this.pathBlock.checkout(this);
     this.blockEnd?.checkout(train);
   }
 

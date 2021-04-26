@@ -12,11 +12,13 @@ import { DirectedTrack } from '../Track/DirectedTrack';
 import { TrackSwitch } from '../Track/TrackSwitch';
 import { Block } from './Block';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
+import { AllowedPath } from './AllowedPath';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
 export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
   private pathBlockEnds: PathBlockEnd[] = [];
+  private allowedPathes: AllowedPath[] = [];
 
   init(jointEnds: BlockJointEnd[]): PathBlock {
     this.initStore(TYPES.PathBlock);
@@ -29,12 +31,16 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     return this;
   }
 
-  allow(startPBE: PathBlockEnd, endPBE: PathBlockEnd, count: number = 1): void {
-    const startDt: DirectedTrack = startPBE
+  allow(
+    startPathBlockEnd: PathBlockEnd,
+    endPathBlockEnd: PathBlockEnd,
+    count: number = 1
+  ): void {
+    const startDt: DirectedTrack = startPathBlockEnd
       .getJointEnd()
       .joint.getPosition()
       .getDirectedTrack();
-    const endDt: DirectedTrack = endPBE
+    const endDt: DirectedTrack = endPathBlockEnd
       .getJointEnd()
       .joint.getPosition()
       .getDirectedTrack();
@@ -70,13 +76,40 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
       }
 
       const block = this.store.create<Block>(TYPES.Block).init({
-        startJointEnd: startPBE.getJointEnd(),
-        endJointEnd: endPBE.getJointEnd()
+        startJointEnd: startPathBlockEnd.getJointEnd(),
+        endJointEnd: endPathBlockEnd.getJointEnd()
       });
-      startPBE.setBlockEnd(block.getEnd(WhichEnd.A));
-      endPBE.setBlockEnd(block.getEnd(WhichEnd.B));
-      startPBE.pathConnect();
-      endPBE.pathConnect();
+      startPathBlockEnd.setBlockEnd(block.getEnd(WhichEnd.A));
+      endPathBlockEnd.setBlockEnd(block.getEnd(WhichEnd.B));
+      startPathBlockEnd.pathConnect();
+      endPathBlockEnd.pathConnect();
+
+      this.allowedPathes.push({
+        startPathBlockEnd,
+        endPathBlockEnd,
+        block,
+        count
+      });
+    }
+  }
+
+  checkout(endPathBlockEnd: PathBlockEnd): void {
+    const allowedPath = this.allowedPathes.find(
+      x =>
+        x.endPathBlockEnd === endPathBlockEnd ||
+        x.startPathBlockEnd === endPathBlockEnd
+    );
+    if (allowedPath) {
+      allowedPath.count--;
+      if (allowedPath.count < 1) {
+        allowedPath.block.getSegment().disconnect();
+        allowedPath.block.remove();
+        allowedPath.startPathBlockEnd.setBlockEnd(null);
+        allowedPath.endPathBlockEnd.setBlockEnd(null);
+        allowedPath.startPathBlockEnd.pathConnect();
+        allowedPath.endPathBlockEnd.pathConnect();
+        this.allowedPathes = this.allowedPathes.filter(x => x !== allowedPath);
+      }
     }
   }
 

@@ -46,6 +46,10 @@ export class ActualBlock extends ActualBaseBrick implements Block {
     return this;
   }
 
+  remove(): void {
+    this.emit('remove', this.id);
+  }
+
   private findCoords(start, end, fx) {
     const lsc: LineSegmentChain[] = [];
     let iter = fx(start.getDirectedTrack());
