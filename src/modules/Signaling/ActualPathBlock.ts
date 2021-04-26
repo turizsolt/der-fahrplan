@@ -68,11 +68,12 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
       }
     }
 
+    const switches: TrackSwitch[] = [];
     if (backFromHere) {
       let next: DirectedTrack = backFromHere;
-      this.handle(next);
+      this.handle(next, switches);
       while ((next = info[next.getHash()])) {
-        this.handle(next);
+        this.handle(next, switches);
       }
 
       const block = this.store.create<Block>(TYPES.Block).init({
@@ -87,6 +88,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
       this.allowedPathes.push({
         startPathBlockEnd,
         endPathBlockEnd,
+        switches,
         block,
         count
       });
@@ -108,17 +110,20 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         allowedPath.endPathBlockEnd.setBlockEnd(null);
         allowedPath.startPathBlockEnd.pathConnect();
         allowedPath.endPathBlockEnd.pathConnect();
+        allowedPath.switches.map(s => s.unlock());
         this.allowedPathes = this.allowedPathes.filter(x => x !== allowedPath);
       }
     }
   }
 
-  private handle(dt: DirectedTrack): void {
+  private handle(dt: DirectedTrack, switches: TrackSwitch[]): void {
     const track = dt.getTrack();
     if (track.getType() === TYPES.TrackSwitch) {
       if (track.getActiveSegment() !== dt.getSegment()) {
         (track as TrackSwitch).switch();
       }
+      (track as TrackSwitch).lock();
+      switches.push(track as TrackSwitch);
     }
   }
 
