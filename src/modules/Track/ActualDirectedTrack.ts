@@ -87,7 +87,7 @@ export class ActualDirectedTrack implements DirectedTrack {
   }
 
   getHash(): string {
-      return this.getTrack().getId() + '-' + this.getDirection();
+      return this.getTrack().getHash(this.getSegment()) + '-' + this.getDirection();
   }
 
 }

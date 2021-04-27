@@ -36,6 +36,15 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     endPathBlockEnd: PathBlockEnd,
     count: number = 1
   ): void {
+    const found = this.allowedPathes.find(
+      ap =>
+        ap.startPathBlockEnd === startPathBlockEnd ||
+        ap.startPathBlockEnd === endPathBlockEnd ||
+        ap.endPathBlockEnd === startPathBlockEnd ||
+        ap.endPathBlockEnd === endPathBlockEnd
+    );
+    if (found) return;
+
     const startDt: DirectedTrack = startPathBlockEnd
       .getJointEnd()
       .joint.getPosition()
@@ -51,20 +60,33 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     queue.push(startDt.reverse());
     info[startDt.getHash()] = null;
     info[startDt.reverse().getHash()] = null;
+    // console.log('push', startDt.getHash());
+    // console.log('push', startDt.reverse().getHash());
 
     let backFromHere: DirectedTrack = null;
 
     while (queue.length > 0) {
       const dt = queue.shift();
+      // console.log('pop', dt.getHash());
 
       if (dt === endDt || dt === endDt.reverse()) {
         backFromHere = dt;
+        // console.log('found');
         break;
       }
 
       for (let next of dt.permaNexts()) {
-        queue.push(next);
-        info[next.getHash()] = dt;
+        if (
+          next.getTrack().getType() === TYPES.TrackSwitch &&
+          (next.getTrack() as TrackSwitch).isLocked()
+        ) {
+          // console.log('skip', next.getHash());
+          // then skip
+        } else {
+          // console.log('push', next.getHash());
+          queue.push(next);
+          info[next.getHash()] = dt;
+        }
       }
     }
 

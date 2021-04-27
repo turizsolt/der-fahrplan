@@ -41,6 +41,10 @@ export class ActualTrack extends ActualTrackBase implements Track {
     return this.segment;
   }
 
+  getHash(segment?: TrackSegment): string {
+    return this.id;
+  }
+
   getCurve(): TrackCurve {
     return this.segment.getCurve();
   }

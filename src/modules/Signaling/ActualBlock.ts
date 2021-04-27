@@ -39,8 +39,13 @@ export class ActualBlock extends ActualBaseBrick implements Block {
       this.sameCoords(start, end) ||
       this.findCoords(start, end, x => x) ||
       this.findCoords(start, end, x => x.reverse());
-    const x = lsc.map(x => x.getRays().map(y => y.coord));
-    this.coords = [].concat(...x);
+    if (lsc && lsc.length) {
+      const x = lsc.map(x => x.getRays().map(y => y.coord));
+      this.coords = [].concat(...x);
+    } else {
+      console.error('no lsc found');
+      this.coords = [start.getRay().coord, end.getRay().coord];
+    }
 
     this.emit('init', this.persist());
     return this;

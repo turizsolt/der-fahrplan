@@ -92,6 +92,10 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     return this.activeSegment;
   }
 
+  getHash(segment?: TrackSegment): string {
+    return this.id + '-' + (segment === this.segmentLeft ? 'Left' : 'Right');
+  }
+
   getCurve(): TrackCurve {
     return this.activeSegment.getCurve();
   }

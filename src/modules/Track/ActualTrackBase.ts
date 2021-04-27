@@ -35,6 +35,10 @@ export abstract class ActualTrackBase extends ActualBaseBrick
     throw new Error('Method not implemented.');
   }
 
+  getHash(segment?: TrackSegment): string {
+    throw new Error('Method not implemented.');
+  }
+
   addPlatform(platform: Platform) {
     this.platformsBeside.push(platform);
   }

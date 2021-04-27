@@ -20,6 +20,7 @@ export interface TrackBase extends BaseBrick {
 
   getDirected(direction: TrackDirection): DirectedTrack;
   getActiveSegment(): TrackSegment;
+  getHash(segment?: TrackSegment): string;
 
   update();
 }
