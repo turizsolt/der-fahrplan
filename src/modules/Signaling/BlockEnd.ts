@@ -2,8 +2,10 @@ import { DirectedBlock } from './DirectedBlock';
 import { BlockJointEnd } from './BlockJointEnd';
 import { Block } from './Block';
 import { Train } from '../Train/Train';
+import { Emitable } from '../../mixins/Emitable';
+import { SignalSignal } from './SignalSignal';
 
-export interface BlockEnd {
+export interface BlockEnd extends Emitable {
   getStart(): DirectedBlock;
   getEnd(): DirectedBlock;
   getJointEnd(): BlockJointEnd;
@@ -14,4 +16,5 @@ export interface BlockEnd {
   getType(): Symbol;
   checkin(train: Train): void;
   checkout(train: Train): void;
+  getSignal(): SignalSignal;
 }

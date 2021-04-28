@@ -6,17 +6,53 @@ import { PathBlockEnd } from './PathBlockEnd';
 import { PathBlock } from './PathBlock';
 import { TYPES } from '../../di/TYPES';
 import { Train } from '../Train/Train';
+import { Emitable } from '../../mixins/Emitable';
+import { applyMixins } from '../../mixins/ApplyMixins';
+import { SignalSignal } from './SignalSignal';
 
+export interface ActualPathBlockEnd extends Emitable {}
+const doApply = () => applyMixins(ActualPathBlockEnd, [Emitable]);
 export class ActualPathBlockEnd implements PathBlockEnd {
   private blockEnd: BlockEnd = null;
+  private signal: SignalSignal = SignalSignal.Red;
+  private blockSubscribe: (data: any) => void;
 
   constructor(
     private jointEnd: BlockJointEnd,
     private pathBlock: PathBlock
-  ) {}
+  ) {
+    this.blockSubscribe = (data: any) => this.updateSignal();
+    this.blockSubscribe.bind(this);
+    this.updateSignal();
+  }
+
+  private updateSignal() {
+    let newSignal = SignalSignal.Green;
+    if(this.blockEnd) {
+      if(!this.blockEnd.getBlock().isFree()) {
+        newSignal = SignalSignal.Red;
+      }
+    } else {
+      newSignal = SignalSignal.Red;
+    }
+    
+    this.signal = newSignal;
+    this.emit('update', this.persist());
+  }
+
+  getSignal(): SignalSignal {
+    return this.signal;
+  }
 
   setBlockEnd(blockEnd: BlockEnd): void {
-      this.blockEnd = blockEnd;
+    if(this.blockEnd) {
+      this.getBlock().off('update', this.blockSubscribe);
+    }
+    this.blockEnd = blockEnd;
+    if(this.blockEnd) {
+      this.getBlock().on('update', this.blockSubscribe);
+    }
+    this.updateSignal();
   }
 
   getPathBlock(): PathBlock {
@@ -67,7 +103,8 @@ export class ActualPathBlockEnd implements PathBlockEnd {
   persist(): Object {
     return {
       end: this.jointEnd.end,
-      joint: this.jointEnd.joint.getId()
+      joint: this.jointEnd.joint.getId(),
+      signal: this.signal
     };
   }
 
@@ -75,3 +112,4 @@ export class ActualPathBlockEnd implements PathBlockEnd {
       return TYPES.PathBlockEnd;
   }
 }
+doApply();

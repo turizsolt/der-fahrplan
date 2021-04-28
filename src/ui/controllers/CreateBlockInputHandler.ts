@@ -8,6 +8,8 @@ import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { BlockJointEnd } from '../../modules/Signaling/BlockJointEnd';
 import { Block } from '../../modules/Signaling/Block';
 import { PathBlock } from '../../modules/Signaling/PathBlock';
+import { Signal } from '../../modules/Signaling/Signal';
+import { SignalSignal } from '../../modules/Signaling/SignalSignal';
 
 export class CreateBlockInputHandler implements InputHandler {
   private store: Store;
@@ -43,13 +45,27 @@ export class CreateBlockInputHandler implements InputHandler {
               endJointEnd: this.jointEnds[1]
             });
             block.getSegment().connect();
+            this.createSignals(this.jointEnds, SignalSignal.Green);
           } else if (this.jointEnds.length > 2) {
             this.store.create<PathBlock>(TYPES.PathBlock).init(this.jointEnds);
+            this.createSignals(this.jointEnds, SignalSignal.Red);
           }
           this.jointEnds = [];
         }
       }
     }
+  }
+
+  private createSignals(jointEnds: BlockJointEnd[], startSignal: SignalSignal) {
+    jointEnds.map(x => {
+      const position = x.joint.getPosition().clone();
+      if (x.end === WhichEnd.B) {
+        position.reverse();
+      }
+      this.store
+        .create<Signal>(TYPES.Signal)
+        .init(position, x.joint.getEnd(x.end), startSignal);
+    });
   }
 
   up(downProps: InputProps, props: InputProps, event: PointerEvent): void {}
