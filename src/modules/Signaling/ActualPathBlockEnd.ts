@@ -9,6 +9,7 @@ import { Train } from '../Train/Train';
 import { Emitable } from '../../mixins/Emitable';
 import { applyMixins } from '../../mixins/ApplyMixins';
 import { SignalSignal } from './SignalSignal';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 
 export interface ActualPathBlockEnd extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlockEnd, [Emitable]);
@@ -23,6 +24,10 @@ export class ActualPathBlockEnd implements PathBlockEnd {
   ) {
     this.blockSubscribe = (data: any) => this.updateSignal();
     this.blockSubscribe.bind(this);
+
+    const other = this.jointEnd.joint.getEnd(this.jointEnd.end === WhichEnd.A ? WhichEnd.B : WhichEnd.A);
+    other?.setHidden();
+
     this.updateSignal();
   }
 
@@ -54,6 +59,8 @@ export class ActualPathBlockEnd implements PathBlockEnd {
     }
     this.updateSignal();
   }
+
+  setHidden(): void {}
 
   getPathBlock(): PathBlock {
       return this.pathBlock;
@@ -100,11 +107,16 @@ export class ActualPathBlockEnd implements PathBlockEnd {
     this.blockEnd?.checkout(train);
   }
 
+  getHash(): string {
+    return this.jointEnd.joint.getId()+'-'+this.jointEnd.end+'-Path';
+}
+
   persist(): Object {
     return {
       end: this.jointEnd.end,
       joint: this.jointEnd.joint.getId(),
-      signal: this.signal
+      signal: this.signal,
+      hidden: false
     };
   }
 

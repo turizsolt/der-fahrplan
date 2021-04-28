@@ -13,6 +13,7 @@ export interface ActualSignal extends Emitable {}
 const doApply = () => applyMixins(ActualSignal, [Emitable]);
 export class ActualSignal extends ActualBaseBrick implements Signal {
   private signal: SignalSignal = SignalSignal.Red;
+  private hidden: boolean = false;
   private position: PositionOnTrack = null;
   private blockEnd: BlockEnd = null;
   private blockSubscribe: (data: any) => void;
@@ -28,14 +29,26 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
 
     this.blockSubscribe = (data: any) => {
       this.setSignal(data.signal);
+      if(data.hidden) {
+        this.setHidden();
+      }
     };
     this.blockSubscribe.bind(this);
 
     this.blockEnd = blockEnd;
     this.blockEnd?.on('update', this.blockSubscribe);
+    const blockEndHidden = this.blockEnd?.persist().hidden;
+    if(blockEndHidden) { 
+      this.hidden = true;
+    }
 
     this.emit('init', this.persist());
     return this;
+  }
+
+  setHidden(): void {
+    this.hidden = true;
+    this.emit('update', this.persist());
   }
 
   getSignal(): SignalSignal {
@@ -55,6 +68,7 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
       id: this.id,
       type: 'Signal',
       signal: this.signal,
+      hidden: this.hidden,
       ray: this.position.getRay().persist()
     };
   }

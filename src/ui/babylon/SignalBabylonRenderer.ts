@@ -39,15 +39,6 @@ export class SignalBabylonRenderer extends BaseBabylonRenderer
     );
     this.greenMesh.position.y = 1.25;
 
-    /*
-    this.redMesh.material = this.meshProvider.getMaterial(
-      MaterialName.ShuntingRed
-    );
-    this.greenMesh.material = this.meshProvider.getMaterial(
-      MaterialName.RailBlack
-    );
-    */
-
     this.meshes = [this.postMesh, this.redMesh, this.greenMesh];
     this.update(data);
   }
@@ -62,6 +53,9 @@ export class SignalBabylonRenderer extends BaseBabylonRenderer
       data.signal === SignalSignal.Green
         ? MaterialName.AllowingGreen
         : MaterialName.RailBlack
+    );
+    this.postMesh.material = this.meshProvider.getMaterial(
+      data.hidden ? MaterialName.BedGray : MaterialName.RailBlack
     );
   }
 }

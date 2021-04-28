@@ -7,11 +7,13 @@ import { Train } from '../Train/Train';
 import { Emitable } from '../../mixins/Emitable';
 import { applyMixins } from '../../mixins/ApplyMixins';
 import { SignalSignal } from './SignalSignal';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 
 export interface ActualBlockEnd extends Emitable {}
 const doApply = () => applyMixins(ActualBlockEnd, [Emitable]);
 export class ActualBlockEnd implements BlockEnd {
   private signal: SignalSignal = SignalSignal.Red;
+  private hidden: boolean = false;
   private blockSubscribe: (data: any) => void;
 
   constructor(
@@ -23,7 +25,22 @@ export class ActualBlockEnd implements BlockEnd {
     this.blockSubscribe.bind(this);
 
     this.getBlock().on('update', this.blockSubscribe);
+
+    const other = this.jointEnd.joint.getEnd(this.jointEnd.end === WhichEnd.A ? WhichEnd.B : WhichEnd.A);
+    if(other) {
+        this.hidden = other.getType() === TYPES.PathBlockEnd;
+    }
+
     this.updateSignal();
+  }
+
+  getHash(): string {
+      return this.jointEnd.joint.getId()+'-'+this.jointEnd.end;
+  }
+
+  setHidden(): void {
+      this.hidden = true;
+      this.emit('update', this.persist());
   }
 
   private updateSignal() {
@@ -73,7 +90,8 @@ export class ActualBlockEnd implements BlockEnd {
     return {
       end: this.jointEnd.end,
       joint: this.jointEnd.joint.getId(),
-      signal: this.signal
+      signal: this.signal,
+      hidden: this.hidden
     };
   }
 

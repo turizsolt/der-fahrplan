@@ -17,4 +17,6 @@ export interface BlockEnd extends Emitable {
   checkin(train: Train): void;
   checkout(train: Train): void;
   getSignal(): SignalSignal;
+  setHidden(): void;
+  getHash(): string;
 }
