@@ -8,6 +8,7 @@ import { Emitable } from '../../mixins/Emitable';
 import { applyMixins } from '../../mixins/ApplyMixins';
 import { SignalSignal } from './SignalSignal';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
+import { TrackDirection } from '../Track/TrackDirection';
 
 export interface ActualBlockEnd extends Emitable {}
 const doApply = () => applyMixins(ActualBlockEnd, [Emitable]);
@@ -32,6 +33,14 @@ export class ActualBlockEnd implements BlockEnd {
     }
 
     this.updateSignal();
+  }
+
+  // todo duplicate
+  getNextBlockEnd(): BlockEnd {
+    const nextDB = this.getStart()?.next();
+    if(!nextDB) return null;
+    const blockEnd = nextDB.getBlock().getEnd(nextDB.getDirection() === TrackDirection.AB ? WhichEnd.A : WhichEnd.B);
+    return blockEnd;
   }
 
   getHash(): string {

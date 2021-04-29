@@ -13,6 +13,7 @@ import { TrackSwitch } from '../Track/TrackSwitch';
 import { Block } from './Block';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { AllowedPath } from './AllowedPath';
+import { SignalSignal } from './SignalSignal';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -44,6 +45,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         ap.endPathBlockEnd === endPathBlockEnd
     );
     if (found) return;
+    const other = endPathBlockEnd.getJointEnd().joint.getEnd(endPathBlockEnd.getJointEnd().end === WhichEnd.A ? WhichEnd.B : WhichEnd.A);
+    if(other?.getSignal() === SignalSignal.Red) return;
 
     const startDt: DirectedTrack = startPathBlockEnd
       .getJointEnd()
