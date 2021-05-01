@@ -210,14 +210,14 @@ export class MeshProvider {
       {
         diameterTop: 1.5,
         diameterBottom: 1.5,
-        tessellation: 12,
-        height: 1
+        tessellation: 3,
+        height: 0.25
       },
       null
     );
-    mesh.position = CoordinateToBabylonVector3(ray.setY(2).coord);
+    mesh.position = CoordinateToBabylonVector3(ray.setY(1.375).coord);
     mesh.rotation.y = ray.dirXZ;
-    mesh.material = this.amber;
+    mesh.material = this.white;
     return mesh;
   }
 

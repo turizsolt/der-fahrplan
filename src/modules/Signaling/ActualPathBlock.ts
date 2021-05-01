@@ -14,6 +14,7 @@ import { Block } from './Block';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { AllowedPath } from './AllowedPath';
 import { SignalSignal } from './SignalSignal';
+import { Sensor } from './Sensor';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -26,6 +27,17 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
 
     this.pathBlockEnds = jointEnds.map(je => new ActualPathBlockEnd(je, this));
     this.pathBlockEnds.map(pbe => pbe.pathConnect());
+    this.pathBlockEnds.map(pbe => {
+        const bj = pbe.getJointEnd().joint;
+        const pot = bj.getPosition().clone();
+        if(pbe.getJointEnd().end === WhichEnd.A) {
+            pot.reverse();
+        }
+        pot.move(30);
+        pot.reverse();
+        
+        this.store.create<Sensor>(TYPES.Sensor).init(pot);
+    });
     console.log('pathblock created', jointEnds);
 
     this.emit('init', this.persist());

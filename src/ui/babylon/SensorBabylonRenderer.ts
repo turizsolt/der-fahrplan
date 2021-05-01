@@ -4,7 +4,6 @@ import { BaseBabylonRenderer } from './BaseBabylonRenderer';
 import { TYPES } from '../../di/TYPES';
 import { MeshProvider } from './MeshProvider';
 import { Ray } from '../../structs/Geometry/Ray';
-import { MaterialName } from './MaterialName';
 import { SensorRenderer } from '../../structs/Renderers/SensorRenderer';
 
 @injectable()
@@ -18,11 +17,12 @@ export class SensorBabylonRenderer extends BaseBabylonRenderer
 
   init(data: any): void {
     this.meshProvider = this.meshProviderFactory();
-    const rayPost = Ray.fromData(data.ray);
+    const ray = Ray.fromData(data.ray);
     this.dotMesh = this.meshProvider.createSensorMesh(
-      rayPost,
+      ray,
       'clickable-sensor-' + data.id
     );
+    this.dotMesh.rotation.y = ray.dirXZ + Math.PI / 6;
     this.meshes = [this.dotMesh];
   }
 

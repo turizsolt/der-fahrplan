@@ -5,12 +5,17 @@ import { applyMixins } from '../../mixins/ApplyMixins';
 import { TYPES } from '../../di/TYPES';
 import { Sensor } from './Sensor';
 import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
+import { PositionOnTrack } from '../Train/PositionOnTrack';
 
 export interface ActualSensor extends Emitable {}
 const doApply = () => applyMixins(ActualSensor, [Emitable]);
 export class ActualSensor extends ActualBaseBrick implements Sensor {
-  init(): Sensor {
+  private position: PositionOnTrack;
+
+  init(position: PositionOnTrack): Sensor {
     this.initStore(TYPES.Signal);
+
+    this.position = position;
 
     this.emit('init', this.persist());
     return this;
@@ -23,7 +28,8 @@ export class ActualSensor extends ActualBaseBrick implements Sensor {
   persist(): Object {
     return {
       id: this.id,
-      type: 'Sensor'
+      type: 'Sensor',
+      ray: this.position.getRay().persist()
     };
   }
 
