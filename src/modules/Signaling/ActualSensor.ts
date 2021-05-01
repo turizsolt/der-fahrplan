@@ -6,19 +6,38 @@ import { TYPES } from '../../di/TYPES';
 import { Sensor } from './Sensor';
 import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
 import { PositionOnTrack } from '../Train/PositionOnTrack';
+import { PathBlock } from './PathBlock';
+import { PathBlockEnd } from './PathBlockEnd';
+import { Train } from '../Train/Train';
 
 export interface ActualSensor extends Emitable {}
 const doApply = () => applyMixins(ActualSensor, [Emitable]);
 export class ActualSensor extends ActualBaseBrick implements Sensor {
   private position: PositionOnTrack;
+  private pathBlock: PathBlock;
+  private pathBlockEnd: PathBlockEnd;
 
-  init(position: PositionOnTrack): Sensor {
+  init(
+    position: PositionOnTrack,
+    pathBlock: PathBlock,
+    pathBlockEnd: PathBlockEnd
+  ): Sensor {
     this.initStore(TYPES.Signal);
 
     this.position = position;
+    this.pathBlock = pathBlock;
+    this.pathBlockEnd = pathBlockEnd;
+
+    this.position
+      .getDirectedTrack()
+      .addMarker(this.position.getPosition(), { type: 'Sensor', sensor: this });
 
     this.emit('init', this.persist());
     return this;
+  }
+
+  checkin(train: Train): void {
+    this.pathBlock.requestPath(this.pathBlockEnd, train);
   }
 
   getRenderer(): BaseRenderer {

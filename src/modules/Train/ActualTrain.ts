@@ -185,6 +185,17 @@ export class ActualTrain extends ActualBaseStorable implements Train {
           next = iter.nextOfFull('BlockJoint');
         }
     }
+
+    // sensor checkin
+    if(formerStart) {
+        const iter = MarkerIterator.fromPositionOnTrack(formerStart, currentStart);
+        let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('Sensor');
+        while(next && next.value) {
+          const sensor = next.value.sensor;
+          sensor.checkin(this);
+          next = iter.nextOfFull('Sensor');
+        }
+    }
   }
 
   remove(): void {

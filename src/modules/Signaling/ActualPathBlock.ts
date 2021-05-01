@@ -15,6 +15,7 @@ import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { AllowedPath } from './AllowedPath';
 import { SignalSignal } from './SignalSignal';
 import { Sensor } from './Sensor';
+import { Train } from '../Train/Train';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -36,7 +37,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         pot.move(30);
         pot.reverse();
         
-        this.store.create<Sensor>(TYPES.Sensor).init(pot);
+        this.store.create<Sensor>(TYPES.Sensor).init(pot, this, pbe);
     });
     console.log('pathblock created', jointEnds);
 
@@ -151,6 +152,10 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         this.allowedPathes = this.allowedPathes.filter(x => x !== allowedPath);
       }
     }
+  }
+
+  requestPath(pathBlockEnd: PathBlockEnd, train: Train): void {
+    console.log('path requested', pathBlockEnd.getHash(), train.getId());
   }
 
   private handle(dt: DirectedTrack, switches: TrackSwitch[]): void {
