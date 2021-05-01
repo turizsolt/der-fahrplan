@@ -288,6 +288,10 @@ export class ActualStore implements Store {
         train.tick();
       });
 
+      this.getAllOf(TYPES.PathBlock).map((pb: PathBlock) => {
+        pb.tick();
+      });
+
       if ((this.getTickCount() + i) % 120 === 0) {
         if (!this.passengerGenerator) {
           this.passengerGenerator = this.PassengerGeneratorFactory().init();

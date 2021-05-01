@@ -16,15 +16,20 @@ import { AllowedPath } from './AllowedPath';
 import { SignalSignal } from './SignalSignal';
 import { Sensor } from './Sensor';
 import { Train } from '../Train/Train';
+import { PathRule } from './PathRule';
+import { PathQueue } from './PathQueue';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
 export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
   private pathBlockEnds: PathBlockEnd[] = [];
   private allowedPathes: AllowedPath[] = [];
+  private queue: PathQueue;
 
   init(jointEnds: BlockJointEnd[]): PathBlock {
     this.initStore(TYPES.PathBlock);
+
+    this.queue = new PathQueue(this);
 
     this.pathBlockEnds = jointEnds.map(je => new ActualPathBlockEnd(je, this));
     this.pathBlockEnds.map(pbe => pbe.pathConnect());
@@ -49,7 +54,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     startPathBlockEnd: PathBlockEnd,
     endPathBlockEnd: PathBlockEnd,
     count: number = 1
-  ): void {
+  ): boolean {
     const found = this.allowedPathes.find(
       ap =>
         ap.startPathBlockEnd === startPathBlockEnd ||
@@ -57,9 +62,9 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         ap.endPathBlockEnd === startPathBlockEnd ||
         ap.endPathBlockEnd === endPathBlockEnd
     );
-    if (found) return;
+    if (found) return false;
     const other = endPathBlockEnd.getJointEnd().joint.getEnd(endPathBlockEnd.getJointEnd().end === WhichEnd.A ? WhichEnd.B : WhichEnd.A);
-    if(other?.getSignal() === SignalSignal.Red) return;
+    if(other?.getSignal() === SignalSignal.Red) return false;
 
     const startDt: DirectedTrack = startPathBlockEnd
       .getJointEnd()
@@ -131,6 +136,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         count
       });
     }
+
+    return !!backFromHere;
   }
 
   checkout(endPathBlockEnd: PathBlockEnd): void {
@@ -154,8 +161,16 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     }
   }
 
+  addRule(rule: PathRule): void {
+    this.queue.addRule(rule);
+  }
+
   requestPath(pathBlockEnd: PathBlockEnd, train: Train): void {
-    console.log('path requested', pathBlockEnd.getHash(), train.getId());
+    this.queue.push(pathBlockEnd, train);
+  }
+
+  tick(): void {
+    this.queue.evaluate();
   }
 
   private handle(dt: DirectedTrack, switches: TrackSwitch[]): void {
