@@ -30,6 +30,8 @@ import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
 import { PathBlockBabylonRenderer } from '../ui/babylon/PathBlockBabylonRenderer';
 import { SectionRenderer } from '../structs/Renderers/SectionRenderer';
 import { SectionBabylonRenderer } from '../ui/babylon/SectionBabylonRenderer';
+import { SensorRenderer } from '../structs/Renderers/SensorRenderer';
+import { SensorBabylonRenderer } from '../ui/babylon/SensorBabylonRenderer';
 
 export const productionContainer = new Container();
 const ioc = new DependencyContainer(productionContainer);
@@ -56,6 +58,11 @@ ioc.fm<SignalRenderer>(
   T.FactoryOfSignalRenderer,
   T.SignalRenderer,
   SignalBabylonRenderer
+);
+ioc.fm<SensorRenderer>(
+  T.FactoryOfSensorRenderer,
+  T.SensorRenderer,
+  SensorBabylonRenderer
 );
 ioc.fm<BlockRenderer>(
   T.FactoryOfBlockRenderer,

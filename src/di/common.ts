@@ -36,6 +36,8 @@ import { ActualBlock } from '../modules/Signaling/ActualBlock';
 import { ActualBlockJoint } from '../modules/Signaling/ActualBlockJoint';
 import { ActualPathBlock } from '../modules/Signaling/ActualPathBlock';
 import { ActualSection } from '../modules/Signaling/ActualSegment';
+import { Sensor } from '../modules/Signaling/Sensor';
+import { ActualSensor } from '../modules/Signaling/ActualSensor';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
@@ -57,6 +59,7 @@ export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.fm<RouteStop>(T.FactoryOfRouteStop, T.RouteStop, ActualRouteStop);
   ioc.fm<Trip>(T.FactoryOfTrip, T.Trip, ActualTrip);
   ioc.fm<Signal>(T.FactoryOfSignal, T.Signal, ActualSignal);
+  ioc.fm<Sensor>(T.FactoryOfSensor, T.Sensor, ActualSensor);
   ioc.fm<Block>(T.FactoryOfBlock, T.Block, ActualBlock);
   ioc.fm<BlockJoint>(T.FactoryOfBlockJoint, T.BlockJoint, ActualBlockJoint);
   ioc.fm<PathBlock>(T.FactoryOfPathBlock, T.PathBlock, ActualPathBlock);

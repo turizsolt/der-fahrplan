@@ -101,7 +101,11 @@ export class MeshProvider {
     this.blue.diffuseColor = new BABYLON.Color3(0 / 255, 0 / 255, 255 / 255);
 
     this.white = new BABYLON.StandardMaterial('white', null);
-    this.white.diffuseColor = new BABYLON.Color3(255 / 255, 255 / 255, 255 / 255);
+    this.white.diffuseColor = new BABYLON.Color3(
+      255 / 255,
+      255 / 255,
+      255 / 255
+    );
 
     this.materials = {
       [MaterialName.BedGray]: this.bedGray,
@@ -197,6 +201,23 @@ export class MeshProvider {
     mesh.position = CoordinateToBabylonVector3(ray.setY(3.75).coord);
     mesh.rotation.y = ray.dirXZ;
     mesh.material = this.railBlack;
+    return mesh;
+  }
+
+  createSensorMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateCylinder(
+      name,
+      {
+        diameterTop: 1.5,
+        diameterBottom: 1.5,
+        tessellation: 12,
+        height: 1
+      },
+      null
+    );
+    mesh.position = CoordinateToBabylonVector3(ray.setY(2).coord);
+    mesh.rotation.y = ray.dirXZ;
+    mesh.material = this.amber;
     return mesh;
   }
 

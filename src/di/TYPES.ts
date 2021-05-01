@@ -81,5 +81,10 @@ export const TYPES = {
   FactoryOfSectionRenderer: Symbol.for('Factory<SectionRenderer>'),
 
   PathBlockEnd: Symbol.for('PathBlockEnd'),
-  BlockEnd: Symbol.for('BlockEnd')
+  BlockEnd: Symbol.for('BlockEnd'),
+
+  Sensor: Symbol.for('Sensor'),
+  SensorRenderer: Symbol.for('SensorRenderer'),
+  FactoryOfSensor: Symbol.for('Factory<Sensor>'),
+  FactoryOfSensorRenderer: Symbol.for('Factory<SensorRenderer>')
 };

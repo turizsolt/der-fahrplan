@@ -27,6 +27,8 @@ import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
 import { PathBlockDummyRenderer } from '../../test/dummies/PathBlockDummyRenderer';
 import { SectionRenderer } from '../structs/Renderers/SectionRenderer';
 import { SectionDummyRenderer } from '../../test/dummies/SectionDummyRenderer';
+import { SensorRenderer } from '../structs/Renderers/SensorRenderer';
+import { SensorDummyRenderer } from '../../test/dummies/SensorDummyRenderer';
 
 export const testContainer = new Container();
 const ioc = new DependencyContainer(testContainer);
@@ -51,6 +53,11 @@ ioc.fm<SignalRenderer>(
   T.FactoryOfSignalRenderer,
   T.SignalRenderer,
   SignalDummyRenderer
+);
+ioc.fm<SensorRenderer>(
+  T.FactoryOfSensorRenderer,
+  T.SensorRenderer,
+  SensorDummyRenderer
 );
 ioc.fm<BlockRenderer>(
   T.FactoryOfBlockRenderer,

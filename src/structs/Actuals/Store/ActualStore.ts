@@ -30,6 +30,8 @@ import { BlockRenderer } from '../../Renderers/BlockRenderer';
 import { BlockJointRenderer } from '../../Renderers/BlockJointRenderer';
 import { PathBlockRenderer } from '../../Renderers/PathBlockRenderer';
 import { SectionRenderer } from '../../Renderers/SectionRenderer';
+import { Sensor } from '../../../modules/Signaling/Sensor';
+import { SensorRenderer } from '../../Renderers/SensorRenderer';
 
 @injectable()
 export class ActualStore implements Store {
@@ -45,6 +47,7 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
   @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
   @inject(TYPES.FactoryOfSignal) private SignalFactory: () => Signal;
+  @inject(TYPES.FactoryOfSensor) private SensorFactory: () => Sensor;
   @inject(TYPES.FactoryOfBlock) private BlockFactory: () => Block;
   @inject(TYPES.FactoryOfBlockJoint)
   private BlockJointFactory: () => BlockJoint;
@@ -65,6 +68,8 @@ export class ActualStore implements Store {
   private WagonRendererFactory: () => WagonRenderer;
   @inject(TYPES.FactoryOfSignalRenderer)
   private SignalRendererFactory: () => SignalRenderer;
+  @inject(TYPES.FactoryOfSensorRenderer)
+  private SensorRendererFactory: () => SensorRenderer;
 
   @inject(TYPES.FactoryOfBlockRenderer)
   private BlockRendererFactory: () => BlockRenderer;
@@ -99,6 +104,7 @@ export class ActualStore implements Store {
       [TYPES.Train]: this.TrainFactory,
       [TYPES.Wagon]: this.WagonFactory,
       [TYPES.Signal]: this.SignalFactory,
+      [TYPES.Sensor]: this.SensorFactory,
       [TYPES.Block]: this.BlockFactory,
       [TYPES.BlockJoint]: this.BlockJointFactory,
       [TYPES.PathBlock]: this.PathBlockFactory,
@@ -118,6 +124,7 @@ export class ActualStore implements Store {
       [TYPES.Train]: -2,
       [TYPES.Passenger]: -3,
       [TYPES.Signal]: -10,
+      [TYPES.Sensor]: -10.5,
       [TYPES.Block]: -11,
       [TYPES.BlockJoint]: -12,
       [TYPES.PathBlock]: -13,
@@ -128,6 +135,7 @@ export class ActualStore implements Store {
       [TYPES.TrackJoint]: [this.TrackJointRendererFactory],
       [TYPES.Wagon]: [this.WagonRendererFactory],
       [TYPES.Signal]: [this.SignalRendererFactory],
+      [TYPES.Sensor]: [this.SensorRendererFactory],
       [TYPES.Block]: [this.BlockRendererFactory],
       [TYPES.BlockJoint]: [this.BlockJointRendererFactory],
       [TYPES.PathBlock]: [this.PathBlockRendererFactory],
