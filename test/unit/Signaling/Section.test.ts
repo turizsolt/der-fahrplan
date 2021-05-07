@@ -30,4 +30,10 @@ describe('Section', () => {
     const { section } = createSection();
     expect(section).not.equals(undefined);
   });
+
+  it('section is free from both sides', () => {
+    const { section } = createSection();
+    expect(section.isFree(TrackDirection.AB)).equals(true);
+    expect(section.isFree(TrackDirection.BA)).equals(true);
+  });
 });

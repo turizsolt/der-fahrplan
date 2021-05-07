@@ -6,6 +6,7 @@ import { applyMixins } from '../../mixins/ApplyMixins';
 import { TYPES } from '../../di/TYPES';
 import { Section } from './Section';
 import { BlockJointEnd } from './BlockJointEnd';
+import { TrackDirection } from '../Track/TrackDirection';
 
 export interface ActualSection extends Emitable {}
 const doApply = () => applyMixins(ActualSection, [Emitable]);
@@ -17,6 +18,10 @@ export class ActualSection extends ActualBaseBrick implements Section {
     this.initStore(TYPES.Section);
     this.emit('init', this.persist());
     return this;
+  }
+
+  isFree(direction: TrackDirection): boolean {
+    return true;
   }
 
   getRenderer(): BaseRenderer {
