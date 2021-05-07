@@ -24,6 +24,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
   private wagons: Wagon[] = [];
   private speed: TrainSpeed = null;
+  private autoMode:boolean = true;
 
   init(pot: PositionOnTrack, wagons: Wagon[]): Train {
     super.initStore(TYPES.Train);
@@ -214,8 +215,6 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.wagons.map(wagon => wagon.update());
   }
 
-  private autoMode:boolean = true;
-
   setAutoMode(autoMode: boolean): void {
     this.autoMode = autoMode;
   }
@@ -310,6 +309,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return {
       id: this.id,
       type: 'Train',
+      autoMode: this.getAutoMode(),
       wagons: this.wagons.map(x => ({
         id: x.getId(),
         appearanceId: x.getAppearanceId(),
@@ -329,6 +329,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       obj.wagons.map(id => store.get(id) as Wagon)
     );
     this.speed.load(obj.speed);
+    this.setAutoMode(obj.autoMode);
     this.wagons.map(wagon => {
         wagon.setTrain(this);
         wagon.update();

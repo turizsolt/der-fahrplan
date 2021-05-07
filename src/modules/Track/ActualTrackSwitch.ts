@@ -145,7 +145,10 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
       toSegmentData(obj.segmentLeftData, store),
       toSegmentData(obj.segmentRightData, store)
     );
-    this.state = obj.state;
+    if (obj.state === 1) {
+      this.switch();
+    }
+    obj.isLocked ? this.lock() : this.unlock();
     this.update();
   }
 }
