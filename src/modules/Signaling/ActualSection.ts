@@ -5,11 +5,15 @@ import { Emitable } from '../../mixins/Emitable';
 import { applyMixins } from '../../mixins/ApplyMixins';
 import { TYPES } from '../../di/TYPES';
 import { Section } from './Section';
+import { BlockJointEnd } from './BlockJointEnd';
 
 export interface ActualSection extends Emitable {}
 const doApply = () => applyMixins(ActualSection, [Emitable]);
 export class ActualSection extends ActualBaseBrick implements Section {
-  init(): Section {
+  init(
+    startBlockJointEnd: BlockJointEnd,
+    endBlockJointEnd: BlockJointEnd
+  ): Section {
     this.initStore(TYPES.Section);
     this.emit('init', this.persist());
     return this;
@@ -20,7 +24,10 @@ export class ActualSection extends ActualBaseBrick implements Section {
   }
 
   persist(): Object {
-    throw new Error('Method not implemented.');
+    return {
+      id: this.id,
+      type: 'Section'
+    };
   }
 
   load(obj: Object, store: Store): void {

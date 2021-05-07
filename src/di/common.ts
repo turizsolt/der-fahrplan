@@ -35,7 +35,7 @@ import { Section } from '../modules/Signaling/Section';
 import { ActualBlock } from '../modules/Signaling/ActualBlock';
 import { ActualBlockJoint } from '../modules/Signaling/ActualBlockJoint';
 import { ActualPathBlock } from '../modules/Signaling/ActualPathBlock';
-import { ActualSection } from '../modules/Signaling/ActualSegment';
+import { ActualSection } from '../modules/Signaling/ActualSection';
 import { Sensor } from '../modules/Signaling/Sensor';
 import { ActualSensor } from '../modules/Signaling/ActualSensor';
 
