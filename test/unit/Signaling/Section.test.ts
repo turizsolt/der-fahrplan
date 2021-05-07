@@ -56,4 +56,15 @@ describe('Section', () => {
     expect(section.isFree(TrackDirection.BA)).equals(true);
     expect(section.getDirection()).equals(TrackDirection.BA);
   });
+
+  it('section direction not changes, when there is already somebody', () => {
+    const { section } = createSection();
+    const train = store.create<Train>(TYPES.Train);
+    const train2 = store.create<Train>(TYPES.Train);
+    section.checkin(WhichEnd.B, train);
+    section.checkin(WhichEnd.A, train2);
+    expect(section.isFree(TrackDirection.AB)).equals(false);
+    expect(section.isFree(TrackDirection.BA)).equals(true);
+    expect(section.getDirection()).equals(TrackDirection.BA);
+  });
 });
