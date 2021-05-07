@@ -94,4 +94,17 @@ describe('Section', () => {
     expect(section.isFree(TrackDirection.BA)).equals(true);
     expect(section.getDirection()).equals(TrackDirection.BA);
   });
+
+  it('section set direction to not permanent, when sb checked in', () => {
+    const { section } = createSection();
+    const train = store.create<Train>(TYPES.Train);
+    section.checkin(WhichEnd.B, train);
+    section.setDirectionPermanent(true);
+    section.setDirectionPermanent(false);
+    expect(section.isDirectionPermanent()).equals(false);
+    expect(section.getDirection()).equals(TrackDirection.BA);
+
+    section.checkout(train);
+    expect(section.getDirection()).equals(undefined);
+  });
 });
