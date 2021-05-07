@@ -133,4 +133,11 @@ describe('Section', () => {
     section.setDirection(TrackDirection.AB);
     expect(section.getDirection()).equals(TrackDirection.AB);
   });
+
+  it('section set direction not working when permanent', () => {
+    const { section } = createSection();
+    section.setDirectionPermanent(true);
+    section.setDirection(TrackDirection.AB);
+    expect(section.getDirection()).equals(undefined);
+  });
 });
