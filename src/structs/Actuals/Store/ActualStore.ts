@@ -110,6 +110,7 @@ export class ActualStore implements Store {
       [TYPES.PathBlock]: this.PathBlockFactory,
       [TYPES.Section]: this.SectionFactory
     };
+    // higher number (12) loads first
     this.typeOrder = {
       [TYPES.Station]: 12,
       [TYPES.RouteStop]: 11,
@@ -123,12 +124,12 @@ export class ActualStore implements Store {
       [TYPES.Wagon]: -1,
       [TYPES.Train]: -2,
       [TYPES.Passenger]: -3,
-      [TYPES.Signal]: -10,
-      [TYPES.Sensor]: -10.5,
+      [TYPES.BlockJoint]: -10,
       [TYPES.Block]: -11,
-      [TYPES.BlockJoint]: -12,
-      [TYPES.PathBlock]: -13,
-      [TYPES.Section]: -14
+      [TYPES.Signal]: -12,
+      [TYPES.Sensor]: -13,
+      [TYPES.PathBlock]: -14,
+      [TYPES.Section]: -15
     };
 
     this.renderers = {

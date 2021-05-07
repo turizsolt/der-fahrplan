@@ -324,12 +324,12 @@ export class InputController {
                   this.store.getSelected().deselect();
               }
               // todo temp
-              console.log(storedBrick.getId());
+              /* console.log(storedBrick.getId());
               if(storedBrick.getType() === TYPES.Block) {
                 const block = storedBrick as Block;
                 const p = block.persist() as any;
                 console.log(block.getId(), p.endA, p.endB);
-              }
+              } */
               this.select(storedBrick);
             }
           }

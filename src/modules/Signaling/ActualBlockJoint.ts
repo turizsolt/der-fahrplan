@@ -74,12 +74,14 @@ export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
     return {
       id: this.id,
       type: 'BlockJoint',
-      ray: this.position.getRay().persist()
+      ray: this.position.getRay().persist(), // only for visuals
+      positionOnTrack: this.position.persist()
     };
   }
 
-  load(obj: Object, store: Store): void {
-    throw new Error('Method not implemented.');
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(PositionOnTrack.fromData(obj.positionOnTrack, store));
   }
 }
 doApply();

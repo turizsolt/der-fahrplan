@@ -13,6 +13,7 @@ import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { LineSegmentChain } from '../../structs/Geometry/LineSegmentChain';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { BlockEnd } from './BlockEnd';
+import { BlockJoint } from './BlockJoint';
 
 export interface ActualBlock extends Emitable {}
 const doApply = () => applyMixins(ActualBlock, [Emitable]);
@@ -126,7 +127,10 @@ export class ActualBlock extends ActualBaseBrick implements Block {
     return {
       id: this.id,
       type: 'Block',
+      segmentData: this.segment.persist(),
       isFree: this.isFree(),
+
+      // for visuals
       rayA: this.segment
         .getEnd(WhichEnd.A)
         .getJointEnd()
@@ -139,7 +143,8 @@ export class ActualBlock extends ActualBaseBrick implements Block {
         .joint.getPosition()
         .getRay()
         .persist(),
-      coords: this.coords,
+      coords: this.coords
+      /*
       endA:
         this.segment
           .getEnd(WhichEnd.A)
@@ -154,6 +159,7 @@ export class ActualBlock extends ActualBaseBrick implements Block {
           .joint.getId() +
         '-' +
         this.segment.getEnd(WhichEnd.B).getJointEnd().end
+      */
     };
   }
 
@@ -165,8 +171,23 @@ export class ActualBlock extends ActualBaseBrick implements Block {
     return this.segment.getEnd(whichEnd);
   }
 
-  load(obj: Object, store: Store): void {
-    throw new Error('Method not implemented.');
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(toBlockSegmentData(obj.segmentData, store));
+    this.getSegment().connect();
   }
 }
 doApply();
+
+export function toBlockSegmentData(data: any, store: Store): BlockSegmentData {
+  return {
+    startJointEnd: {
+      end: data.startJointEnd.end,
+      joint: store.get(data.startJointEnd.joint) as BlockJoint
+    },
+    endJointEnd: {
+      end: data.endJointEnd.end,
+      joint: store.get(data.endJointEnd.joint) as BlockJoint
+    }
+  };
+}

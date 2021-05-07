@@ -8,6 +8,7 @@ import { SignalSignal } from './SignalSignal';
 import { PositionOnTrack } from '../Train/PositionOnTrack';
 import { TYPES } from '../../di/TYPES';
 import { BlockEnd } from './BlockEnd';
+import { BlockJoint } from './BlockJoint';
 
 export interface ActualSignal extends Emitable {}
 const doApply = () => applyMixins(ActualSignal, [Emitable]);
@@ -63,17 +64,28 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
   getRenderer(): BaseRenderer {
     throw new Error('Method not implemented.');
   }
+
   persist(): Object {
     return {
       id: this.id,
       type: 'Signal',
       signal: this.signal,
       hidden: this.hidden,
-      ray: this.position.getRay().persist()
+      ray: this.position.getRay().persist(),
+      positionOnTrack: this.position.persist(),
+      blockEnd: this.blockEnd?.persist()
     };
   }
-  load(obj: Object, store: Store): void {
-    throw new Error('Method not implemented.');
+
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    let blockEnd = undefined;
+    if(obj.blockEnd) {
+        const joint = store.get(obj.blockEnd.joint) as BlockJoint;
+        blockEnd = joint.getEnd(obj.blockEnd.end);
+    }
+    this.init(PositionOnTrack.fromData(obj.positionOnTrack, store), blockEnd, obj.signal);
+    if(obj.hidden) { this.setHidden(); }
   }
 
   remove() {
