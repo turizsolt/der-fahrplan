@@ -302,7 +302,7 @@ export class InputController {
                 storedBrick.getType() === TYPES.Signal
               ) {
                 const signal = (storedBrick as Signal);
-                signal.setSignal(signal.getSignal() === SignalSignal.Red ? SignalSignal.Green : SignalSignal.Red);
+                signal.setBlockSignal(signal.getSignal() === SignalSignal.Red ? SignalSignal.Green : SignalSignal.Red);
             }
           } else {
             let selected: BaseStorable = this.store.getSelected();

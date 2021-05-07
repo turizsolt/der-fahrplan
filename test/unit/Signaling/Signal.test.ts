@@ -21,7 +21,7 @@ describe('Signal', () => {
 
   it('sets and gets a SignalSignal', () => {
     const signal = store.create<Signal>(TYPES.Signal).init(pos);
-    signal.setSignal(SignalSignal.Green);
+    signal.setBlockSignal(SignalSignal.Green);
     expect(signal.getSignal()).equals(SignalSignal.Green);
   });
 });

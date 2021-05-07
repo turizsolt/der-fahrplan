@@ -8,6 +8,7 @@ import { BlockJoint } from './BlockJoint';
 import { PositionOnTrack } from '../Train/PositionOnTrack';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { BlockEnd } from './BlockEnd';
+import { SectionEnd } from './SectionEnd';
 
 export interface ActualBlockJoint extends Emitable {}
 const doApply = () => applyMixins(ActualBlockJoint, [Emitable]);
@@ -15,6 +16,7 @@ export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
   private position: PositionOnTrack = null;
   private opposition: PositionOnTrack = null;
   private ends: Record<WhichEnd, BlockEnd>;
+  private sectionEnds: Record<WhichEnd, SectionEnd>;
 
   init(position: PositionOnTrack): BlockJoint {
     this.initStore(TYPES.BlockJoint);
@@ -26,6 +28,11 @@ export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
     this.opposition.addMarker({ type: 'BlockJoint', blockJoint: this });
 
     this.ends = {
+      A: null,
+      B: null
+    };
+
+    this.sectionEnds = {
       A: null,
       B: null
     };
@@ -58,8 +65,24 @@ export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
     }
   }
 
+  setOneSectionEnd(jointEnd: WhichEnd, sectionEnd: SectionEnd): void {
+    this.sectionEnds[jointEnd] = sectionEnd;
+  }
+
+  removeSectionEnd(sectionEnd: SectionEnd): void {
+    if(this.sectionEnds[WhichEnd.A] === sectionEnd) {
+      this.sectionEnds[WhichEnd.A] = null;
+    } else if(this.sectionEnds[WhichEnd.B] === sectionEnd) {
+      this.sectionEnds[WhichEnd.B] = null;
+    }
+  }
+
   getEnd(whichEnd: WhichEnd): BlockEnd {
     return this.ends[whichEnd];
+  }
+
+  getSectionEnd(whichEnd: WhichEnd): SectionEnd {
+    return this.sectionEnds[whichEnd];
   }
 
   getPosition(): PositionOnTrack {

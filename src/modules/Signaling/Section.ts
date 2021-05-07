@@ -3,8 +3,9 @@ import { BlockJointEnd } from './BlockJointEnd';
 import { TrackDirection } from '../Track/TrackDirection';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { Train } from '../Train/Train';
+import { Emitable } from '../../mixins/Emitable';
 
-export interface Section extends BaseBrick {
+export interface Section extends BaseBrick, Emitable {
   init(
     startBlockJointEnd: BlockJointEnd,
     endBlockJointEnd: BlockJointEnd
@@ -16,4 +17,6 @@ export interface Section extends BaseBrick {
   checkout(train: Train): void;
   setDirectionPermanent(permanentDirection: boolean): void;
   isDirectionPermanent(): boolean;
+  connect(): void;
+  disconnect(): void;
 }

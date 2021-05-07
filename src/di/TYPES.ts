@@ -82,6 +82,7 @@ export const TYPES = {
 
   PathBlockEnd: Symbol.for('PathBlockEnd'),
   BlockEnd: Symbol.for('BlockEnd'),
+  SectionEnd: Symbol.for('SectionEnd'),
 
   Sensor: Symbol.for('Sensor'),
   SensorRenderer: Symbol.for('SensorRenderer'),

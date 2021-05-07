@@ -9,6 +9,8 @@ import { BlockJointEnd } from './BlockJointEnd';
 import { TrackDirection } from '../Track/TrackDirection';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { Train } from '../Train/Train';
+import { SectionEnd } from './SectionEnd';
+import { ActualSectionEnd } from './ActualSectionEnd';
 
 export interface ActualSection extends Emitable {}
 const doApply = () => applyMixins(ActualSection, [Emitable]);
@@ -16,14 +18,31 @@ export class ActualSection extends ActualBaseBrick implements Section {
   private direction: TrackDirection = undefined;
   private trainCount: number = 0;
   private permanentDirection: boolean = false;
+  private ends: Record<WhichEnd, SectionEnd> = { A: null, B: null };
 
   init(
     startBlockJointEnd: BlockJointEnd,
     endBlockJointEnd: BlockJointEnd
   ): Section {
     this.initStore(TYPES.Section);
+
+    this.ends = {
+      A: new ActualSectionEnd(this, WhichEnd.A, startBlockJointEnd),
+      B: new ActualSectionEnd(this, WhichEnd.A, endBlockJointEnd)
+    };
+
     this.emit('init', this.persist());
     return this;
+  }
+
+  connect(): void {
+    this.ends.A.connect();
+    this.ends.B.connect();
+  }
+
+  disconnect(): void {
+    this.ends.A.disconnect();
+    this.ends.B.disconnect();
   }
 
   isFree(direction: TrackDirection): boolean {

@@ -81,7 +81,7 @@ export class CreateBlockInputHandler implements InputHandler {
       }
       this.store
         .create<Signal>(TYPES.Signal)
-        .init(position, x.joint.getEnd(x.end), startSignal);
+        .init(position, x.joint.getEnd(x.end), null, startSignal);
     });
   }
 
