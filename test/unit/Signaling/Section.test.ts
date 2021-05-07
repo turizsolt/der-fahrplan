@@ -119,4 +119,12 @@ describe('Section', () => {
     section.setDirectionPermanent(false);
     expect(section.getDirection()).equals(undefined);
   });
+
+  it('section no direction also stays permanent', () => {
+    const { section } = createSection();
+    section.setDirectionPermanent(true);
+    const train = store.create<Train>(TYPES.Train);
+    section.checkin(WhichEnd.B, train);
+    expect(section.getDirection()).equals(undefined);
+  });
 });
