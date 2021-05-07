@@ -11,6 +11,7 @@ export interface Section extends BaseBrick {
   ): Section;
   isFree(direction: TrackDirection): boolean;
   getDirection(): TrackDirection;
+  setDirection(direction: TrackDirection): void;
   checkin(whichEnd: WhichEnd, train: Train): void;
   checkout(train: Train): void;
   setDirectionPermanent(permanentDirection: boolean): void;

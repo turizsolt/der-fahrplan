@@ -34,6 +34,12 @@ export class ActualSection extends ActualBaseBrick implements Section {
     return this.direction;
   }
 
+  setDirection(direction: TrackDirection): void {
+    if (this.isDirectionChangable()) {
+      this.direction = direction;
+    }
+  }
+
   checkin(whichEnd: WhichEnd, train: Train): void {
     if (this.isDirectionChangable()) {
       if (whichEnd === WhichEnd.A) {

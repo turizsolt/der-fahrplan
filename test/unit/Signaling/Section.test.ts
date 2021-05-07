@@ -127,4 +127,10 @@ describe('Section', () => {
     section.checkin(WhichEnd.B, train);
     expect(section.getDirection()).equals(undefined);
   });
+
+  it('section set direction', () => {
+    const { section } = createSection();
+    section.setDirection(TrackDirection.AB);
+    expect(section.getDirection()).equals(TrackDirection.AB);
+  });
 });
