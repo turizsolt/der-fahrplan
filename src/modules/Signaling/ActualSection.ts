@@ -54,6 +54,9 @@ export class ActualSection extends ActualBaseBrick implements Section {
 
   setDirectionPermanent(permanentDirection: boolean): void {
     this.permanentDirection = permanentDirection;
+    if (this.trainCount < 1 && !this.permanentDirection) {
+      this.direction = undefined;
+    }
   }
 
   isDirectionPermanent(): boolean {

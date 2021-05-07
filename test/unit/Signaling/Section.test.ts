@@ -107,4 +107,16 @@ describe('Section', () => {
     section.checkout(train);
     expect(section.getDirection()).equals(undefined);
   });
+
+  it('section set direction to not permanent, when nb checked in', () => {
+    const { section } = createSection();
+    const train = store.create<Train>(TYPES.Train);
+    section.checkin(WhichEnd.B, train);
+    section.setDirectionPermanent(true);
+    section.checkout(train);
+    expect(section.getDirection()).equals(TrackDirection.BA);
+
+    section.setDirectionPermanent(false);
+    expect(section.getDirection()).equals(undefined);
+  });
 });
