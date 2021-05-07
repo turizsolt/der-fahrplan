@@ -38,6 +38,8 @@ export class ActualSection extends ActualBaseBrick implements Section {
     if (this.isDirectionChangable()) {
       this.direction = direction;
     }
+
+    this.emit('update', this.persist());
   }
 
   checkin(whichEnd: WhichEnd, train: Train): void {
@@ -49,6 +51,7 @@ export class ActualSection extends ActualBaseBrick implements Section {
       }
     }
     this.trainCount++;
+    this.emit('update', this.persist());
   }
 
   checkout(train: Train): void {
@@ -56,6 +59,7 @@ export class ActualSection extends ActualBaseBrick implements Section {
     if (this.trainCount < 1 && !this.permanentDirection) {
       this.direction = undefined;
     }
+    this.emit('update', this.persist());
   }
 
   setDirectionPermanent(permanentDirection: boolean): void {
@@ -63,6 +67,7 @@ export class ActualSection extends ActualBaseBrick implements Section {
     if (this.trainCount < 1 && !this.permanentDirection) {
       this.direction = undefined;
     }
+    this.emit('update', this.persist());
   }
 
   isDirectionPermanent(): boolean {
@@ -80,12 +85,20 @@ export class ActualSection extends ActualBaseBrick implements Section {
   persist(): Object {
     return {
       id: this.id,
-      type: 'Section'
+      type: 'Section',
+      direction: this.direction,
+      trainCount: this.trainCount,
+      permanentDirection: this.permanentDirection
     };
   }
 
-  load(obj: Object, store: Store): void {
-    throw new Error('Method not implemented.');
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(null, null);
+    this.direction = obj.direction;
+    this.trainCount = obj.trainCount;
+    this.permanentDirection = obj.permanentDirection;
+    this.emit('update', this.persist());
   }
 }
 doApply();
