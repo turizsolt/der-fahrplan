@@ -24,6 +24,10 @@ export class ActualSection extends ActualBaseBrick implements Section {
     return true;
   }
 
+  getDirection(): TrackDirection {
+    return undefined;
+  }
+
   getRenderer(): BaseRenderer {
     throw new Error('Method not implemented.');
   }

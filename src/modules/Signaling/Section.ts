@@ -8,4 +8,5 @@ export interface Section extends BaseBrick {
     endBlockJointEnd: BlockJointEnd
   ): Section;
   isFree(direction: TrackDirection): boolean;
+  getDirection(): TrackDirection;
 }

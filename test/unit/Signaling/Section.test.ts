@@ -35,5 +35,6 @@ describe('Section', () => {
     const { section } = createSection();
     expect(section.isFree(TrackDirection.AB)).equals(true);
     expect(section.isFree(TrackDirection.BA)).equals(true);
+    expect(section.getDirection()).equals(undefined);
   });
 });
