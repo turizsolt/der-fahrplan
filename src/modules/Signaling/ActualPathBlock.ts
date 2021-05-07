@@ -14,10 +14,10 @@ import { Block } from './Block';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { AllowedPath } from './AllowedPath';
 import { SignalSignal } from './SignalSignal';
-import { Sensor } from './Sensor';
 import { Train } from '../Train/Train';
 import { PathRule } from './PathRule';
-import { PathQueue } from './PathQueue';
+import { PathQueue, persistBlockJointEnd, loadBlockJointEnd } from './PathQueue';
+import { BlockJoint } from './BlockJoint';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -32,22 +32,13 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     this.queue = new PathQueue(this);
 
     this.pathBlockEnds = jointEnds.map(je => new ActualPathBlockEnd(je, this));
-    this.pathBlockEnds.map(pbe => pbe.pathConnect());
-    this.pathBlockEnds.map(pbe => {
-        const bj = pbe.getJointEnd().joint;
-        const pot = bj.getPosition().clone();
-        if(pbe.getJointEnd().end === WhichEnd.A) {
-            pot.reverse();
-        }
-        pot.move(30);
-        pot.reverse();
-        
-        this.store.create<Sensor>(TYPES.Sensor).init(pot, this, pbe);
-    });
-    console.log('pathblock created', jointEnds);
 
     this.emit('init', this.persist());
     return this;
+  }
+
+  getPathBlockEnds(): PathBlockEnd[] {
+      return this.pathBlockEnds;
   }
 
   allow(
@@ -81,18 +72,14 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     queue.push(startDt.reverse());
     info[startDt.getHash()] = null;
     info[startDt.reverse().getHash()] = null;
-    // console.log('push', startDt.getHash());
-    // console.log('push', startDt.reverse().getHash());
-
+    
     let backFromHere: DirectedTrack = null;
 
     while (queue.length > 0) {
       const dt = queue.shift();
-      // console.log('pop', dt.getHash());
-
+    
       if (dt === endDt || dt === endDt.reverse()) {
         backFromHere = dt;
-        // console.log('found');
         break;
       }
 
@@ -101,10 +88,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
           next.getTrack().getType() === TYPES.TrackSwitch &&
           (next.getTrack() as TrackSwitch).isLocked()
         ) {
-          // console.log('skip', next.getHash());
           // then skip
         } else {
-          // console.log('push', next.getHash());
           queue.push(next);
           info[next.getHash()] = dt;
         }
@@ -123,21 +108,27 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         startJointEnd: startPathBlockEnd.getJointEnd(),
         endJointEnd: endPathBlockEnd.getJointEnd()
       });
-      startPathBlockEnd.setBlockEnd(block.getEnd(WhichEnd.A));
-      endPathBlockEnd.setBlockEnd(block.getEnd(WhichEnd.B));
-      startPathBlockEnd.pathConnect();
-      endPathBlockEnd.pathConnect();
-
-      this.allowedPathes.push({
+      
+      const allowedPath:AllowedPath = {
         startPathBlockEnd,
         endPathBlockEnd,
         switches,
         block,
         count
-      });
+      };
+
+      this.allowBlock(allowedPath);
+      this.allowedPathes.push(allowedPath);
     }
 
     return !!backFromHere;
+  }
+
+  private allowBlock(allowedPath: AllowedPath) {
+    allowedPath.startPathBlockEnd.setBlockEnd(allowedPath.block.getEnd(WhichEnd.A));
+    allowedPath.endPathBlockEnd.setBlockEnd(allowedPath.block.getEnd(WhichEnd.B));
+    allowedPath.startPathBlockEnd.pathConnect();
+    allowedPath.endPathBlockEnd.pathConnect();
   }
 
   checkout(endPathBlockEnd: PathBlockEnd): void {
@@ -191,12 +182,46 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
   persist(): Object {
     return {
       id: this.getId(),
-      type: 'PathBlock'
+      type: 'PathBlock',
+      jointEnds: this.pathBlockEnds.map(pbe => persistBlockJointEnd(pbe.getJointEnd())),
+      queue: this.queue.persist(),
+      allowedPathes: this.allowedPathes.map(this.persistAllowedPath)
     };
   }
 
-  load(obj: Object, store: Store): void {
-    throw new Error('Method not implemented.');
+  private persistAllowedPath(allowedPath: AllowedPath): any {
+    return {
+      block: allowedPath.block.getId(),
+      count: allowedPath.count,
+      switches: allowedPath.switches.map(sw => sw.getId()),
+      startPathBlockEnd: allowedPath.startPathBlockEnd.persist(),
+      endPathBlockEnd: allowedPath.endPathBlockEnd.persist(),
+    };
+  }
+
+  private loadAllowedPath(obj: any, store: Store): AllowedPath {
+    return {
+      block: store.get(obj.block) as Block,
+      count: obj.count,
+      switches: obj.switches.map(sw => store.get(sw) as TrackSwitch),
+      startPathBlockEnd: loadPathBlockEnd(obj.startPathBlockEnd, store),
+      endPathBlockEnd: loadPathBlockEnd(obj.endPathBlockEnd, store),
+    };
+}
+
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(obj.jointEnds.map(je => loadBlockJointEnd(je, store)));
+    this.getPathBlockEnds().map(pbe => {console.log('pbe pathConnect', pbe.getPathBlock().getId());pbe.pathConnect()});
+
+    this.queue.load(obj.queue, store);
+    this.allowedPathes = obj.allowedPathes.map(ap => this.loadAllowedPath(ap, store));
+    this.allowedPathes.map(this.allowBlock);
   }
 }
 doApply();
+
+export const loadPathBlockEnd = (obj: any, store: Store):PathBlockEnd => {
+    const joint = store.get(obj.joint) as BlockJoint;
+    return joint.getEnd(obj.end) as PathBlockEnd;
+};

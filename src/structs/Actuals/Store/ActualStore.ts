@@ -126,9 +126,9 @@ export class ActualStore implements Store {
       [TYPES.Passenger]: -3,
       [TYPES.BlockJoint]: -10,
       [TYPES.Block]: -11,
-      [TYPES.Signal]: -12,
-      [TYPES.Sensor]: -13,
-      [TYPES.PathBlock]: -14,
+      [TYPES.PathBlock]: -12,
+      [TYPES.Signal]: -13,
+      [TYPES.Sensor]: -14,
       [TYPES.Section]: -15
     };
 

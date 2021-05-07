@@ -10,5 +10,6 @@ export interface PathBlock extends BaseBrick {
   checkout(endPathBlockEnd: PathBlockEnd): void;
   requestPath(pathBlockEnd: PathBlockEnd, train: Train): void;
   addRule(rule: PathRule): void;
+  getPathBlockEnds(): PathBlockEnd[];
   tick(): void;
 }

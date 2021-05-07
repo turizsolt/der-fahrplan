@@ -10,6 +10,7 @@ import { Block } from '../../modules/Signaling/Block';
 import { PathBlock } from '../../modules/Signaling/PathBlock';
 import { Signal } from '../../modules/Signaling/Signal';
 import { SignalSignal } from '../../modules/Signaling/SignalSignal';
+import { Sensor } from '../../modules/Signaling/Sensor';
 
 export class CreateBlockInputHandler implements InputHandler {
   private store: Store;
@@ -47,7 +48,23 @@ export class CreateBlockInputHandler implements InputHandler {
             block.getSegment().connect();
             this.createSignals(this.jointEnds, SignalSignal.Green);
           } else if (this.jointEnds.length > 2) {
-            this.store.create<PathBlock>(TYPES.PathBlock).init(this.jointEnds);
+            const pb = this.store
+              .create<PathBlock>(TYPES.PathBlock)
+              .init(this.jointEnds);
+
+            pb.getPathBlockEnds().map(pbe => pbe.pathConnect());
+            pb.getPathBlockEnds().map(pbe => {
+              const bj = pbe.getJointEnd().joint;
+              const pot = bj.getPosition().clone();
+              if (pbe.getJointEnd().end === WhichEnd.A) {
+                pot.reverse();
+              }
+              pot.move(30);
+              pot.reverse();
+
+              this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
+            });
+
             this.createSignals(this.jointEnds, SignalSignal.Red);
           }
           this.jointEnds = [];

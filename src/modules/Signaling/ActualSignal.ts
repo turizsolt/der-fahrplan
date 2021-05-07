@@ -79,7 +79,7 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
 
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
-    let blockEnd = undefined;
+    let blockEnd:BlockEnd = undefined;
     if(obj.blockEnd) {
         const joint = store.get(obj.blockEnd.joint) as BlockJoint;
         blockEnd = joint.getEnd(obj.blockEnd.end);

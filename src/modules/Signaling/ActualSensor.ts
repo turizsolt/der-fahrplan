@@ -9,6 +9,7 @@ import { PositionOnTrack } from '../Train/PositionOnTrack';
 import { PathBlock } from './PathBlock';
 import { PathBlockEnd } from './PathBlockEnd';
 import { Train } from '../Train/Train';
+import { loadPathBlockEnd } from './ActualPathBlock';
 
 export interface ActualSensor extends Emitable {}
 const doApply = () => applyMixins(ActualSensor, [Emitable]);
@@ -48,12 +49,21 @@ export class ActualSensor extends ActualBaseBrick implements Sensor {
     return {
       id: this.id,
       type: 'Sensor',
-      ray: this.position.getRay().persist()
+      positionOnTrack: this.position.persist(),
+      pathBlock: this.pathBlock.getId(),
+      pathBlockEnd: this.pathBlockEnd.persist(),
+
+      ray: this.position.getRay().persist() // visuals
     };
   }
 
-  load(obj: Object, store: Store): void {
-    throw new Error('Method not implemented.');
+  load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(
+      PositionOnTrack.fromData(obj.positionOnTrack, store),
+      store.get(obj.pathBlock) as PathBlock,
+      loadPathBlockEnd(obj.pathBlockEnd, store)
+    );
   }
 }
 doApply();
