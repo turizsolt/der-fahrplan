@@ -13,4 +13,6 @@ export interface Section extends BaseBrick {
   getDirection(): TrackDirection;
   checkin(whichEnd: WhichEnd, train: Train): void;
   checkout(train: Train): void;
+  setDirectionPermanent(permanentDirection: boolean): void;
+  isDirectionPermanent(): boolean;
 }

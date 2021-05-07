@@ -15,6 +15,7 @@ const doApply = () => applyMixins(ActualSection, [Emitable]);
 export class ActualSection extends ActualBaseBrick implements Section {
   private direction: TrackDirection = undefined;
   private trainCount: number = 0;
+  private permanentDirection: boolean = false;
 
   init(
     startBlockJointEnd: BlockJointEnd,
@@ -34,7 +35,7 @@ export class ActualSection extends ActualBaseBrick implements Section {
   }
 
   checkin(whichEnd: WhichEnd, train: Train): void {
-    if (!this.direction) {
+    if (this.isDirectionChangable()) {
       if (whichEnd === WhichEnd.A) {
         this.direction = TrackDirection.AB;
       } else {
@@ -46,9 +47,21 @@ export class ActualSection extends ActualBaseBrick implements Section {
 
   checkout(train: Train): void {
     this.trainCount--;
-    if (this.trainCount < 1) {
+    if (this.trainCount < 1 && !this.permanentDirection) {
       this.direction = undefined;
     }
+  }
+
+  setDirectionPermanent(permanentDirection: boolean): void {
+    this.permanentDirection = permanentDirection;
+  }
+
+  isDirectionPermanent(): boolean {
+    return this.permanentDirection;
+  }
+
+  private isDirectionChangable(): boolean {
+    return !this.direction && !this.permanentDirection;
   }
 
   getRenderer(): BaseRenderer {
