@@ -100,8 +100,8 @@ export function toSegmentData(data: any, store: Store): TrackSegmentData {
       joint: store.get(data.startJointEnd.joint) as TrackJoint
     },
     endJointEnd: {
-      end: data.startJointEnd.end,
-      joint: store.get(data.startJointEnd.joint) as TrackJoint
+      end: data.endJointEnd.end,
+      joint: store.get(data.endJointEnd.joint) as TrackJoint
     },
     coordinates: data.coordinates.map(c => new Coordinate(c.x, c.y, c.z))
   };
