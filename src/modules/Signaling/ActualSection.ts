@@ -7,10 +7,14 @@ import { TYPES } from '../../di/TYPES';
 import { Section } from './Section';
 import { BlockJointEnd } from './BlockJointEnd';
 import { TrackDirection } from '../Track/TrackDirection';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
+import { Train } from '../Train/Train';
 
 export interface ActualSection extends Emitable {}
 const doApply = () => applyMixins(ActualSection, [Emitable]);
 export class ActualSection extends ActualBaseBrick implements Section {
+  private direction: TrackDirection = undefined;
+
   init(
     startBlockJointEnd: BlockJointEnd,
     endBlockJointEnd: BlockJointEnd
@@ -21,11 +25,19 @@ export class ActualSection extends ActualBaseBrick implements Section {
   }
 
   isFree(direction: TrackDirection): boolean {
-    return true;
+    return this.direction === direction || !this.direction;
   }
 
   getDirection(): TrackDirection {
-    return undefined;
+    return this.direction;
+  }
+
+  checkin(whichEnd: WhichEnd, train: Train): void {
+    if (whichEnd === WhichEnd.A) {
+      this.direction = TrackDirection.AB;
+    } else {
+      this.direction = TrackDirection.BA;
+    }
   }
 
   getRenderer(): BaseRenderer {

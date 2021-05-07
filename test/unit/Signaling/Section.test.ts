@@ -8,6 +8,7 @@ import { TrackDirection } from '../../../src/modules/Track/TrackDirection';
 import { BlockJoint } from '../../../src/modules/Signaling/BlockJoint';
 import { Section } from '../../../src/modules/Signaling/Section';
 import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
+import { Train } from '../../../src/modules/Train/Train';
 chai.use(chaiAlmost());
 
 const store = getTestStore();
@@ -36,5 +37,23 @@ describe('Section', () => {
     expect(section.isFree(TrackDirection.AB)).equals(true);
     expect(section.isFree(TrackDirection.BA)).equals(true);
     expect(section.getDirection()).equals(undefined);
+  });
+
+  it('section checkin from A', () => {
+    const { section } = createSection();
+    const train = store.create<Train>(TYPES.Train);
+    section.checkin(WhichEnd.A, train);
+    expect(section.isFree(TrackDirection.AB)).equals(true);
+    expect(section.isFree(TrackDirection.BA)).equals(false);
+    expect(section.getDirection()).equals(TrackDirection.AB);
+  });
+
+  it('section checkin from B', () => {
+    const { section } = createSection();
+    const train = store.create<Train>(TYPES.Train);
+    section.checkin(WhichEnd.B, train);
+    expect(section.isFree(TrackDirection.AB)).equals(false);
+    expect(section.isFree(TrackDirection.BA)).equals(true);
+    expect(section.getDirection()).equals(TrackDirection.BA);
   });
 });
