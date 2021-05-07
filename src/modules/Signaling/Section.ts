@@ -12,4 +12,5 @@ export interface Section extends BaseBrick {
   isFree(direction: TrackDirection): boolean;
   getDirection(): TrackDirection;
   checkin(whichEnd: WhichEnd, train: Train): void;
+  checkout(train: Train): void;
 }

@@ -14,6 +14,7 @@ export interface ActualSection extends Emitable {}
 const doApply = () => applyMixins(ActualSection, [Emitable]);
 export class ActualSection extends ActualBaseBrick implements Section {
   private direction: TrackDirection = undefined;
+  private trainCount: number = 0;
 
   init(
     startBlockJointEnd: BlockJointEnd,
@@ -39,6 +40,14 @@ export class ActualSection extends ActualBaseBrick implements Section {
       } else {
         this.direction = TrackDirection.BA;
       }
+    }
+    this.trainCount++;
+  }
+
+  checkout(train: Train): void {
+    this.trainCount--;
+    if (this.trainCount < 1) {
+      this.direction = undefined;
     }
   }
 

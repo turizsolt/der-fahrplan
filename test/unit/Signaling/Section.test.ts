@@ -67,4 +67,19 @@ describe('Section', () => {
     expect(section.isFree(TrackDirection.BA)).equals(true);
     expect(section.getDirection()).equals(TrackDirection.BA);
   });
+
+  it('section checks 2 in on one side, checks 2 out, the checks in from the other side', () => {
+    const { section } = createSection();
+    const train = store.create<Train>(TYPES.Train);
+    const train2 = store.create<Train>(TYPES.Train);
+    const train3 = store.create<Train>(TYPES.Train);
+    section.checkin(WhichEnd.A, train);
+    section.checkin(WhichEnd.A, train2);
+    section.checkout(train);
+    section.checkout(train2);
+    section.checkin(WhichEnd.B, train3);
+    expect(section.isFree(TrackDirection.AB)).equals(false);
+    expect(section.isFree(TrackDirection.BA)).equals(true);
+    expect(section.getDirection()).equals(TrackDirection.BA);
+  });
 });
