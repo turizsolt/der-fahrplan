@@ -33,6 +33,28 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
       signal: this
     });
 
+    if(sectionEnd) {
+      this.addSectionEmitter(sectionEnd);
+    }
+    if(blockEnd) {
+      this.addBlockEmitter(blockEnd);
+    }
+
+    this.emit('init', this.persist());
+    return this;
+  }
+
+  addSectionEmitter(sectionEnd: SectionEnd): void {
+    this.sectionSubscribe = (data: any) => {
+      this.setSectionSignal(data.signal);
+    };
+    this.sectionSubscribe.bind(this);
+  
+    this.sectionEnd = sectionEnd;
+    this.sectionEnd?.on('update', this.sectionSubscribe);
+  }
+
+  addBlockEmitter(blockEnd: BlockEnd): void {
     this.blockSubscribe = (data: any) => {
       this.setBlockSignal(data.signal);
       if(data.hidden) {
@@ -40,24 +62,13 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
       }
     };
     this.blockSubscribe.bind(this);
-
-    this.sectionSubscribe = (data: any) => {
-        this.setSectionSignal(data.signal);
-      };
-      this.sectionSubscribe.bind(this);
   
-      this.sectionEnd = sectionEnd;
-      this.sectionEnd?.on('update', this.sectionSubscribe);
-
-      this.blockEnd = blockEnd;
+    this.blockEnd = blockEnd;
     this.blockEnd?.on('update', this.blockSubscribe);
     const blockEndHidden = this.blockEnd?.persist().hidden;
     if(blockEndHidden) { 
       this.hidden = true;
     }
-
-    this.emit('init', this.persist());
-    return this;
   }
 
   setHidden(): void {

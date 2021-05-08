@@ -14,4 +14,6 @@ export interface Signal extends BaseBrick {
   getSignal(): SignalSignal;
   setBlockSignal(signal: SignalSignal): void;
   setHidden(): void;
+  addSectionEmitter(sectionEnd: SectionEnd): void;
+  addBlockEmitter(blockEnd: BlockEnd): void;
 }

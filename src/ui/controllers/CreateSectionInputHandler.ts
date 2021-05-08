@@ -43,8 +43,8 @@ export class CreateSectionInputHandler implements InputHandler {
               .create<Section>(TYPES.Section)
               .init(this.jointEnds[0], this.jointEnds[1]);
             section.connect();
-            // todo itt kell meg resen lenni
-            this.createSignals(this.jointEnds, SignalSignal.Green);
+
+            createSignals(this.jointEnds, SignalSignal.Green, this.store);
           }
           this.jointEnds = [];
         }
@@ -52,19 +52,38 @@ export class CreateSectionInputHandler implements InputHandler {
     }
   }
 
-  private createSignals(jointEnds: BlockJointEnd[], startSignal: SignalSignal) {
+  up(downProps: InputProps, props: InputProps, event: PointerEvent): void {}
+
+  cancel(): void {}
+}
+
+export function createSignals(jointEnds: BlockJointEnd[], startSignal: SignalSignal, store: Store) {
     jointEnds.map(x => {
       const position = x.joint.getPosition().clone();
       if (x.end === WhichEnd.B) {
         position.reverse();
       }
-      this.store
-        .create<Signal>(TYPES.Signal)
-        .init(position, null, x.joint.getSectionEnd(x.end), startSignal);
+
+      const dt = position.getDirectedTrack();
+      const pos = position.getPosition();
+      const signal:Signal = dt
+        .getMarkers()
+        .find(m => m.marker.type === 'Signal' && m.position === pos)?.marker.signal;
+
+      const sectionEnd = x.joint.getSectionEnd(x.end);
+      const blockEnd = x.joint.getEnd(x.end);
+
+      if (signal) {
+        if(sectionEnd) {
+          signal.addSectionEmitter(sectionEnd);
+        }
+        if(blockEnd) {
+          signal.addBlockEmitter(blockEnd);
+        }
+      } else {
+        store
+          .create<Signal>(TYPES.Signal)
+          .init(position, blockEnd, sectionEnd, startSignal);
+      }
     });
   }
-
-  up(downProps: InputProps, props: InputProps, event: PointerEvent): void {}
-
-  cancel(): void {}
-}
