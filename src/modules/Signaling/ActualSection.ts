@@ -11,6 +11,7 @@ import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { Train } from '../Train/Train';
 import { SectionEnd } from './SectionEnd';
 import { ActualSectionEnd } from './ActualSectionEnd';
+import { BlockJoint } from './BlockJoint';
 
 export interface ActualSection extends Emitable {}
 const doApply = () => applyMixins(ActualSection, [Emitable]);
@@ -28,7 +29,7 @@ export class ActualSection extends ActualBaseBrick implements Section {
 
     this.ends = {
       A: new ActualSectionEnd(this, WhichEnd.A, startBlockJointEnd),
-      B: new ActualSectionEnd(this, WhichEnd.A, endBlockJointEnd)
+      B: new ActualSectionEnd(this, WhichEnd.B, endBlockJointEnd)
     };
 
     this.emit('init', this.persist());
@@ -107,16 +108,36 @@ export class ActualSection extends ActualBaseBrick implements Section {
       type: 'Section',
       direction: this.direction,
       trainCount: this.trainCount,
-      permanentDirection: this.permanentDirection
+      permanentDirection: this.permanentDirection,
+      isFreeA: this.isFree(TrackDirection.AB),
+      isFreeB: this.isFree(TrackDirection.BA),
+      startBlockJointEnd: {
+        joint: this.ends.A.getJointEnd().joint.getId(),
+        end: this.ends.A.getJointEnd().end
+      },
+      endBlockJointEnd: {
+        joint: this.ends.B.getJointEnd().joint.getId(),
+        end: this.ends.B.getJointEnd().end
+      }
     };
   }
 
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
-    this.init(null, null);
+    this.init(
+      {
+        joint: store.get(obj.startBlockJointEnd.joint) as BlockJoint,
+        end: obj.startBlockJointEnd.end
+      },
+      {
+        joint: store.get(obj.endBlockJointEnd.joint) as BlockJoint,
+        end: obj.endBlockJointEnd.end
+      }
+    );
     this.direction = obj.direction;
     this.trainCount = obj.trainCount;
     this.permanentDirection = obj.permanentDirection;
+    this.connect();
     this.emit('update', this.persist());
   }
 }

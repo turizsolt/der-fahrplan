@@ -127,9 +127,9 @@ export class ActualStore implements Store {
       [TYPES.BlockJoint]: -10,
       [TYPES.Block]: -11,
       [TYPES.PathBlock]: -12,
-      [TYPES.Signal]: -13,
       [TYPES.Sensor]: -14,
-      [TYPES.Section]: -15
+      [TYPES.Section]: -15,
+      [TYPES.Signal]: -16
     };
 
     this.renderers = {

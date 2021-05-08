@@ -19,6 +19,9 @@ import { MarkerIterator } from './MarkerIterator';
 import { TrackMarker } from '../Track/TrackMarker';
 import { DirectedTrack } from '../Track/DirectedTrack';
 import { TrackDirection } from '../Track/TrackDirection';
+import { BlockJointEnd } from '../Signaling/BlockJointEnd';
+import { SectionEnd } from '../Signaling/SectionEnd';
+import { BlockEnd } from '../Signaling/BlockEnd';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
@@ -163,28 +166,36 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     // block checkout
 
     if(formerEnd) {
-        const iter = MarkerIterator.fromPositionOnTrack(formerEnd, currentEnd);
-        let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
-        while(next && next.value) {
-          const bjend = next.value.blockJoint.getEnd(convert2(next.directedTrack.getDirection()));
-          if(bjend) {
-            bjend.checkout(this);
-          }
-          next = iter.nextOfFull('BlockJoint');
+      const iter = MarkerIterator.fromPositionOnTrack(formerEnd, currentEnd);
+      let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
+      while(next && next.value) {
+        const bjend:BlockEnd = next.value.blockJoint.getEnd(convert2(next.directedTrack.getDirection()));
+        const send:SectionEnd = next.value.blockJoint.getSectionEnd(convert2(next.directedTrack.getDirection()));
+        if(bjend) {
+          bjend.checkout(this);
         }
+        if(send) {
+          send.checkout(this);
+        }
+        next = iter.nextOfFull('BlockJoint');
+      }
     }
     
     // block checkin
     if(formerStart) {
-        const iter = MarkerIterator.fromPositionOnTrack(formerStart, currentStart);
-        let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
-        while(next && next.value) {
-          const bjend = next.value.blockJoint.getEnd(convert(next.directedTrack.getDirection()));
-          if(bjend) {
-            bjend.checkin(this);
-          }
-          next = iter.nextOfFull('BlockJoint');
+      const iter = MarkerIterator.fromPositionOnTrack(formerStart, currentStart);
+      let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
+      while(next && next.value) {
+        const bjend:BlockEnd = next.value.blockJoint.getEnd(convert(next.directedTrack.getDirection()));
+        const send:SectionEnd = next.value.blockJoint.getSectionEnd(convert(next.directedTrack.getDirection()));
+        if(bjend) {
+          bjend.checkin(this);
         }
+        if(send) {
+          send.checkin(this);
+        }
+        next = iter.nextOfFull('BlockJoint');
+      }
     }
 
     // sensor checkin

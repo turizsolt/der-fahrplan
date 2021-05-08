@@ -45,6 +45,7 @@ import { Block } from '../../modules/Signaling/Block';
 import { CreateBlockInputHandler } from './CreateBlockInputHandler';
 import { AllowPathInputHandler } from './AllowPathInputHandler';
 import { CreatePathInputHandler } from './CreatePathInputHandler';
+import { CreateSectionInputHandler } from './CreateSectionInputHandler';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -56,6 +57,7 @@ export enum InputMode {
   CREATE_SIGNAL = 'CREATE_SIGNAL',
   CREATE_BLOCK_JOINT = 'CREATE_BLOCK_JOINT',
   CREATE_BLOCK = 'CREATE_BLOCK',
+  CREATE_SECTION = 'CREATE_SECTION',
   CREATE_PATH = 'CREATE_PATH',
   ALLOW_PATH = 'ALLOW_PATH',
 }
@@ -110,6 +112,7 @@ export class InputController {
       [InputMode.CREATE_SIGNAL]: new CreateSignalInputHandler(),
       [InputMode.CREATE_BLOCK_JOINT]: new CreateBlockJointInputHandler(),
       [InputMode.CREATE_BLOCK]: new CreateBlockInputHandler(),
+      [InputMode.CREATE_SECTION]: new CreateSectionInputHandler(),
       [InputMode.CREATE_PATH]: new CreatePathInputHandler(),
       [InputMode.ALLOW_PATH]: new AllowPathInputHandler()
     };
@@ -124,6 +127,7 @@ export class InputController {
       [InputMode.CREATE_SIGNAL]: '+Sign',
       [InputMode.CREATE_BLOCK_JOINT]: '+BJnt',
       [InputMode.CREATE_BLOCK]: '+Blck',
+      [InputMode.CREATE_SECTION]: '+Sect',
       [InputMode.CREATE_PATH]: '+Path',
       [InputMode.ALLOW_PATH]: 'Allow'
     };
@@ -255,7 +259,7 @@ export class InputController {
       //(props.point &&
       //  this.downProps.point.coord.equalsTo(props.point.coord)))
     ) {
-      let ready = (this.mode === InputMode.CREATE_BLOCK || this.mode === InputMode.ALLOW_PATH || this.mode === InputMode.CREATE_PATH) ? false : this.selectIfPossible(event);
+      let ready = (this.mode === InputMode.CREATE_BLOCK || this.mode === InputMode.ALLOW_PATH || this.mode === InputMode.CREATE_PATH || this.mode === InputMode.CREATE_SECTION) ? false : this.selectIfPossible(event);
       if (ready) {
         this.inputHandler.cancel();
       } else {
