@@ -251,6 +251,21 @@ export class MeshProvider {
     return mesh;
   }
 
+  createSectionMesh(name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateCylinder(
+      name,
+      {
+        diameterTop: 1.5,
+        diameterBottom: 1.5,
+        tessellation: 12,
+        height: 1
+      },
+      null
+    );
+    mesh.material = this.white;
+    return mesh;
+  }
+
   createSleeperJointMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
     const mesh = BABYLON.MeshBuilder.CreateBox(
       name,

@@ -12,6 +12,8 @@ import { Train } from '../Train/Train';
 import { SectionEnd } from './SectionEnd';
 import { ActualSectionEnd } from './ActualSectionEnd';
 import { BlockJoint } from './BlockJoint';
+import { Ray } from '../../structs/Geometry/Ray';
+import { PositionOnTrack } from '../Train/PositionOnTrack';
 
 export interface ActualSection extends Emitable {}
 const doApply = () => applyMixins(ActualSection, [Emitable]);
@@ -20,6 +22,8 @@ export class ActualSection extends ActualBaseBrick implements Section {
   private trainCount: number = 0;
   private permanentDirection: boolean = false;
   private ends: Record<WhichEnd, SectionEnd> = { A: null, B: null };
+  private signageA: Ray;
+  private signageB: Ray;
 
   init(
     startBlockJointEnd: BlockJointEnd,
@@ -31,6 +35,24 @@ export class ActualSection extends ActualBaseBrick implements Section {
       A: new ActualSectionEnd(this, WhichEnd.A, startBlockJointEnd),
       B: new ActualSectionEnd(this, WhichEnd.B, endBlockJointEnd)
     };
+
+    const posA: PositionOnTrack = this.ends.A.getJointEnd()
+      .joint.getPosition()
+      .clone();
+    if (this.ends.A.getJointEnd().end === WhichEnd.B) {
+      posA.reverse();
+    }
+    posA.move(5);
+    this.signageA = posA.getRay();
+
+    const posB: PositionOnTrack = this.ends.B.getJointEnd()
+      .joint.getPosition()
+      .clone();
+    if (this.ends.B.getJointEnd().end === WhichEnd.B) {
+      posB.reverse();
+    }
+    posB.move(5);
+    this.signageB = posB.getRay();
 
     this.emit('init', this.persist());
     return this;
@@ -118,7 +140,9 @@ export class ActualSection extends ActualBaseBrick implements Section {
       endBlockJointEnd: {
         joint: this.ends.B.getJointEnd().joint.getId(),
         end: this.ends.B.getJointEnd().end
-      }
+      },
+      rayA: this.signageA.persist(),
+      rayB: this.signageB.persist()
     };
   }
 
