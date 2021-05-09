@@ -31,12 +31,6 @@ export class WagonAnnouncement {
 
   getTrip(): Trip {
     return this.trip;
-    /*
-    const wagonWithTrip = this.train
-      .getWagonsWithSides()
-      .find(x => x.wagon === this.parent);
-    return wagonWithTrip?.trip;
-    */
   }
 
   getTrain(): Train {

@@ -19,15 +19,16 @@ import { MarkerIterator } from './MarkerIterator';
 import { TrackMarker } from '../Track/TrackMarker';
 import { DirectedTrack } from '../Track/DirectedTrack';
 import { TrackDirection } from '../Track/TrackDirection';
-import { BlockJointEnd } from '../Signaling/BlockJointEnd';
 import { SectionEnd } from '../Signaling/SectionEnd';
 import { BlockEnd } from '../Signaling/BlockEnd';
+import { Trip } from '../../structs/Scheduling/Trip';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
   private wagons: Wagon[] = [];
   private speed: TrainSpeed = null;
   private autoMode:boolean = true;
+  private trips: Trip[] = [];
 
   init(pot: PositionOnTrack, wagons: Wagon[]): Train {
     super.initStore(TYPES.Train);
@@ -252,6 +253,44 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return this.nearestSignal;
   }
 
+  assignTrip(trip: Trip, wagons?: Wagon[]): void {
+    let addedCount = 0;
+    for (let i = 0; i < this.wagons.length; i++) {
+      if (
+        (!wagons || wagons.includes(this.wagons[i])) &&
+        (this.wagons[i].getPassengerCount())
+      ) {
+        addedCount++;
+        this.wagons[i].setTrip(trip);
+      }
+    }
+
+    if (addedCount && trip && !this.trips.includes(trip)) {
+      this.trips.push(trip);
+    }
+
+    if (!trip) {
+      this.updateTrips();
+    }
+  }
+
+  private updateTrips(): void {
+    this.trips = this.trips.filter(t => this.wagons.findIndex(w => w.getTrip() === t) > -1);
+  }
+
+  getTrips(): Trip[] {
+    return this.trips;
+  }
+
+  removeTrip(trip: Trip): void {
+    this.trips = this.trips.filter(t => t != trip);
+    for (let i = 0; i < this.wagons.length; i++) {
+      if (this.wagons[i].getTrip() === trip) {
+        this.wagons[i].setTrip(undefined);
+      }
+    }
+  }
+
   tick(): void {
     const nextPosition = this.position.clone();
     
@@ -325,11 +364,11 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         id: x.getId(),
         appearanceId: x.getAppearanceId(),
         tripId: x.getTrip()?.getId(),
-        tripNo: 1, // todo trip, this.trips.findIndex(y => x.trip === y) + 1,
+        tripNo: this.trips.findIndex(y => x.getTrip() === y) + 1,
         trip: x.getTrip()?.persistDeep(),
         side: (x.getAppearanceId() === 'vez' && x.getFacing() === TrackDirection.BA) ? WhichEnd.B : WhichEnd.A,
       })),
-      trips: [] // todo trip, this.trips.map(t => t.persistDeep())
+      trips: this.trips.map(t => t.persistDeep())
     };
   }
 
