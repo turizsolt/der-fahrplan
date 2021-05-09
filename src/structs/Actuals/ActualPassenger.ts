@@ -80,7 +80,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     // todo redo everything
 
     if (toIndex !== -1 && stationIndex !== -1 && stationIndex < toIndex) {
-      const wagon = train.getWagons()[0]; //train.getFreeWagon();
+      const wagon = train.getFreeWagon();
       if (wagon) {
         this.setPlace(wagon);
         this.renderer.update();

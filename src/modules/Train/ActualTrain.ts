@@ -22,6 +22,9 @@ import { TrackDirection } from '../Track/TrackDirection';
 import { SectionEnd } from '../Signaling/SectionEnd';
 import { BlockEnd } from '../Signaling/BlockEnd';
 import { Trip } from '../../structs/Scheduling/Trip';
+import { Passenger } from '../../structs/Interfaces/Passenger';
+import { Station } from '../../structs/Scheduling/Station';
+import { Platform } from '../../structs/Interfaces/Platform';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
@@ -343,6 +346,8 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         )
       );
     }
+
+    this.moveBoardedPassengers();
   }
 
   persist(): Object {
@@ -371,6 +376,50 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       trips: this.trips.map(t => t.persistDeep())
     };
   }
+
+  // boarding and announcements
+
+  stoppedAt(station: Station, platform: Platform) {
+    if (this.speed.getSpeed() > 0) return;
+
+    this.getTrips().map(trip => {
+      this.callOnPassengers((p: Passenger) => {
+        p.listenWagonStoppedAtAnnouncement(
+          station,
+          platform,
+          this,
+          trip.getRoute()
+        );
+      });
+      if (station) {
+        station.announceArrived(this, platform, trip);
+      }
+    });
+  }
+
+  moveBoardedPassengers(): void {
+    for (let wagon of this.getWagons()) {
+      wagon.moveBoardedPassengers();
+    }
+  }
+
+  private callOnPassengers(f: (p: Passenger) => void): void {
+    for (let wagon of this.getWagons()) {
+      wagon.getBoardedPassengers().map(p => f(p));
+    }
+  }
+
+  getFreeWagon(): Wagon {
+    for (let wagon of this.getWagons()) {
+      if (wagon.hasFreeSeat()) {
+        return wagon;
+      }
+    }
+    return null;
+  }
+
+  /* persist and load */
+
 
   load(obj: any, store: Store): void {
     this.presetId(obj.id);

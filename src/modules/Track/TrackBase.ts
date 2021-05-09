@@ -13,7 +13,7 @@ export interface TrackBase extends BaseBrick {
   getCheckedList(): Train[];
 
   addPlatform(platform: Platform);
-  getPlatformsBeside();
+  getPlatformsBeside(): Platform[];
 
   getCurve(): TrackCurve;
   getLength(): number;

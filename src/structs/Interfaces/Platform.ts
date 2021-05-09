@@ -6,9 +6,11 @@ import { LineSegmentChain } from '../Geometry/LineSegmentChain';
 import { Station } from '../Scheduling/Station';
 import { BaseBrick } from './BaseBrick';
 import { Boardable } from '../../mixins/Boardable';
+import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
 
 export interface Platform extends BaseBrick, Boardable {
   isBeside(position: number): boolean;
+  isBesidePoT(pot: PositionOnTrack): boolean;
 
   pseudoBoard(): Coordinate;
 

@@ -661,9 +661,9 @@ export class InputController {
         break;
 
       case 'Enter':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('stop');
+        if(this.getSelectedBrick().getType() === TYPES.Wagon) {
+            (this.getSelectedBrick() as Wagon).stop();
+        }
         break;
 
         case 'D':

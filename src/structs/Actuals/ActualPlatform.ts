@@ -14,6 +14,8 @@ import { Station } from '../Scheduling/Station';
 import { Left, Right } from '../Geometry/Directions';
 import { ActualBoardable } from '../../mixins/ActualBoardable';
 import { ActualBaseBrick } from './ActualBaseBrick';
+import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
+import { TrackDirection } from '../../modules/Track/TrackDirection';
 
 @injectable()
 export class ActualPlatform extends ActualBaseBrick implements Platform {
@@ -219,6 +221,14 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
 
   isBeside(position: number): boolean {
     return this.start <= position && position <= this.end;
+  }
+
+  isBesidePoT(pot: PositionOnTrack): boolean {
+    let pos = pot.getPosition();
+    if (pot.getDirectedTrack().getDirection() === TrackDirection.BA) {
+      pos = pot.getTrack().getLength() - pos;
+    }
+    return this.track === pot.getTrack() && this.isBeside(pos);
   }
 
   remove(): boolean {
