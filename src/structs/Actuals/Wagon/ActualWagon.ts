@@ -227,6 +227,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.axles.hasEngine();
   }
 
+  getFacing():TrackDirection {
+      return this.axles.getFacing();
+  }
+
   ///////////////////////
   // persist
   ///////////////////////

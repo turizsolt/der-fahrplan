@@ -327,7 +327,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         tripId: x.getTrip()?.getId(),
         tripNo: 1, // todo trip, this.trips.findIndex(y => x.trip === y) + 1,
         trip: x.getTrip()?.persistDeep(),
-        side: WhichEnd.A,
+        side: (x.getAppearanceId() === 'vez' && x.getFacing() === TrackDirection.BA) ? WhichEnd.B : WhichEnd.A,
       })),
       trips: [] // todo trip, this.trips.map(t => t.persistDeep())
     };
