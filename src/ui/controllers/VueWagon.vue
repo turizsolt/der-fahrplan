@@ -271,13 +271,13 @@ export default class VueWagon extends Vue {
 }
 
 .pattern-2 {
-  --bg: rgba(255, 255, 255, 0.5);
-
-  background: linear-gradient(135deg, var(--bg) 25%, transparent 25%) -5px 0,
-    linear-gradient(225deg, var(--bg) 25%, transparent 25%) -5px 0,
-    linear-gradient(315deg, var(--bg) 25%, transparent 25%),
-    linear-gradient(45deg, var(--bg) 25%, transparent 25%);
+  --stripe: rgba(255, 255, 255, 0.5);
+  background-image: linear-gradient(45deg, var(--stripe) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--stripe) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--stripe) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--stripe) 75%);
   background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
 }
 
 .pattern-3 {
@@ -293,12 +293,12 @@ export default class VueWagon extends Vue {
 }
 
 .pattern-4 {
-  --stripe: rgba(255, 255, 255, 0.5);
-  background-image: linear-gradient(45deg, var(--stripe) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--stripe) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--stripe) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--stripe) 75%);
+  --bg: rgba(255, 255, 255, 0.5);
+
+  background-image: linear-gradient(135deg, var(--bg) 0%, transparent 50%),
+    linear-gradient(225deg, var(--bg) 0%, transparent 50%),
+    linear-gradient(315deg, var(--bg) 25%, transparent 25%),
+    linear-gradient(45deg, var(--bg) 25%, transparent 25%);
   background-size: 10px 10px;
-  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
 }
 </style>
