@@ -295,6 +295,10 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }
   }
 
+  private nextPlatformToStop: Platform = null;
+  private lastPlatformStopped: Platform = null;
+  private remainingStopTime: number = 0;
+
   tick(): void {
     const nextPosition = this.position.clone();
     
@@ -315,16 +319,29 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }
     */
 
-    if(this.autoMode && this.nearestPlatform.platform) {
+    if(this.autoMode 
+        && this.nearestPlatform.platform 
+        && this.nearestPlatform.platform !== this.lastPlatformStopped) {
       if(
           ((this.speed.getStoppingDistance() + 5 >= this.nearestPlatform.distance) 
           && this.speed.getSpeed() > 1)
          || (this.speed.getStoppingDistance() + 2 >= this.nearestPlatform.distance)) {
           this.speed.setPedal(SpeedPedal.Brake);
+          if(!this.nextPlatformToStop) {
+            this.nextPlatformToStop = this.nearestPlatform.platform;
+            this.remainingStopTime = 60; // todo constant
+          }
       } else {
         this.speed.setPedal(SpeedPedal.Throttle);
       }
+    } else if(this.autoMode 
+        && this.nearestPlatform.platform) {
+        this.speed.setPedal(SpeedPedal.Throttle);
+    } else if(this.autoMode) {
+        this.speed.setPedal(SpeedPedal.Brake);
     }
+
+    // todo utolson tulcsussz
 
     this.speed.tick();
     if(this.speed.getSpeed() === 0 && this.lastSpeed === 0) {
@@ -332,9 +349,17 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }
     this.lastSpeed = this.speed.getSpeed();
 
-    if (this.speed.getSpeed() === 0) return;
-    
-    
+    if (this.speed.getSpeed() === 0 && this.nextPlatformToStop) {
+        this.remainingStopTime--;
+        if(this.remainingStopTime < 1) {
+            this.lastPlatformStopped = this.nextPlatformToStop;
+            this.nextPlatformToStop = null;
+        }
+    }
+
+    if (this.speed.getSpeed() === 0) {
+        return;
+    }
 
     nextPosition.move(this.speed.getSpeed());
 
