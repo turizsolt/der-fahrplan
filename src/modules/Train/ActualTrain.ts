@@ -297,6 +297,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   private nextPlatformToStop: Platform = null;
   private lastPlatformStopped: Platform = null;
+  private justPlatformStopped: Platform = null;
   private remainingStopTime: number = 0;
 
   tick(): void {
@@ -347,9 +348,16 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
     if (this.speed.getSpeed() === 0 && this.nextPlatformToStop) {
         this.remainingStopTime--;
+        if(!this.justPlatformStopped) {
+            this.justPlatformStopped = this.nextPlatformToStop;
+            this.startStopping();
+        }
         if(this.remainingStopTime < 1) {
             this.lastPlatformStopped = this.nextPlatformToStop;
             this.nextPlatformToStop = null;
+
+            this.endStopping();
+            this.justPlatformStopped = null;
         }
     }
 
@@ -384,6 +392,16 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }
 
     this.moveBoardedPassengers();
+  }
+
+  private startStopping() {
+    console.log('start stopping at ', this.justPlatformStopped?.getId());
+    this.wagons[0].stop();
+  }
+
+  private endStopping() {
+    console.log('end stopping', this.justPlatformStopped?.getId());
+    this.wagons[0].stop();
   }
 
   persist(): Object {
