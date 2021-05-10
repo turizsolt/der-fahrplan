@@ -307,38 +307,34 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.nearestSignal = Nearest.signal(nextPosition);
     this.nearestPlatform = Nearest.platform(nextPosition);
  
-    /*
-    if(this.autoMode && this.nearestSignal.signal) {
-        if(this.nearestSignal.signal.getSignal() === SignalSignal.Red &&
-        (this.speed.getStoppingDistance() + 5) >= this.nearestSignal.distance) {
-            this.speed.setPedal(SpeedPedal.Brake);
-        } else {
-        // if(this.nearestSignal.signal.getSignal() === SignalSignal.Green) {
-            this.speed.setPedal(SpeedPedal.Throttle);
+    if(this.autoMode) {
+        let pedal = SpeedPedal.Throttle;
+        if(this.nearestSignal.signal) {
+            if(this.nearestSignal.signal.getSignal() === SignalSignal.Red &&
+            (this.speed.getStoppingDistance() + 5) >= this.nearestSignal.distance) {
+                pedal = SpeedPedal.Brake;
+            }
         }
-    }
-    */
+        
 
-    if(this.autoMode 
-        && this.nearestPlatform.platform 
-        && this.nearestPlatform.platform !== this.lastPlatformStopped) {
-      if(
-          ((this.speed.getStoppingDistance() + 5 >= this.nearestPlatform.distance) 
-          && this.speed.getSpeed() > 1)
-         || (this.speed.getStoppingDistance() + 2 >= this.nearestPlatform.distance)) {
-          this.speed.setPedal(SpeedPedal.Brake);
-          if(!this.nextPlatformToStop) {
-            this.nextPlatformToStop = this.nearestPlatform.platform;
-            this.remainingStopTime = 60; // todo constant
-          }
-      } else {
-        this.speed.setPedal(SpeedPedal.Throttle);
-      }
-    } else if(this.autoMode 
-        && this.nearestPlatform.platform) {
-        this.speed.setPedal(SpeedPedal.Throttle);
-    } else if(this.autoMode) {
-        this.speed.setPedal(SpeedPedal.Brake);
+        if(this.nearestPlatform.platform 
+            && this.nearestPlatform.platform !== this.lastPlatformStopped) {
+            if(
+                ((this.speed.getStoppingDistance() + 5 >= this.nearestPlatform.distance) 
+                && this.speed.getSpeed() > 1)
+                || (this.speed.getStoppingDistance() + 2 >= this.nearestPlatform.distance)) {
+                
+                pedal = SpeedPedal.Brake;
+                
+                if(!this.nextPlatformToStop) {
+                    this.nextPlatformToStop = this.nearestPlatform.platform;
+                    this.remainingStopTime = 60; // todo constant
+                }
+            } 
+        } else if(!this.nearestPlatform.platform) {
+            pedal = SpeedPedal.Brake;
+        }
+        this.speed.setPedal(pedal);
     }
 
     // todo utolson tulcsussz
