@@ -396,11 +396,17 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   private startStopping() {
     console.log('start stopping at ', this.justPlatformStopped?.getId());
+    if(this.justPlatformStopped.getStation()) {
+        this.trips.map(t => t.setStationServed(this.justPlatformStopped.getStation()));
+    }
     this.wagons[0].stop();
   }
 
   private endStopping() {
     console.log('end stopping', this.justPlatformStopped?.getId());
+    if(this.justPlatformStopped.getStation()) {
+        this.trips.map(t => t.setAtStation(null));
+    }
     this.wagons[0].stop();
   }
 
