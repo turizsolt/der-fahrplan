@@ -84,6 +84,19 @@
         isTrip
       >
       </route-stop>
+
+      <div v-if="trip.next">
+        Next trip: <br />
+        <route-stop
+          v-for="(stop, index) in trip.next.stops"
+          :key="stop.id"
+          :route="trip.route"
+          :stop="stop"
+          :index="index"
+          isTrip
+        >
+        </route-stop>
+      </div>
     </div>
   </div>
 </template>

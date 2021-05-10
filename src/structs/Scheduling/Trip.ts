@@ -16,4 +16,7 @@ export interface Trip extends BaseStorable {
   setAtStation(atStation: Station): void;
   getRemainingStops(): TripStop[];
   isStillInFuture(station: Station): boolean;
+  setNextTrip(trip: Trip): void;
+  setPrevTrip(trip: Trip): void;
+  xpersistDeep(level?: number): Object;
 }

@@ -86,11 +86,4 @@ export class WagonAnnouncement {
       }
     });
   }
-
-  persist(): any {
-    return {
-      trip: this.trip && this.trip.getId(),
-      train: this.train.getId()
-    };
-  }
 }

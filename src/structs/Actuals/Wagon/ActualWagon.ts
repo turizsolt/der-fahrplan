@@ -257,8 +257,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
         engine: this.hasEngine(),
         appearanceFacing: this.axles.getFacing()
       },
-
-      ...this.announcement.persist()
     };
   }
 
@@ -308,10 +306,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     
     this.setSeatCount(obj.seatCount, obj.seatColumns);
     this.boardable.load(obj.seats, store);
-
-    if (obj.trip) {
-      this.assignTrip(store.get(obj.trip) as Trip);
-    }
   }
 }
 

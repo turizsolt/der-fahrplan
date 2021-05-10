@@ -422,7 +422,11 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         type: 'Train',
         position: this.position?.persist(),
         speed: this.speed?.persist(),
-        wagons: this.wagons.map(wagon => wagon.getId())
+        wagons: this.wagons.map(wagon => ({
+            wagon: wagon.getId(),
+            trip: wagon.getTrip()?.getId()
+        })),
+        trips: this.trips.map(t => t.getId())
     };
   }
 
@@ -488,15 +492,22 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
 
   load(obj: any, store: Store): void {
+    const m:Record<string, Trip> = {};
+    const wagons:Wagon[] = obj.wagons.map(wagon => {
+        const ret:Wagon = store.get(wagon.wagon) as Wagon;
+        m[wagon.wagon] = store.get(wagon.trip) as Trip;
+        return ret;
+    });
     this.presetId(obj.id);
     this.init(
       PositionOnTrack.fromData(obj.position as PositionData, store), 
-      obj.wagons.map(id => store.get(id) as Wagon)
+      wagons
     );
     this.speed.load(obj.speed);
     this.setAutoMode(obj.autoMode);
     this.wagons.map(wagon => {
         wagon.setTrain(this);
+        this.assignTrip(m[wagon.getId()], [wagon]);
         wagon.update();
     });
   }
