@@ -77,7 +77,7 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
   }
 
   getSignal(): SignalSignal {
-    return this.blockSignal;
+    return this.signal;
   }
 
   setBlockSignal(signal: SignalSignal): void {
