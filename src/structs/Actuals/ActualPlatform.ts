@@ -21,6 +21,9 @@ import { TrackDirection } from '../../modules/Track/TrackDirection';
 export class ActualPlatform extends ActualBaseBrick implements Platform {
   private boardable: ActualBoardable = new ActualBoardable();
 
+  private xposition: PositionOnTrack = null;
+  private xopposition: PositionOnTrack = null;
+
   private position: Coordinate;
   private rotation: number;
 
@@ -145,6 +148,13 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     const b = segment.getLastPoint();
     const segLen = segment.getLength();
 
+    // swap if it is the wrong way around
+    if (end < start) {
+      const temp = end;
+      end = start;
+      start = temp;
+    }
+
     this.startPerc = start;
     this.endPerc = end;
 
@@ -191,6 +201,22 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     this.position = shift2.add(shift.scale(dist)).add(height);
     const rot1 = Math.atan2(rot.x, rot.z);
     this.rotation = rot1;
+
+    ////////////
+
+    this.xposition = new PositionOnTrack(
+      track.getDirected(TrackDirection.AB),
+      end
+    );
+    this.xopposition = new PositionOnTrack(
+      track.getDirected(TrackDirection.BA),
+      track.getLength() - start
+    );
+
+    this.xposition.addMarker({ type: 'Platform', platform: this });
+    this.xopposition.addMarker({ type: 'Platform', platform: this });
+
+    /////////////
 
     this.renderer.init(this);
 

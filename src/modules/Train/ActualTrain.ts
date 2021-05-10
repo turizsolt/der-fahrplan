@@ -243,6 +243,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private nearestEnd: NearestData = null;
   private nearestTrain: NearestData = null;
   private nearestSignal: NearestData = null;
+  private nearestPlatform: NearestData = null;
 
   getNearestEnd(): NearestData {
     return this.nearestEnd;
@@ -300,7 +301,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.nearestEnd = Nearest.end(nextPosition);
     this.nearestTrain = Nearest.train(nextPosition);
     this.nearestSignal = Nearest.signal(nextPosition);
-
+    this.nearestPlatform = Nearest.platform(nextPosition);
+ 
+    /*
     if(this.autoMode && this.nearestSignal.signal) {
         if(this.nearestSignal.signal.getSignal() === SignalSignal.Red &&
         (this.speed.getStoppingDistance() + 5) >= this.nearestSignal.distance) {
@@ -309,6 +312,18 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         // if(this.nearestSignal.signal.getSignal() === SignalSignal.Green) {
             this.speed.setPedal(SpeedPedal.Throttle);
         }
+    }
+    */
+
+    if(this.autoMode && this.nearestPlatform.platform) {
+      if(
+          ((this.speed.getStoppingDistance() + 5 >= this.nearestPlatform.distance) 
+          && this.speed.getSpeed() > 1)
+         || (this.speed.getStoppingDistance() + 2 >= this.nearestPlatform.distance)) {
+          this.speed.setPedal(SpeedPedal.Brake);
+      } else {
+        this.speed.setPedal(SpeedPedal.Throttle);
+      }
     }
 
     this.speed.tick();

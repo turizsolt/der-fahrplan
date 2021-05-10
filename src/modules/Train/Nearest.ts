@@ -3,6 +3,7 @@ import { Train } from './Train';
 import { NearestData } from './NearestData';
 import { Signal } from '../Signaling/Signal';
 import { BlockJoint } from '../Signaling/BlockJoint';
+import { Platform } from '../../structs/Interfaces/Platform';
 
 export class Nearest {
   static end(pot: PositionOnTrack): NearestData {
@@ -107,6 +108,49 @@ export class Nearest {
       distance: foundSignal ? distance : Number.POSITIVE_INFINITY,
       segmentCount,
       signal: foundSignal
+    };
+  }
+
+  static platform(pot: PositionOnTrack): NearestData {
+    let segmentCount = 1;
+    let distance = pot.getTrack().getLength() - pot.getPosition();
+    let iter = pot.getDirectedTrack();
+    let ttl = 100;
+    let foundPlatform: Platform = null;
+
+    for (let marker of iter.getMarkers()) {
+      if (
+        marker.position > pot.getPosition() &&
+        marker.marker.type === 'Platform'
+      ) {
+        distance = marker.position - pot.getPosition();
+        foundPlatform = marker.marker.platform;
+        break;
+      }
+    }
+
+    iter = iter.next();
+    while (iter && !foundPlatform && ttl) {
+      for (let marker of iter.getMarkers()) {
+        if (marker.marker.type === 'Platform') {
+          distance += marker.position;
+          foundPlatform = marker.marker.platform;
+          break;
+        }
+      }
+
+      if (!foundPlatform) {
+        distance += iter.getLength();
+      }
+      segmentCount++;
+      ttl--;
+      iter = iter.next();
+    }
+
+    return {
+      distance: foundPlatform ? distance : Number.POSITIVE_INFINITY,
+      segmentCount,
+      platform: foundPlatform
     };
   }
 
