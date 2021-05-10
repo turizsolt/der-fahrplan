@@ -34,6 +34,10 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       this.nextTrip = trip;
   }
 
+  getNextTrip(): Trip {
+    return this.nextTrip;
+  }
+
   setPrevTrip(trip: Trip): void {
     this.prevTrip = trip;
   }

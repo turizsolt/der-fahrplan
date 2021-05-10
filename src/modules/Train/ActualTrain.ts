@@ -299,6 +299,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private lastPlatformStopped: Platform = null;
   private justPlatformStopped: Platform = null;
   private remainingStopTime: number = 0;
+  private shouldTurn: boolean = false;
 
   tick(): void {
     const nextPosition = this.position.clone();
@@ -401,19 +402,34 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   private startStopping(): void {
-    console.log('start stopping at ', this.justPlatformStopped?.getId());
+    this.shouldTurn = false;
     if(this.justPlatformStopped.getStation()) {
         this.trips.map(t => t.setStationServed(this.justPlatformStopped.getStation()));
     }
     this.wagons[0].stop();
+    const lastStop = this.trips.length > 0 ? Util.last(this.trips[0].getStops()) : null;
+    if(lastStop && lastStop.station === this.justPlatformStopped.getStation()) {
+        this.arrivedToLastStation();
+    }
+  }
+
+  private arrivedToLastStation() {
+    const newTrip = this.trips.length > 0 ? this.trips[0].getNextTrip() : null;
+    if(newTrip) {
+        this.assignTrip(null);
+        this.assignTrip(newTrip);
+        this.shouldTurn = true;
+    }
   }
 
   private endStopping(): void {
-    console.log('end stopping', this.justPlatformStopped?.getId());
     if(this.justPlatformStopped.getStation()) {
         this.trips.map(t => t.setAtStation(null));
     }
     this.wagons[0].stop();
+    if(this.shouldTurn) {
+        this.reverse();
+    }
   }
 
   persist(): Object {
