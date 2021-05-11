@@ -14,6 +14,12 @@
     <div>
       <div class="trip-list">
         <div class="trip" :key="trip.id" v-for="trip in filteredTripList">
+          <div class="trip-stop trip-id-header blue" @click="paste(trip.id)">
+              {{trip.prevTrip}}
+          </div>
+          <div class="trip-stop trip-id-header">
+              {{trip.id}}
+          </div>
           <div class="trip-stop">
             <div class="trip-stop-time-header trip-stop-arrival">arr</div>
             <div class="trip-stop-time-header trip-stop-departure">dep</div>
@@ -25,6 +31,9 @@
             <div class="trip-stop-time trip-stop-departure">
               {{ stop.isArrivalStation ? "-" : stop.departureTimeString }}
             </div>
+          </div>
+          <div class="trip-stop trip-id-header blue" @click="copy(trip.id)">
+              {{trip.nextTrip}}
           </div>
         </div>
       </div>
@@ -42,6 +51,10 @@ import {
   getAllOfStorable,
   createStorable,
 } from "../../structs/Actuals/Store/StoreForVue";
+import {
+  copyTripId,
+  pasteTripId
+} from "../../structs/Actuals/Store/TripIdClipboard";
 
 @Component
 export default class RouteTitle extends Vue {
@@ -91,6 +104,22 @@ export default class RouteTitle extends Vue {
     this.timeStr = value;
     this.time = value === "" ? undefined : time * 60;
   }
+
+  copy(tripId: string): void {
+      copyTripId(tripId);
+  }
+
+  paste(tripId: string): void {
+      const paste = pasteTripId();
+
+      const prevTrip = getStorable(paste) as Trip;
+      const nextTrip = getStorable(tripId) as Trip;
+
+      prevTrip?.setNextTrip(nextTrip);
+      nextTrip?.setPrevTrip(prevTrip);
+
+      this.update();
+  }
 }
 </script>
 
@@ -128,5 +157,28 @@ export default class RouteTitle extends Vue {
   border: 1px solid #cec;
   color: #cec;
   text-align: center;
+}
+
+.trip-id-header {
+  border-radius: 2px;
+  padding: 0 3px 0 3px;
+  width: 78px;
+  font: 400 13.3333px Arial;
+  height: 13px;
+
+  background-color: #070;
+  border: 1px solid #cec;
+  color: #cec;
+  text-align: center;
+}
+
+.blue {
+  background-color: #007;
+  border: 1px solid #cce;  
+}
+
+.blue:hover {
+  background-color: #00A;
+  cursor: pointer;
 }
 </style>
