@@ -312,7 +312,7 @@ export class InputController {
             let selected: BaseStorable = this.store.getSelected();
             if (storedObj.isSelected()) {
               if (
-                this.selectCallback &&
+                this.selectCallback && 
                 selected.getType() === TYPES.Wagon
               ) {
                 (selected as Wagon).off('info', this.selectCallback);
@@ -325,7 +325,16 @@ export class InputController {
               storedObj.deselect();
             } else {
               if(this.store.getSelected()){
+                  
+                  if (
+                    this.selectCallback
+                    && this.store.getSelected().getType() === TYPES.Wagon
+                  ) {
+                    (this.store.getSelected() as Wagon).off('info', this.selectCallback);
+                  }
+
                   this.store.getSelected().deselect();
+
               }
               // todo temp
               /* console.log(storedBrick.getId());
@@ -355,7 +364,7 @@ export class InputController {
   select(storedObj: BaseBrick) {
     if (this.getSelected()) {
       if (
-        this.selectCallback &&
+        this.selectCallback && 
         this.getSelected().getType() === Symbol.for('Wagon')
       ) {
         (this.getSelected() as Wagon).off('info', this.selectCallback);
