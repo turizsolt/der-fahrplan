@@ -5,7 +5,7 @@
     <div class="item-id">
       Mode: {{obj.autoMode ? 'AUTO' : 'Manual'}}<br />
       Shunting: {{obj.shunting ? 'SHUNTING' : 'Normal'}}<br />
-      Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "???" }}<br />
+      Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "STOPPED" }}<br />
       SD: {{ Math.round(obj.stoppingDistance * 10) }}<br />
       NE: {{ Math.round(obj.nearestEnd * 10) }}<br />
       NT: {{ Math.round(obj.nearestTrain * 10) }}<br />
