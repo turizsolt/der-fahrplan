@@ -227,12 +227,12 @@ export class CommandProcessor {
 
   shuntingTrain(trainId: string): void {
     const train = this.store.get(trainId) as Train;
-    train.getSpeed().setShunting(true);
+    train.setShunting(true);
   }
 
   unshuntingTrain(trainId: string): void {
     const train = this.store.get(trainId) as Train;
-    train.getSpeed().setShunting(false);
+    train.setShunting(false);
   }
 
   switchTrack(switchId: string): void {

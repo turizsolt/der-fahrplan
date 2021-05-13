@@ -56,6 +56,12 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return this.speed;
   }
 
+  setShunting(shunting: boolean): void {
+    this.speed.setShunting(shunting);
+    // just for the sidebar
+    this.wagons.map(wagon => wagon.update());
+  }
+
   getPosition(): PositionOnTrack {
     return this.position;
   }
@@ -67,6 +73,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   addWagons(wagons: Wagon[]): void {
     this.wagons.push(...wagons);
     this.alignAxles();
+    // just for the sidebar
     this.wagons.map(wagon => wagon.update());
   }
 

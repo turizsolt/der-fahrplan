@@ -19,6 +19,7 @@ export interface Train extends BaseStorable {
   tick(): void;
   setPosition(position: PositionOnTrack): void;
   getSpeed(): TrainSpeed;
+  setShunting(shunting: boolean): void;
   removeAndKeepWagons(): void;
   setAutoMode(autoMode: boolean): void;
   getAutoMode(): boolean;
