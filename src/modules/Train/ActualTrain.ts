@@ -232,6 +232,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   setAutoMode(autoMode: boolean): void {
     this.autoMode = autoMode;
+    this.wagons.map(w => w.update());
   }
 
   getAutoMode(): boolean {
