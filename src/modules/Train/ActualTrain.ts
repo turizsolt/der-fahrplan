@@ -402,7 +402,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private isTimeToGo(): boolean {
     if(this.trips.length === 0) return true;
     const depTime:number = this.trips[0].getStationDepartureTime(this.justPlatformStopped.getStation());
-    return depTime <= this.store.getTickCount();
+    return !depTime || depTime <= this.store.getTickCount();
   }
 
   private startStopping(): void {
