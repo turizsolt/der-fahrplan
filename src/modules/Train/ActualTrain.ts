@@ -341,13 +341,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
                     this.remainingStopTime = 60; // todo constant
                 }
             } 
-        } else if(!this.nearestPlatform.platform) {
-            pedal = SpeedPedal.Brake;
         }
         this.speed.setPedal(pedal);
     }
-
-    // todo utolson tulcsussz
 
     this.speed.tick();
     if(this.speed.getSpeed() === 0 && this.lastSpeed === 0) {
