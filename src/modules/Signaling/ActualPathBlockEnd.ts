@@ -40,7 +40,14 @@ export class ActualPathBlockEnd implements PathBlockEnd {
     return blockEnd;
   }
 
+  setGreen() {
+    this.signal = SignalSignal.Green;
+    this.emit('update', this.persist());
+  }
+
   private updateSignal() {
+    if(this.signal !== SignalSignal.Green) return;
+
     let newSignal = SignalSignal.Green;
     if(this.blockEnd) {
       if(!this.blockEnd.getBlock().isFree()) {

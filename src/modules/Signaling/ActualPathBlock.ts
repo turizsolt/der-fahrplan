@@ -44,6 +44,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
   allow(
     startPathBlockEnd: PathBlockEnd,
     endPathBlockEnd: PathBlockEnd,
+    train: Train,
     count: number = 1
   ): boolean {
     const found = this.allowedPathes.find(
@@ -55,7 +56,9 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     );
     if (found) return false;
     const other = endPathBlockEnd.getJointEnd().joint.getEnd(endPathBlockEnd.getJointEnd().end === WhichEnd.A ? WhichEnd.B : WhichEnd.A);
+    const otherSeg = endPathBlockEnd.getJointEnd().joint.getSectionEnd(endPathBlockEnd.getJointEnd().end === WhichEnd.A ? WhichEnd.B : WhichEnd.A);
     if(other?.getSignal() === SignalSignal.Red) return false;
+    if(otherSeg?.getSignal() === SignalSignal.Red) return false;
 
     const startDt: DirectedTrack = startPathBlockEnd
       .getJointEnd()
@@ -119,6 +122,10 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
 
       this.allowBlock(allowedPath);
       this.allowedPathes.push(allowedPath);
+
+      if(train && otherSeg) {
+          otherSeg.checkin(train);
+      }
     }
 
     return !!backFromHere;
@@ -129,6 +136,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     allowedPath.endPathBlockEnd.setBlockEnd(allowedPath.block.getEnd(WhichEnd.B));
     allowedPath.startPathBlockEnd.pathConnect();
     allowedPath.endPathBlockEnd.pathConnect();
+
+    allowedPath.startPathBlockEnd.setGreen();
   }
 
   checkout(endPathBlockEnd: PathBlockEnd): void {

@@ -32,7 +32,7 @@ export class PathQueue {
     for (let next of toEval) {
       let succ = false;
       for (let to of next.toOptions) {
-        if (this.pathBlock.allow(next.from, to)) {
+        if (this.pathBlock.allow(next.from, to, next.train)) {
           succ = true;
           break;
         }

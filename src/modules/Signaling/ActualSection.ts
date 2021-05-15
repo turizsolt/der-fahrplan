@@ -20,6 +20,7 @@ const doApply = () => applyMixins(ActualSection, [Emitable]);
 export class ActualSection extends ActualBaseBrick implements Section {
   private direction: TrackDirection = undefined;
   private trainCount: number = 0;
+  private trains: Train[] = [];
   private permanentDirection: boolean = false;
   private ends: Record<WhichEnd, SectionEnd> = { A: null, B: null };
   private signageA: Ray;
@@ -92,12 +93,16 @@ export class ActualSection extends ActualBaseBrick implements Section {
         this.direction = TrackDirection.BA;
       }
     }
+    if (train) {
+      this.trains.push(train);
+    }
     this.trainCount++;
     this.emit('update', this.persist());
   }
 
   checkout(train: Train): void {
-    this.trainCount--;
+    this.trains = this.trains.filter(t => t !== train);
+    this.trainCount = this.trains.length;
     if (this.trainCount < 1 && !this.permanentDirection) {
       this.direction = undefined;
     }

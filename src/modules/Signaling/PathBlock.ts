@@ -6,7 +6,12 @@ import { PathRule } from './PathRule';
 
 export interface PathBlock extends BaseBrick {
   init(jointEnds: BlockJointEnd[]): PathBlock;
-  allow(startPBE: PathBlockEnd, endPBE: PathBlockEnd, count?: number): boolean;
+  allow(
+    startPBE: PathBlockEnd,
+    endPBE: PathBlockEnd,
+    train: Train,
+    count?: number
+  ): boolean;
   checkout(endPathBlockEnd: PathBlockEnd): void;
   requestPath(pathBlockEnd: PathBlockEnd, train: Train): void;
   addRule(rule: PathRule): void;

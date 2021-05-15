@@ -54,7 +54,7 @@ export class AllowPathInputHandler implements InputHandler {
               (blockEnd0 as PathBlockEnd).getPathBlock() ===
               (blockEnd1 as PathBlockEnd).getPathBlock()
             ) {
-              (blockEnd1 as PathBlockEnd).getPathBlock().allow(blockEnd0 as PathBlockEnd, blockEnd1 as PathBlockEnd);
+              (blockEnd1 as PathBlockEnd).getPathBlock().allow(blockEnd0 as PathBlockEnd, blockEnd1 as PathBlockEnd, null);
             }
           }
 
