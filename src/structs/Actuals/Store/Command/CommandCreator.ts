@@ -50,10 +50,12 @@ export class CommandCreator {
     coordinates: Coordinate[],
     jointId1: string,
     whichEnd1: WhichEnd,
-    jointId2,
+    jointId2: string,
     whichEnd2: WhichEnd,
-    jointId3,
-    whichEnd3: WhichEnd
+    jointId3: string,
+    whichEnd3: WhichEnd,
+    jointId4: string,
+    whichEnd4: WhichEnd
   ): ProcessableCommand {
     return {
       type: 'processable',
@@ -67,7 +69,9 @@ export class CommandCreator {
         jointId2,
         whichEnd2,
         jointId3,
-        whichEnd3
+        whichEnd3,
+        jointId4,
+        whichEnd4
       ]
     };
   }

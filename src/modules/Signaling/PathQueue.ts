@@ -1,0 +1,100 @@
+import { PathRule } from './PathRule';
+import { PathRequest } from './PathRequest';
+import { PathBlockEnd } from './PathBlockEnd';
+import { Train } from '../Train/Train';
+import { PathBlock } from './PathBlock';
+import { BlockJointEnd } from './BlockJointEnd';
+import { Store } from '../../structs/Interfaces/Store';
+import { BlockJoint } from './BlockJoint';
+import { BlockEnd } from './BlockEnd';
+
+export class PathQueue {
+  private rules: PathRule[] = [];
+  private queue: PathRequest[] = [];
+
+  constructor(private pathBlock: PathBlock) {}
+
+  push(pathBlockEnd: PathBlockEnd, train: Train) {
+    const found = this.rules.find(r => r.from === pathBlockEnd);
+    if (found) {
+      this.queue.push({
+        from: pathBlockEnd,
+        train,
+        toOptions: found.toOptions
+      });
+    }
+  }
+
+  evaluate() {
+    const toEval = [...this.queue];
+    this.queue = [];
+
+    for (let next of toEval) {
+      let succ = false;
+      for (let to of next.toOptions) {
+        if (this.pathBlock.allow(next.from, to, next.train)) {
+          succ = true;
+          break;
+        }
+      }
+
+      if (!succ) {
+        this.queue.push(next);
+      }
+    }
+  }
+
+  addRule(rule: PathRule) {
+    this.rules.push(rule);
+  }
+
+  persist(): Object {
+    return {
+      rules: this.rules.map(r => ({
+        from: persistPathBlockEnd(r.from),
+        toOptions: r.toOptions.map(o => persistPathBlockEnd(o))
+      })),
+      queue: this.queue.map(r => ({
+        from: persistPathBlockEnd(r.from),
+        toOptions: r.toOptions.map(o => persistPathBlockEnd(o)),
+        train: r.train.getId()
+      }))
+    };
+  }
+
+  load(obj: any, store: Store): void {
+    this.rules = obj.rules.map(r => ({
+      from: loadPathBlockEnd(r.from, store),
+      toOptions: r.toOptions.map(o => loadPathBlockEnd(o, store))
+    }));
+    this.queue = obj.queue.map(r => ({
+      from: loadPathBlockEnd(r.from, store),
+      toOptions: r.toOptions.map(o => loadPathBlockEnd(o, store)),
+      train: store.get(r.train) as Train
+    }));
+  }
+}
+
+export const persistBlockJointEnd = (bje: BlockJointEnd): any => {
+  return {
+    joint: bje.joint.getId(),
+    end: bje.end
+  };
+};
+
+export const loadBlockJointEnd = (obj: any, store: Store): BlockJointEnd => {
+  const joint = store.get(obj.joint) as BlockJoint;
+  return { joint, end: obj.end };
+};
+
+export const persistPathBlockEnd = (bje: BlockEnd): any => {
+  return {
+    joint: bje.getJointEnd().joint.getId(),
+    end: bje.getJointEnd().end
+  };
+};
+
+export const loadPathBlockEnd = (obj: any, store: Store): BlockEnd => {
+  const joint = store.get(obj.joint) as BlockJoint;
+  return joint.getEnd(obj.end);
+};

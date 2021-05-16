@@ -118,3 +118,24 @@ export const curveToTube = (curve, normal = true, prevMesh = null, id = '') => {
   tube.material = boxMaterial;
   return tube;
 };
+
+export const curveToTube2 = (
+  curve,
+  normal = true,
+  prevMesh = null,
+  id = ''
+) => {
+  const tube = BABYLON.Mesh.CreateTube(
+    'clickable-block-' + id,
+    curve,
+    0.5,
+    8,
+    null,
+    0,
+    null,
+    true,
+    BABYLON.Mesh.FRONTSIDE,
+    prevMesh
+  );
+  return tube;
+};

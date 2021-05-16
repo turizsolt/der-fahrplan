@@ -227,6 +227,10 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     return this.axles.hasEngine();
   }
 
+  getFacing():TrackDirection {
+      return this.axles.getFacing();
+  }
+
   ///////////////////////
   // persist
   ///////////////////////
@@ -253,8 +257,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
         engine: this.hasEngine(),
         appearanceFacing: this.axles.getFacing()
       },
-
-      ...this.announcement.persist()
     };
   }
 
@@ -263,10 +265,15 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       id: this.id,
       type: 'Wagon',
       speed: this.getTrain()?.getSpeed()?.getSpeed(),
+      stoppingDistance: this.getTrain()?.getSpeed()?.getStoppingDistance(),
       train: this.getTrain()?.persistDeep(),
       trip: this.getTrip()?.persistDeep(),
       nearestEnd: this.getTrain()?.getNearestEnd()?.distance,
       nearestTrain: this.getTrain()?.getNearestTrain()?.distance,
+      nearestSignal: this.getTrain()?.getNearestSignal()?.distance,
+      nearestSignalSignal: this.getTrain()?.getNearestSignal()?.signal?.getSignal(),
+      autoMode: this.getTrain()?.getAutoMode(),
+      shunting: this.getTrain()?.getSpeed()?.isShunting()
     };
   }
 
@@ -300,10 +307,6 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     
     this.setSeatCount(obj.seatCount, obj.seatColumns);
     this.boardable.load(obj.seats, store);
-
-    if (obj.trip) {
-      this.assignTrip(store.get(obj.trip) as Trip);
-    }
   }
 }
 

@@ -9,6 +9,7 @@ import { ActualTrackOcupancy } from './ActualTrackOcupancy';
 import { TrackDirection } from './TrackDirection';
 import { DirectedTrack } from './DirectedTrack';
 import { Train } from '../Train/Train';
+import { TrackSegment } from './TrackSegment';
 
 @injectable()
 export abstract class ActualTrackBase extends ActualBaseBrick
@@ -27,6 +28,14 @@ export abstract class ActualTrackBase extends ActualBaseBrick
   }
 
   getDirected(direction: TrackDirection): DirectedTrack {
+    throw new Error('Method not implemented.');
+  }
+
+  getActiveSegment(): TrackSegment {
+    throw new Error('Method not implemented.');
+  }
+
+  getHash(segment?: TrackSegment): string {
     throw new Error('Method not implemented.');
   }
 

@@ -55,9 +55,6 @@ export class CommandProcessor {
       endJointEnd: { joint: other, end: whichEnd2 }
     });
 
-    // one.setOneEnd(whichEnd1, track.getAx());
-    // other.setOneEnd(whichEnd2, track.getBx());
-
     return track;
   }
 
@@ -70,12 +67,6 @@ export class CommandProcessor {
     whichEnd2: WhichEnd
   ): void {
     const track = this.store.get(trackId) as Track;
-    // const one = this.store.get(jointId1) as TrackJoint;
-    // const other = this.store.get(jointId2) as TrackJoint;
-
-    // one.removeEnd(track.getAx());
-    // other.removeEnd(track.getBx());
-
     track.remove();
   }
 
@@ -88,13 +79,16 @@ export class CommandProcessor {
     jointId2: string,
     whichEnd2: WhichEnd,
     jointId3: string,
-    whichEnd3: WhichEnd
+    whichEnd3: WhichEnd,
+    jointId4: string,
+    whichEnd4: WhichEnd
   ): TrackBase {
     const trackSwitch = this.store.create<TrackSwitch>(TYPES.TrackSwitch);
     trackSwitch.presetId(trackId);
     const one = this.store.get(jointId1) as TrackJoint;
     const other = this.store.get(jointId2) as TrackJoint;
     const third = this.store.get(jointId3) as TrackJoint;
+    const fourth = this.store.get(jointId4) as TrackJoint;
 
     trackSwitch.init(
       {
@@ -104,15 +98,10 @@ export class CommandProcessor {
       },
       {
         coordinates,
-        startJointEnd: { joint: one, end: whichEnd1 },
-        endJointEnd: { joint: third, end: whichEnd3 }
+        startJointEnd: { joint: third, end: whichEnd3 },
+        endJointEnd: { joint: fourth, end: whichEnd4 }
       }
     );
-
-    // todo redo
-    // one.setOneEnd(whichEnd1, trackSwitch.getA());
-    // other.setOneEnd(whichEnd2, trackSwitch.getE());
-    // third.setOneEnd(whichEnd3, trackSwitch.getF());
 
     return trackSwitch;
   }
@@ -126,17 +115,11 @@ export class CommandProcessor {
     jointId2: string,
     whichEnd2: WhichEnd,
     jointId3: string,
-    whichEnd3: WhichEnd
+    whichEnd3: WhichEnd,
+    jointId4: string,
+    whichEnd4: WhichEnd
   ): void {
     const trackSwitch = this.store.get(trackId) as TrackSwitch;
-    const one = this.store.get(jointId1) as TrackJoint;
-    const other = this.store.get(jointId2) as TrackJoint;
-    const third = this.store.get(jointId3) as TrackJoint;
-
-    // todo redo
-    // one.removeEnd(trackSwitch.getA());
-    // other.removeEnd(trackSwitch.getE());
-    // third.removeEnd(trackSwitch.getF());
     trackSwitch.remove();
   }
 
@@ -157,7 +140,7 @@ export class CommandProcessor {
 
     const track = this.store.get(trackId) as Track;
     train.init(
-      new PositionOnTrack(
+      PositionOnTrack.fromTrack(
         track,
         position * track.getLength(),
         direction === 1 ? TrackDirection.AB : TrackDirection.BA
@@ -244,12 +227,12 @@ export class CommandProcessor {
 
   shuntingTrain(trainId: string): void {
     const train = this.store.get(trainId) as Train;
-    train.getSpeed().setShunting(true);
+    train.setShunting(true);
   }
 
   unshuntingTrain(trainId: string): void {
     const train = this.store.get(trainId) as Train;
-    train.getSpeed().setShunting(false);
+    train.setShunting(false);
   }
 
   switchTrack(switchId: string): void {

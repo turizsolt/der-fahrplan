@@ -53,5 +53,39 @@ export const TYPES = {
 
   Station: Symbol.for('Station'),
   StationRenderer: Symbol.for('StationRenderer'),
-  FactoryOfStation: Symbol.for('Factory<Station>')
+  FactoryOfStation: Symbol.for('Factory<Station>'),
+
+  Signal: Symbol.for('Signal'),
+  SignalRenderer: Symbol.for('SignalRenderer'),
+  FactoryOfSignal: Symbol.for('Factory<Signal>'),
+  FactoryOfSignalRenderer: Symbol.for('Factory<SignalRenderer>'),
+
+  Block: Symbol.for('Block'),
+  BlockRenderer: Symbol.for('BlockRenderer'),
+  FactoryOfBlock: Symbol.for('Factory<Block>'),
+  FactoryOfBlockRenderer: Symbol.for('Factory<BlockRenderer>'),
+
+  BlockJoint: Symbol.for('BlockJoint'),
+  BlockJointRenderer: Symbol.for('BlockJointRenderer'),
+  FactoryOfBlockJoint: Symbol.for('Factory<BlockJoint>'),
+  FactoryOfBlockJointRenderer: Symbol.for('Factory<BlockJointRenderer>'),
+
+  PathBlock: Symbol.for('PathBlock'),
+  PathBlockRenderer: Symbol.for('PathBlockRenderer'),
+  FactoryOfPathBlock: Symbol.for('Factory<PathBlock>'),
+  FactoryOfPathBlockRenderer: Symbol.for('Factory<PathBlockRenderer>'),
+
+  Section: Symbol.for('Section'),
+  SectionRenderer: Symbol.for('SectionRenderer'),
+  FactoryOfSection: Symbol.for('Factory<Section>'),
+  FactoryOfSectionRenderer: Symbol.for('Factory<SectionRenderer>'),
+
+  PathBlockEnd: Symbol.for('PathBlockEnd'),
+  BlockEnd: Symbol.for('BlockEnd'),
+  SectionEnd: Symbol.for('SectionEnd'),
+
+  Sensor: Symbol.for('Sensor'),
+  SensorRenderer: Symbol.for('SensorRenderer'),
+  FactoryOfSensor: Symbol.for('Factory<Sensor>'),
+  FactoryOfSensorRenderer: Symbol.for('Factory<SensorRenderer>')
 };

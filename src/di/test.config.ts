@@ -17,6 +17,18 @@ import { StationRenderer } from '../structs/Renderers/StationRenderer';
 import { StationDummyRenderer } from '../../test/dummies/StationDummyRenderer';
 import { addCommonMaps } from './common';
 import { DependencyContainer } from './DependencyContainer';
+import { SignalRenderer } from '../structs/Renderers/SignalRenderer';
+import { SignalDummyRenderer } from '../../test/dummies/SignalDummyRenderer';
+import { BlockRenderer } from '../structs/Renderers/BlockRenderer';
+import { BlockDummyRenderer } from '../../test/dummies/BlockDummyRenderer';
+import { BlockJointRenderer } from '../structs/Renderers/BlockJointRenderer';
+import { BlockJointDummyRenderer } from '../../test/dummies/BlockJointDummyRenderer';
+import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
+import { PathBlockDummyRenderer } from '../../test/dummies/PathBlockDummyRenderer';
+import { SectionRenderer } from '../structs/Renderers/SectionRenderer';
+import { SectionDummyRenderer } from '../../test/dummies/SectionDummyRenderer';
+import { SensorRenderer } from '../structs/Renderers/SensorRenderer';
+import { SensorDummyRenderer } from '../../test/dummies/SensorDummyRenderer';
 
 export const testContainer = new Container();
 const ioc = new DependencyContainer(testContainer);
@@ -36,4 +48,34 @@ ioc.fm<WagonRenderer>(
   T.FactoryOfWagonRenderer,
   T.WagonRenderer,
   WagonDummyRenderer
+);
+ioc.fm<SignalRenderer>(
+  T.FactoryOfSignalRenderer,
+  T.SignalRenderer,
+  SignalDummyRenderer
+);
+ioc.fm<SensorRenderer>(
+  T.FactoryOfSensorRenderer,
+  T.SensorRenderer,
+  SensorDummyRenderer
+);
+ioc.fm<BlockRenderer>(
+  T.FactoryOfBlockRenderer,
+  T.BlockRenderer,
+  BlockDummyRenderer
+);
+ioc.fm<BlockJointRenderer>(
+  T.FactoryOfBlockJointRenderer,
+  T.BlockJointRenderer,
+  BlockJointDummyRenderer
+);
+ioc.fm<PathBlockRenderer>(
+  T.FactoryOfPathBlockRenderer,
+  T.PathBlockRenderer,
+  PathBlockDummyRenderer
+);
+ioc.fm<SectionRenderer>(
+  T.FactoryOfSectionRenderer,
+  T.SectionRenderer,
+  SectionDummyRenderer
 );

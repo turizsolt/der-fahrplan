@@ -3,5 +3,9 @@ export enum MaterialName {
   RailBlack = 'RailBlack',
   SleeperBrown = 'SleeperBrown',
   SelectorRed = 'SelectorRed',
-  ShuntingRed = 'ShuntingRed'
+  ShuntingRed = 'ShuntingRed',
+  AllowingGreen = 'AllowingGreen',
+  Amber = 'Amber',
+  Blue = 'Blue',
+  White = 'White'
 }

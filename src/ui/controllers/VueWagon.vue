@@ -3,9 +3,13 @@
     <div class="item-type">🚂 Mozdony</div>
     <div class="item-id">{{ idt }}</div>
     <div class="item-id">
-      Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "???" }}<br />
+      Mode: {{obj.autoMode ? 'AUTO' : 'Manual'}}<br />
+      Shunting: {{obj.shunting ? 'SHUNTING' : 'Normal'}}<br />
+      Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "STOPPED" }}<br />
+      SD: {{ Math.round(obj.stoppingDistance * 10) }}<br />
       NE: {{ Math.round(obj.nearestEnd * 10) }}<br />
-      NT: {{ Math.round(obj.nearestTrain * 10) }}
+      NT: {{ Math.round(obj.nearestTrain * 10) }}<br />
+      NS: {{ Math.round(obj.nearestSignal * 10) }} ({{obj.nearestSignalSignal}})
     </div>
 
     <!-- train -->
@@ -81,6 +85,19 @@
         isTrip
       >
       </route-stop>
+
+      <div v-if="trip.next">
+        Next trip: <br />
+        <route-stop
+          v-for="(stop, index) in trip.next.stops"
+          :key="stop.id"
+          :route="trip.route"
+          :stop="stop"
+          :index="index"
+          isTrip
+        >
+        </route-stop>
+      </div>
     </div>
   </div>
 </template>
@@ -122,8 +139,8 @@ export default class VueWagon extends Vue {
     if (this.selectedCount === 0 && !isPreDefinedTrip) {
       const train = getStorable(this.obj.train.id) as Train;
       const trip = getStorable(vTripId) as Trip;
-      // todo train.assignTrip(null);
-      // todo train.assignTrip(trip);
+      train.assignTrip(null);
+      train.assignTrip(trip);
 
       this.showTripList = false;
     } else {
@@ -139,7 +156,7 @@ export default class VueWagon extends Vue {
 
       const train = getStorable(this.obj.train.id) as Train;
       const trip = getStorable(vTripId) as Trip;
-      // todo train.assignTrip(trip, wagons);
+      train.assignTrip(trip, wagons);
 
       this.showTripList = false;
     }
@@ -149,7 +166,7 @@ export default class VueWagon extends Vue {
   clearTrip() {
     if (this.selectedCount === 0) {
       const train = getStorable(this.obj.train.id) as Train;
-      // todo train.assignTrip(null);
+      train.assignTrip(null);
 
       this.showTripList = false;
     } else {
@@ -162,7 +179,7 @@ export default class VueWagon extends Vue {
         }
       }
       const train = getStorable(this.obj.train.id) as Train;
-      // todo train.assignTrip(null, wagons);
+      train.assignTrip(null, wagons);
 
       this.showTripList = false;
     }
@@ -268,13 +285,13 @@ export default class VueWagon extends Vue {
 }
 
 .pattern-2 {
-  --bg: rgba(255, 255, 255, 0.5);
-
-  background: linear-gradient(135deg, var(--bg) 25%, transparent 25%) -5px 0,
-    linear-gradient(225deg, var(--bg) 25%, transparent 25%) -5px 0,
-    linear-gradient(315deg, var(--bg) 25%, transparent 25%),
-    linear-gradient(45deg, var(--bg) 25%, transparent 25%);
+  --stripe: rgba(255, 255, 255, 0.5);
+  background-image: linear-gradient(45deg, var(--stripe) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--stripe) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--stripe) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--stripe) 75%);
   background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
 }
 
 .pattern-3 {
@@ -290,12 +307,12 @@ export default class VueWagon extends Vue {
 }
 
 .pattern-4 {
-  --stripe: rgba(255, 255, 255, 0.5);
-  background-image: linear-gradient(45deg, var(--stripe) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--stripe) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--stripe) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--stripe) 75%);
+  --bg: rgba(255, 255, 255, 0.5);
+
+  background-image: linear-gradient(135deg, var(--bg) 0%, transparent 50%),
+    linear-gradient(225deg, var(--bg) 0%, transparent 50%),
+    linear-gradient(315deg, var(--bg) 25%, transparent 25%),
+    linear-gradient(45deg, var(--bg) 25%, transparent 25%);
   background-size: 10px 10px;
-  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
 }
 </style>

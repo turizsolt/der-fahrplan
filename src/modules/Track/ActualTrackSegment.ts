@@ -28,11 +28,12 @@ export class ActualTrackSegment implements TrackSegment {
     this.A = new ActualTrackEnd(this.AB, this.BA, segmentData.startJointEnd);
     this.B = new ActualTrackEnd(this.BA, this.AB, segmentData.endJointEnd);
 
-    this.connect();
+    this.permaConnect();
   }
 
   remove(): void {
     this.disconnect();
+    this.permaDisconnect();
   }
 
   getEnd(whichEnd: WhichEnd): TrackEnd {
@@ -63,6 +64,16 @@ export class ActualTrackSegment implements TrackSegment {
   disconnect(): void {
     this.A.disconnect();
     this.B.disconnect();
+  }
+
+  permaConnect(): void {
+    this.A.permaConnect();
+    this.B.permaConnect();
+  }
+
+  permaDisconnect(): void {
+    this.A.permaDisconnect();
+    this.B.permaDisconnect();
   }
 
   persist(): any {

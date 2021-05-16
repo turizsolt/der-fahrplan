@@ -18,4 +18,8 @@ export interface TrackJoint extends BaseBrick, Emitable {
   getEnd(whichEnd: WhichEnd): TrackEnd;
   setOneEnd(jointEnd: WhichEnd, trackEnd: TrackEnd): void;
   removeEnd(trackEnd: TrackEnd): void;
+
+  getPermaEnds(whichEnd: WhichEnd): TrackEnd[];
+  setPermaOneEnd(jointEnd: WhichEnd, trackEnd: TrackEnd): void;
+  removePermaEnd(trackEnd: TrackEnd): void;
 }

@@ -12,11 +12,26 @@ import { Nearest } from './Nearest';
 import { NearestData } from './NearestData';
 import { WAGON_GAP } from '../../structs/Actuals/Wagon/WagonGap';
 import { PositionData } from './PositionData';
+import { SignalSignal } from '../Signaling/SignalSignal';
+import { SpeedPedal } from './SpeedPedal';
+import { Util } from '../../structs/Util';
+import { MarkerIterator } from './MarkerIterator';
+import { TrackMarker } from '../Track/TrackMarker';
+import { DirectedTrack } from '../Track/DirectedTrack';
+import { TrackDirection } from '../Track/TrackDirection';
+import { SectionEnd } from '../Signaling/SectionEnd';
+import { BlockEnd } from '../Signaling/BlockEnd';
+import { Trip } from '../../structs/Scheduling/Trip';
+import { Passenger } from '../../structs/Interfaces/Passenger';
+import { Station } from '../../structs/Scheduling/Station';
+import { Platform } from '../../structs/Interfaces/Platform';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
   private wagons: Wagon[] = [];
   private speed: TrainSpeed = null;
+  private autoMode:boolean = true;
+  private trips: Trip[] = [];
 
   init(pot: PositionOnTrack, wagons: Wagon[]): Train {
     super.initStore(TYPES.Train);
@@ -41,6 +56,12 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return this.speed;
   }
 
+  setShunting(shunting: boolean): void {
+    this.speed.setShunting(shunting);
+    // just for the sidebar
+    this.wagons.map(wagon => wagon.update());
+  }
+
   getPosition(): PositionOnTrack {
     return this.position;
   }
@@ -52,6 +73,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   addWagons(wagons: Wagon[]): void {
     this.wagons.push(...wagons);
     this.alignAxles();
+    // just for the sidebar
     this.wagons.map(wagon => wagon.update());
   }
 
@@ -107,6 +129,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private alignAxles(): void {
     if (!this.position) return;
 
+    const formerStart = Util.first(this.wagons).getAxlePosition(WhichEnd.A);
+    const formerEnd = Util.last(this.wagons).getAxlePosition(WhichEnd.B);
+
     // checkouts
     let iter = this.getEndPosition()?.getDirectedTrack();
     if(iter) {
@@ -119,6 +144,8 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
       this.clearMarkers();
     }
+
+    // todo remove the lot of clonings
 
     const pos: PositionOnTrack = this.position.clone();
     pos.reverse();
@@ -143,6 +170,55 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     iter.getTrack().checkin(this);
 
     this.setMarkers();
+
+    const currentStart = Util.first(this.wagons).getAxlePosition(WhichEnd.A);
+    const currentEnd = Util.last(this.wagons).getAxlePosition(WhichEnd.B);
+
+    // block checkout
+
+    if(formerEnd) {
+      const iter = MarkerIterator.fromPositionOnTrack(formerEnd, currentEnd);
+      let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
+      while(next && next.value) {
+        const bjend:BlockEnd = next.value.blockJoint.getEnd(convert2(next.directedTrack.getDirection()));
+        const send:SectionEnd = next.value.blockJoint.getSectionEnd(convert2(next.directedTrack.getDirection()));
+        if(bjend) {
+          bjend.checkout(this);
+        }
+        if(send) {
+          send.checkout(this);
+        }
+        next = iter.nextOfFull('BlockJoint');
+      }
+    }
+    
+    // block checkin
+    if(formerStart) {
+      const iter = MarkerIterator.fromPositionOnTrack(formerStart, currentStart);
+      let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
+      while(next && next.value) {
+        const bjend:BlockEnd = next.value.blockJoint.getEnd(convert(next.directedTrack.getDirection()));
+        const send:SectionEnd = next.value.blockJoint.getSectionEnd(convert(next.directedTrack.getDirection()));
+        if(bjend) {
+          bjend.checkin(this);
+        }
+        if(send) {
+          send.checkin(this);
+        }
+        next = iter.nextOfFull('BlockJoint');
+      }
+    }
+
+    // sensor checkin
+    if(formerStart) {
+        const iter = MarkerIterator.fromPositionOnTrack(formerStart, currentStart);
+        let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('Sensor');
+        while(next && next.value) {
+          const sensor = next.value.sensor;
+          sensor.checkin(this);
+          next = iter.nextOfFull('Sensor');
+        }
+    }
   }
 
   remove(): void {
@@ -161,10 +237,21 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.wagons.map(wagon => wagon.update());
   }
 
+  setAutoMode(autoMode: boolean): void {
+    this.autoMode = autoMode;
+    this.wagons.map(w => w.update());
+  }
+
+  getAutoMode(): boolean {
+      return this.autoMode;
+  }
+
   private lastSpeed: number = -1;
 
   private nearestEnd: NearestData = null;
   private nearestTrain: NearestData = null;
+  private nearestSignal: NearestData = null;
+  private nearestPlatform: NearestData = null;
 
   getNearestEnd(): NearestData {
     return this.nearestEnd;
@@ -174,20 +261,116 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return this.nearestTrain;
   }
 
+  getNearestSignal(): NearestData {
+    return this.nearestSignal;
+  }
+
+  assignTrip(trip: Trip, wagons?: Wagon[]): void {
+    let addedCount = 0;
+    for (let i = 0; i < this.wagons.length; i++) {
+      if (
+        (!wagons || wagons.includes(this.wagons[i])) &&
+        (this.wagons[i].getPassengerCount())
+      ) {
+        addedCount++;
+        this.wagons[i].setTrip(trip);
+      }
+    }
+
+    if (addedCount && trip && !this.trips.includes(trip)) {
+      this.trips.push(trip);
+    }
+
+    if (!trip) {
+      this.updateTrips();
+    }
+  }
+
+  private updateTrips(): void {
+    this.trips = this.trips.filter(t => this.wagons.findIndex(w => w.getTrip() === t) > -1);
+  }
+
+  getTrips(): Trip[] {
+    return this.trips;
+  }
+
+  removeTrip(trip: Trip): void {
+    this.trips = this.trips.filter(t => t != trip);
+    for (let i = 0; i < this.wagons.length; i++) {
+      if (this.wagons[i].getTrip() === trip) {
+        this.wagons[i].setTrip(undefined);
+      }
+    }
+  }
+
+  private nextPlatformToStop: Platform = null;
+  private lastPlatformStopped: Platform = null;
+  private justPlatformStopped: Platform = null;
+  private remainingStopTime: number = 0;
+  private shouldTurn: boolean = false;
+
   tick(): void {
+    const nextPosition = this.position.clone();
+    
+    this.nearestEnd = Nearest.end(nextPosition);
+    this.nearestTrain = Nearest.train(nextPosition);
+    this.nearestSignal = Nearest.signal(nextPosition);
+    this.nearestPlatform = Nearest.platform(nextPosition);
+ 
+    if(this.autoMode) {
+        let pedal = SpeedPedal.Throttle;
+        if(this.nearestSignal.signal) {
+            if(this.nearestSignal.signal.getSignal() === SignalSignal.Red &&
+            (this.speed.getStoppingDistance() + 5) >= this.nearestSignal.distance) {
+                pedal = SpeedPedal.Brake;
+            }
+        }
+        
+
+        if(this.nearestPlatform.platform 
+            && this.nearestPlatform.platform !== this.lastPlatformStopped) {
+            if(
+                ((this.speed.getStoppingDistance() + 5 >= this.nearestPlatform.distance) 
+                && this.speed.getSpeed() > 1)
+                || (this.speed.getStoppingDistance() + 2 >= this.nearestPlatform.distance)) {
+                
+                pedal = SpeedPedal.Brake;
+                
+                if(!this.nextPlatformToStop) {
+                    this.nextPlatformToStop = this.nearestPlatform.platform;
+                    this.remainingStopTime = 60; // todo constant
+                }
+            } 
+        }
+        this.speed.setPedal(pedal);
+    }
+
     this.speed.tick();
     if(this.speed.getSpeed() === 0 && this.lastSpeed === 0) {
       this.wagons.map(wagon => wagon.update());
     }
     this.lastSpeed = this.speed.getSpeed();
 
-    if (this.speed.getSpeed() === 0) return;
-    
-    const nextPosition = this.position.clone();
-    nextPosition.move(this.speed.getSpeed());
+    if (this.speed.getSpeed() === 0 && this.nextPlatformToStop) {
+        this.remainingStopTime--;
+        if(!this.justPlatformStopped) {
+            this.justPlatformStopped = this.nextPlatformToStop;
+            this.startStopping();
+        }
+        if(this.remainingStopTime < 1 && this.isTimeToGo()) {
+            this.lastPlatformStopped = this.nextPlatformToStop;
+            this.nextPlatformToStop = null;
 
-    this.nearestEnd = Nearest.end(nextPosition);
-    this.nearestTrain = Nearest.train(nextPosition);
+            this.endStopping();
+            this.justPlatformStopped = null;
+        }
+    }
+
+    if (this.speed.getSpeed() === 0) {
+        return;
+    }
+
+    nextPosition.move(this.speed.getSpeed());
 
     if(this.nearestTrain.distance < WAGON_GAP) {
       const frontDist = this.nearestTrain.train.getPosition().getRay().coord.distance2d(this.position.getRay().coord);
@@ -212,6 +395,45 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         )
       );
     }
+
+    this.moveBoardedPassengers();
+  }
+
+  private isTimeToGo(): boolean {
+    if(this.trips.length === 0) return true;
+    const depTime:number = this.trips[0].getStationDepartureTime(this.justPlatformStopped.getStation());
+    return !depTime || depTime <= this.store.getTickCount();
+  }
+
+  private startStopping(): void {
+    this.shouldTurn = false;
+    if(this.justPlatformStopped.getStation()) {
+        this.trips.map(t => t.setStationServed(this.justPlatformStopped.getStation()));
+    }
+    this.wagons[0].stop();
+    const lastStop = this.trips.length > 0 ? Util.last(this.trips[0].getStops()) : null;
+    if(lastStop && lastStop.station === this.justPlatformStopped.getStation()) {
+        this.arrivedToLastStation();
+    }
+  }
+
+  private arrivedToLastStation() {
+    const newTrip = this.trips.length > 0 ? this.trips[0].getNextTrip() : null;
+    if(newTrip) {
+        this.assignTrip(null);
+        this.assignTrip(newTrip);
+        this.shouldTurn = true;
+    }
+  }
+
+  private endStopping(): void {
+    if(this.justPlatformStopped.getStation()) {
+        this.trips.map(t => t.setAtStation(null));
+    }
+    this.wagons[0].stop();
+    if(this.shouldTurn) {
+        this.reverse();
+    }
   }
 
   persist(): Object {
@@ -220,7 +442,11 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         type: 'Train',
         position: this.position?.persist(),
         speed: this.speed?.persist(),
-        wagons: this.wagons.map(wagon => wagon.getId())
+        wagons: this.wagons.map(wagon => ({
+            wagon: wagon.getId(),
+            trip: wagon.getTrip()?.getId()
+        })),
+        trips: this.trips.map(t => t.getId())
     };
   }
 
@@ -228,28 +454,93 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return {
       id: this.id,
       type: 'Train',
+      autoMode: this.getAutoMode(),
       wagons: this.wagons.map(x => ({
         id: x.getId(),
         appearanceId: x.getAppearanceId(),
         tripId: x.getTrip()?.getId(),
-        tripNo: 1, // todo trip, this.trips.findIndex(y => x.trip === y) + 1,
+        tripNo: this.trips.findIndex(y => x.getTrip() === y) + 1,
         trip: x.getTrip()?.persistDeep(),
-        side: WhichEnd.A,
+        side: (x.getAppearanceId() === 'vez' && x.getFacing() === TrackDirection.BA) ? WhichEnd.B : WhichEnd.A,
       })),
-      trips: [] // todo trip, this.trips.map(t => t.persistDeep())
+      trips: this.trips.map(t => t.persistDeep())
     };
   }
 
+  // boarding and announcements
+
+  stoppedAt(station: Station, platform: Platform) {
+    if (this.speed.getSpeed() > 0) return;
+
+    this.getTrips().map(trip => {
+      this.callOnPassengers((p: Passenger) => {
+        p.listenWagonStoppedAtAnnouncement(
+          station,
+          platform,
+          this,
+          trip.getRoute()
+        );
+      });
+      if (station) {
+        station.announceArrived(this, platform, trip);
+      }
+    });
+  }
+
+  moveBoardedPassengers(): void {
+    for (let wagon of this.getWagons()) {
+      wagon.moveBoardedPassengers();
+    }
+  }
+
+  private callOnPassengers(f: (p: Passenger) => void): void {
+    for (let wagon of this.getWagons()) {
+      wagon.getBoardedPassengers().map(p => f(p));
+    }
+  }
+
+  getFreeWagon(): Wagon {
+    for (let wagon of this.getWagons()) {
+      if (wagon.hasFreeSeat()) {
+        return wagon;
+      }
+    }
+    return null;
+  }
+
+  /* persist and load */
+
+
   load(obj: any, store: Store): void {
+    const m:Record<string, Trip> = {};
+    const wagons:Wagon[] = obj.wagons.map(wagon => {
+        const ret:Wagon = store.get(wagon.wagon) as Wagon;
+        m[wagon.wagon] = store.get(wagon.trip) as Trip;
+        return ret;
+    });
     this.presetId(obj.id);
     this.init(
       PositionOnTrack.fromData(obj.position as PositionData, store), 
-      obj.wagons.map(id => store.get(id) as Wagon)
+      wagons
     );
     this.speed.load(obj.speed);
+    this.setAutoMode(obj.autoMode);
     this.wagons.map(wagon => {
         wagon.setTrain(this);
+        this.assignTrip(m[wagon.getId()], [wagon]);
         wagon.update();
     });
   }
 }
+
+function convert2(t: TrackDirection): WhichEnd {
+    if (t === TrackDirection.AB) return WhichEnd.B;
+    if (t === TrackDirection.BA) return WhichEnd.A;
+    return null;
+  }
+  
+  function convert(t: TrackDirection): WhichEnd {
+    if (t === TrackDirection.AB) return WhichEnd.A;
+    if (t === TrackDirection.BA) return WhichEnd.B;
+    return null;
+  }

@@ -17,6 +17,7 @@ const doApply = () => applyMixins(ActualTrackJoint, [Emitable]);
 export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
   private ray: Ray;
   private ends: Record<WhichEnd, TrackEnd>;
+  private permaEnds: Record<WhichEnd, TrackEnd[]>;
 
   init(ray: Ray): TrackJoint {
     super.initStore(TYPES.TrackJoint);
@@ -26,6 +27,11 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
     this.ends = {
       A: null,
       B: null
+    };
+
+    this.permaEnds = {
+      A: [],
+      B: []
     };
 
     this.emit('init', this.persist());
@@ -64,6 +70,68 @@ export class ActualTrackJoint extends ActualBaseBrick implements TrackJoint {
         this.ends.B.getEnd().setNext(null);
       }
       this.ends.B = null;
+    }
+  }
+
+  getPermaEnds(whichEnd: WhichEnd): TrackEnd[] {
+    return this.permaEnds[whichEnd];
+  }
+
+  setPermaOneEnd(jointEnd: WhichEnd, trackEnd: TrackEnd): void {
+    this.permaEnds[jointEnd].push(trackEnd);
+
+    if (this.permaEnds.A.length && this.permaEnds.B.length) {
+      this.permaEnds.A.map(a =>
+        a.getEnd().setPermaNexts(this.permaEnds.B.map(b => b.getStart()))
+      );
+      this.permaEnds.B.map(b =>
+        b.getEnd().setPermaNexts(this.permaEnds.A.map(a => a.getStart()))
+      );
+    }
+  }
+
+  // todo simplify after it has been tested
+  removePermaEnd(trackEnd: TrackEnd): void {
+    if (this.permaEnds.A.includes(trackEnd)) {
+      if (this.permaEnds.A.length && this.permaEnds.B.length) {
+        if (this.permaEnds.A.length && this.permaEnds.B.length) {
+          this.permaEnds.A.map(a =>
+            a.getEnd().setPermaNexts(this.permaEnds.B.map(b => null))
+          );
+          this.permaEnds.B.map(b =>
+            b.getEnd().setPermaNexts(this.permaEnds.A.map(a => null))
+          );
+        }
+      }
+      this.permaEnds.A = this.permaEnds.A.filter(x => x !== trackEnd);
+      if (this.permaEnds.A.length && this.permaEnds.B.length) {
+        this.permaEnds.A.map(a =>
+          a.getEnd().setPermaNexts(this.permaEnds.B.map(b => b.getStart()))
+        );
+        this.permaEnds.B.map(b =>
+          b.getEnd().setPermaNexts(this.permaEnds.A.map(a => a.getStart()))
+        );
+      }
+    } else if (this.permaEnds.B.includes(trackEnd)) {
+      if (this.permaEnds.A.length && this.permaEnds.B.length) {
+        if (this.permaEnds.A.length && this.permaEnds.B.length) {
+          this.permaEnds.A.map(a =>
+            a.getEnd().setPermaNexts(this.permaEnds.B.map(b => null))
+          );
+          this.permaEnds.B.map(b =>
+            b.getEnd().setPermaNexts(this.permaEnds.A.map(a => null))
+          );
+        }
+      }
+      this.permaEnds.B = this.permaEnds.B.filter(x => x !== trackEnd);
+      if (this.permaEnds.A.length && this.permaEnds.B.length) {
+        this.permaEnds.A.map(a =>
+          a.getEnd().setPermaNexts(this.permaEnds.B.map(b => b.getStart()))
+        );
+        this.permaEnds.B.map(b =>
+          b.getEnd().setPermaNexts(this.permaEnds.A.map(a => a.getStart()))
+        );
+      }
     }
   }
 

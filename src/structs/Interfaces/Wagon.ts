@@ -11,6 +11,7 @@ import { Trip } from '../Scheduling/Trip';
 import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
 import { Emitable } from '../../mixins/Emitable';
 import { Train } from '../../modules/Train/Train';
+import { TrackDirection } from '../../modules/Track/TrackDirection';
 
 export interface Wagon extends Boardable, BaseBrick, Emitable {
   init(config?: WagonConfig, train?: Train): Wagon;
@@ -20,6 +21,7 @@ export interface Wagon extends Boardable, BaseBrick, Emitable {
   setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack): void;
   getAxlePosition(whichEnd: WhichEnd): PositionOnTrack;
   axleReverse(): void;
+  getFacing(): TrackDirection;
 
   getPassengerArrangement(): PassengerArrangement;
   getPassengerCount(): number;

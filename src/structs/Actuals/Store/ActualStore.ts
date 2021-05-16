@@ -20,6 +20,18 @@ import { BaseRenderer } from '../../Renderers/BaseRenderer';
 import { Emitable } from '../../../mixins/Emitable';
 import { WagonRenderer } from '../../Renderers/WagonRenderer';
 import { Train } from '../../../modules/Train/Train';
+import { Signal } from '../../../modules/Signaling/Signal';
+import { SignalRenderer } from '../../Renderers/SignalRenderer';
+import { Block } from '../../../modules/Signaling/Block';
+import { BlockJoint } from '../../../modules/Signaling/BlockJoint';
+import { PathBlock } from '../../../modules/Signaling/PathBlock';
+import { Section } from '../../../modules/Signaling/Section';
+import { BlockRenderer } from '../../Renderers/BlockRenderer';
+import { BlockJointRenderer } from '../../Renderers/BlockJointRenderer';
+import { PathBlockRenderer } from '../../Renderers/PathBlockRenderer';
+import { SectionRenderer } from '../../Renderers/SectionRenderer';
+import { Sensor } from '../../../modules/Signaling/Sensor';
+import { SensorRenderer } from '../../Renderers/SensorRenderer';
 
 @injectable()
 export class ActualStore implements Store {
@@ -34,6 +46,13 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfTrip) private TripFactory: () => Trip;
   @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
   @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
+  @inject(TYPES.FactoryOfSignal) private SignalFactory: () => Signal;
+  @inject(TYPES.FactoryOfSensor) private SensorFactory: () => Sensor;
+  @inject(TYPES.FactoryOfBlock) private BlockFactory: () => Block;
+  @inject(TYPES.FactoryOfBlockJoint)
+  private BlockJointFactory: () => BlockJoint;
+  @inject(TYPES.FactoryOfPathBlock) private PathBlockFactory: () => PathBlock;
+  @inject(TYPES.FactoryOfSection) private SectionFactory: () => Section;
 
   @inject(TYPES.FactoryOfTrain) private TrainFactory: () => Train;
   @inject(TYPES.FactoryOfTrack) private TrackFactory: () => Track;
@@ -47,6 +66,19 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
   @inject(TYPES.FactoryOfWagonRenderer)
   private WagonRendererFactory: () => WagonRenderer;
+  @inject(TYPES.FactoryOfSignalRenderer)
+  private SignalRendererFactory: () => SignalRenderer;
+  @inject(TYPES.FactoryOfSensorRenderer)
+  private SensorRendererFactory: () => SensorRenderer;
+
+  @inject(TYPES.FactoryOfBlockRenderer)
+  private BlockRendererFactory: () => BlockRenderer;
+  @inject(TYPES.FactoryOfBlockJointRenderer)
+  private BlockJointRendererFactory: () => BlockJointRenderer;
+  @inject(TYPES.FactoryOfPathBlockRenderer)
+  private PathBlockRendererFactory: () => PathBlockRenderer;
+  @inject(TYPES.FactoryOfSectionRenderer)
+  private SectionRendererFactory: () => SectionRenderer;
 
   @inject(TYPES.FactoryOfPassengerGenerator)
   private PassengerGeneratorFactory: () => PassengerGenerator;
@@ -70,8 +102,15 @@ export class ActualStore implements Store {
       [TYPES.TrackJoint]: this.TrackJointFactory,
       [TYPES.Platform]: this.PlatformFactory,
       [TYPES.Train]: this.TrainFactory,
-      [TYPES.Wagon]: this.WagonFactory
+      [TYPES.Wagon]: this.WagonFactory,
+      [TYPES.Signal]: this.SignalFactory,
+      [TYPES.Sensor]: this.SensorFactory,
+      [TYPES.Block]: this.BlockFactory,
+      [TYPES.BlockJoint]: this.BlockJointFactory,
+      [TYPES.PathBlock]: this.PathBlockFactory,
+      [TYPES.Section]: this.SectionFactory
     };
+    // higher number (12) loads first
     this.typeOrder = {
       [TYPES.Station]: 12,
       [TYPES.RouteStop]: 11,
@@ -84,12 +123,24 @@ export class ActualStore implements Store {
       // skip zero, cos it is falsy
       [TYPES.Wagon]: -1,
       [TYPES.Train]: -2,
-      [TYPES.Passenger]: -3
+      [TYPES.Passenger]: -3,
+      [TYPES.BlockJoint]: -10,
+      [TYPES.Block]: -11,
+      [TYPES.PathBlock]: -12,
+      [TYPES.Sensor]: -14,
+      [TYPES.Section]: -15,
+      [TYPES.Signal]: -16
     };
 
     this.renderers = {
       [TYPES.TrackJoint]: [this.TrackJointRendererFactory],
-      [TYPES.Wagon]: [this.WagonRendererFactory]
+      [TYPES.Wagon]: [this.WagonRendererFactory],
+      [TYPES.Signal]: [this.SignalRendererFactory],
+      [TYPES.Sensor]: [this.SensorRendererFactory],
+      [TYPES.Block]: [this.BlockRendererFactory],
+      [TYPES.BlockJoint]: [this.BlockJointRendererFactory],
+      [TYPES.PathBlock]: [this.PathBlockRendererFactory],
+      [TYPES.Section]: [this.SectionRendererFactory]
     };
 
     shortid.characters(
@@ -236,6 +287,10 @@ export class ActualStore implements Store {
     for (let i = 0; i < this.tickSpeed; i++) {
       this.getAllOf(TYPES.Train).map((train: Train) => {
         train.tick();
+      });
+
+      this.getAllOf(TYPES.PathBlock).map((pb: PathBlock) => {
+        pb.tick();
       });
 
       if ((this.getTickCount() + i) % 120 === 0) {

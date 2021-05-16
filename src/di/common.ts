@@ -26,6 +26,18 @@ import { Trip } from '../structs/Scheduling/Trip';
 import { ActualTrip } from '../structs/Scheduling/ActualTrip';
 import { Train } from '../modules/Train/Train';
 import { ActualTrain } from '../modules/Train/ActualTrain';
+import { Signal } from '../modules/Signaling/Signal';
+import { ActualSignal } from '../modules/Signaling/ActualSignal';
+import { Block } from '../modules/Signaling/Block';
+import { BlockJoint } from '../modules/Signaling/BlockJoint';
+import { PathBlock } from '../modules/Signaling/PathBlock';
+import { Section } from '../modules/Signaling/Section';
+import { ActualBlock } from '../modules/Signaling/ActualBlock';
+import { ActualBlockJoint } from '../modules/Signaling/ActualBlockJoint';
+import { ActualPathBlock } from '../modules/Signaling/ActualPathBlock';
+import { ActualSection } from '../modules/Signaling/ActualSection';
+import { Sensor } from '../modules/Signaling/Sensor';
+import { ActualSensor } from '../modules/Signaling/ActualSensor';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
@@ -46,4 +58,10 @@ export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.fm<Route>(T.FactoryOfRoute, T.Route, ActualRoute);
   ioc.fm<RouteStop>(T.FactoryOfRouteStop, T.RouteStop, ActualRouteStop);
   ioc.fm<Trip>(T.FactoryOfTrip, T.Trip, ActualTrip);
+  ioc.fm<Signal>(T.FactoryOfSignal, T.Signal, ActualSignal);
+  ioc.fm<Sensor>(T.FactoryOfSensor, T.Sensor, ActualSensor);
+  ioc.fm<Block>(T.FactoryOfBlock, T.Block, ActualBlock);
+  ioc.fm<BlockJoint>(T.FactoryOfBlockJoint, T.BlockJoint, ActualBlockJoint);
+  ioc.fm<PathBlock>(T.FactoryOfPathBlock, T.PathBlock, ActualPathBlock);
+  ioc.fm<Section>(T.FactoryOfSection, T.Section, ActualSection);
 };

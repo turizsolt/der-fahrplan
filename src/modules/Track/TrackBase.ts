@@ -4,6 +4,7 @@ import { TrackCurve } from './TrackCurve';
 import { TrackDirection } from './TrackDirection';
 import { DirectedTrack } from './DirectedTrack';
 import { Train } from '../Train/Train';
+import { TrackSegment } from './TrackSegment';
 
 export interface TrackBase extends BaseBrick {
   checkin(train: Train);
@@ -12,12 +13,14 @@ export interface TrackBase extends BaseBrick {
   getCheckedList(): Train[];
 
   addPlatform(platform: Platform);
-  getPlatformsBeside();
+  getPlatformsBeside(): Platform[];
 
   getCurve(): TrackCurve;
   getLength(): number;
 
   getDirected(direction: TrackDirection): DirectedTrack;
+  getActiveSegment(): TrackSegment;
+  getHash(segment?: TrackSegment): string;
 
   update();
 }

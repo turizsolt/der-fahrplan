@@ -37,6 +37,15 @@ import { Train } from '../../modules/Train/Train';
 import { SpeedPedal } from '../../modules/Train/SpeedPedal';
 import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
 import { GENERATE_ID } from '../../structs/Actuals/Store/Command/CommandLog';
+import { CreateSignalInputHandler } from './CreateSignalInputHandler';
+import { Signal } from '../../modules/Signaling/Signal';
+import { SignalSignal } from '../../modules/Signaling/SignalSignal';
+import { CreateBlockJointInputHandler } from './CreateBlockJointInputHandler';
+import { Block } from '../../modules/Signaling/Block';
+import { CreateBlockInputHandler } from './CreateBlockInputHandler';
+import { AllowPathInputHandler } from './AllowPathInputHandler';
+import { CreatePathInputHandler } from './CreatePathInputHandler';
+import { CreateSectionInputHandler } from './CreateSectionInputHandler';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -44,7 +53,13 @@ export enum InputMode {
   CREATE_TRACK = 'CREATE_TRACK',
   CREATE_PLATFORM = 'CREATE_PLATFORM',
   CREATE_ENGINE = 'CREATE_ENGINE',
-  CREATE_STATION = 'CREATE_STATION'
+  CREATE_STATION = 'CREATE_STATION',
+  CREATE_SIGNAL = 'CREATE_SIGNAL',
+  CREATE_BLOCK_JOINT = 'CREATE_BLOCK_JOINT',
+  CREATE_BLOCK = 'CREATE_BLOCK',
+  CREATE_SECTION = 'CREATE_SECTION',
+  CREATE_PATH = 'CREATE_PATH',
+  ALLOW_PATH = 'ALLOW_PATH',
 }
 
 export class InputController {
@@ -93,16 +108,28 @@ export class InputController {
       [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(this.store),
       [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(),
       [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(),
-      [InputMode.CREATE_STATION]: new CreateStationInputHandler()
+      [InputMode.CREATE_STATION]: new CreateStationInputHandler(),
+      [InputMode.CREATE_SIGNAL]: new CreateSignalInputHandler(),
+      [InputMode.CREATE_BLOCK_JOINT]: new CreateBlockJointInputHandler(),
+      [InputMode.CREATE_BLOCK]: new CreateBlockInputHandler(),
+      [InputMode.CREATE_SECTION]: new CreateSectionInputHandler(),
+      [InputMode.CREATE_PATH]: new CreatePathInputHandler(),
+      [InputMode.ALLOW_PATH]: new AllowPathInputHandler()
     };
 
-    const modeNames = {
+    const modeNames: Record<InputMode, string> = {
       [InputMode.CAMERA]: 'Cam',
       [InputMode.SELECT]: 'Sel',
       [InputMode.CREATE_TRACK]: '+Trac',
       [InputMode.CREATE_PLATFORM]: '+Plat',
       [InputMode.CREATE_ENGINE]: '+Eng',
-      [InputMode.CREATE_STATION]: '+Stat'
+      [InputMode.CREATE_STATION]: '+Stat',
+      [InputMode.CREATE_SIGNAL]: '+Sign',
+      [InputMode.CREATE_BLOCK_JOINT]: '+BJnt',
+      [InputMode.CREATE_BLOCK]: '+Blck',
+      [InputMode.CREATE_SECTION]: '+Sect',
+      [InputMode.CREATE_PATH]: '+Path',
+      [InputMode.ALLOW_PATH]: 'Allow'
     };
 
     for (let mode of Object.keys(this.inputHandlers)) {
@@ -232,7 +259,7 @@ export class InputController {
       //(props.point &&
       //  this.downProps.point.coord.equalsTo(props.point.coord)))
     ) {
-      let ready = this.selectIfPossible(event);
+      let ready = (this.mode === InputMode.CREATE_BLOCK || this.mode === InputMode.ALLOW_PATH || this.mode === InputMode.CREATE_PATH || this.mode === InputMode.CREATE_SECTION) ? false : this.selectIfPossible(event);
       if (ready) {
         this.inputHandler.cancel();
       } else {
@@ -260,8 +287,8 @@ export class InputController {
         const storedObj = this.store.get(id);
         const storedBrick = storedObj as BaseBrick;
         if (storedBrick) {
-          if (command) {
-            storedBrick.getRenderer().process(command);
+          if (command && !command.startsWith('joint')) {
+            // storedBrick.getRenderer().process(command);
             if(command === 'endA') {
                 const wagon = storedBrick as Wagon;
                 this.store.getCommandLog().addAction(CommandCreator.unmergeTrain(
@@ -272,16 +299,21 @@ export class InputController {
             }
           } else if (event.button === 2) {
             if (
-                storedBrick.getType() === Symbol.for('TrackSwitch')
+                storedBrick.getType() === TYPES.TrackSwitch
               ) {
                 this.store.getCommandLog().addAction(CommandCreator.switchTrack(storedBrick.getId()));
+            } else if (
+                storedBrick.getType() === TYPES.Signal
+              ) {
+                const signal = (storedBrick as Signal);
+                signal.setBlockSignal(signal.getSignal() === SignalSignal.Red ? SignalSignal.Green : SignalSignal.Red);
             }
           } else {
             let selected: BaseStorable = this.store.getSelected();
             if (storedObj.isSelected()) {
               if (
-                this.selectCallback &&
-                selected.getType() === Symbol.for('Wagon')
+                this.selectCallback && 
+                selected.getType() === TYPES.Wagon
               ) {
                 (selected as Wagon).off('info', this.selectCallback);
               }
@@ -293,8 +325,24 @@ export class InputController {
               storedObj.deselect();
             } else {
               if(this.store.getSelected()){
+                  
+                  if (
+                    this.selectCallback
+                    && this.store.getSelected().getType() === TYPES.Wagon
+                  ) {
+                    (this.store.getSelected() as Wagon).off('info', this.selectCallback);
+                  }
+
                   this.store.getSelected().deselect();
+
               }
+              // todo temp
+              /* console.log(storedBrick.getId());
+              if(storedBrick.getType() === TYPES.Block) {
+                const block = storedBrick as Block;
+                const p = block.persist() as any;
+                console.log(block.getId(), p.endA, p.endB);
+              } */
               this.select(storedBrick);
             }
           }
@@ -316,7 +364,7 @@ export class InputController {
   select(storedObj: BaseBrick) {
     if (this.getSelected()) {
       if (
-        this.selectCallback &&
+        this.selectCallback && 
         this.getSelected().getType() === Symbol.for('Wagon')
       ) {
         (this.getSelected() as Wagon).off('info', this.selectCallback);
@@ -602,6 +650,13 @@ export class InputController {
       }
         break;
 
+        case 'A':
+          if (this.getSelected().getType() === TYPES.Wagon) {
+            const wagon = this.getSelected() as Wagon;
+            wagon.getTrain().setAutoMode(!wagon.getTrain().getAutoMode());
+          }
+        break;
+
       case '/':
         this.getSelectedBrick()
           .getRenderer()
@@ -615,9 +670,15 @@ export class InputController {
         break;
 
       case 'Enter':
+        if(this.getSelectedBrick().getType() === TYPES.Wagon) {
+            (this.getSelectedBrick() as Wagon).stop();
+        }
+        break;
+
+        case 'D':
         this.getSelectedBrick()
           .getRenderer()
-          .process('stop');
+          .process('lock');
         break;
 
       case 'S':

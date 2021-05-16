@@ -1,6 +1,9 @@
 import { PositionOnTrack } from './PositionOnTrack';
 import { Train } from './Train';
 import { NearestData } from './NearestData';
+import { Signal } from '../Signaling/Signal';
+import { BlockJoint } from '../Signaling/BlockJoint';
+import { Platform } from '../../structs/Interfaces/Platform';
 
 export class Nearest {
   static end(pot: PositionOnTrack): NearestData {
@@ -22,7 +25,7 @@ export class Nearest {
     };
   }
 
-  static train(pot: PositionOnTrack, train?: Train): NearestData {
+  static train(pot: PositionOnTrack): NearestData {
     let segmentCount = 1;
     let distance = pot.getTrack().getLength() - pot.getPosition();
     let iter = pot.getDirectedTrack();
@@ -30,7 +33,10 @@ export class Nearest {
     let foundTrain: Train = null;
 
     for (let marker of iter.getMarkers()) {
-      if (marker.position > pot.getPosition()) {
+      if (
+        marker.position > pot.getPosition() &&
+        marker.marker.type === 'Train'
+      ) {
         distance = marker.position - pot.getPosition();
         foundTrain = marker.marker.train;
         break;
@@ -40,9 +46,11 @@ export class Nearest {
     iter = iter.next();
     while (iter && !foundTrain && ttl) {
       for (let marker of iter.getMarkers()) {
-        distance += marker.position;
-        foundTrain = marker.marker.train;
-        break;
+        if (marker.marker.type === 'Train') {
+          distance += marker.position;
+          foundTrain = marker.marker.train;
+          break;
+        }
       }
 
       if (!foundTrain) {
@@ -57,6 +65,147 @@ export class Nearest {
       distance: foundTrain ? distance : Number.POSITIVE_INFINITY,
       segmentCount,
       train: foundTrain
+    };
+  }
+
+  static signal(pot: PositionOnTrack): NearestData {
+    let segmentCount = 1;
+    let distance = pot.getTrack().getLength() - pot.getPosition();
+    let iter = pot.getDirectedTrack();
+    let ttl = 100;
+    let foundSignal: Signal = null;
+
+    for (let marker of iter.getMarkers()) {
+      if (
+        marker.position > pot.getPosition() &&
+        marker.marker.type === 'Signal'
+      ) {
+        distance = marker.position - pot.getPosition();
+        foundSignal = marker.marker.signal;
+        break;
+      }
+    }
+
+    iter = iter.next();
+    while (iter && !foundSignal && ttl) {
+      for (let marker of iter.getMarkers()) {
+        if (marker.marker.type === 'Signal') {
+          distance += marker.position;
+          foundSignal = marker.marker.signal;
+          break;
+        }
+      }
+
+      if (!foundSignal) {
+        distance += iter.getLength();
+      }
+      segmentCount++;
+      ttl--;
+      iter = iter.next();
+    }
+
+    return {
+      distance: foundSignal ? distance : Number.POSITIVE_INFINITY,
+      segmentCount,
+      signal: foundSignal
+    };
+  }
+
+  static platform(pot: PositionOnTrack): NearestData {
+    let segmentCount = 1;
+    let distance = pot.getTrack().getLength() - pot.getPosition();
+    let iter = pot.getDirectedTrack();
+    let ttl = 100;
+    let foundPlatform: Platform = null;
+
+    for (let marker of iter.getMarkers()) {
+      if (
+        marker.position > pot.getPosition() &&
+        marker.marker.type === 'Platform'
+      ) {
+        distance = marker.position - pot.getPosition();
+        foundPlatform = marker.marker.platform;
+        break;
+      }
+    }
+
+    iter = iter.next();
+    while (iter && !foundPlatform && ttl) {
+      for (let marker of iter.getMarkers()) {
+        if (marker.marker.type === 'Platform') {
+          distance += marker.position;
+          foundPlatform = marker.marker.platform;
+          break;
+        }
+      }
+
+      if (!foundPlatform) {
+        distance += iter.getLength();
+      }
+      segmentCount++;
+      ttl--;
+      iter = iter.next();
+    }
+
+    return {
+      distance: foundPlatform ? distance : Number.POSITIVE_INFINITY,
+      segmentCount,
+      platform: foundPlatform
+    };
+  }
+
+  static blockJoint(pot: PositionOnTrack): NearestData {
+    let segmentCount = 1;
+    let distance = pot.getTrack().getLength() - pot.getPosition();
+    let iter = pot.getDirectedTrack();
+    let ttl = 100;
+    let foundBlockJoint: BlockJoint = null;
+    let foundPosition: PositionOnTrack = null;
+
+    for (let marker of iter.getMarkers()) {
+      if (
+        marker.position > pot.getPosition() &&
+        marker.marker.type === 'BlockJoint'
+      ) {
+        distance = marker.position - pot.getPosition();
+        foundBlockJoint = marker.marker.blockJoint;
+        foundPosition = PositionOnTrack.fromTrack(
+          iter.getTrack(),
+          marker.position,
+          iter.getDirection()
+        );
+        break;
+      }
+    }
+
+    iter = iter.next();
+    while (iter && !foundBlockJoint && ttl) {
+      for (let marker of iter.getMarkers()) {
+        if (marker.marker.type === 'BlockJoint') {
+          distance += marker.position;
+          foundBlockJoint = marker.marker.blockJoint;
+          foundPosition = PositionOnTrack.fromTrack(
+            iter.getTrack(),
+            marker.position,
+            iter.getDirection()
+          );
+          break;
+        }
+      }
+
+      if (!foundBlockJoint) {
+        distance += iter.getLength();
+      }
+      segmentCount++;
+      ttl--;
+      iter = iter.next();
+    }
+
+    return {
+      distance: foundBlockJoint ? distance : Number.POSITIVE_INFINITY,
+      segmentCount,
+      blockJoint: foundBlockJoint,
+      position: foundPosition
     };
   }
 }

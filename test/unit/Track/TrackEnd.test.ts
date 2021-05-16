@@ -23,7 +23,7 @@ const mockTrackBase: TrackBase = {
   getCurve: () => null,
   getId: () => null,
   getLength: () => null,
-  getPlatformsBeside: () => {},
+  getPlatformsBeside: () => null,
   getRenderer: () => null,
   getType: () => null,
   isEmpty: () => null,
@@ -40,7 +40,9 @@ const mockTrackBase: TrackBase = {
   select: () => {},
   toggleSelect: () => {},
   update: () => {},
-  getDirected: () => null
+  getDirected: () => null,
+  getActiveSegment: () => null,
+  getHash: () => null
 };
 
 const mockTrackSegment: TrackSegment = {
@@ -68,7 +70,10 @@ const mockDirectedTrack: DirectedTrack = {
   getMarkers: () => null,
   removeMarker: () => {},
   removeMarkerBothDirections: () => {},
-  addMarker: () => {}
+  addMarker: () => {},
+  getHash: () => null,
+  permaNexts: () => null,
+  setPermaNexts: () => {}
 };
 const mockDirectedTrack2: DirectedTrack = { ...mockDirectedTrack };
 

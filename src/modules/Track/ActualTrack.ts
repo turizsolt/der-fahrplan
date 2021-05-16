@@ -14,6 +14,7 @@ import { TrackDirection } from './TrackDirection';
 import { DirectedTrack } from './DirectedTrack';
 import { TrackJoint } from './TrackJoint/TrackJoint';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { TrackSegment } from './TrackSegment';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
@@ -25,6 +26,7 @@ export class ActualTrack extends ActualTrackBase implements Track {
     super.initStore(TYPES.Track);
 
     this.segment = new ActualTrackSegment(this, segmentData);
+    this.segment.connect();
 
     // todo emit
     this.renderer.init(this);
@@ -33,6 +35,14 @@ export class ActualTrack extends ActualTrackBase implements Track {
 
   getDirected(direction: TrackDirection): DirectedTrack {
     return this.segment.getDirected(direction);
+  }
+
+  getActiveSegment(): TrackSegment {
+    return this.segment;
+  }
+
+  getHash(segment?: TrackSegment): string {
+    return this.id;
   }
 
   getCurve(): TrackCurve {
@@ -90,8 +100,8 @@ export function toSegmentData(data: any, store: Store): TrackSegmentData {
       joint: store.get(data.startJointEnd.joint) as TrackJoint
     },
     endJointEnd: {
-      end: data.startJointEnd.end,
-      joint: store.get(data.startJointEnd.joint) as TrackJoint
+      end: data.endJointEnd.end,
+      joint: store.get(data.endJointEnd.joint) as TrackJoint
     },
     coordinates: data.coordinates.map(c => new Coordinate(c.x, c.y, c.z))
   };

@@ -18,6 +18,10 @@ export class MeshProvider {
   private railBlack: BABYLON.StandardMaterial;
   private selectorRed: BABYLON.StandardMaterial;
   private shuntingRed: BABYLON.StandardMaterial;
+  private allowingGreen: BABYLON.StandardMaterial;
+  private amber: BABYLON.StandardMaterial;
+  private blue: BABYLON.StandardMaterial;
+  private white: BABYLON.StandardMaterial;
 
   public getMaterial(name: MaterialName) {
     return this.materials[name];
@@ -83,12 +87,36 @@ export class MeshProvider {
       0 / 255
     );
 
+    this.allowingGreen = new BABYLON.StandardMaterial('allowingGreen', null);
+    this.allowingGreen.diffuseColor = new BABYLON.Color3(
+      0 / 255,
+      255 / 255,
+      0 / 255
+    );
+
+    this.amber = new BABYLON.StandardMaterial('amber', null);
+    this.amber.diffuseColor = new BABYLON.Color3(255 / 255, 255 / 255, 0 / 255);
+
+    this.blue = new BABYLON.StandardMaterial('blue', null);
+    this.blue.diffuseColor = new BABYLON.Color3(0 / 255, 0 / 255, 255 / 255);
+
+    this.white = new BABYLON.StandardMaterial('white', null);
+    this.white.diffuseColor = new BABYLON.Color3(
+      255 / 255,
+      255 / 255,
+      255 / 255
+    );
+
     this.materials = {
       [MaterialName.BedGray]: this.bedGray,
       [MaterialName.RailBlack]: this.railBlack,
       [MaterialName.SleeperBrown]: this.sleeperBrown,
       [MaterialName.SelectorRed]: this.selectorRed,
-      [MaterialName.ShuntingRed]: this.shuntingRed
+      [MaterialName.ShuntingRed]: this.shuntingRed,
+      [MaterialName.AllowingGreen]: this.allowingGreen,
+      [MaterialName.Amber]: this.amber,
+      [MaterialName.Blue]: this.blue,
+      [MaterialName.White]: this.white
     };
   }
 
@@ -149,6 +177,92 @@ export class MeshProvider {
     mesh.position = CoordinateToBabylonVector3(ray.setY(1.05).coord);
     mesh.rotation.y = ray.dirXZ;
     mesh.material = this.sleeperBrown;
+    return mesh;
+  }
+
+  createSignalMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateBox(
+      name,
+      { height: 5, width: 2.5, depth: 0.5 },
+      this.scene
+    );
+    mesh.position = CoordinateToBabylonVector3(ray.setY(2.5).coord);
+    mesh.rotation.y = ray.dirXZ;
+    mesh.material = this.railBlack;
+    return mesh;
+  }
+
+  createSignalLight(ray: Ray, name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateBox(
+      name,
+      { height: 1.5, width: 1.5, depth: 0.5 },
+      this.scene
+    );
+    mesh.position = CoordinateToBabylonVector3(ray.setY(3.75).coord);
+    mesh.rotation.y = ray.dirXZ;
+    mesh.material = this.railBlack;
+    return mesh;
+  }
+
+  createSensorMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateCylinder(
+      name,
+      {
+        diameterTop: 1.5,
+        diameterBottom: 1.5,
+        tessellation: 3,
+        height: 0.25
+      },
+      null
+    );
+    mesh.position = CoordinateToBabylonVector3(ray.setY(1.375).coord);
+    mesh.rotation.y = ray.dirXZ;
+    mesh.material = this.white;
+    return mesh;
+  }
+
+  createBlockJointMesh(name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateCylinder(
+      name,
+      {
+        diameterTop: 2,
+        diameterBottom: 2,
+        tessellation: 3,
+        height: 2
+      },
+      null
+    );
+    mesh.material = this.allowingGreen;
+    return mesh;
+  }
+
+  createBlockMesh(name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateCylinder(
+      name,
+      {
+        diameterTop: 4,
+        diameterBottom: 4,
+        tessellation: 6,
+        height: 0.1
+      },
+      null
+    );
+    mesh.material = this.bedGray;
+    return mesh;
+  }
+
+  createSectionMesh(name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateCylinder(
+      name,
+      {
+        diameterTop: 1.5,
+        diameterBottom: 1.5,
+        tessellation: 12,
+        height: 1
+      },
+      null
+    );
+    mesh.material = this.white;
     return mesh;
   }
 

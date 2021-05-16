@@ -15,8 +15,8 @@ const store = getTestStore();
 describe('WagonAxles', () => {
   it('create, get and set WagonAxles', () => {
     const { track } = createTrack();
-    const pot = new PositionOnTrack(track, 14, TrackDirection.AB);
-    const pot2 = new PositionOnTrack(track, 0, TrackDirection.AB);
+    const pot = PositionOnTrack.fromTrack(track, 14, TrackDirection.AB);
+    const pot2 = PositionOnTrack.fromTrack(track, 0, TrackDirection.AB);
     const wagonAxles: WagonAxles = new ActualWagonAxles(
       getPredefinedWagonConfig('wagon')
     );

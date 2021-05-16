@@ -4,6 +4,7 @@ import { Store } from '../../Interfaces/Store';
 import { Platform } from '../../Interfaces/Platform';
 import { Trip } from '../../Scheduling/Trip';
 import { Train } from '../../../modules/Train/Train';
+import { WhichEnd } from '../../Interfaces/WhichEnd';
 
 // todo redo everything
 
@@ -31,12 +32,6 @@ export class WagonAnnouncement {
 
   getTrip(): Trip {
     return this.trip;
-    /*
-    const wagonWithTrip = this.train
-      .getWagonsWithSides()
-      .find(x => x.wagon === this.parent);
-    return wagonWithTrip?.trip;
-    */
   }
 
   getTrain(): Train {
@@ -49,35 +44,33 @@ export class WagonAnnouncement {
 
   stop(): void {
     // todo use the worm
+    // todo worm is obsolete now, use the markers
     const platformsInvolved: Platform[] = this.platformsBeside();
     platformsInvolved.map(p => this.stoppedAt(p));
   }
 
   platformsBeside(): Platform[] {
-    return [];
-    /*
     const platformsInvolved: Platform[] = [];
-    const trackA = this.parent.getA().positionOnTrack.getTrack();
+    const trackA = this.parent.getAxlePosition(WhichEnd.A).getTrack();
     platformsInvolved.push(
       ...trackA
         .getPlatformsBeside()
-        .filter(p => this.parent.getA().positionOnTrack.isBeside(p))
+        .filter(p => p.isBesidePoT(this.parent.getAxlePosition(WhichEnd.A)))
     );
-    const trackB = this.parent.getB().positionOnTrack.getTrack();
+    const trackB = this.parent.getAxlePosition(WhichEnd.B).getTrack();
     trackB
       .getPlatformsBeside()
-      .filter(p => this.parent.getB().positionOnTrack.isBeside(p))
+      .filter(p => p.isBesidePoT(this.parent.getAxlePosition(WhichEnd.B)))
       .map((p: Platform) => {
         if (!platformsInvolved.find(x => x === p)) {
           platformsInvolved.push(p);
         }
       });
     return platformsInvolved;
-    */
   }
 
   stoppedAt(platform: Platform): void {
-    // this.train.stoppedAt(platform.getStation(), platform);
+    this.train.stoppedAt(platform.getStation(), platform);
   }
 
   announceStoppedAt(platform: Platform): void {
@@ -92,12 +85,5 @@ export class WagonAnnouncement {
         );
       }
     });
-  }
-
-  persist(): any {
-    return {
-      trip: this.trip && this.trip.getId(),
-      train: this.train.getId()
-    };
   }
 }

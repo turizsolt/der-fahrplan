@@ -20,6 +20,18 @@ import { addCommonMaps } from './common';
 import { ActualLand } from '../structs/Actuals/ActualLand';
 import { Land } from '../structs/Interfaces/Land';
 import { MeshProvider } from '../ui/babylon/MeshProvider';
+import { SignalRenderer } from '../structs/Renderers/SignalRenderer';
+import { SignalBabylonRenderer } from '../ui/babylon/SignalBabylonRenderer';
+import { BlockRenderer } from '../structs/Renderers/BlockRenderer';
+import { BlockBabylonRenderer } from '../ui/babylon/BlockBabylonRenderer';
+import { BlockJointRenderer } from '../structs/Renderers/BlockJointRenderer';
+import { BlockJointBabylonRenderer } from '../ui/babylon/BlockJointBabylonRenderer';
+import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
+import { PathBlockBabylonRenderer } from '../ui/babylon/PathBlockBabylonRenderer';
+import { SectionRenderer } from '../structs/Renderers/SectionRenderer';
+import { SectionBabylonRenderer } from '../ui/babylon/SectionBabylonRenderer';
+import { SensorRenderer } from '../structs/Renderers/SensorRenderer';
+import { SensorBabylonRenderer } from '../ui/babylon/SensorBabylonRenderer';
 
 export const productionContainer = new Container();
 const ioc = new DependencyContainer(productionContainer);
@@ -41,4 +53,34 @@ ioc.fm<WagonRenderer>(
   T.FactoryOfWagonRenderer,
   T.WagonRenderer,
   WagonBabylonRenderer
+);
+ioc.fm<SignalRenderer>(
+  T.FactoryOfSignalRenderer,
+  T.SignalRenderer,
+  SignalBabylonRenderer
+);
+ioc.fm<SensorRenderer>(
+  T.FactoryOfSensorRenderer,
+  T.SensorRenderer,
+  SensorBabylonRenderer
+);
+ioc.fm<BlockRenderer>(
+  T.FactoryOfBlockRenderer,
+  T.BlockRenderer,
+  BlockBabylonRenderer
+);
+ioc.fm<BlockJointRenderer>(
+  T.FactoryOfBlockJointRenderer,
+  T.BlockJointRenderer,
+  BlockJointBabylonRenderer
+);
+ioc.fm<PathBlockRenderer>(
+  T.FactoryOfPathBlockRenderer,
+  T.PathBlockRenderer,
+  PathBlockBabylonRenderer
+);
+ioc.fm<SectionRenderer>(
+  T.FactoryOfSectionRenderer,
+  T.SectionRenderer,
+  SectionBabylonRenderer
 );

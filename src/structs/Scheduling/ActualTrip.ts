@@ -16,6 +16,9 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   private lastStationServed: Station = null;
   private atStation: Station = null;
 
+  private prevTrip: Trip = null;
+  private nextTrip: Trip = null;
+
   init(route: Route, departureTime: number): Trip {
     super.initStore(TYPES.Trip);
     this.route = route;
@@ -25,6 +28,18 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     stationsInvolved.map((station: Station) => station.addTripToSchedule(this));
     this.updateScheduleOnAllStations(stationsInvolved);
     return this;
+  }
+
+  setNextTrip(trip: Trip): void {
+      this.nextTrip = trip;
+  }
+
+  getNextTrip(): Trip {
+    return this.nextTrip;
+  }
+
+  setPrevTrip(trip: Trip): void {
+    this.prevTrip = trip;
   }
 
   redefine(stop: RouteStop, props: OptionalTripStop): void {
@@ -159,11 +174,17 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       type: 'Trip',
       route: this.route.getId(),
       departureTime: this.departureTime,
+      prevTrip: this.prevTrip?.getId(),
+      nextTrip: this.nextTrip?.getId(),
       redefinedProps
     };
   }
 
   persistDeep(): Object {
+    return this.xpersistDeep();
+  }
+
+  xpersistDeep(level: number = 1): Object {
     return {
       id: this.id,
       type: 'Trip',
@@ -171,7 +192,10 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       route: this.route.persistDeep(),
       departureTime: this.departureTime,
       departureTimeString: Util.timeToStr(this.departureTime),
-      stops: this.getStops()
+      stops: this.getStops(),
+      prevTrip: this.prevTrip?.getId(),
+      nextTrip: this.nextTrip?.getId(),
+      next: (this.nextTrip && level > 0) ? this.nextTrip.xpersistDeep(level-1) : null
     };
   }
 
@@ -185,6 +209,20 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         ...obj.redefinedProps[stopId],
         platform: store.get(obj.redefinedProps[stopId].platform) as Platform
       });
+    }
+    if(obj.prevTrip) {
+        const trip = store.get(obj.prevTrip) as Trip;
+        if(trip) {
+            this.setPrevTrip(trip);
+            trip.setNextTrip(this);
+        }
+    }
+    if(obj.nextTrip) {
+        const trip = store.get(obj.nextTrip) as Trip;
+        if(trip) {
+            this.setNextTrip(trip);
+            trip.setPrevTrip(this);
+        }
     }
   }
 }

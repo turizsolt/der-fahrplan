@@ -219,6 +219,7 @@ export class CreateTrackInputHandler implements InputHandler {
             b.params[3] = idMapping[b.params[3]] ?? b.params[3];
             b.params[5] = idMapping[b.params[5]] ?? b.params[5];
             b.params[7] = idMapping[b.params[7]] ?? b.params[7];
+            b.params[9] = idMapping[b.params[9]] ?? b.params[9];
           }
 
           this.commandLog.addAction(b)

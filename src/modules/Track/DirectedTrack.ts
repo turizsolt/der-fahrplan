@@ -9,6 +9,9 @@ export interface DirectedTrack {
   next(): DirectedTrack;
   setNext(nextTrack: DirectedTrack): void;
 
+  permaNexts(): DirectedTrack[];
+  setPermaNexts(permaNextTracks: DirectedTrack[]): void;
+
   reverse(): DirectedTrack;
   setReverse(reverseTrack: DirectedTrack): void;
 
@@ -23,4 +26,6 @@ export interface DirectedTrack {
   addMarkerBothDirections(position: number, marker: TrackMarker): void;
   removeMarkerBothDirections(marker: TrackMarker): void;
   getMarkers(): PositionedTrackMarker[];
+
+  getHash(): string;
 }
