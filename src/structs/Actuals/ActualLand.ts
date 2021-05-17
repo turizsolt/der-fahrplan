@@ -13,6 +13,8 @@ import { EIGHTH_LEVEL } from '../../levels/EighthLevel';
 import { TEST_LEVEL } from '../../levels/TestLevel';
 import { InputController } from '../../ui/controllers/InputController';
 import { TestFw } from '../../levels/TestFw';
+import { DEMO_ONE_TRACK } from '../../levels/DemoOneTrack';
+import { DEMO_TWO_TRACKS } from '../../levels/DemoTwoTracks';
 
 @injectable()
 export class ActualLand implements Land {
@@ -32,6 +34,8 @@ export class ActualLand implements Land {
       seventh: SEVENTH_LEVEL,
       eighth: EIGHTH_LEVEL,
       testfw: TestFw,
+      demoonetrack: DEMO_ONE_TRACK,
+      demotwotracks: DEMO_TWO_TRACKS,
 
       test: TEST_LEVEL
     };

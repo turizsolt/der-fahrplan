@@ -440,6 +440,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return {
         id: this.id,
         type: 'Train',
+        autoMode: this.getAutoMode(),
         position: this.position?.persist(),
         speed: this.speed?.persist(),
         wagons: this.wagons.map(wagon => ({
