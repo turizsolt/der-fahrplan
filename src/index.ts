@@ -84,19 +84,23 @@ function keyboard(value) {
 
 let keyDown = keyboard('ArrowDown');
 let keyUp = keyboard('ArrowUp');
+let keyLeft = keyboard('ArrowLeft');
+let keyRight = keyboard('ArrowRight');
 
 keyDown.press = () => {
-  console.log('down pr');
   app.stage.y += 50;
 };
 
 keyUp.press = () => {
-  console.log('up pr');
   app.stage.y -= 50;
 };
 
-keyDown.release = () => {
-  console.log('down rel');
+keyRight.press = () => {
+  app.stage.x += 50;
+};
+
+keyLeft.press = () => {
+  app.stage.x -= 50;
 };
 
 // todo key holding
@@ -119,8 +123,8 @@ app.stage.on('pointerdown', (event: PIXI.InteractionEvent) => {
   const newCircle = new PIXI.Graphics();
   newCircle.beginFill(0x0bef47);
   newCircle.drawCircle(
-    event.data.global.x - app.stage.x,
-    event.data.global.y - app.stage.y,
+    (event.data.global.x - app.stage.x) / app.stage.scale.x,
+    (event.data.global.y - app.stage.y) / app.stage.scale.y,
     5
   );
   newCircle.endFill();
@@ -144,3 +148,18 @@ app.renderer.plugins.interaction.on(
 window.addEventListener('pointerdown', (event: any) => {
   console.log('window');
 });
+
+window.addEventListener('mousewheel', (event: any) => {
+  const step = event.wheelDelta > 0 ? 0.1 : -0.1;
+  if (app.stage.scale.x + step >= 0.1) {
+    app.stage.scale.x += step;
+    app.stage.scale.y += step;
+  }
+});
+
+/*
+window.addEventListener('mousewheel', (event: any) => {
+  const step = event.wheelDelta > 0 ? Math.PI / 18 : -Math.PI / 18;
+  app.stage.rotation += step;
+});
+*/
