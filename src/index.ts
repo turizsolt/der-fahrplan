@@ -4,7 +4,7 @@ import { productionContainer } from './di/production.config';
 import { Land } from './structs/Interfaces/Land';
 import { TYPES } from './di/TYPES';
 import { GridDrawer } from './ui/controllers/GridDrawer';
-import { InputController } from './ui/controllers/InputController';
+import { GlobalController } from './ui/controllers/GlobalController';
 import { MeshProvider } from './ui/babylon/MeshProvider';
 import { BabylonController } from './ui/controllers/BabylonController';
 
@@ -61,7 +61,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const key = upper(event.key);
       if (!map[key]) {
         if (!modifier(key)) {
-          inputController.keyDown(key, {
+          globalController.keyDown(key, {
             shift: map['Shift'],
             ctrl: map['Control']
           });
@@ -73,7 +73,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keyup', event => {
       const key = upper(event.key);
       if (!modifier(key)) {
-        inputController.keyUp(key, {
+        globalController.keyUp(key, {
           shift: map['Shift'],
           ctrl: map['Control']
         });
@@ -85,13 +85,13 @@ window.addEventListener('DOMContentLoaded', () => {
     scene.registerAfterRender(() => {
       for (let key of Object.keys(map)) {
         if (map[key] && !modifier(key)) {
-          inputController.keyHold(key, {
+          globalController.keyHold(key, {
             shift: map['Shift'],
             ctrl: map['Control']
           });
         }
       }
-      inputController.tick();
+      globalController.tick();
     });
 
     return { scene, camera };
@@ -99,9 +99,9 @@ window.addEventListener('DOMContentLoaded', () => {
   const { scene, camera } = createScene();
 
   const specificController = new BabylonController(scene, camera);
-  const inputController = new InputController(specificController);
+  const globalController = new GlobalController(specificController);
   const land = productionContainer.get<Land>(TYPES.Land);
-  land.init(inputController);
+  land.init(globalController);
 
   renderEngine.runRenderLoop(() => {
     scene.render();
@@ -112,7 +112,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   canvas.addEventListener('pointerdown', e => {
-    inputController.down(e);
+    globalController.down(e);
     if (e.button === 1) {
       e.preventDefault();
       return false;
@@ -120,17 +120,17 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   canvas.addEventListener('pointerup', e => {
-    inputController.up(e);
+    globalController.up(e);
   });
 
   canvas.addEventListener('pointermove', e => {
-    inputController.move(e);
+    globalController.move(e);
   });
 
   canvas.addEventListener('pointerenter', () => {});
 
   canvas.addEventListener('pointerleave', e => {
-    inputController.up(e);
+    globalController.up(e);
   });
 
   canvas.addEventListener('focus', () => {});
@@ -138,7 +138,7 @@ window.addEventListener('DOMContentLoaded', () => {
   canvas.addEventListener('blur', () => {});
 
   window.addEventListener('wheel', e => {
-    inputController.wheel(e);
+    globalController.wheel(e);
   });
 
   document.addEventListener('contextmenu', e => {
@@ -174,8 +174,8 @@ window.addEventListener('DOMContentLoaded', () => {
             if (!obj._version) throw new Error();
             if (obj._version != 2) throw new Error();
             if (!obj._format || obj._format !== 'fahrplan') throw new Error();
-            inputController.load(obj.data);
-            inputController.loadSpecific(obj);
+            globalController.load(obj.data);
+            globalController.loadSpecific(obj);
           } catch {
             console.error('Not proper JSON, hey!');
           }

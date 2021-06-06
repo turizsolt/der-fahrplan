@@ -11,7 +11,7 @@ import { SIXTH_LEVEL } from '../../levels/SixthLevel';
 import { SEVENTH_LEVEL } from '../../levels/SeventhLevel';
 import { EIGHTH_LEVEL } from '../../levels/EighthLevel';
 import { TEST_LEVEL } from '../../levels/TestLevel';
-import { InputController } from '../../ui/controllers/InputController';
+import { GlobalController } from '../../ui/controllers/GlobalController';
 import { TestFw } from '../../levels/TestFw';
 import { DEMO_ONE_TRACK } from '../../levels/DemoOneTrack';
 import { DEMO_TWO_TRACKS } from '../../levels/DemoTwoTracks';
@@ -20,7 +20,7 @@ import { DEMO_TWO_TRACKS } from '../../levels/DemoTwoTracks';
 export class ActualLand implements Land {
   @inject(TYPES.FactoryOfStore) storeFactory: () => Store;
 
-  init(inputController: InputController): void {
+  init(globalController: GlobalController): void {
     const store: Store = this.storeFactory();
 
     const levelId = window.location.search.slice(1);
@@ -44,10 +44,10 @@ export class ActualLand implements Land {
       setTimeout(() => {
         store.loadAll(levels[levelId].data);
         if (levels[levelId].camera) {
-          inputController.loadSpecific(levels[levelId]);
+          globalController.loadSpecific(levels[levelId]);
         }
         if (levels[levelId].target_passenger) {
-          inputController.setTargetPassenger(levels[levelId].target_passenger);
+          globalController.setTargetPassenger(levels[levelId].target_passenger);
         }
         if (levels[levelId].actions) {
           store.getCommandLog().setActions(levels[levelId].actions);

@@ -1,6 +1,6 @@
 import { InputHandler } from './InputHandler';
 import { CreateTrackInputHandler } from './CreateTrackInputHandler';
-import { BabylonVector3ToCoordinate } from '../../ui/babylon/converters/BabylonVector3ToCoordinate';
+import { BabylonVector3ToCoordinate } from '../babylon/converters/BabylonVector3ToCoordinate';
 import { Ray } from '../../structs/Geometry/Ray';
 import {
   snapXZ,
@@ -60,7 +60,7 @@ export enum InputMode {
   ALLOW_PATH = 'ALLOW_PATH',
 }
 
-export class InputController {
+export class GlobalController {
   private mode: InputMode = InputMode.CAMERA;
   private viewMode: string = 'terrain';
   private store: Store;

@@ -1,5 +1,5 @@
-import { InputController } from "../../ui/controllers/InputController";
+import { GlobalController } from '../../ui/controllers/GlobalController';
 
 export interface Land {
-  init(inputController: InputController): void;
+  init(globalController: GlobalController): void;
 }
