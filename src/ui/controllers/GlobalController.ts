@@ -44,6 +44,10 @@ import { AllowPathInputHandler } from './AllowPathInputHandler';
 import { CreatePathInputHandler } from './CreatePathInputHandler';
 import { CreateSectionInputHandler } from './CreateSectionInputHandler';
 import { GUISpecificController } from './GUISpecificController';
+import { NewSelectInputHandler } from './InputHandlers/NewSelectInputHandler';
+import { Input } from './InputHandlers/Interfaces/Input';
+import { InputType } from './InputHandlers/Interfaces/InputType';
+import { InputMod } from './InputHandlers/Interfaces/InputMod';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -210,10 +214,12 @@ export class GlobalController {
     return ret;
   }
 
+  private ih: NewSelectInputHandler = new NewSelectInputHandler();
+
   down(event: PointerEvent) {
     const props = this.convert(event);
     this.downProps = props;
-    this.inputHandler.down(props, event);
+    // this.inputHandler.down(props, event);
     this.downAt = (new Date()).getTime();
   }
 
@@ -223,9 +229,9 @@ export class GlobalController {
 
     const props = this.convert(event);
     if (this.downProps) {
-      this.inputHandler.move(this.downProps, props, event);
+      // this.inputHandler.move(this.downProps, props, event);
     } else {
-      this.inputHandler.roam(props, event);
+      // this.inputHandler.roam(props, event);
     }
   }
 
@@ -244,12 +250,17 @@ export class GlobalController {
     ) {
       let ready = (this.mode === InputMode.CREATE_BLOCK || this.mode === InputMode.ALLOW_PATH || this.mode === InputMode.CREATE_PATH || this.mode === InputMode.CREATE_SECTION) ? false : this.selectIfPossible(event);
       if (ready) {
-        this.inputHandler.cancel();
+        // this.inputHandler.cancel();
       } else {
-        this.inputHandler.click(this.downProps, event);
+        // this.inputHandler.click(this.downProps, event);
+        this.ih.handle({
+            input: Input.MouseClick,
+            type: InputType.MouseLeft,
+            mod: InputMod.None
+        });
       }
     } else {
-      this.inputHandler.up(this.downProps, props, event);
+      // this.inputHandler.up(this.downProps, props, event);
     }
     this.downProps = null;
   }
@@ -492,6 +503,13 @@ export class GlobalController {
   }
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    this.ih.handle({
+        input: Input.KeyboardUp,
+        type: key,
+        mod: mods.shift ? ( mods.ctrl? InputMod.Both : InputMod.Shift) : ( mods.ctrl? InputMod.Ctrl : InputMod.None)
+    });
+    return;
+    
     switch (key) {
       case 'T':
         this.store.getCommandLog().runNext();
