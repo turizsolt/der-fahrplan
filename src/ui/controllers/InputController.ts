@@ -1,4 +1,3 @@
-import * as BABYLON from 'babylonjs';
 import { InputHandler } from './InputHandler';
 import { CreateTrackInputHandler } from './CreateTrackInputHandler';
 import { BabylonVector3ToCoordinate } from '../../ui/babylon/converters/BabylonVector3ToCoordinate';
@@ -25,7 +24,6 @@ import { Store } from '../../structs/Interfaces/Store';
 import { CreateStationInputHandler } from './CreateStationInputHandler';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
-import { Vector3 } from 'babylonjs';
 import { VueSidebar } from './VueSidebar';
 import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
@@ -41,11 +39,11 @@ import { CreateSignalInputHandler } from './CreateSignalInputHandler';
 import { Signal } from '../../modules/Signaling/Signal';
 import { SignalSignal } from '../../modules/Signaling/SignalSignal';
 import { CreateBlockJointInputHandler } from './CreateBlockJointInputHandler';
-import { Block } from '../../modules/Signaling/Block';
 import { CreateBlockInputHandler } from './CreateBlockInputHandler';
 import { AllowPathInputHandler } from './AllowPathInputHandler';
 import { CreatePathInputHandler } from './CreatePathInputHandler';
 import { CreateSectionInputHandler } from './CreateSectionInputHandler';
+import { GUISpecificController } from './GUISpecificController';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -90,8 +88,7 @@ export class InputController {
   private downAt: number = 0;
 
   constructor(
-    private scene: BABYLON.Scene,
-    private camera: BABYLON.ArcRotateCamera,
+    private specificController: GUISpecificController
   ) {
     this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
     this.vueSidebar = new VueSidebar(this.store);
@@ -103,7 +100,7 @@ export class InputController {
     this.store.getCommandLog().setInputController(this);
 
     this.inputHandlers = {
-      [InputMode.CAMERA]: new CameraInputHandler(camera),
+      [InputMode.CAMERA]: new CameraInputHandler(this.specificController),
       [InputMode.SELECT]: new SelectInputHandler(),
       [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(this.store),
       [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(),
@@ -152,10 +149,7 @@ export class InputController {
   }
 
   convert(event: PointerEvent): InputProps {
-    const { pickedPoint, pickedMesh } = this.scene.pick(
-      this.scene.pointerX,
-      this.scene.pointerY
-    );
+    const { pickedPoint, pickedMesh } = this.specificController.pick();
 
     if (!pickedPoint) {
       const ret: InputProps = {
@@ -168,16 +162,6 @@ export class InputController {
         wheelDeg: this.wheelRotation,
         wheelRad: (this.wheelRotation / 180) * Math.PI,
         selected: this.store.getSelected(),
-        cameraRadius: this.camera.radius,
-        cameraAlpha: this.camera.alpha,
-        cameraBeta: this.camera.beta,
-        pointerX: this.scene.pointerX,
-        pointerY: this.scene.pointerY,
-        targetX: this.camera.target.x,
-        targetZ: this.camera.target.z,
-        fromX: this.camera.position.x,
-        fromY: this.camera.position.y,
-        fromZ: this.camera.position.z,
         wagonType: this.vueToolbox.getWagon()
       };
 
@@ -210,16 +194,6 @@ export class InputController {
       wheelDeg: this.wheelRotation,
       wheelRad: (this.wheelRotation / 180) * Math.PI,
       selected: this.store.getSelected(),
-      cameraRadius: this.camera.radius,
-      cameraAlpha: this.camera.alpha,
-      cameraBeta: this.camera.beta,
-      pointerX: this.scene.pointerX,
-      pointerY: this.scene.pointerY,
-      targetX: this.camera.target.x,
-      targetZ: this.camera.target.z,
-      fromX: this.camera.position.x,
-      fromY: this.camera.position.y,
-      fromZ: this.camera.position.z,
       wagonType: this.vueToolbox.getWagon()
     };
     ret.snappedPoint.dirXZ = ret.wheelRad;
@@ -397,9 +371,9 @@ export class InputController {
 
   wheel(event: WheelEvent) {
     if (Math.sign(event.deltaY) > 0) {
-      this.camera.radius *= 1.2;
+      this.specificController.modRadius(1.2);
     } else {
-      this.camera.radius /= 1.2;
+      this.specificController.modRadius(1/1.2);
     }
   }
 
@@ -549,7 +523,7 @@ export class InputController {
 
         const data = {
           data: this.store.persistAll(),
-          camera: this.saveCamera(),
+          ...this.saveSpecific(),
           _version: 2,
           _format: 'fahrplan'
         };
@@ -724,7 +698,7 @@ export class InputController {
       Math.floor(count / 60) + ':' + (count % 60 < 10 ? '0' : '') + (count % 60)
     );
     this.vueSidebar.setData('tickSpeed', speed);
-    this.vueSidebar.setData('fps', this.camera.getEngine().getFps().toFixed());
+    this.vueSidebar.setData('fps', this.specificController.getFps());
     const passengerStats = this.store.getPassengerStats();
     this.vueSidebar.setData('passengerCount', passengerStats.count);
     this.vueSidebar.setData('passengerArrivedCount', passengerStats.arrivedCount);
@@ -737,15 +711,8 @@ export class InputController {
 
     if (this.inputHandler.tick) {
       const ize: TickInputProps = {
-        pointerX: this.scene.pointerX,
-        pointerY: this.scene.pointerY,
         canvasWidth: (document.getElementById('renderCanvas') as HTMLCanvasElement).width,
         canvasHeight: (document.getElementById('renderCanvas') as HTMLCanvasElement).height,
-        targetX: this.camera.target.x,
-        targetZ: this.camera.target.z,
-        fromX: this.camera.position.x,
-        fromY: this.camera.position.y,
-        fromZ: this.camera.position.z,
         setFollowCamOff: this.followCam ? () => { this.followCam = false; } : () => { }
       }
       this.inputHandler.tick(ize);
@@ -753,19 +720,7 @@ export class InputController {
 
     if (this.followCam && this.getSelectedBrick() && this.getSelectedBrick().getType() === Symbol.for('Wagon')) {
       const wagon = this.getSelectedBrick() as Wagon;
-      const dx = wagon.getRay().coord.x - this.camera.target.x;
-      const dz = wagon.getRay().coord.z - this.camera.target.z;
-
-      this.camera.setPosition(
-        new Vector3(
-          this.camera.position.x + dx,
-          this.camera.position.y,
-          this.camera.position.z + dz
-        )
-      );
-      this.camera.setTarget(
-        new Vector3(this.camera.target.x + dx, 0, this.camera.target.z + dz)
-      );
+      this.specificController.setFollowCam(wagon.getRay().coord);
     }
   }
 
@@ -773,33 +728,13 @@ export class InputController {
     this.store.loadAll(data);
   }
 
-  saveCamera(): any {
-    return {
-      alpha: this.camera.alpha,
-      beta: this.camera.beta,
-      radius: this.camera.radius,
-      target: {
-        x: this.camera.target.x,
-        y: this.camera.target.y,
-        z: this.camera.target.z
-      },
-      position: {
-        x: this.camera.position.x,
-        y: this.camera.position.y,
-        z: this.camera.position.z
-      }
-    };
+  // specific
+
+  saveSpecific(): any {
+    return this.specificController.saveSpecific();
   }
 
-  setCamera(camera: any) {
-    this.camera.alpha = camera.alpha;
-    this.camera.beta = camera.beta;
-    this.camera.radius = camera.radius;
-    this.camera.setTarget(
-      new Vector3(camera.target.x, camera.target.y, camera.target.z)
-    );
-    this.camera.setPosition(
-      new Vector3(camera.position.x, camera.position.y, camera.position.z)
-    );
+  loadSpecific(obj: any): void {
+    this.specificController.loadSpecific(obj);
   }
 }

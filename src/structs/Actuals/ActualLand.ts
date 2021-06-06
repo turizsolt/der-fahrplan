@@ -44,7 +44,7 @@ export class ActualLand implements Land {
       setTimeout(() => {
         store.loadAll(levels[levelId].data);
         if (levels[levelId].camera) {
-          inputController.setCamera(levels[levelId].camera);
+          inputController.loadSpecific(levels[levelId]);
         }
         if (levels[levelId].target_passenger) {
           inputController.setTargetPassenger(levels[levelId].target_passenger);

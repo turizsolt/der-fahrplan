@@ -1,165 +1,195 @@
-import * as PIXI from 'pixi.js';
+import * as BABYLON from 'babylonjs';
+import 'babylonjs-loaders';
+import { productionContainer } from './di/production.config';
+import { Land } from './structs/Interfaces/Land';
+import { TYPES } from './di/TYPES';
+import { GridDrawer } from './ui/controllers/GridDrawer';
+import { InputController } from './ui/controllers/InputController';
+import { MeshProvider } from './ui/babylon/MeshProvider';
+import { BabylonController } from './ui/controllers/BabylonController';
 
-const app = new PIXI.Application({ width: 512, height: 512 });
+window.addEventListener('DOMContentLoaded', () => {
+  const canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
+    'renderCanvas'
+  ) as HTMLCanvasElement;
+  const renderEngine = new BABYLON.Engine(canvas, true);
+  const createScene = () => {
+    const scene = new BABYLON.Scene(renderEngine);
 
-const container = document.getElementById('renderCanvas');
+    const meshProviderFactory = productionContainer.get<() => MeshProvider>(
+      TYPES.FactoryOfMeshProvider
+    );
+    const meshProvider = meshProviderFactory();
+    meshProvider.setScene(scene);
 
-container.appendChild(app.view);
+    scene.clearColor = new BABYLON.Color4(0, 1, 0, 1);
 
-app.renderer.backgroundColor = 0xcceecc;
+    const camera = new BABYLON.ArcRotateCamera(
+      'Camera',
+      0,
+      0.8,
+      70,
+      new BABYLON.Vector3(0, 0, 30),
+      scene
+    );
 
-app.renderer.view.style.position = 'absolute';
-app.renderer.view.style.display = 'block';
-app.renderer.resize(window.innerWidth, window.innerHeight);
+    const light = new BABYLON.HemisphericLight(
+      'HemiLight',
+      new BABYLON.Vector3(0, 1, 0),
+      scene
+    );
 
-app.renderer.view.style.zIndex = '5'; // '-1';
+    (window as any).switches = [];
 
-// add a rectange
-let rectangle = new PIXI.Graphics();
-rectangle.lineStyle(4, 0xff3300, 1);
-rectangle.beginFill(0x66ccff);
-rectangle.drawRect(0, 0, 64, 64);
-rectangle.endFill();
-rectangle.x = 320;
-rectangle.y = 320;
-app.stage.addChild(rectangle);
+    const gridDrawer = new GridDrawer();
+    gridDrawer.setScene(scene);
+    gridDrawer.drawGrid();
 
-// add a circle
-let circle = new PIXI.Graphics();
-circle.lineStyle(4, 0xff3300, 1);
-circle.beginFill(0x9966ff);
-circle.drawCircle(0, 0, 32);
-circle.endFill();
-circle.x = 400;
-circle.y = 320;
-app.stage.addChild(circle);
+    const map = {};
+    scene.actionManager = new BABYLON.ActionManager(scene);
 
-// add a text
-let message = new PIXI.Text('Hello Pixi!');
-app.stage.addChild(message);
-message.position.set(480, 480);
+    const modifier = key => {
+      const list = ['Shift', 'Control', 'Alt'];
+      return list.includes(key);
+    };
 
-function keyboard(value) {
-  let key: any = {};
-  key.value = value;
-  key.isDown = false;
-  key.isUp = true;
-  key.press = undefined;
-  key.release = undefined;
-  //The `downHandler`
-  key.downHandler = event => {
-    if (event.key === key.value) {
-      if (key.isUp && key.press) key.press();
-      key.isDown = true;
-      key.isUp = false;
-      event.preventDefault();
+    const upper = key => {
+      return key[0].toUpperCase() + key.slice(1);
+    };
+
+    document.addEventListener('keydown', event => {
+      const key = upper(event.key);
+      if (!map[key]) {
+        if (!modifier(key)) {
+          inputController.keyDown(key, {
+            shift: map['Shift'],
+            ctrl: map['Control']
+          });
+        }
+      }
+      map[key] = event.type == 'keydown';
+    });
+
+    document.addEventListener('keyup', event => {
+      const key = upper(event.key);
+      if (!modifier(key)) {
+        inputController.keyUp(key, {
+          shift: map['Shift'],
+          ctrl: map['Control']
+        });
+      }
+
+      map[key] = event.type == 'keydown';
+    });
+
+    scene.registerAfterRender(() => {
+      for (let key of Object.keys(map)) {
+        if (map[key] && !modifier(key)) {
+          inputController.keyHold(key, {
+            shift: map['Shift'],
+            ctrl: map['Control']
+          });
+        }
+      }
+      inputController.tick();
+    });
+
+    return { scene, camera };
+  };
+  const { scene, camera } = createScene();
+
+  const specificController = new BabylonController(scene, camera);
+  const inputController = new InputController(specificController);
+  const land = productionContainer.get<Land>(TYPES.Land);
+  land.init(inputController);
+
+  renderEngine.runRenderLoop(() => {
+    scene.render();
+  });
+
+  window.addEventListener('resize', () => {
+    renderEngine.resize();
+  });
+
+  canvas.addEventListener('pointerdown', e => {
+    inputController.down(e);
+    if (e.button === 1) {
+      e.preventDefault();
+      return false;
     }
-  };
+  });
 
-  //The `upHandler`
-  key.upHandler = event => {
-    if (event.key === key.value) {
-      if (key.isDown && key.release) key.release();
-      key.isDown = false;
-      key.isUp = true;
+  canvas.addEventListener('pointerup', e => {
+    inputController.up(e);
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    inputController.move(e);
+  });
+
+  canvas.addEventListener('pointerenter', () => {});
+
+  canvas.addEventListener('pointerleave', e => {
+    inputController.up(e);
+  });
+
+  canvas.addEventListener('focus', () => {});
+
+  canvas.addEventListener('blur', () => {});
+
+  window.addEventListener('wheel', e => {
+    inputController.wheel(e);
+  });
+
+  document.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    return false;
+  });
+  document.addEventListener(
+    'dragover',
+    function(event) {
       event.preventDefault();
-    }
-  };
-
-  //Attach event listeners
-  const downListener = key.downHandler.bind(key);
-  const upListener = key.upHandler.bind(key);
-
-  window.addEventListener('keydown', downListener, false);
-  window.addEventListener('keyup', upListener, false);
-
-  // Detach event listeners
-  key.unsubscribe = () => {
-    window.removeEventListener('keydown', downListener);
-    window.removeEventListener('keyup', upListener);
-  };
-
-  return key;
-}
-
-let keyDown = keyboard('ArrowDown');
-let keyUp = keyboard('ArrowUp');
-let keyLeft = keyboard('ArrowLeft');
-let keyRight = keyboard('ArrowRight');
-
-keyDown.press = () => {
-  app.stage.y += 50;
-};
-
-keyUp.press = () => {
-  app.stage.y -= 50;
-};
-
-keyRight.press = () => {
-  app.stage.x += 50;
-};
-
-keyLeft.press = () => {
-  app.stage.x -= 50;
-};
-
-// todo key holding
-
-const point = new PIXI.Graphics();
-point.beginFill(0x0bef47);
-point.drawCircle(300, 300, 50);
-point.endFill();
-point.interactive = true; // Respond to interaction
-point.buttonMode = true; // The mouse changes hands
-point.on('pointerdown', (event: PIXI.InteractionEvent) => {
-  console.log('graphics');
-});
-app.stage.addChild(point);
-
-app.stage.interactive = true; // This can't be forgotten
-app.stage.on('pointerdown', (event: PIXI.InteractionEvent) => {
-  console.log('stage', event);
-
-  const newCircle = new PIXI.Graphics();
-  newCircle.beginFill(0x0bef47);
-  newCircle.drawCircle(
-    (event.data.global.x - app.stage.x) / app.stage.scale.x,
-    (event.data.global.y - app.stage.y) / app.stage.scale.y,
-    5
+    },
+    false
   );
-  newCircle.endFill();
-  app.stage.addChild(newCircle);
+
+  document.addEventListener(
+    'drop',
+    function(event) {
+      // cancel default actions
+      event.preventDefault();
+
+      var i = 0,
+        files = event && event.dataTransfer && event.dataTransfer.files,
+        len = (files && files.length) || 0;
+
+      for (; i < len; i++) {
+        var reader = new FileReader();
+        reader.onload = function(event) {
+          var contents = (event.target as any).result;
+
+          try {
+            const obj = JSON.parse(contents);
+
+            if (!obj._version) throw new Error();
+            if (obj._version != 2) throw new Error();
+            if (!obj._format || obj._format !== 'fahrplan') throw new Error();
+            inputController.load(obj.data);
+            inputController.loadSpecific(obj);
+          } catch {
+            console.error('Not proper JSON, hey!');
+          }
+        };
+
+        reader.onerror = function(event) {
+          console.error(
+            'File could not be read! Code ' + (event.target as any).error.code
+          );
+        };
+
+        if (files) reader.readAsText(files[i]);
+      }
+    },
+    false
+  );
 });
-
-app.stage.hitArea = new PIXI.Rectangle(
-  0,
-  0,
-  window.innerWidth,
-  window.innerHeight
-);
-
-app.renderer.plugins.interaction.on(
-  'pointerdown',
-  (event: PIXI.InteractionEvent) => {
-    console.log('renderer', event);
-  }
-);
-
-window.addEventListener('pointerdown', (event: any) => {
-  console.log('window');
-});
-
-window.addEventListener('mousewheel', (event: any) => {
-  const step = event.wheelDelta > 0 ? 0.1 : -0.1;
-  if (app.stage.scale.x + step >= 0.1) {
-    app.stage.scale.x += step;
-    app.stage.scale.y += step;
-  }
-});
-
-/*
-window.addEventListener('mousewheel', (event: any) => {
-  const step = event.wheelDelta > 0 ? Math.PI / 18 : -Math.PI / 18;
-  app.stage.rotation += step;
-});
-*/
