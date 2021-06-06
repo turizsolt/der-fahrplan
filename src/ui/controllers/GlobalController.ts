@@ -159,9 +159,9 @@ export class GlobalController {
         snappedPositionOnTrack: null,
         snappedJoint: null,
         snappedJointOnTrack: null,
-        wheelDeg: this.wheelRotation,
+        // wheelDeg: this.wheelRotation,
         wheelRad: (this.wheelRotation / 180) * Math.PI,
-        selected: this.store.getSelected(),
+        // selected: this.store.getSelected(),
         wagonType: this.vueToolbox.getWagon()
       };
 
@@ -185,16 +185,25 @@ export class GlobalController {
     }
 
     const ret: InputProps = {
-      point: point,
-      mesh: pickedMesh,
+      // pick
+      point: point, // only at Platform, deciding the side
+      mesh: pickedMesh, // to actually get the selected
+      
+      // snap - 6 different uses it, should place inside them
       snappedPoint: snapXZ(point),
       snappedPositionOnTrack: snapPositionOnTrack(point, trackList),
       snappedJoint: snapJoint(point, jointList),
       snappedJointOnTrack: snapPositionOnTrack(snapXZ(point), trackList),
-      wheelDeg: this.wheelRotation,
-      wheelRad: (this.wheelRotation / 180) * Math.PI,
-      selected: this.store.getSelected(),
-      wagonType: this.vueToolbox.getWagon()
+      
+      // wheel, only for track placement
+      // wheelDeg: this.wheelRotation, // nobody uses this
+      wheelRad: (this.wheelRotation / 180) * Math.PI, // Track
+
+      // nobody uses this
+      // selected: this.store.getSelected(),
+
+      // only for wagon placement
+      wagonType: this.vueToolbox.getWagon() //Wagon
     };
     ret.snappedPoint.dirXZ = ret.wheelRad;
 

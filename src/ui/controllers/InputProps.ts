@@ -23,10 +23,10 @@ export interface InputProps {
     segment: string;
   };
 
-  wheelDeg: number;
+  // wheelDeg: number;
   wheelRad: number;
 
-  selected: BaseStorable;
+  // selected: BaseStorable;
 
   wagonType: string;
 }
