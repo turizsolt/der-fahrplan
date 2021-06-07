@@ -17,7 +17,6 @@ export class VueSidebar {
       data: {
         selected: null,
         type: null,
-        opts: [],
         tickCount: '0:00',
         tickSpeed: 0,
         fps: -1,

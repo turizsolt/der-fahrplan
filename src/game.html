@@ -380,7 +380,7 @@
             v-bind:class="{ selected: selected === button.id }">{{button.text}}</button>
     </div>
     <div id="info-box">
-        <component v-if="selected" :is="type" :idt="selected.id" :obj="selected" :opts="opts"></component>
+        <component v-if="selected" :is="type" :idt="selected.id" :obj="selected"></component>
         <div v-if="!selected"></div>
         <div class="to-menu">
             Time: <span>{{tickCount}}</span> ({{tickSpeed}}x) (fps:{{fps}})<br />

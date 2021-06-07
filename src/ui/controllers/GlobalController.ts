@@ -268,12 +268,21 @@ export class GlobalController {
 
   private wheelRotation = 0;
 
+  // SELECT
+
   private selectCallback: (ob: Object) => void = null;
+
+  getSelected(): BaseStorable {
+    return this.store.getSelected();
+  }
+
+  getSelectedBrick(): BaseBrick {
+    return this.store.getSelected() as BaseBrick;
+  }
 
   private getMeshInfo(meshId: string): MeshInfo {
     if(!meshId) return null;
 
-    //chop everything after the dot
     if (meshId.includes('.')) {
         meshId = meshId.slice(0, meshId.indexOf('.'));
     }
@@ -290,23 +299,25 @@ export class GlobalController {
     return null;
   }
 
-  // if has callback, then clear it - todo: should work for all, not just wagons...
+  // todo - should work for all, not just wagons...
   private setCallbackOff(selected: BaseStorable) {
     if (
         this.selectCallback && 
+        selected &&
         selected.getType() === TYPES.Wagon
       ) {
         (selected as Wagon).off('info', this.selectCallback);
       }
   }
 
+  // todo - should work for all, not just wagons...
   private setCallbackOn(selected: BaseStorable) {
-    if (selected.getType() === Symbol.for('Wagon')) {
-        this.selectCallback = (obj: Object): void => {
-          this.vueSidebar.setData('selected', obj);
-        };
-        (selected as Wagon).on('info', this.selectCallback);
-      }
+    if (selected && selected.getType() === Symbol.for('Wagon')) {
+      this.selectCallback = (obj: Object): void => {
+        this.vueSidebar.setData('selected', obj);
+      };
+      (selected as Wagon).on('info', this.selectCallback);
+    }
   }
 
   private selectIfPossible(event: PointerEvent): boolean {
@@ -317,30 +328,13 @@ export class GlobalController {
     let selected: BaseStorable = this.store.getSelected();
 
     if(selected) {
-      this.setCallbackOff(selected)
-
-      // todo - emit instead
-      this.vueSidebar.setData('selected', null);
-      this.vueSidebar.setData('type', null);
-      this.vueSidebar.setData('opts', []);
-
-      // todo - wtf
-      this.store.clearSelected();
-      selected.deselect();
+      this.deselect(selected);
     }
 
     if (storedBrick !== selected) {  
       this.select(storedBrick);
     }
     return true;  
-  }
-
-  getSelected(): BaseStorable {
-    return this.store.getSelected();
-  }
-
-  getSelectedBrick(): BaseBrick {
-    return this.store.getSelected() as BaseBrick;
   }
 
   convertSymbolToType(type: Symbol): string {
@@ -350,37 +344,23 @@ export class GlobalController {
     return 'idtext';
   }
 
-  select(storedObj: BaseBrick) {
-    // remove callback, for the third time....
-    if (this.getSelected()) {
-      this.setCallbackOff(this.getSelected());
-    }
+  deselect(selected: BaseStorable) {
+    this.setCallbackOff(selected)
+    selected.deselect();
 
-    // do select the object
-    // also does select at the store - inconsistency detected...
-    storedObj.select();
+    // todo - emit instead
+    this.vueSidebar.setData('selected', null);
+    this.vueSidebar.setData('type', null);
+  }
 
-    // add the callback
+  select(selectable: BaseStorable) {
+    this.setCallbackOff(this.getSelected());
+    selectable.select();
     this.setCallbackOn(this.getSelected());
 
     // todo - emiting
-    // update it now
-    this.vueSidebar.setData('selected', Object.freeze(storedObj.persistDeep()));
-    // todo a really ugly setter with cases
-    this.vueSidebar.setData(
-      'type',
-      this.convertSymbolToType(storedObj.getType())
-    );
-    // if wagon, then update the trips, should be somewhere else...
-    if (storedObj.getType() === Symbol.for('Wagon')) {
-      this.vueSidebar.setData(
-        'opts',
-        this.store
-          .getAllOf<Trip>(TYPES.Trip)
-          .map(x => Object.freeze(x.persistDeep()))
-          .sort((a: any, b: any) => a.departureTime - b.departureTime)
-      );
-    }
+    this.vueSidebar.setData('selected', Object.freeze(selectable.persistDeep()));
+    this.vueSidebar.setData('type',this.convertSymbolToType(selectable.getType()));
   }
 
   wheel(event: WheelEvent) {
@@ -408,17 +388,6 @@ export class GlobalController {
     } else {
       this.selectMode(InputMode.CAMERA);
       this.vueBigScreen.setShow(false);
-
-      // copied from
-      if (this.getSelectedBrick() && this.getSelectedBrick().getType() === Symbol.for('Wagon')) {
-        this.vueSidebar.setData(
-          'opts',
-          this.store
-            .getAllOf<Trip>(TYPES.Trip)
-            .map(x => Object.freeze(x.persistDeep()))
-            .sort((a: any, b: any) => a.departureTime - b.departureTime)
-        );
-      }
     }
 
     if (mode === 'builder') {
