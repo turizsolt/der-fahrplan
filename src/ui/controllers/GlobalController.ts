@@ -27,17 +27,13 @@ import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
 import { VueSidebar } from './VueSidebar';
 import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
-import { Trip } from '../../structs/Scheduling/Trip';
 import { TickInputProps } from './TickInputProps';
 import { VueViewbox } from './VueViewbox';
 import { VueTestPanel } from './VueTestPanel';
 import { Train } from '../../modules/Train/Train';
 import { SpeedPedal } from '../../modules/Train/SpeedPedal';
 import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
-import { GENERATE_ID } from '../../structs/Actuals/Store/Command/CommandLog';
 import { CreateSignalInputHandler } from './CreateSignalInputHandler';
-import { Signal } from '../../modules/Signaling/Signal';
-import { SignalSignal } from '../../modules/Signaling/SignalSignal';
 import { CreateBlockJointInputHandler } from './CreateBlockJointInputHandler';
 import { CreateBlockInputHandler } from './CreateBlockInputHandler';
 import { AllowPathInputHandler } from './AllowPathInputHandler';
@@ -48,7 +44,6 @@ import { NewSelectInputHandler } from './InputHandlers/NewSelectInputHandler';
 import { Input } from './InputHandlers/Interfaces/Input';
 import { InputType } from './InputHandlers/Interfaces/InputType';
 import { InputMod } from './InputHandlers/Interfaces/InputMod';
-import { MeshInfo } from './MeshInfo';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -92,6 +87,8 @@ export class GlobalController {
 
   private downAt: number = 0;
 
+  private ih: NewSelectInputHandler;
+
   constructor(
     private specificController: GUISpecificController
   ) {
@@ -100,6 +97,8 @@ export class GlobalController {
     this.vueBigScreen = new VueBigscreen(this.store);
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
+
+    this.ih = new NewSelectInputHandler(this.store, this.vueSidebar);
 
     this.vueTestPanel = new VueTestPanel(this.store);
     this.store.getCommandLog().setInputController(this);
@@ -215,8 +214,6 @@ export class GlobalController {
     return ret;
   }
 
-  private ih: NewSelectInputHandler = new NewSelectInputHandler(this.store);
-
   down(event: PointerEvent) {
     const props = this.convert(event);
     this.downProps = props;
@@ -249,17 +246,19 @@ export class GlobalController {
       //(props.point &&
       //  this.downProps.point.coord.equalsTo(props.point.coord)))
     ) {
-      let ready = (this.mode === InputMode.CREATE_BLOCK || this.mode === InputMode.ALLOW_PATH || this.mode === InputMode.CREATE_PATH || this.mode === InputMode.CREATE_SECTION) ? false : this.selectIfPossible(event);
-      if (ready) {
+      // let ready = (this.mode === InputMode.CREATE_BLOCK || this.mode === InputMode.ALLOW_PATH || this.mode === InputMode.CREATE_PATH || this.mode === InputMode.CREATE_SECTION) ? false : this.selectIfPossible(event);
+      // if (ready) {
         // this.inputHandler.cancel();
-      } else {
+      //} else {
         // this.inputHandler.click(this.downProps, event);
         this.ih.handle({
             input: Input.MouseClick,
-            type: InputType.MouseLeft,
+            type: event.button === 0 ? InputType.MouseLeft:
+            event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
             mod: InputMod.None
-        });
-      }
+        },
+        this.downProps);
+      //}
     } else {
       // this.inputHandler.up(this.downProps, props, event);
     }
@@ -268,99 +267,12 @@ export class GlobalController {
 
   private wheelRotation = 0;
 
-  // SELECT
-
-  private selectCallback: (ob: Object) => void = null;
-
   getSelected(): BaseStorable {
     return this.store.getSelected();
   }
 
   getSelectedBrick(): BaseBrick {
     return this.store.getSelected() as BaseBrick;
-  }
-
-  private getMeshInfo(meshId: string): MeshInfo {
-    if(!meshId) return null;
-
-    if (meshId.includes('.')) {
-        meshId = meshId.slice(0, meshId.indexOf('.'));
-    }
-
-    if (meshId.startsWith('clickable-')) {
-      const [_, type, id, command] = meshId.split('-');
-      const storedObj = this.store.get(id);
-      const storedBrick = storedObj as BaseBrick;
-      return {
-          typeString: type, id, command, storedBrick, type: storedBrick?.getType()
-      };
-    }
-
-    return null;
-  }
-
-  // todo - should work for all, not just wagons...
-  private setCallbackOff(selected: BaseStorable) {
-    if (
-        this.selectCallback && 
-        selected &&
-        selected.getType() === TYPES.Wagon
-      ) {
-        (selected as Wagon).off('info', this.selectCallback);
-      }
-  }
-
-  // todo - should work for all, not just wagons...
-  private setCallbackOn(selected: BaseStorable) {
-    if (selected && selected.getType() === Symbol.for('Wagon')) {
-      this.selectCallback = (obj: Object): void => {
-        this.vueSidebar.setData('selected', obj);
-      };
-      (selected as Wagon).on('info', this.selectCallback);
-    }
-  }
-
-  private selectIfPossible(event: PointerEvent): boolean {
-    const meshInfo = this.getMeshInfo(this.downProps.mesh?.id);
-    if(!meshInfo || !meshInfo.storedBrick) return false;
-
-    const {storedBrick} = meshInfo;
-    let selected: BaseStorable = this.store.getSelected();
-
-    if(selected) {
-      this.deselect(selected);
-    }
-
-    if (storedBrick !== selected) {  
-      this.select(storedBrick);
-    }
-    return true;  
-  }
-
-  convertSymbolToType(type: Symbol): string {
-    if(type === Symbol.for('Passenger')) return 'passenger';
-    if(type === Symbol.for('Wagon')) return 'wagon';
-    if(type === Symbol.for('Station')) return 'station';
-    return 'idtext';
-  }
-
-  deselect(selected: BaseStorable) {
-    this.setCallbackOff(selected)
-    selected.deselect();
-
-    // todo - emit instead
-    this.vueSidebar.setData('selected', null);
-    this.vueSidebar.setData('type', null);
-  }
-
-  select(selectable: BaseStorable) {
-    this.setCallbackOff(this.getSelected());
-    selectable.select();
-    this.setCallbackOn(this.getSelected());
-
-    // todo - emiting
-    this.vueSidebar.setData('selected', Object.freeze(selectable.persistDeep()));
-    this.vueSidebar.setData('type',this.convertSymbolToType(selectable.getType()));
   }
 
   wheel(event: WheelEvent) {
@@ -417,7 +329,7 @@ export class GlobalController {
           const pivot = wagon?.getTrain()?.getId();
           const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
           const newIndex = (index + 1) % list.length;
-          this.select(list[newIndex].getWagons()[0]);
+          // todo this.select(list[newIndex].getWagons()[0]);
         }
         break;
 
@@ -428,7 +340,7 @@ export class GlobalController {
           const pivot = wagon?.getTrain()?.getId();
           const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
           const newIndex = (index - 1) < 0 ? list.length + index - 1 : index - 1;
-          this.select(list[newIndex].getWagons()[0]);
+          // todo this.select(list[newIndex].getWagons()[0]);
         }
         break;
     }
