@@ -1,5 +1,4 @@
 import { InputHandler } from './InputHandler';
-import { CreateTrackInputHandler } from './CreateTrackInputHandler';
 import { BabylonVector3ToCoordinate } from '../babylon/converters/BabylonVector3ToCoordinate';
 import { Ray } from '../../structs/Geometry/Ray';
 import {
@@ -16,12 +15,7 @@ import { ActualTrackJoint } from '../../modules/Track/TrackJoint/ActualTrackJoin
 import { InputProps } from './InputProps';
 import { BaseBrick } from '../../structs/Interfaces/BaseBrick';
 import { ActualTrackSwitch } from '../../modules/Track/ActualTrackSwitch';
-import { CameraInputHandler } from './CameraInputHandler';
-import { SelectInputHandler } from './SelectInputHandler';
-import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
-import { CreateEngineInputHandler } from './CreateEngineInputHandler';
 import { Store } from '../../structs/Interfaces/Store';
-import { CreateStationInputHandler } from './CreateStationInputHandler';
 import { Wagon } from '../../structs/Interfaces/Wagon';
 import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
 import { VueSidebar } from './VueSidebar';
@@ -33,12 +27,20 @@ import { VueTestPanel } from './VueTestPanel';
 import { Train } from '../../modules/Train/Train';
 import { SpeedPedal } from '../../modules/Train/SpeedPedal';
 import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
+/*
+import { CreateTrackInputHandler } from './CreateTrackInputHandler';
+import { CameraInputHandler } from './CameraInputHandler';
+import { SelectInputHandler } from './SelectInputHandler';
+import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
+import { CreateEngineInputHandler } from './CreateEngineInputHandler';
+import { CreateStationInputHandler } from './CreateStationInputHandler';
 import { CreateSignalInputHandler } from './CreateSignalInputHandler';
 import { CreateBlockJointInputHandler } from './CreateBlockJointInputHandler';
 import { CreateBlockInputHandler } from './CreateBlockInputHandler';
 import { AllowPathInputHandler } from './AllowPathInputHandler';
 import { CreatePathInputHandler } from './CreatePathInputHandler';
 import { CreateSectionInputHandler } from './CreateSectionInputHandler';
+*/
 import { GUISpecificController } from './GUISpecificController';
 import { NewSelectInputHandler } from './InputHandlers/NewSelectInputHandler';
 import { Input } from './InputHandlers/Interfaces/Input';
@@ -66,7 +68,7 @@ export class GlobalController {
   private store: Store;
 
   private inputHandler: InputHandler;
-  private inputHandlers: Record<InputMode, InputHandler>;
+  private inputHandlers: Record<any, InputHandler>;
 
   private downProps: InputProps;
 
@@ -104,6 +106,7 @@ export class GlobalController {
     this.store.getCommandLog().setInputController(this);
 
     this.inputHandlers = {
+        /*
       [InputMode.CAMERA]: new CameraInputHandler(this.specificController),
       [InputMode.SELECT]: new SelectInputHandler(),
       [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(this.store),
@@ -116,6 +119,7 @@ export class GlobalController {
       [InputMode.CREATE_SECTION]: new CreateSectionInputHandler(),
       [InputMode.CREATE_PATH]: new CreatePathInputHandler(),
       [InputMode.ALLOW_PATH]: new AllowPathInputHandler()
+      */
     };
 
     const modeNames: Record<InputMode, string> = {
