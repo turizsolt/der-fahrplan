@@ -48,6 +48,7 @@ import { NewSelectInputHandler } from './InputHandlers/NewSelectInputHandler';
 import { Input } from './InputHandlers/Interfaces/Input';
 import { InputType } from './InputHandlers/Interfaces/InputType';
 import { InputMod } from './InputHandlers/Interfaces/InputMod';
+import { MeshInfo } from './MeshInfo';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -214,7 +215,7 @@ export class GlobalController {
     return ret;
   }
 
-  private ih: NewSelectInputHandler = new NewSelectInputHandler();
+  private ih: NewSelectInputHandler = new NewSelectInputHandler(this.store);
 
   down(event: PointerEvent) {
     const props = this.convert(event);
@@ -269,82 +270,69 @@ export class GlobalController {
 
   private selectCallback: (ob: Object) => void = null;
 
-  private selectIfPossible(event: PointerEvent) {
-    let ready = false;
-    if (this.downProps.mesh) {
-      let meshId = this.downProps.mesh.id;
-      if (meshId.includes('.')) {
+  private getMeshInfo(meshId: string): MeshInfo {
+    if(!meshId) return null;
+
+    //chop everything after the dot
+    if (meshId.includes('.')) {
         meshId = meshId.slice(0, meshId.indexOf('.'));
-      }
-      if (meshId.startsWith('clickable-')) {
-        const [_, type, id, command] = meshId.split('-');
-        const storedObj = this.store.get(id);
-        const storedBrick = storedObj as BaseBrick;
-        if (storedBrick) {
-          if (command && !command.startsWith('joint')) {
-            // storedBrick.getRenderer().process(command);
-            if(command === 'endA') {
-                const wagon = storedBrick as Wagon;
-                this.store.getCommandLog().addAction(CommandCreator.unmergeTrain(
-                    wagon.getTrain().getId(),
-                    GENERATE_ID,
-                    wagon.getId(),
-                ));
-            }
-          } else if (event.button === 2) {
-            if (
-                storedBrick.getType() === TYPES.TrackSwitch
-              ) {
-                this.store.getCommandLog().addAction(CommandCreator.switchTrack(storedBrick.getId()));
-            } else if (
-                storedBrick.getType() === TYPES.Signal
-              ) {
-                const signal = (storedBrick as Signal);
-                signal.setBlockSignal(signal.getSignal() === SignalSignal.Red ? SignalSignal.Green : SignalSignal.Red);
-            }
-          } else {
-            let selected: BaseStorable = this.store.getSelected();
-            if (storedObj.isSelected()) {
-              if (
-                this.selectCallback && 
-                selected.getType() === TYPES.Wagon
-              ) {
-                (selected as Wagon).off('info', this.selectCallback);
-              }
-
-              this.store.clearSelected();
-              this.vueSidebar.setData('selected', null);
-              this.vueSidebar.setData('type', null);
-              this.vueSidebar.setData('opts', []);
-              storedObj.deselect();
-            } else {
-              if(this.store.getSelected()){
-                  
-                  if (
-                    this.selectCallback
-                    && this.store.getSelected().getType() === TYPES.Wagon
-                  ) {
-                    (this.store.getSelected() as Wagon).off('info', this.selectCallback);
-                  }
-
-                  this.store.getSelected().deselect();
-
-              }
-              // todo temp
-              /* console.log(storedBrick.getId());
-              if(storedBrick.getType() === TYPES.Block) {
-                const block = storedBrick as Block;
-                const p = block.persist() as any;
-                console.log(block.getId(), p.endA, p.endB);
-              } */
-              this.select(storedBrick);
-            }
-          }
-          ready = true;
-        }
-      }
     }
-    return ready;
+
+    if (meshId.startsWith('clickable-')) {
+      const [_, type, id, command] = meshId.split('-');
+      const storedObj = this.store.get(id);
+      const storedBrick = storedObj as BaseBrick;
+      return {
+          typeString: type, id, command, storedBrick, type: storedBrick?.getType()
+      };
+    }
+
+    return null;
+  }
+
+  // if has callback, then clear it - todo: should work for all, not just wagons...
+  private setCallbackOff(selected: BaseStorable) {
+    if (
+        this.selectCallback && 
+        selected.getType() === TYPES.Wagon
+      ) {
+        (selected as Wagon).off('info', this.selectCallback);
+      }
+  }
+
+  private setCallbackOn(selected: BaseStorable) {
+    if (selected.getType() === Symbol.for('Wagon')) {
+        this.selectCallback = (obj: Object): void => {
+          this.vueSidebar.setData('selected', obj);
+        };
+        (selected as Wagon).on('info', this.selectCallback);
+      }
+  }
+
+  private selectIfPossible(event: PointerEvent): boolean {
+    const meshInfo = this.getMeshInfo(this.downProps.mesh?.id);
+    if(!meshInfo || !meshInfo.storedBrick) return false;
+
+    const {storedBrick} = meshInfo;
+    let selected: BaseStorable = this.store.getSelected();
+
+    if(selected) {
+      this.setCallbackOff(selected)
+
+      // todo - emit instead
+      this.vueSidebar.setData('selected', null);
+      this.vueSidebar.setData('type', null);
+      this.vueSidebar.setData('opts', []);
+
+      // todo - wtf
+      this.store.clearSelected();
+      selected.deselect();
+    }
+
+    if (storedBrick !== selected) {  
+      this.select(storedBrick);
+    }
+    return true;  
   }
 
   getSelected(): BaseStorable {
@@ -355,29 +343,35 @@ export class GlobalController {
     return this.store.getSelected() as BaseBrick;
   }
 
+  convertSymbolToType(type: Symbol): string {
+    if(type === Symbol.for('Passenger')) return 'passenger';
+    if(type === Symbol.for('Wagon')) return 'wagon';
+    if(type === Symbol.for('Station')) return 'station';
+    return 'idtext';
+  }
+
   select(storedObj: BaseBrick) {
+    // remove callback, for the third time....
     if (this.getSelected()) {
-      if (
-        this.selectCallback && 
-        this.getSelected().getType() === Symbol.for('Wagon')
-      ) {
-        (this.getSelected() as Wagon).off('info', this.selectCallback);
-      }
+      this.setCallbackOff(this.getSelected());
     }
 
+    // do select the object
+    // also does select at the store - inconsistency detected...
     storedObj.select();
 
-    if (storedObj.getType() === Symbol.for('Wagon')) {
-      this.selectCallback = (obj: Object): void => {
-        this.vueSidebar.setData('selected', obj);
-      };
-      (this.getSelected() as Wagon).on('info', this.selectCallback);
-    }
+    // add the callback
+    this.setCallbackOn(this.getSelected());
+
+    // todo - emiting
+    // update it now
     this.vueSidebar.setData('selected', Object.freeze(storedObj.persistDeep()));
+    // todo a really ugly setter with cases
     this.vueSidebar.setData(
       'type',
-      storedObj.getType() === Symbol.for('Passenger') ? 'passenger' : storedObj.getType() === Symbol.for('Wagon') ? 'wagon' : (storedObj.getType() === Symbol.for('Station') ? 'station' : 'idtext')
+      this.convertSymbolToType(storedObj.getType())
     );
+    // if wagon, then update the trips, should be somewhere else...
     if (storedObj.getType() === Symbol.for('Wagon')) {
       this.vueSidebar.setData(
         'opts',
@@ -503,13 +497,14 @@ export class GlobalController {
   }
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    /*
     this.ih.handle({
         input: Input.KeyboardUp,
         type: key,
         mod: mods.shift ? ( mods.ctrl? InputMod.Both : InputMod.Shift) : ( mods.ctrl? InputMod.Ctrl : InputMod.None)
     });
-    return;
-    
+    */
+
     switch (key) {
       case 'T':
         this.store.getCommandLog().runNext();
