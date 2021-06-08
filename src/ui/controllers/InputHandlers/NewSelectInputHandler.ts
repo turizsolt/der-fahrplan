@@ -26,6 +26,7 @@ export class NewSelectInputHandler extends NewInputHander {
       console.log('clicked');
     
       const meshInfo = this.getMeshInfo(legacyProp?.mesh?.id);
+      console.log('meshInfo', meshInfo);
       if(!meshInfo || !meshInfo.storedBrick) return false;
 
       const {storedBrick} = meshInfo;

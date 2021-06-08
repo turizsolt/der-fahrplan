@@ -12,8 +12,11 @@ export class PixiController implements GUISpecificController {
     return null;
   }
 
-  pick(): BABYLON.PickingInfo {
-    return null;
+  pick(event: any): any {
+    return {
+      pickedPoint: { x: event.data.global.x, y: 0, z: event.data.global.y },
+      pickedMesh: { id: event.meshId }
+    };
   }
 
   modRadius(value: number): void {}

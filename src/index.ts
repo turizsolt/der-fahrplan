@@ -17,7 +17,7 @@ app.renderer.view.style.position = 'absolute';
 app.renderer.view.style.display = 'block';
 app.renderer.resize(window.innerWidth, window.innerHeight);
 
-app.renderer.view.style.zIndex = '-1';
+app.renderer.view.style.zIndex = '0';
 
 // add a rectange
 let rectangle = new PIXI.Graphics();
@@ -127,12 +127,10 @@ point.on('click', (event: PIXI.InteractionEvent) => {
 });
 app.stage.addChild(point);
 
-// todo global
-globalThis.stage = app.stage;
-
 app.stage.interactive = true; // This can't be forgotten
 app.stage.on('pointerdown', (event: PIXI.InteractionEvent) => {
-  // console.log('stage', event);
+  console.log('stage', event);
+  return;
 
   const newCircle = new PIXI.Graphics();
   newCircle.beginFill(0x0bef47);
@@ -191,6 +189,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const globalController = new GlobalController(specificController);
   const land = productionContainer.get<Land>(TYPES.Land);
   land.init(globalController);
+
+  // todo global
+  globalThis.stage = app.stage;
+  globalThis.globalController = globalController;
 
   document.addEventListener('contextmenu', e => {
     e.preventDefault();

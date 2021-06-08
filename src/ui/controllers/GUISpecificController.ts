@@ -6,5 +6,5 @@ export interface GUISpecificController {
   getFps(): string;
   setFollowCam(coord: Coordinate): void;
   modRadius(value: number): void;
-  pick(): any;
+  pick(event: any): any;
 }

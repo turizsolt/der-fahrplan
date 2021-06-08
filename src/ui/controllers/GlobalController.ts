@@ -157,7 +157,7 @@ export class GlobalController {
   }
 
   convert(event: PointerEvent): InputProps {
-    const { pickedPoint, pickedMesh } = this.specificController.pick();
+    const { pickedPoint, pickedMesh } = this.specificController.pick(event);
 
     if (!pickedPoint) {
       const ret: InputProps = {
@@ -242,7 +242,7 @@ export class GlobalController {
 
     let props = this.convert(event);
     const now = (new Date()).getTime();
-
+    
     if (
       //this.downProps.point && (
       now - this.downAt < 500

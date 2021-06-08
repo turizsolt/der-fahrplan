@@ -28,7 +28,7 @@ export class BabylonController implements GUISpecificController {
     };
   }
 
-  pick(): BABYLON.PickingInfo {
+  pick(event: any): BABYLON.PickingInfo {
     return this.scene.pick(this.scene.pointerX, this.scene.pointerY);
   }
 
