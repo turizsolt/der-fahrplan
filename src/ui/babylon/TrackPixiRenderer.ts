@@ -39,23 +39,30 @@ export class TrackPixiRenderer extends BasePixiRenderer
     */
     //line.lineStyle(4, 0xff0000, 1);
 
-    line.on('pointerdown', event => {
+    line.on('pointerdown', (event: PIXI.InteractionEvent) => {
       console.log('mousedown');
       globalThis.globalController.down({
         ...event,
         meshId: 'clickable-track-' + track.getId(),
         button: event.data.button
       });
+
+      event.stopPropagation();
+      event.data.originalEvent.stopPropagation();
     });
 
-    line.on('pointerup', event => {
+    line.on('pointerup', (event: PIXI.InteractionEvent) => {
       console.log('mouseup');
       globalThis.globalController.up({
         ...event,
         meshId: 'clickable-track-' + track.getId(),
         button: event.data.button
       });
+
+      event.stopPropagation();
+      event.data.originalEvent.stopPropagation();
     });
+
     globalThis.stage.addChild(line);
   }
 

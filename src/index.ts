@@ -130,7 +130,6 @@ app.stage.addChild(point);
 app.stage.interactive = true; // This can't be forgotten
 app.stage.on('pointerdown', (event: PIXI.InteractionEvent) => {
   console.log('stage', event);
-  return;
 
   const newCircle = new PIXI.Graphics();
   newCircle.beginFill(0x0bef47);
