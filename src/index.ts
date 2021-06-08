@@ -112,7 +112,7 @@ keyLeft.press = () => {
 
 const point = new PIXI.Graphics();
 point.beginFill(0x0bef47);
-point.drawCircle(300, 300, 50);
+point.drawCircle(0, 0, 10);
 point.endFill();
 point.interactive = true; // Respond to interaction
 point.buttonMode = true; // The mouse changes hands
@@ -140,6 +140,17 @@ app.stage.on('pointerdown', (event: PIXI.InteractionEvent) => {
   );
   newCircle.endFill();
   app.stage.addChild(newCircle);
+});
+
+app.stage.on('pointermove', (event: PIXI.InteractionEvent) => {
+  point.x = event.data.global.x + 20;
+  point.y = event.data.global.y + 20;
+
+  if (point.x % 400 < 200) {
+    point.renderable = false;
+  } else {
+    point.renderable = true;
+  }
 });
 
 app.stage.hitArea = new PIXI.Rectangle(
