@@ -111,14 +111,10 @@ export class ActualPathBlockEnd implements PathBlockEnd {
   }
 
   checkin(train: Train): void {
-    console.log('PBE checkin', this.getBlock()?.getId());
-    //this.getBlock()?.checkin(train);
     this.blockEnd?.checkin(train);
   }
 
   checkout(train: Train): void{
-    console.log('PBE checkout', this.getBlock()?.getId());
-    //this.getBlock()?.checkout(train);
     this.pathBlock.checkout(this);
     this.blockEnd?.checkout(train);
   }

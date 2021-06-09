@@ -86,12 +86,10 @@ export class ActualBlockEnd implements BlockEnd {
   }
 
   checkin(train: Train): void {
-    console.log('block checkin', this.getBlock()?.getId());
     this.getBlock()?.checkin(train);
   }
 
   checkout(train: Train): void {
-    console.log('block checkout', this.getBlock()?.getId());
     this.getBlock()?.checkout(train);
   }
 

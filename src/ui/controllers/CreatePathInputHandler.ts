@@ -38,7 +38,6 @@ export class CreatePathInputHandler implements InputHandler {
 
         this.jointEnds.push({ joint, end });
         if (event.button === 2) {
-          console.log('added');
           const pathBlocksEnds = this.jointEnds.map(
             je => je.joint.getEnd(je.end) as PathBlockEnd
           );

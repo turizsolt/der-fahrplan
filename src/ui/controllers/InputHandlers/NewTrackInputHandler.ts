@@ -60,23 +60,19 @@ export class NewTrackInputHandler extends NewInputHandler {
     });
 
     this.reg(move(), (legacyProp: InputProps) => {
-      console.log('move');
       const ray = snapHexaXZ(legacyProp.point);
       point.x = ray.coord.x;
       point.y = ray.coord.z;
     });
 
     this.reg(roam(), (legacyProp: InputProps) => {
-      console.log('roam');
       const ray = snapHexaXZ(legacyProp.point);
       point.x = ray.coord.x;
       point.y = ray.coord.z;
     });
 
     this.reg(click(MouseLeft), (legacyProp: InputProps) => {
-      console.log('track click');
       if (!legacyProp.snappedJoint && !legacyProp.snappedPositionOnTrack) {
-        console.log('created track command');
         this.commandLog.addAction(
           CommandCreator.createTrackJoint(
             GENERATE_ID,
@@ -87,21 +83,17 @@ export class NewTrackInputHandler extends NewInputHandler {
         );
         return true;
       }
-      console.log('not created');
       return false;
     });
 
     this.reg(drag(MouseLeft), () => {
-        console.log('drag', this.wheelRad);
         this.downWheelRad = this.wheelRad;
     });
 
     this.reg(drop(MouseLeft), (legacyProp: InputProps) => {
-        console.log('drop', this.wheelRad);
         const props = legacyProp;
         const downProps = legacyProp.downProps;
-        console.log('snapped', props, downProps);
-
+    
         // only if the point is not on a track, except the two ends
         if (
             !downProps.snappedPoint.coord.equalsTo(props.snappedPoint.coord) &&

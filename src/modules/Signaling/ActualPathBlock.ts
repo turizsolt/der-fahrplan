@@ -221,7 +221,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(obj.jointEnds.map(je => loadBlockJointEnd(je, store)));
-    this.getPathBlockEnds().map(pbe => {console.log('pbe pathConnect', pbe.getPathBlock().getId());pbe.pathConnect()});
+    this.getPathBlockEnds().map(pbe => pbe.pathConnect());
 
     this.queue.load(obj.queue, store);
     this.allowedPathes = obj.allowedPathes.map(ap => this.loadAllowedPath(ap, store));

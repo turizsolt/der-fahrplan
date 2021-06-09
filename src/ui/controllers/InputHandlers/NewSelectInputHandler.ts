@@ -18,15 +18,8 @@ export class NewSelectInputHandler extends NewInputHandler {
   constructor(private store: Store, private vueSidebar: VueSidebar) {
     super();
 
-    this.reg(keyUp('Q'), () => {
-      console.log('Q');
-    });
-
     this.reg(click(MouseLeft), (legacyProp: InputProps) => {
-      console.log('clicked');
-    
       const meshInfo = this.getMeshInfo(legacyProp?.mesh?.id);
-      console.log('meshInfo', meshInfo);
       if(!meshInfo || !meshInfo.storedBrick) return false;
 
       const {storedBrick} = meshInfo;
@@ -44,8 +37,6 @@ export class NewSelectInputHandler extends NewInputHandler {
     });
 
     this.reg(click(MouseRight), (legacyProp: InputProps) => {
-      console.log('right clicked');
-
       const meshInfo = this.getMeshInfo(legacyProp?.mesh?.id);
       if(!meshInfo || !meshInfo.storedBrick) return false;
 

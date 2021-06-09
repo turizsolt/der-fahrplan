@@ -36,15 +36,12 @@ export class AllowPathInputHandler implements InputHandler {
 
         this.jointEnds.push({ joint, end });
         if (this.jointEnds.length === 2) {
-          console.log('allow');
           const blockEnd0 = this.jointEnds[0].joint.getEnd(
             this.jointEnds[0].end
           );
           const blockEnd1 = this.jointEnds[1].joint.getEnd(
             this.jointEnds[1].end
           );
-
-          console.log('je', this.jointEnds, blockEnd0, blockEnd1);
 
           if (
             blockEnd0?.getType() === TYPES.PathBlockEnd &&
