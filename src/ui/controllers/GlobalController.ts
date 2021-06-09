@@ -233,8 +233,22 @@ export class GlobalController {
     const props = this.convert(event);
     if (this.downProps) {
       // this.inputHandler.move(this.downProps, props, event);
+      this.ih.handle({
+        input: Input.MouseMove,
+        type: event.button === 0 ? InputType.MouseLeft:
+        event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
+        mod: InputMod.None
+    },
+    props);
     } else {
       // this.inputHandler.roam(props, event);
+      this.ih.handle({
+        input: Input.MouseRoam,
+        type: event.button === 0 ? InputType.MouseLeft:
+        event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
+        mod: InputMod.None
+    },
+    props);
     }
   }
 
@@ -281,11 +295,11 @@ export class GlobalController {
   }
 
   wheel(event: WheelEvent) {
-    if (Math.sign(event.deltaY) > 0) {
-      this.specificController.modRadius(1.2);
-    } else {
-      this.specificController.modRadius(1/1.2);
-    }
+    this.ih.handle({
+      input: Input.Wheel,
+      type: Math.sign(event.deltaY) > 0 ? InputType.WheelPos:InputType.WheelNeg,
+      mod: InputMod.None
+    });
   }
 
   selectMode(mode: InputMode) {

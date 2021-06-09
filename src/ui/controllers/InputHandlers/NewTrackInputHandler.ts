@@ -1,6 +1,20 @@
+import * as PIXI from 'pixi.js';
 import { NewInputHandler } from './NewInputHandler';
-import { MouseLeft, MouseRight } from './Interfaces/InputType';
-import { keyUp, click, drag, drop } from './Interfaces/Helpers';
+import {
+  MouseLeft,
+  MouseRight,
+  WheelPos,
+  WheelNeg
+} from './Interfaces/InputType';
+import {
+  keyUp,
+  click,
+  drag,
+  drop,
+  wheel,
+  move,
+  roam
+} from './Interfaces/Helpers';
 import { Store } from '../../../structs/Interfaces/Store';
 import { InputProps } from '../InputProps';
 import {
@@ -8,17 +22,50 @@ import {
   GENERATE_ID
 } from '../../../structs/Actuals/Store/Command/CommandLog';
 import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
+import { snapHexaXZ } from '../../../structs/Geometry/Snap';
 
 export class NewTrackInputHandler extends NewInputHandler {
   private commandLog: CommandLog;
+  private wheelRad: number = Math.PI / 2;
 
   constructor(private store: Store) {
     super();
 
     this.commandLog = store.getCommandLog();
 
+    const point = new PIXI.Graphics();
+    point.beginFill(0xff0000); //0x0bef47);
+    point.drawRect(-0.5, -1.5, 1, 3);
+    point.endFill();
+    point.rotation = -this.wheelRad;
+    globalThis.stage.addChild(point);
+
     // todo copy from old
     // todo put BAB/PIX dependecies into a separate class
+
+    this.reg(wheel(WheelPos), () => {
+      this.wheelRad -= Math.PI / 3;
+      point.rotation = -this.wheelRad;
+    });
+
+    this.reg(wheel(WheelNeg), () => {
+      this.wheelRad += Math.PI / 3;
+      point.rotation = -this.wheelRad;
+    });
+
+    this.reg(move(), (legacyProp: InputProps) => {
+      console.log('move');
+      const ray = snapHexaXZ(legacyProp.point);
+      point.x = ray.coord.x;
+      point.y = ray.coord.z;
+    });
+
+    this.reg(roam(), (legacyProp: InputProps) => {
+      console.log('roam');
+      const ray = snapHexaXZ(legacyProp.point);
+      point.x = ray.coord.x;
+      point.y = ray.coord.z;
+    });
 
     this.reg(click(MouseLeft), (legacyProp: InputProps) => {
       console.log('track click');
@@ -29,7 +76,7 @@ export class NewTrackInputHandler extends NewInputHandler {
             GENERATE_ID,
             legacyProp.snappedPoint.coord.x,
             legacyProp.snappedPoint.coord.z,
-            legacyProp.wheelRad
+            this.wheelRad
           )
         );
         return true;

@@ -4,23 +4,17 @@ import { GlobalController } from './ui/controllers/GlobalController';
 import { Land } from './structs/Interfaces/Land';
 import { TYPES } from './di/TYPES';
 import { PixiController } from './ui/controllers/PixiController';
-import { Ray } from './structs/Geometry/Ray';
-import { snapHexaXZ } from './structs/Geometry/Snap';
 
+// init PIXI
 const app = new PIXI.Application({ width: 512, height: 512 });
-
-const container = document.getElementById('renderCanvas');
-
-container.appendChild(app.view);
-
+document.getElementById('renderCanvas').appendChild(app.view);
 app.renderer.backgroundColor = 0xcceecc;
-
 app.renderer.view.style.position = 'absolute';
 app.renderer.view.style.display = 'block';
 app.renderer.resize(window.innerWidth, window.innerHeight);
-
 app.renderer.view.style.zIndex = '0';
 
+// todo keyboard - should be removed
 function keyboard(value) {
   let key: any = {};
   key.value = value;
@@ -68,6 +62,8 @@ let keyDown = keyboard('ArrowDown');
 let keyUp = keyboard('ArrowUp');
 let keyLeft = keyboard('ArrowLeft');
 let keyRight = keyboard('ArrowRight');
+let keyQ = keyboard('q');
+let keyA = keyboard('a');
 
 keyDown.press = () => {
   app.stage.y += 50;
@@ -85,14 +81,28 @@ keyLeft.press = () => {
   app.stage.x -= 50;
 };
 
-// todo key holding
+keyQ.press = () => {
+  const step = 0.5;
+  if (app.stage.scale.x + step >= 0.5) {
+    app.stage.scale.x += step;
+    app.stage.scale.y += step;
+  }
+};
 
+keyA.press = () => {
+  const step = -0.5;
+  if (app.stage.scale.x + step >= 0.5) {
+    app.stage.scale.x += step;
+    app.stage.scale.y += step;
+  }
+};
+
+// draw the grid
 const HEIGHT = (10 * Math.sqrt(3)) / 2;
 const WIDTH = 10;
 
-// draw the grid
 let line = new PIXI.Graphics();
-line.lineStyle(0.5, 0x000000, 0.5);
+line.lineStyle(0.25, 0x000000, 0.25);
 for (let i = -50; i < 50; i++) {
   line.moveTo(-50 * WIDTH, i * HEIGHT);
   line.lineTo(50 * WIDTH, i * HEIGHT);
@@ -103,59 +113,13 @@ for (let i = -50; i < 50; i++) {
   line.moveTo((50 * WIDTH) / 2 + i * WIDTH, -50 * HEIGHT);
   line.lineTo((-50 * WIDTH) / 2 + i * WIDTH, 50 * HEIGHT);
 }
+app.stage.scale.x = 3;
+app.stage.scale.y = 3;
 app.stage.addChild(line);
+// todo global
+globalThis.stage = app.stage;
 
-const point = new PIXI.Graphics();
-point.beginFill(0xff0000); //0x0bef47);
-point.drawCircle(0, 0, 2);
-point.endFill();
-app.stage.addChild(point);
-
-app.stage.interactive = true; // This can't be forgotten
-app.stage.sortableChildren = true;
-
-app.stage.on('pointermove', (event: PIXI.InteractionEvent) => {
-  const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
-  const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
-
-  const ray = snapHexaXZ(Ray.from(x, 0, y, 0));
-  point.x = ray.coord.x;
-  point.y = ray.coord.z;
-});
-
-app.stage.hitArea = new PIXI.Rectangle(
-  -500,
-  -500,
-  1000, // window.innerWidth,
-  1000 // window.innerHeight
-);
-
-app.renderer.plugins.interaction.on(
-  'pointerdown',
-  (event: PIXI.InteractionEvent) => {
-    // console.log('renderer', event);
-  }
-);
-
-window.addEventListener('pointerdown', (event: any) => {
-  // console.log('window');
-});
-
-window.addEventListener('mousewheel', (event: any) => {
-  const step = event.wheelDelta > 0 ? 0.1 : -0.1;
-  if (app.stage.scale.x + step >= 0.1) {
-    app.stage.scale.x += step;
-    app.stage.scale.y += step;
-  }
-});
-
-/*
-window.addEventListener('mousewheel', (event: any) => {
-  const step = event.wheelDelta > 0 ? Math.PI / 18 : -Math.PI / 18;
-  app.stage.rotation += step;
-});
-*/
-
+// listeners
 window.addEventListener('DOMContentLoaded', () => {
   const specificController = new PixiController();
   const globalController = new GlobalController(specificController);
@@ -163,7 +127,6 @@ window.addEventListener('DOMContentLoaded', () => {
   land.init(globalController);
 
   // todo global
-  globalThis.stage = app.stage;
   globalThis.globalController = globalController;
 
   app.stage.on('pointerdown', (event: PIXI.InteractionEvent) => {
@@ -180,6 +143,28 @@ window.addEventListener('DOMContentLoaded', () => {
     event.data.global.x = x;
     event.data.global.y = y;
     globalController.up({ ...event, button: event.data.button } as any);
+  });
+
+  app.stage.on('pointermove', (event: PIXI.InteractionEvent) => {
+    const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
+    const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
+    event.data.global.x = x;
+    event.data.global.y = y;
+    globalController.move({ ...event, button: event.data.button } as any);
+  });
+
+  app.stage.interactive = true; // This can't be forgotten
+  app.stage.sortableChildren = true;
+
+  app.stage.hitArea = new PIXI.Rectangle(
+    -500,
+    -500,
+    1000, // window.innerWidth,
+    1000 // window.innerHeight
+  );
+
+  window.addEventListener('mousewheel', (event: any) => {
+    globalController.wheel(event);
   });
 
   document.addEventListener('contextmenu', e => {

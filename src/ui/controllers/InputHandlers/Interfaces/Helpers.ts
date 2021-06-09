@@ -21,9 +21,9 @@ export const keyHold = (key: string, mod?: InputMod):InputHandlerProp => ({
     mod: mod ?? InputMod.DontCare
 });
 
-export const wheel = (key: string, mod?: InputMod):InputHandlerProp => ({
+export const wheel = (wheelDir?: InputType, mod?: InputMod):InputHandlerProp => ({
     input: Input.Wheel,
-    type: InputType.WheelAny,
+    type: wheelDir ?? InputType.WheelAny,
     mod: mod ?? InputMod.DontCare
 });
 
