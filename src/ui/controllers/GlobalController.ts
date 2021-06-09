@@ -223,6 +223,14 @@ export class GlobalController {
     const props = this.convert(event);
     this.downProps = props;
     // this.inputHandler.down(props, event);
+    this.ih.handle({
+        input: Input.MouseDown,
+        type: event.button === 0 ? InputType.MouseLeft:
+        event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
+        mod: InputMod.None
+    },
+    props);
+
     this.downAt = (new Date()).getTime();
   }
 
@@ -239,7 +247,7 @@ export class GlobalController {
         event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
         mod: InputMod.None
     },
-    props);
+    {...props, downProps: this.downProps});
     } else {
       // this.inputHandler.roam(props, event);
       this.ih.handle({
@@ -276,10 +284,17 @@ export class GlobalController {
             event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
             mod: InputMod.None
         },
-        this.downProps);
+        {...props, downProps: this.downProps});
       //}
     } else {
       // this.inputHandler.up(this.downProps, props, event);
+      this.ih.handle({
+        input: Input.MouseUp,
+        type: event.button === 0 ? InputType.MouseLeft:
+        event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
+        mod: InputMod.None
+        },
+        {...props, downProps: this.downProps});
     }
     this.downProps = null;
   }

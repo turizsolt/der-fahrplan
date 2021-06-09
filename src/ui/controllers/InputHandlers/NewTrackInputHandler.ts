@@ -23,10 +23,16 @@ import {
 } from '../../../structs/Actuals/Store/Command/CommandLog';
 import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
 import { snapHexaXZ } from '../../../structs/Geometry/Snap';
+import { TrackJoint } from '../../../modules/Track/TrackJoint/TrackJoint';
+import { Command } from '../../../structs/Actuals/Store/Command/Command';
+import { TYPES } from '../../../di/TYPES';
+import { Ray } from '../../../structs/Geometry/Ray';
+import { TrackJointConnector } from '../../../modules/Track/TrackJoint/TrackJointConnector';
 
 export class NewTrackInputHandler extends NewInputHandler {
   private commandLog: CommandLog;
   private wheelRad: number = Math.PI / 2;
+  private downWheelRad: number = Math.PI / 2;
 
   constructor(private store: Store) {
     super();
@@ -85,8 +91,15 @@ export class NewTrackInputHandler extends NewInputHandler {
       return false;
     });
 
+    this.reg(drag(MouseLeft), () => {
+        console.log('drag', this.wheelRad);
+        this.downWheelRad = this.wheelRad;
+    });
+
     this.reg(drop(MouseLeft), (legacyProp: InputProps) => {
-      /*
+        console.log('drop', this.wheelRad);
+        const props = legacyProp;
+        const downProps = legacyProp.downProps;
         if (
             !downProps.snappedPoint.coord.equalsTo(props.snappedPoint.coord) &&
             (!props.snappedJointOnTrack ||
@@ -110,13 +123,13 @@ export class NewTrackInputHandler extends NewInputHandler {
                   downProps.snappedPoint.coord.x,
                   0,
                   downProps.snappedPoint.coord.z,
-                  downProps.wheelRad
+                  this.downWheelRad
                 ));
               actions.push(CommandCreator.createTrackJoint(
                 GENERATE_ID,
                 downProps.snappedPoint.coord.x,
                 downProps.snappedPoint.coord.z,
-                downProps.wheelRad
+                this.downWheelRad
               ));
               deletable.push(j1);
             }
@@ -130,13 +143,13 @@ export class NewTrackInputHandler extends NewInputHandler {
                   props.snappedPoint.coord.x,
                   0,
                   props.snappedPoint.coord.z,
-                  props.wheelRad
+                  this.wheelRad
                 ));
               actions.push(CommandCreator.createTrackJoint(
                 GENERATE_ID,
                 props.snappedPoint.coord.x,
                 props.snappedPoint.coord.z,
-                props.wheelRad
+                this.wheelRad
               ));
               deletable.push(j2);
             }
@@ -175,7 +188,7 @@ export class NewTrackInputHandler extends NewInputHandler {
           }
           
       return true;
-      */
+      
     });
   }
 }

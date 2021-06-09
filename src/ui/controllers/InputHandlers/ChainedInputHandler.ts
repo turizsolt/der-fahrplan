@@ -12,8 +12,8 @@ export class ChainedInputHandler extends NewInputHandler {
   constructor(private store: Store, private vueSidebar: VueSidebar) {
     super();
 
-    this.handlers.push(new NewSelectInputHandler(store, vueSidebar));
     this.handlers.push(new NewTrackInputHandler(store));
+    this.handlers.push(new NewSelectInputHandler(store, vueSidebar));
   }
 
   handle(inputProp: InputHandlerProp, legacyProp?: InputProps): boolean {

@@ -29,4 +29,6 @@ export interface InputProps {
   // selected: BaseStorable;
 
   wagonType: string;
+
+  downProps?: InputProps;
 }
