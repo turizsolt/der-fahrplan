@@ -50,12 +50,12 @@ export class NewTrackInputHandler extends NewInputHandler {
     // todo put BAB/PIX dependecies into a separate class
 
     this.reg(wheel(WheelPos), () => {
-      this.wheelRad -= Math.PI / 3;
+      this.wheelRad -= Math.PI / 6;
       point.rotation = -this.wheelRad;
     });
 
     this.reg(wheel(WheelNeg), () => {
-      this.wheelRad += Math.PI / 3;
+      this.wheelRad += Math.PI / 6;
       point.rotation = -this.wheelRad;
     });
 
@@ -100,6 +100,9 @@ export class NewTrackInputHandler extends NewInputHandler {
         console.log('drop', this.wheelRad);
         const props = legacyProp;
         const downProps = legacyProp.downProps;
+        console.log('snapped', props, downProps);
+
+        // only if the point is not on a track, except the two ends
         if (
             !downProps.snappedPoint.coord.equalsTo(props.snappedPoint.coord) &&
             (!props.snappedJointOnTrack ||
@@ -110,14 +113,13 @@ export class NewTrackInputHandler extends NewInputHandler {
               downProps.snappedJointOnTrack.position === 1)
           ) {
             let j1, j2: TrackJoint;
-            let s1: boolean = false;
-            let s2: boolean = false;
             const deletable: TrackJoint[] = [];
             const actions: Command[] = [];
+
+            // if there is a joint to snap, then do not create a new
             if (downProps.snappedJoint) {
               j1 = downProps.snappedJoint;
             } else {
-              s1 = true;
               j1 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
                 Ray.from(
                   downProps.snappedPoint.coord.x,
@@ -137,7 +139,6 @@ export class NewTrackInputHandler extends NewInputHandler {
             if (props.snappedJoint) {
               j2 = props.snappedJoint;
             } else {
-              s2 = true;
               j2 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
                 Ray.from(
                   props.snappedPoint.coord.x,
@@ -158,6 +159,8 @@ export class NewTrackInputHandler extends NewInputHandler {
       
             const replacementIds = deletable.map(j => j.getId());
       
+            // if created, we should delete, so we can create it again officially
+            // then we need to map the id-s in the command, and replace them ??? 
             deletable.map(j => j.remove());
       
             if (ret) {

@@ -41,6 +41,12 @@ export class TrackPixiRenderer extends BasePixiRenderer
     //line.lineStyle(4, 0xff0000, 1);
 
     line.on('pointerdown', (event: PIXI.InteractionEvent) => {
+      const x =
+        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
+      const y =
+        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
+      event.data.global.x = x;
+      event.data.global.y = y;
       console.log('mousedown');
       globalThis.globalController.down({
         ...event,
@@ -53,6 +59,12 @@ export class TrackPixiRenderer extends BasePixiRenderer
     });
 
     line.on('pointerup', (event: PIXI.InteractionEvent) => {
+      const x =
+        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
+      const y =
+        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
+      event.data.global.x = x;
+      event.data.global.y = y;
       console.log('mouseup');
       globalThis.globalController.up({
         ...event,

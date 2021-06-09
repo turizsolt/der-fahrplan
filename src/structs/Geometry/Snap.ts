@@ -103,7 +103,7 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
 }
 
 export function snapJoint(p: Ray, jointList: TrackJoint[]) {
-  const snapped = snapXZ(p);
+  const snapped = snapHexaXZ(p);
 
   for (let joint of jointList) {
     if (joint.getPosition().equalsTo(snapped.coord)) return joint;
