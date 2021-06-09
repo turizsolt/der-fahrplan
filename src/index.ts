@@ -112,6 +112,24 @@ keyLeft.press = () => {
 
 // todo key holding
 
+const HEIGHT = (10 * Math.sqrt(3)) / 2;
+const WIDTH = 10;
+
+// draw the grid
+let line = new PIXI.Graphics();
+line.lineStyle(0.5, 0x000000, 0.5);
+for (let i = -50; i < 50; i++) {
+  line.moveTo(-50 * WIDTH, i * HEIGHT);
+  line.lineTo(50 * WIDTH, i * HEIGHT);
+
+  line.moveTo((-50 * WIDTH) / 2 + i * WIDTH, -50 * HEIGHT);
+  line.lineTo((50 * WIDTH) / 2 + i * WIDTH, 50 * HEIGHT);
+
+  line.moveTo((50 * WIDTH) / 2 + i * WIDTH, -50 * HEIGHT);
+  line.lineTo((-50 * WIDTH) / 2 + i * WIDTH, 50 * HEIGHT);
+}
+app.stage.addChild(line);
+
 const point = new PIXI.Graphics();
 point.beginFill(0x0bef47);
 point.drawCircle(0, 0, 1);
