@@ -28,11 +28,15 @@ import { Command } from '../../../structs/Actuals/Store/Command/Command';
 import { TYPES } from '../../../di/TYPES';
 import { Ray } from '../../../structs/Geometry/Ray';
 import { TrackJointConnector } from '../../../modules/Track/TrackJoint/TrackJointConnector';
+import { Coordinate } from '../../../structs/Geometry/Coordinate';
+import { BezierCreater } from '../../../structs/Geometry/Bezier/BezierCreater';
+import { Left, Right } from '../../../structs/Geometry/Directions';
 
 export class NewTrackInputHandler extends NewInputHandler {
   private commandLog: CommandLog;
   private wheelRad: number = Math.PI / 2;
   private downWheelRad: number = Math.PI / 2;
+  private line: PIXI.Graphics;
 
   constructor(private store: Store) {
     super();
@@ -45,6 +49,11 @@ export class NewTrackInputHandler extends NewInputHandler {
     point.endFill();
     point.rotation = -this.wheelRad;
     globalThis.stage.addChild(point);
+
+    let line = new PIXI.Graphics();
+    line.lineStyle(1, 0x0000FF, 1);
+    globalThis.stage.addChild(line);
+    
 
     // todo copy from old
     // todo put BAB/PIX dependecies into a separate class
@@ -63,12 +72,49 @@ export class NewTrackInputHandler extends NewInputHandler {
       const ray = snapHexaXZ(legacyProp.point);
       point.x = ray.coord.x;
       point.y = ray.coord.z;
+
+      const props = legacyProp;
+      const downProps = legacyProp.downProps;
+      props.snappedPoint.dirXZ = this.wheelRad;
+      downProps.snappedPoint.dirXZ = this.downWheelRad;
+      if(props.snappedJoint) {
+        props.snappedPoint.dirXZ = props.snappedJoint.getRotation();
+      }
+      if(downProps.snappedJoint) {
+        downProps.snappedPoint.dirXZ = downProps.snappedJoint.getRotation();
+      }
+      const midpoint = downProps.snappedPoint.computeMidpoint(props.snappedPoint);
+      const midpointCoord: Coordinate = midpoint === false ? undefined : midpoint;
+      const chain = BezierCreater.Create([
+        downProps.snappedPoint.coord,
+        midpointCoord,
+        props.snappedPoint.coord
+      ])
+        .getLineSegmentChain();
+        
+        const rays1 = chain.getRays().map(r => r.fromHere(Left, 0.25));
+        const rays2 = chain
+          .getRays()
+          .map(r => r.fromHere(Right, 0.25))
+          .reverse();
+    
+        const coords = rays1.map(r => new PIXI.Point(r.coord.x, r.coord.z));
+        coords.push(...rays2.map(r => new PIXI.Point(r.coord.x, r.coord.z)));
+        const polygon = new PIXI.Polygon(coords);
+    
+        line.clear();
+        line.hitArea = polygon;
+        line.beginFill(0x0000ff);
+        line.drawPolygon(polygon);
+        line.endFill();
+        line.zIndex = 2;      
     });
 
     this.reg(roam(), (legacyProp: InputProps) => {
       const ray = snapHexaXZ(legacyProp.point);
       point.x = ray.coord.x;
       point.y = ray.coord.z;
+      line.clear();
     });
 
     this.reg(click(MouseLeft), (legacyProp: InputProps) => {

@@ -6,20 +6,22 @@ import { TrackJointRenderer } from '../../structs/Renderers/TrackJointRenderer';
 @injectable()
 export class TrackJointPixiRenderer extends BasePixiRenderer
   implements TrackJointRenderer {
+  private rectangle: PIXI.Graphics;
+
   init(data: any) {
-    const rectangle = new PIXI.Graphics();
-    rectangle.interactive = true;
-    rectangle.buttonMode = true;
-    rectangle.beginFill(0x470bef);
-    rectangle.drawRect(-0.5, -1.5, 1, 3);
-    rectangle.endFill();
+    this.rectangle = new PIXI.Graphics();
+    this.rectangle.interactive = true;
+    this.rectangle.buttonMode = true;
+    this.rectangle.beginFill(0x470bef);
+    this.rectangle.drawRect(-0.5, -1.5, 1, 3);
+    this.rectangle.endFill();
 
-    rectangle.x = data.ray.x;
-    rectangle.y = data.ray.z;
-    rectangle.rotation = -data.ray.dirXZ;
-    rectangle.zIndex = 1;
+    this.rectangle.x = data.ray.x;
+    this.rectangle.y = data.ray.z;
+    this.rectangle.rotation = -data.ray.dirXZ;
+    this.rectangle.zIndex = 1;
 
-    rectangle.on('pointerdown', (event: PIXI.InteractionEvent) => {
+    this.rectangle.on('pointerdown', (event: PIXI.InteractionEvent) => {
       const x =
         (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
       const y =
@@ -36,7 +38,7 @@ export class TrackJointPixiRenderer extends BasePixiRenderer
       event.data.originalEvent.stopPropagation();
     });
 
-    rectangle.on('pointerup', (event: PIXI.InteractionEvent) => {
+    this.rectangle.on('pointerup', (event: PIXI.InteractionEvent) => {
       const x =
         (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
       const y =
@@ -53,8 +55,12 @@ export class TrackJointPixiRenderer extends BasePixiRenderer
       event.data.originalEvent.stopPropagation();
     });
 
-    globalThis.stage.addChild(rectangle);
+    globalThis.stage.addChild(this.rectangle);
   }
 
   update() {}
+
+  remove() {
+    this.rectangle.renderable = false;
+  }
 }
