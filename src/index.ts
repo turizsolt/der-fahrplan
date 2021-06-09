@@ -131,8 +131,8 @@ for (let i = -50; i < 50; i++) {
 app.stage.addChild(line);
 
 const point = new PIXI.Graphics();
-point.beginFill(0x0bef47);
-point.drawCircle(0, 0, 1);
+point.beginFill(0xff0000); //0x0bef47);
+point.drawCircle(0, 0, 2);
 point.endFill();
 point.interactive = true; // Respond to interaction
 point.buttonMode = true; // The mouse changes hands
@@ -172,10 +172,10 @@ app.stage.on('pointermove', (event: PIXI.InteractionEvent) => {
 });
 
 app.stage.hitArea = new PIXI.Rectangle(
-  0,
-  0,
-  window.innerWidth,
-  window.innerHeight
+  -500,
+  -500,
+  1000, // window.innerWidth,
+  1000 // window.innerHeight
 );
 
 app.renderer.plugins.interaction.on(
