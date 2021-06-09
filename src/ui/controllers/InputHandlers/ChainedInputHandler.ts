@@ -4,6 +4,7 @@ import { VueSidebar } from '../VueSidebar';
 import { InputProps } from '../InputProps';
 import { InputHandlerProp } from './Interfaces/InputHandlerProp';
 import { NewSelectInputHandler } from './NewSelectInputHandler';
+import { NewTrackInputHandler } from './NewTrackInputHandler';
 
 export class ChainedInputHandler extends NewInputHandler {
   private handlers: NewInputHandler[] = [];
@@ -12,6 +13,7 @@ export class ChainedInputHandler extends NewInputHandler {
     super();
 
     this.handlers.push(new NewSelectInputHandler(store, vueSidebar));
+    this.handlers.push(new NewTrackInputHandler(store));
   }
 
   handle(inputProp: InputHandlerProp, legacyProp?: InputProps): boolean {

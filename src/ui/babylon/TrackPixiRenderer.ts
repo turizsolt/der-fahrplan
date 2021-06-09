@@ -30,6 +30,7 @@ export class TrackPixiRenderer extends BasePixiRenderer
     line.beginFill(0x0bef47);
     line.drawPolygon(polygon);
     line.endFill();
+    line.zIndex = 0;
 
     /*
     line.moveTo(rays[0].coord.x, rays[0].coord.z);

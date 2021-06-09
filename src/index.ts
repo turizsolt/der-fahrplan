@@ -21,31 +21,6 @@ app.renderer.resize(window.innerWidth, window.innerHeight);
 
 app.renderer.view.style.zIndex = '0';
 
-// add a rectange
-let rectangle = new PIXI.Graphics();
-rectangle.lineStyle(4, 0xff3300, 1);
-rectangle.beginFill(0x66ccff);
-rectangle.drawRect(0, 0, 64, 64);
-rectangle.endFill();
-rectangle.x = 320;
-rectangle.y = 320;
-app.stage.addChild(rectangle);
-
-// add a circle
-let circle = new PIXI.Graphics();
-circle.lineStyle(4, 0xff3300, 1);
-circle.beginFill(0x9966ff);
-circle.drawCircle(0, 0, 32);
-circle.endFill();
-circle.x = 400;
-circle.y = 320;
-app.stage.addChild(circle);
-
-// add a text
-let message = new PIXI.Text('Hello Pixi!');
-app.stage.addChild(message);
-message.position.set(480, 480);
-
 function keyboard(value) {
   let key: any = {};
   key.value = value;
@@ -134,33 +109,10 @@ const point = new PIXI.Graphics();
 point.beginFill(0xff0000); //0x0bef47);
 point.drawCircle(0, 0, 2);
 point.endFill();
-point.interactive = true; // Respond to interaction
-point.buttonMode = true; // The mouse changes hands
-point.on('pointerdown', (event: PIXI.InteractionEvent) => {
-  console.log('graphics pd');
-});
-point.on('pointerup', (event: PIXI.InteractionEvent) => {
-  console.log('graphics pu');
-});
-point.on('click', (event: PIXI.InteractionEvent) => {
-  console.log('graphics cl');
-});
 app.stage.addChild(point);
 
 app.stage.interactive = true; // This can't be forgotten
-app.stage.on('pointerdown', (event: PIXI.InteractionEvent) => {
-  console.log('stage', event);
-
-  const newCircle = new PIXI.Graphics();
-  newCircle.beginFill(0x0bef47);
-  newCircle.drawCircle(
-    (event.data.global.x - app.stage.x) / app.stage.scale.x,
-    (event.data.global.y - app.stage.y) / app.stage.scale.y,
-    5
-  );
-  newCircle.endFill();
-  app.stage.addChild(newCircle);
-});
+app.stage.sortableChildren = true;
 
 app.stage.on('pointermove', (event: PIXI.InteractionEvent) => {
   const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
@@ -204,14 +156,6 @@ window.addEventListener('mousewheel', (event: any) => {
 });
 */
 
-/*
-let id = 0;
-app.ticker.add(delta => {
-  console.log(id, delta);
-  id++;
-});
-*/
-
 window.addEventListener('DOMContentLoaded', () => {
   const specificController = new PixiController();
   const globalController = new GlobalController(specificController);
@@ -221,6 +165,22 @@ window.addEventListener('DOMContentLoaded', () => {
   // todo global
   globalThis.stage = app.stage;
   globalThis.globalController = globalController;
+
+  app.stage.on('pointerdown', (event: PIXI.InteractionEvent) => {
+    const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
+    const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
+    event.data.global.x = x;
+    event.data.global.y = y;
+    globalController.down({ ...event, button: event.data.button } as any);
+  });
+
+  app.stage.on('pointerup', (event: PIXI.InteractionEvent) => {
+    const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
+    const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
+    event.data.global.x = x;
+    event.data.global.y = y;
+    globalController.up({ ...event, button: event.data.button } as any);
+  });
 
   document.addEventListener('contextmenu', e => {
     e.preventDefault();

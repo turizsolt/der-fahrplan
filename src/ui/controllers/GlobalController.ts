@@ -2,7 +2,7 @@ import { InputHandler } from './InputHandler';
 import { BabylonVector3ToCoordinate } from '../babylon/converters/BabylonVector3ToCoordinate';
 import { Ray } from '../../structs/Geometry/Ray';
 import {
-  snapXZ,
+  snapHexaXZ,
   snapPositionOnTrack,
   snapJoint
 } from '../../structs/Geometry/Snap';
@@ -199,10 +199,10 @@ export class GlobalController {
       mesh: pickedMesh, // to actually get the selected
       
       // snap - 6 different uses it, should place inside them
-      snappedPoint: snapXZ(point),
+      snappedPoint: snapHexaXZ(point),
       snappedPositionOnTrack: snapPositionOnTrack(point, trackList),
       snappedJoint: snapJoint(point, jointList),
-      snappedJointOnTrack: snapPositionOnTrack(snapXZ(point), trackList),
+      snappedJointOnTrack: snapPositionOnTrack(snapHexaXZ(point), trackList),
       
       // wheel, only for track placement
       // wheelDeg: this.wheelRotation, // nobody uses this
