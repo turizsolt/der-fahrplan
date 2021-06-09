@@ -1,4 +1,4 @@
-import { NewInputHander } from './NewInputHandler';
+import { NewInputHandler } from './NewInputHandler';
 import { MouseLeft, MouseRight } from './Interfaces/InputType';
 import { keyUp, click } from './Interfaces/Helpers';
 import { GENERATE_ID } from '../../../structs/Actuals/Store/Command/CommandLog';
@@ -14,7 +14,7 @@ import { BaseStorable } from '../../../structs/Interfaces/BaseStorable';
 import { VueSidebar } from '../VueSidebar';
 import { InputProps } from '../InputProps';
 
-export class NewSelectInputHandler extends NewInputHander {
+export class NewSelectInputHandler extends NewInputHandler {
   constructor(private store: Store, private vueSidebar: VueSidebar) {
     super();
 

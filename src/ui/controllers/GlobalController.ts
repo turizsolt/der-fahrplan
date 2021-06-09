@@ -42,10 +42,11 @@ import { CreatePathInputHandler } from './CreatePathInputHandler';
 import { CreateSectionInputHandler } from './CreateSectionInputHandler';
 */
 import { GUISpecificController } from './GUISpecificController';
-import { NewSelectInputHandler } from './InputHandlers/NewSelectInputHandler';
+import { NewInputHandler } from './InputHandlers/NewInputHandler';
 import { Input } from './InputHandlers/Interfaces/Input';
 import { InputType } from './InputHandlers/Interfaces/InputType';
 import { InputMod } from './InputHandlers/Interfaces/InputMod';
+import { ChainedInputHandler } from './InputHandlers/ChainedInputHandler';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -89,7 +90,7 @@ export class GlobalController {
 
   private downAt: number = 0;
 
-  private ih: NewSelectInputHandler;
+  private ih: NewInputHandler;
 
   constructor(
     private specificController: GUISpecificController
@@ -100,7 +101,7 @@ export class GlobalController {
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
 
-    this.ih = new NewSelectInputHandler(this.store, this.vueSidebar);
+    this.ih = new ChainedInputHandler(this.store, this.vueSidebar);
 
     this.vueTestPanel = new VueTestPanel(this.store);
     this.store.getCommandLog().setInputController(this);
