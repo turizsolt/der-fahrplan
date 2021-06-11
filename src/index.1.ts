@@ -7,6 +7,7 @@ import { GridDrawer } from './ui/controllers/GridDrawer';
 import { GlobalController } from './ui/controllers/GlobalController';
 import { MeshProvider } from './ui/babylon/MeshProvider';
 import { BabylonController } from './ui/controllers/BabylonController';
+import { KeyboardInputs } from './KeyboardInputs';
 
 window.addEventListener('DOMContentLoaded', () => {
   const canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
@@ -45,52 +46,11 @@ window.addEventListener('DOMContentLoaded', () => {
     gridDrawer.setScene(scene);
     gridDrawer.drawGrid();
 
-    const map = {};
     scene.actionManager = new BABYLON.ActionManager(scene);
 
-    const modifier = key => {
-      const list = ['Shift', 'Control', 'Alt'];
-      return list.includes(key);
-    };
-
-    const upper = key => {
-      return key[0].toUpperCase() + key.slice(1);
-    };
-
-    document.addEventListener('keydown', event => {
-      const key = upper(event.key);
-      if (!map[key]) {
-        if (!modifier(key)) {
-          globalController.keyDown(key, {
-            shift: map['Shift'],
-            ctrl: map['Control']
-          });
-        }
-      }
-      map[key] = event.type == 'keydown';
-    });
-
-    document.addEventListener('keyup', event => {
-      const key = upper(event.key);
-      if (!modifier(key)) {
-        globalController.keyUp(key, {
-          shift: map['Shift'],
-          ctrl: map['Control']
-        });
-      }
-
-      map[key] = event.type == 'keydown';
-    });
-
+    const keyboardInputs = new KeyboardInputs(globalController);
     scene.registerAfterRender(() => {
-      for (let key of Object.keys(map)) {
-        if (map[key] && !modifier(key)) {
-          globalController.keyHold(key, {
-            shift: map['Shift'],
-            ctrl: map['Control']
-          });
-        }
-      }
+      keyboardInputs.fireKeyHolds();
       globalController.tick();
     });
 

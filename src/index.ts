@@ -4,6 +4,7 @@ import { GlobalController } from './ui/controllers/GlobalController';
 import { Land } from './structs/Interfaces/Land';
 import { TYPES } from './di/TYPES';
 import { PixiController } from './ui/controllers/PixiController';
+import { KeyboardInputs } from './KeyboardInputs';
 
 // init PIXI
 const app = new PIXI.Application({ width: 512, height: 512 });
@@ -13,89 +14,6 @@ app.renderer.view.style.position = 'absolute';
 app.renderer.view.style.display = 'block';
 app.renderer.resize(window.innerWidth, window.innerHeight);
 app.renderer.view.style.zIndex = '0';
-
-// todo keyboard - should be removed
-function keyboard(value) {
-  let key: any = {};
-  key.value = value;
-  key.isDown = false;
-  key.isUp = true;
-  key.press = undefined;
-  key.release = undefined;
-  //The `downHandler`
-  key.downHandler = event => {
-    if (event.key === key.value) {
-      if (key.isUp && key.press) key.press();
-      key.isDown = true;
-      key.isUp = false;
-      event.preventDefault();
-    }
-  };
-
-  //The `upHandler`
-  key.upHandler = event => {
-    if (event.key === key.value) {
-      if (key.isDown && key.release) key.release();
-      key.isDown = false;
-      key.isUp = true;
-      event.preventDefault();
-    }
-  };
-
-  //Attach event listeners
-  const downListener = key.downHandler.bind(key);
-  const upListener = key.upHandler.bind(key);
-
-  window.addEventListener('keydown', downListener, false);
-  window.addEventListener('keyup', upListener, false);
-
-  // Detach event listeners
-  key.unsubscribe = () => {
-    window.removeEventListener('keydown', downListener);
-    window.removeEventListener('keyup', upListener);
-  };
-
-  return key;
-}
-
-let keyDown = keyboard('ArrowDown');
-let keyUp = keyboard('ArrowUp');
-let keyLeft = keyboard('ArrowLeft');
-let keyRight = keyboard('ArrowRight');
-let keyQ = keyboard('q');
-let keyA = keyboard('a');
-
-keyDown.press = () => {
-  app.stage.y += 50;
-};
-
-keyUp.press = () => {
-  app.stage.y -= 50;
-};
-
-keyRight.press = () => {
-  app.stage.x += 50;
-};
-
-keyLeft.press = () => {
-  app.stage.x -= 50;
-};
-
-keyQ.press = () => {
-  const step = 0.5;
-  if (app.stage.scale.x + step >= 0.5) {
-    app.stage.scale.x += step;
-    app.stage.scale.y += step;
-  }
-};
-
-keyA.press = () => {
-  const step = -0.5;
-  if (app.stage.scale.x + step >= 0.5) {
-    app.stage.scale.x += step;
-    app.stage.scale.y += step;
-  }
-};
 
 // draw the grid
 const HEIGHT = (10 * Math.sqrt(3)) / 2;
@@ -218,4 +136,10 @@ window.addEventListener('DOMContentLoaded', () => {
     },
     false
   );
+
+  const keyboardInputs = new KeyboardInputs(globalController);
+  app.ticker.add(delta => () => {
+    keyboardInputs.fireKeyHolds();
+    globalController.tick();
+  });
 });
