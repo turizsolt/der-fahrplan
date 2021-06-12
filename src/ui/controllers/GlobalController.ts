@@ -47,6 +47,7 @@ import { Input } from './InputHandlers/Interfaces/Input';
 import { InputType } from './InputHandlers/Interfaces/InputType';
 import { InputMod } from './InputHandlers/Interfaces/InputMod';
 import { ChainedInputHandler } from './InputHandlers/ChainedInputHandler';
+import { InputHandlerProp } from './InputHandlers/Interfaces/InputHandlerProp';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -60,7 +61,7 @@ export enum InputMode {
   CREATE_BLOCK = 'CREATE_BLOCK',
   CREATE_SECTION = 'CREATE_SECTION',
   CREATE_PATH = 'CREATE_PATH',
-  ALLOW_PATH = 'ALLOW_PATH',
+  ALLOW_PATH = 'ALLOW_PATH'
 }
 
 export class GlobalController {
@@ -92,22 +93,20 @@ export class GlobalController {
 
   private ih: NewInputHandler;
 
-  constructor(
-    private specificController: GUISpecificController
-  ) {
+  constructor(private specificController: GUISpecificController) {
     this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
     this.vueSidebar = new VueSidebar(this.store);
     this.vueBigScreen = new VueBigscreen(this.store);
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
 
-    this.ih = new ChainedInputHandler(this.store, this.vueSidebar);
+    this.ih = new ChainedInputHandler(this.store, this.vueSidebar, this);
 
     this.vueTestPanel = new VueTestPanel(this.store);
     this.store.getCommandLog().setInputController(this);
 
     this.inputHandlers = {
-        /*
+      /*
       [InputMode.CAMERA]: new CameraInputHandler(this.specificController),
       [InputMode.SELECT]: new SelectInputHandler(),
       [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(this.store),
@@ -197,13 +196,13 @@ export class GlobalController {
       // pick
       point: point, // only at Platform, deciding the side
       mesh: pickedMesh, // to actually get the selected
-      
+
       // snap - 6 different uses it, should place inside them
       snappedPoint: snapHexaXZ(point),
       snappedPositionOnTrack: snapPositionOnTrack(point, trackList),
       snappedJoint: snapJoint(point, jointList),
       snappedJointOnTrack: snapPositionOnTrack(snapHexaXZ(point), trackList),
-      
+
       // wheel, only for track placement
       // wheelDeg: this.wheelRotation, // nobody uses this
       wheelRad: (this.wheelRotation / 180) * Math.PI, // Track
@@ -223,40 +222,58 @@ export class GlobalController {
     const props = this.convert(event);
     this.downProps = props;
     // this.inputHandler.down(props, event);
-    this.ih.handle({
+    this.ih.handle(
+      {
         input: Input.MouseDown,
-        type: event.button === 0 ? InputType.MouseLeft:
-        event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
+        type:
+          event.button === 0
+            ? InputType.MouseLeft
+            : event.button === 2
+            ? InputType.MouseRight
+            : InputType.MouseMiddle,
         mod: InputMod.None
-    },
-    props);
+      },
+      props
+    );
 
-    this.downAt = (new Date()).getTime();
+    this.downAt = new Date().getTime();
   }
 
   move(event: PointerEvent) {
-    const now = (new Date()).getTime();
+    const now = new Date().getTime();
     if (now - this.downAt < 500) return;
 
     const props = this.convert(event);
     if (this.downProps) {
       // this.inputHandler.move(this.downProps, props, event);
-      this.ih.handle({
-        input: Input.MouseMove,
-        type: event.button === 0 ? InputType.MouseLeft:
-        event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
-        mod: InputMod.None
-    },
-    {...props, downProps: this.downProps});
+      this.ih.handle(
+        {
+          input: Input.MouseMove,
+          type:
+            event.button === 0
+              ? InputType.MouseLeft
+              : event.button === 2
+              ? InputType.MouseRight
+              : InputType.MouseMiddle,
+          mod: InputMod.None
+        },
+        { ...props, downProps: this.downProps }
+      );
     } else {
       // this.inputHandler.roam(props, event);
-      this.ih.handle({
-        input: Input.MouseRoam,
-        type: event.button === 0 ? InputType.MouseLeft:
-        event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
-        mod: InputMod.None
-    },
-    props);
+      this.ih.handle(
+        {
+          input: Input.MouseRoam,
+          type:
+            event.button === 0
+              ? InputType.MouseLeft
+              : event.button === 2
+              ? InputType.MouseRight
+              : InputType.MouseMiddle,
+          mod: InputMod.None
+        },
+        props
+      );
     }
   }
 
@@ -264,55 +281,61 @@ export class GlobalController {
     if (!this.downProps) return;
 
     let props = this.convert(event);
-    const now = (new Date()).getTime();
-    
+    const now = new Date().getTime();
+
     if (
       //this.downProps.point && (
-      now - this.downAt < 500
+      now - this.downAt <
+      500
       // ||
       //(props.point &&
       //  this.downProps.point.coord.equalsTo(props.point.coord)))
     ) {
       // let ready = (this.mode === InputMode.CREATE_BLOCK || this.mode === InputMode.ALLOW_PATH || this.mode === InputMode.CREATE_PATH || this.mode === InputMode.CREATE_SECTION) ? false : this.selectIfPossible(event);
       // if (ready) {
-        // this.inputHandler.cancel();
+      // this.inputHandler.cancel();
       //} else {
-        // this.inputHandler.click(this.downProps, event);
-        this.ih.handle({
-            input: Input.MouseClick,
-            type: event.button === 0 ? InputType.MouseLeft:
-            event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
-            mod: InputMod.None
+      // this.inputHandler.click(this.downProps, event);
+      this.ih.handle(
+        {
+          input: Input.MouseClick,
+          type:
+            event.button === 0
+              ? InputType.MouseLeft
+              : event.button === 2
+              ? InputType.MouseRight
+              : InputType.MouseMiddle,
+          mod: InputMod.None
         },
-        {...props, downProps: this.downProps});
+        { ...props, downProps: this.downProps }
+      );
       //}
     } else {
       // this.inputHandler.up(this.downProps, props, event);
-      this.ih.handle({
-        input: Input.MouseUp,
-        type: event.button === 0 ? InputType.MouseLeft:
-        event.button === 2 ? InputType.MouseRight : InputType.MouseMiddle,
-        mod: InputMod.None
+      this.ih.handle(
+        {
+          input: Input.MouseUp,
+          type:
+            event.button === 0
+              ? InputType.MouseLeft
+              : event.button === 2
+              ? InputType.MouseRight
+              : InputType.MouseMiddle,
+          mod: InputMod.None
         },
-        {...props, downProps: this.downProps});
+        { ...props, downProps: this.downProps }
+      );
     }
     this.downProps = null;
   }
 
   private wheelRotation = 0;
 
-  getSelected(): BaseStorable {
-    return this.store.getSelected();
-  }
-
-  getSelectedBrick(): BaseBrick {
-    return this.store.getSelected() as BaseBrick;
-  }
-
   wheel(event: WheelEvent) {
     this.ih.handle({
       input: Input.Wheel,
-      type: Math.sign(event.deltaY) > 0 ? InputType.WheelPos:InputType.WheelNeg,
+      type:
+        Math.sign(event.deltaY) > 0 ? InputType.WheelPos : InputType.WheelNeg,
       mod: InputMod.None
     });
   }
@@ -343,108 +366,43 @@ export class GlobalController {
     }
   }
 
+  // keyboard handling
+
   keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    this.ih.handle({
-        input: Input.KeyboardDown,
-        type: key,
-        mod: mods.shift ? ( mods.ctrl? InputMod.Both : InputMod.Shift) : ( mods.ctrl? InputMod.Ctrl : InputMod.None)
-    });
-
-    switch (key) {
-      case 'X':
-        this.wheelRotation += 45;
-        if (this.wheelRotation > 180) this.wheelRotation -= 360;
-        const props = this.convert(null);
-        if (props.point) this.move(null);
-        break;
-
-      case 'ScrollLock':
-        this.inputHandlers.CAMERA.setPanLock();
-        break;
-
-      case 'PageUp':
-        {
-          const list = this.store.getAllOf<Train>(Symbol.for('Train'));
-          const wagon = this.getSelectedBrick()?.getType() === Symbol.for('Wagon') ? (this.getSelectedBrick() as Wagon) : null;
-          const pivot = wagon?.getTrain()?.getId();
-          const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
-          const newIndex = (index + 1) % list.length;
-          // todo this.select(list[newIndex].getWagons()[0]);
-        }
-        break;
-
-      case 'PageDown':
-        {
-          const list = this.store.getAllOf<Train>(Symbol.for('Train'));
-          const wagon = this.getSelectedBrick()?.getType() === Symbol.for('Wagon') ? (this.getSelectedBrick() as Wagon) : null;
-          const pivot = wagon?.getTrain()?.getId();
-          const index = pivot ? list.findIndex(x => x.getId() === pivot) : -1;
-          const newIndex = (index - 1) < 0 ? list.length + index - 1 : index - 1;
-          // todo this.select(list[newIndex].getWagons()[0]);
-        }
-        break;
-    }
+    this.ih.handle(this.getHandle(Input.KeyboardDown, key, mods));
   }
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    this.ih.handle({
-        input: Input.KeyboardUp,
-        type: key,
-        mod: mods.shift ? ( mods.ctrl? InputMod.Both : InputMod.Shift) : ( mods.ctrl? InputMod.Ctrl : InputMod.None)
-    });
-    
-    switch (key) {
-      case 'K':
-        const download = (content, fileName, contentType) => {
-          var a = document.createElement('a');
-          var file = new Blob([content], { type: contentType });
-          a.href = URL.createObjectURL(file);
-          a.download = fileName;
-          a.click();
-        };
-
-        const data = {
-          data: this.store.persistAll(),
-          ...this.saveSpecific(),
-          _version: 2,
-          _format: 'fahrplan'
-        };
-
-        const fileName = `${new Date().toISOString()}.${(Math.random() *
-          90000) |
-          (0 + 100000)}.fahrplan`;
-
-        download(JSON.stringify(data), fileName, 'application/json');
-        break;
-    }
-
-    if (!this.getSelected()) return;
-
-    switch (key) {
-
-        case 'D':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('lock');
-        break;
-
-      case 'S':
-        this.store.getCommandLog().addAction(CommandCreator.switchTrack(this.getSelectedBrick().getId()));
-        break;
-
-      case 'Home':
-        this.followCam = !this.followCam;
-        break;
-    }
+    this.ih.handle(this.getHandle(Input.KeyboardUp, key, mods));
   }
 
   keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    this.ih.handle({
-        input: Input.KeyboardHold,
-        type: key,
-        mod: mods.shift ? ( mods.ctrl? InputMod.Both : InputMod.Shift) : ( mods.ctrl? InputMod.Ctrl : InputMod.None)
-    });
+    this.ih.handle(this.getHandle(Input.KeyboardHold, key, mods));
   }
+
+  private getHandle(
+    input: Input,
+    key: string,
+    mods: { shift: boolean; ctrl: boolean }
+  ): InputHandlerProp {
+    return {
+      input: input,
+      type: key,
+      mod: this.getMods(mods)
+    };
+  }
+
+  private getMods(mods: { shift: boolean; ctrl: boolean }): InputMod {
+    return mods.shift
+      ? mods.ctrl
+        ? InputMod.Both
+        : InputMod.Shift
+      : mods.ctrl
+      ? InputMod.Ctrl
+      : InputMod.None;
+  }
+
+  // end of keyboard handling
 
   tick() {
     const speed = this.store.getTickSpeed();
@@ -458,8 +416,14 @@ export class GlobalController {
     this.vueSidebar.setData('fps', this.specificController.getFps());
     const passengerStats = this.store.getPassengerStats();
     this.vueSidebar.setData('passengerCount', passengerStats.count);
-    this.vueSidebar.setData('passengerArrivedCount', passengerStats.arrivedCount);
-    this.vueSidebar.setData('passengerAverageArriveSpeed', Math.round(passengerStats.averageArriveSpeed * 100) / 100);
+    this.vueSidebar.setData(
+      'passengerArrivedCount',
+      passengerStats.arrivedCount
+    );
+    this.vueSidebar.setData(
+      'passengerAverageArriveSpeed',
+      Math.round(passengerStats.averageArriveSpeed * 100) / 100
+    );
 
     if (passengerStats.arrivedCount >= this.targetPassengerCount) {
       alert('Nyertél! Elvittél ' + this.targetPassengerCount + ' utast.');
@@ -468,16 +432,19 @@ export class GlobalController {
 
     if (this.inputHandler.tick) {
       const ize: TickInputProps = {
-        canvasWidth: (document.getElementById('renderCanvas') as HTMLCanvasElement).width,
-        canvasHeight: (document.getElementById('renderCanvas') as HTMLCanvasElement).height,
-        setFollowCamOff: this.followCam ? () => { this.followCam = false; } : () => { }
-      }
+        canvasWidth: (document.getElementById(
+          'renderCanvas'
+        ) as HTMLCanvasElement).width,
+        canvasHeight: (document.getElementById(
+          'renderCanvas'
+        ) as HTMLCanvasElement).height,
+        setFollowCamOff: this.followCam
+          ? () => {
+              this.followCam = false;
+            }
+          : () => {}
+      };
       this.inputHandler.tick(ize);
-    }
-
-    if (this.followCam && this.getSelectedBrick() && this.getSelectedBrick().getType() === Symbol.for('Wagon')) {
-      const wagon = this.getSelectedBrick() as Wagon;
-      this.specificController.setFollowCam(wagon.getRay().coord);
     }
   }
 
