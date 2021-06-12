@@ -5,15 +5,17 @@ import { InputProps } from '../InputProps';
 import { InputHandlerProp } from './Interfaces/InputHandlerProp';
 import { NewSelectInputHandler } from './NewSelectInputHandler';
 import { NewTrackInputHandler } from './NewTrackInputHandler';
+import { GameSpeedInputHandler } from './GameSpeedInputHandler';
 
 export class ChainedInputHandler extends NewInputHandler {
   private handlers: NewInputHandler[] = [];
 
-  constructor(private store: Store, private vueSidebar: VueSidebar) {
+  constructor(store: Store, vueSidebar: VueSidebar) {
     super();
 
     this.handlers.push(new NewSelectInputHandler(store, vueSidebar));
     this.handlers.push(new NewTrackInputHandler(store));
+    this.handlers.push(new GameSpeedInputHandler(store));
   }
 
   handle(inputProp: InputHandlerProp, legacyProp?: InputProps): boolean {

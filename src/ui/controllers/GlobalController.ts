@@ -412,43 +412,13 @@ export class GlobalController {
   }
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    /*
     this.ih.handle({
         input: Input.KeyboardUp,
         type: key,
         mod: mods.shift ? ( mods.ctrl? InputMod.Both : InputMod.Shift) : ( mods.ctrl? InputMod.Ctrl : InputMod.None)
     });
-    */
-
+    
     switch (key) {
-      case 'T':
-        this.store.getCommandLog().runNext();
-        break;
-
-      case 'U':
-        this.selectMode(InputMode.CAMERA);
-        break;
-
-      case 'I':
-        this.selectMode(InputMode.SELECT);
-        break;
-
-      case 'O':
-        this.selectMode(InputMode.CREATE_TRACK);
-        break;
-
-      case 'P':
-        this.selectMode(InputMode.CREATE_PLATFORM);
-        break;
-
-      case '8':
-        this.selectMode(InputMode.CREATE_ENGINE);
-        break;
-
-      case '9':
-        this.selectMode(InputMode.CREATE_STATION);
-        break;
-
       case 'K':
         const download = (content, fileName, contentType) => {
           var a = document.createElement('a');
@@ -470,40 +440,6 @@ export class GlobalController {
           (0 + 100000)}.fahrplan`;
 
         download(JSON.stringify(data), fileName, 'application/json');
-        break;
-
-      case ' ':
-        if (this.store.getTickSpeed() === 0) {
-          this.store.setTickSpeed(1);
-        } else {
-          this.store.setTickSpeed(0);
-        }
-        break;
-
-
-      case '`':
-      case '0':
-        this.store.setTickSpeed(0);
-        break;
-
-      case '1':
-        this.store.setTickSpeed(1);
-        break;
-
-      case '2':
-        this.store.setTickSpeed(2);
-        break;
-
-      case '3':
-        this.store.setTickSpeed(3);
-        break;
-
-      case '4':
-        this.store.setTickSpeed(4);
-        break;
-
-      case '5':
-        this.store.setTickSpeed(5);
         break;
     }
 
