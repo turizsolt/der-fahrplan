@@ -43,6 +43,7 @@ export class NewTrackInputHandler extends NewInputHandler {
 
     this.commandLog = store.getCommandLog();
 
+    /* todo remove to separate file
     const point = new PIXI.Graphics();
     point.beginFill(0xff0000); //0x0bef47);
     point.drawRect(-0.5, -1.5, 1, 3);
@@ -53,25 +54,25 @@ export class NewTrackInputHandler extends NewInputHandler {
     let line = new PIXI.Graphics();
     line.lineStyle(1, 0x0000FF, 1);
     globalThis.stage.addChild(line);
-    
+    */
 
     // todo copy from old
     // todo put BAB/PIX dependecies into a separate class
 
     this.reg(wheel(WheelPos), () => {
       this.wheelRad -= Math.PI / 6;
-      point.rotation = -this.wheelRad;
+      // todo point.rotation = -this.wheelRad;
     });
 
     this.reg(wheel(WheelNeg), () => {
       this.wheelRad += Math.PI / 6;
-      point.rotation = -this.wheelRad;
+      // todo point.rotation = -this.wheelRad;
     });
 
     this.reg(move(), (legacyProp: InputProps) => {
       const ray = snapHexaXZ(legacyProp.point);
-      point.x = ray.coord.x;
-      point.y = ray.coord.z;
+      // todo point.x = ray.coord.x;
+      // todo point.y = ray.coord.z;
 
       const props = legacyProp;
       const downProps = legacyProp.downProps;
@@ -91,7 +92,8 @@ export class NewTrackInputHandler extends NewInputHandler {
         props.snappedPoint.coord
       ])
         .getLineSegmentChain();
-        
+    
+        /* todo
         const rays1 = chain.getRays().map(r => r.fromHere(Left, 0.25));
         const rays2 = chain
           .getRays()
@@ -107,14 +109,16 @@ export class NewTrackInputHandler extends NewInputHandler {
         line.beginFill(0x0000ff);
         line.drawPolygon(polygon);
         line.endFill();
-        line.zIndex = 2;      
+        line.zIndex = 2; */
     });
 
     this.reg(roam(), (legacyProp: InputProps) => {
+      /* todo
       const ray = snapHexaXZ(legacyProp.point);
       point.x = ray.coord.x;
       point.y = ray.coord.z;
       line.clear();
+      */
     });
 
     this.reg(click(MouseLeft), (legacyProp: InputProps) => {

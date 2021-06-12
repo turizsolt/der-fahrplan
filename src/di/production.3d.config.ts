@@ -33,8 +33,8 @@ import { SectionBabylonRenderer } from '../ui/babylon/SectionBabylonRenderer';
 import { SensorRenderer } from '../structs/Renderers/SensorRenderer';
 import { SensorBabylonRenderer } from '../ui/babylon/SensorBabylonRenderer';
 
-export const productionContainer = new Container();
-const ioc = new DependencyContainer(productionContainer);
+export const productionContainer3d = new Container();
+const ioc = new DependencyContainer(productionContainer3d);
 addCommonMaps(ioc);
 ioc.map<Land>(T.Land, ActualLand);
 ioc.sng<MeshProvider>(T.FactoryOfMeshProvider, T.MeshProvider, MeshProvider);

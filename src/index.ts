@@ -1,145 +1,305 @@
 import * as PIXI from 'pixi.js';
-import { productionContainer } from './di/production.config';
+import * as BABYLON from 'babylonjs';
+import { productionContainer2d } from './di/production.2d.config';
+import { productionContainer3d } from './di/production.3d.config';
 import { GlobalController } from './ui/controllers/GlobalController';
 import { Land } from './structs/Interfaces/Land';
 import { TYPES } from './di/TYPES';
 import { PixiController } from './ui/controllers/PixiController';
 import { KeyboardInputs } from './KeyboardInputs';
+import { Store } from './structs/Interfaces/Store';
+import { BabylonController } from './ui/controllers/BabylonController';
+import { GridDrawer } from './ui/controllers/GridDrawer';
+import { MeshProvider } from './ui/babylon/MeshProvider';
 
-// init PIXI
-const app = new PIXI.Application({ width: 512, height: 512 });
-document.getElementById('renderCanvas').appendChild(app.view);
-app.renderer.backgroundColor = 0xcceecc;
-app.renderer.view.style.position = 'absolute';
-app.renderer.view.style.display = 'block';
-app.renderer.resize(window.innerWidth, window.innerHeight);
-app.renderer.view.style.zIndex = '0';
+const productionContainer =
+  globalThis.startParam === '2d'
+    ? productionContainer2d
+    : productionContainer3d;
 
-// draw the grid
-const HEIGHT = (10 * Math.sqrt(3)) / 2;
-const WIDTH = 10;
+if (globalThis.startParam === '2d') {
+  // init PIXI
+  const app = new PIXI.Application({ width: 512, height: 512 });
+  document.getElementById('renderCanvas').appendChild(app.view);
+  app.renderer.backgroundColor = 0xcceecc;
+  app.renderer.view.style.position = 'absolute';
+  app.renderer.view.style.display = 'block';
+  app.renderer.resize(window.innerWidth, window.innerHeight);
+  app.renderer.view.style.zIndex = '0';
 
-let line = new PIXI.Graphics();
-line.lineStyle(0.25, 0x000000, 0.25);
-for (let i = -50; i < 50; i++) {
-  line.moveTo(-50 * WIDTH, i * HEIGHT);
-  line.lineTo(50 * WIDTH, i * HEIGHT);
+  // draw the grid
+  const HEIGHT = (10 * Math.sqrt(3)) / 2;
+  const WIDTH = 10;
 
-  line.moveTo((-50 * WIDTH) / 2 + i * WIDTH, -50 * HEIGHT);
-  line.lineTo((50 * WIDTH) / 2 + i * WIDTH, 50 * HEIGHT);
+  let line = new PIXI.Graphics();
+  line.lineStyle(0.25, 0x000000, 0.25);
+  for (let i = -50; i < 50; i++) {
+    line.moveTo(-50 * WIDTH, i * HEIGHT);
+    line.lineTo(50 * WIDTH, i * HEIGHT);
 
-  line.moveTo((50 * WIDTH) / 2 + i * WIDTH, -50 * HEIGHT);
-  line.lineTo((-50 * WIDTH) / 2 + i * WIDTH, 50 * HEIGHT);
-}
-app.stage.scale.x = 3;
-app.stage.scale.y = 3;
-app.stage.addChild(line);
-// todo global
-globalThis.stage = app.stage;
+    line.moveTo((-50 * WIDTH) / 2 + i * WIDTH, -50 * HEIGHT);
+    line.lineTo((50 * WIDTH) / 2 + i * WIDTH, 50 * HEIGHT);
 
-// listeners
-window.addEventListener('DOMContentLoaded', () => {
-  const specificController = new PixiController();
-  const globalController = new GlobalController(specificController);
-  const land = productionContainer.get<Land>(TYPES.Land);
-  land.init(globalController);
-
+    line.moveTo((50 * WIDTH) / 2 + i * WIDTH, -50 * HEIGHT);
+    line.lineTo((-50 * WIDTH) / 2 + i * WIDTH, 50 * HEIGHT);
+  }
+  app.stage.scale.x = 3;
+  app.stage.scale.y = 3;
+  app.stage.addChild(line);
   // todo global
-  globalThis.globalController = globalController;
+  globalThis.stage = app.stage;
 
-  app.stage.on('pointerdown', (event: PIXI.InteractionEvent) => {
-    const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
-    const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
-    event.data.global.x = x;
-    event.data.global.y = y;
-    globalController.down({ ...event, button: event.data.button } as any);
+  // listeners
+  window.addEventListener('DOMContentLoaded', () => {
+    const specificController = new PixiController();
+    const store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
+    const globalController = new GlobalController(store, specificController);
+    const land = productionContainer.get<Land>(TYPES.Land);
+    land.init(globalController);
+
+    // todo global
+    globalThis.globalController = globalController;
+
+    app.stage.on('pointerdown', (event: PIXI.InteractionEvent) => {
+      const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
+      const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
+      event.data.global.x = x;
+      event.data.global.y = y;
+      globalController.down({ ...event, button: event.data.button } as any);
+    });
+
+    app.stage.on('pointerup', (event: PIXI.InteractionEvent) => {
+      const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
+      const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
+      event.data.global.x = x;
+      event.data.global.y = y;
+      globalController.up({ ...event, button: event.data.button } as any);
+    });
+
+    app.stage.on('pointermove', (event: PIXI.InteractionEvent) => {
+      const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
+      const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
+      event.data.global.x = x;
+      event.data.global.y = y;
+      globalController.move({ ...event, button: event.data.button } as any);
+    });
+
+    app.stage.interactive = true; // This can't be forgotten
+    app.stage.sortableChildren = true;
+
+    app.stage.hitArea = new PIXI.Rectangle(
+      -500,
+      -500,
+      1000, // window.innerWidth,
+      1000 // window.innerHeight
+    );
+
+    window.addEventListener('mousewheel', (event: any) => {
+      globalController.wheel(event);
+    });
+
+    document.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      return false;
+    });
+    document.addEventListener(
+      'dragover',
+      function(event) {
+        event.preventDefault();
+      },
+      false
+    );
+
+    document.addEventListener(
+      'drop',
+      function(event) {
+        // cancel default actions
+        event.preventDefault();
+
+        var i = 0,
+          files = event && event.dataTransfer && event.dataTransfer.files,
+          len = (files && files.length) || 0;
+
+        for (; i < len; i++) {
+          var reader = new FileReader();
+          reader.onload = function(event) {
+            var contents = (event.target as any).result;
+
+            try {
+              const obj = JSON.parse(contents);
+
+              if (!obj._version) throw new Error();
+              if (obj._version != 2) throw new Error();
+              if (!obj._format || obj._format !== 'fahrplan') throw new Error();
+              globalController.load(obj.data);
+              globalController.loadSpecific(obj);
+            } catch {
+              console.error('Not proper JSON, hey!');
+            }
+          };
+
+          reader.onerror = function(event) {
+            console.error(
+              'File could not be read! Code ' + (event.target as any).error.code
+            );
+          };
+
+          if (files) reader.readAsText(files[i]);
+        }
+      },
+      false
+    );
+
+    const keyboardInputs = new KeyboardInputs(globalController);
+    app.ticker.add(delta => () => {
+      keyboardInputs.fireKeyHolds();
+      globalController.tick();
+    });
   });
+} else {
+  window.addEventListener('DOMContentLoaded', () => {
+    const canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
+      'renderCanvas'
+    ) as HTMLCanvasElement;
+    const renderEngine = new BABYLON.Engine(canvas, true);
+    const createScene = () => {
+      const scene = new BABYLON.Scene(renderEngine);
 
-  app.stage.on('pointerup', (event: PIXI.InteractionEvent) => {
-    const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
-    const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
-    event.data.global.x = x;
-    event.data.global.y = y;
-    globalController.up({ ...event, button: event.data.button } as any);
-  });
+      const meshProviderFactory = productionContainer.get<() => MeshProvider>(
+        TYPES.FactoryOfMeshProvider
+      );
+      const meshProvider = meshProviderFactory();
+      meshProvider.setScene(scene);
 
-  app.stage.on('pointermove', (event: PIXI.InteractionEvent) => {
-    const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
-    const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
-    event.data.global.x = x;
-    event.data.global.y = y;
-    globalController.move({ ...event, button: event.data.button } as any);
-  });
+      scene.clearColor = new BABYLON.Color4(0, 1, 0, 1);
 
-  app.stage.interactive = true; // This can't be forgotten
-  app.stage.sortableChildren = true;
+      const camera = new BABYLON.ArcRotateCamera(
+        'Camera',
+        0,
+        0.8,
+        70,
+        new BABYLON.Vector3(0, 0, 30),
+        scene
+      );
 
-  app.stage.hitArea = new PIXI.Rectangle(
-    -500,
-    -500,
-    1000, // window.innerWidth,
-    1000 // window.innerHeight
-  );
+      const light = new BABYLON.HemisphericLight(
+        'HemiLight',
+        new BABYLON.Vector3(0, 1, 0),
+        scene
+      );
 
-  window.addEventListener('mousewheel', (event: any) => {
-    globalController.wheel(event);
-  });
+      (window as any).switches = [];
 
-  document.addEventListener('contextmenu', e => {
-    e.preventDefault();
-    return false;
-  });
-  document.addEventListener(
-    'dragover',
-    function(event) {
-      event.preventDefault();
-    },
-    false
-  );
+      const gridDrawer = new GridDrawer();
+      gridDrawer.setScene(scene);
+      gridDrawer.drawGrid();
 
-  document.addEventListener(
-    'drop',
-    function(event) {
-      // cancel default actions
-      event.preventDefault();
+      scene.actionManager = new BABYLON.ActionManager(scene);
 
-      var i = 0,
-        files = event && event.dataTransfer && event.dataTransfer.files,
-        len = (files && files.length) || 0;
+      const keyboardInputs = new KeyboardInputs(globalController);
+      scene.registerAfterRender(() => {
+        keyboardInputs.fireKeyHolds();
+        globalController.tick();
+      });
 
-      for (; i < len; i++) {
-        var reader = new FileReader();
-        reader.onload = function(event) {
-          var contents = (event.target as any).result;
+      return { scene, camera };
+    };
+    const { scene, camera } = createScene();
 
-          try {
-            const obj = JSON.parse(contents);
+    const specificController = new BabylonController(scene, camera);
+    const store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
+    const globalController = new GlobalController(store, specificController);
+    const land = productionContainer.get<Land>(TYPES.Land);
+    land.init(globalController);
 
-            if (!obj._version) throw new Error();
-            if (obj._version != 2) throw new Error();
-            if (!obj._format || obj._format !== 'fahrplan') throw new Error();
-            globalController.load(obj.data);
-            globalController.loadSpecific(obj);
-          } catch {
-            console.error('Not proper JSON, hey!');
-          }
-        };
+    renderEngine.runRenderLoop(() => {
+      scene.render();
+    });
 
-        reader.onerror = function(event) {
-          console.error(
-            'File could not be read! Code ' + (event.target as any).error.code
-          );
-        };
+    window.addEventListener('resize', () => {
+      renderEngine.resize();
+    });
 
-        if (files) reader.readAsText(files[i]);
+    canvas.addEventListener('pointerdown', e => {
+      globalController.down(e);
+      if (e.button === 1) {
+        e.preventDefault();
+        return false;
       }
-    },
-    false
-  );
+    });
 
-  const keyboardInputs = new KeyboardInputs(globalController);
-  app.ticker.add(delta => () => {
-    keyboardInputs.fireKeyHolds();
-    globalController.tick();
+    canvas.addEventListener('pointerup', e => {
+      globalController.up(e);
+    });
+
+    canvas.addEventListener('pointermove', e => {
+      globalController.move(e);
+    });
+
+    canvas.addEventListener('pointerenter', () => {});
+
+    canvas.addEventListener('pointerleave', e => {
+      globalController.up(e);
+    });
+
+    canvas.addEventListener('focus', () => {});
+
+    canvas.addEventListener('blur', () => {});
+
+    window.addEventListener('wheel', e => {
+      globalController.wheel(e);
+    });
+
+    document.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      return false;
+    });
+    document.addEventListener(
+      'dragover',
+      function(event) {
+        event.preventDefault();
+      },
+      false
+    );
+
+    document.addEventListener(
+      'drop',
+      function(event) {
+        // cancel default actions
+        event.preventDefault();
+
+        var i = 0,
+          files = event && event.dataTransfer && event.dataTransfer.files,
+          len = (files && files.length) || 0;
+
+        for (; i < len; i++) {
+          var reader = new FileReader();
+          reader.onload = function(event) {
+            var contents = (event.target as any).result;
+
+            try {
+              const obj = JSON.parse(contents);
+
+              if (!obj._version) throw new Error();
+              if (obj._version != 2) throw new Error();
+              if (!obj._format || obj._format !== 'fahrplan') throw new Error();
+              globalController.load(obj.data);
+              globalController.loadSpecific(obj);
+            } catch {
+              console.error('Not proper JSON, hey!');
+            }
+          };
+
+          reader.onerror = function(event) {
+            console.error(
+              'File could not be read! Code ' + (event.target as any).error.code
+            );
+          };
+
+          if (files) reader.readAsText(files[i]);
+        }
+      },
+      false
+    );
   });
-});
+}

@@ -32,8 +32,8 @@ import { Land } from '../structs/Interfaces/Land';
 import { TrackJointPixiRenderer } from '../ui/babylon/TrackJointPixiRenderer';
 import { TrackSwitchPixiRenderer } from '../ui/babylon/TrackSwitchPixiRenderer';
 
-export const productionContainer = new Container();
-const ioc = new DependencyContainer(productionContainer);
+export const productionContainer2d = new Container();
+const ioc = new DependencyContainer(productionContainer2d);
 addCommonMaps(ioc);
 ioc.map<Land>(T.Land, ActualLand);
 ioc.map<TrackRenderer>(T.TrackRenderer, TrackPixiRenderer);

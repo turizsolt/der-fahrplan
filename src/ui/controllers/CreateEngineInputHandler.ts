@@ -3,8 +3,6 @@ import { InputHandler } from './InputHandler';
 import { InputProps } from './InputProps';
 import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/CoordinateToBabylonVector3';
 import { ActualTrack } from '../../modules/Track/ActualTrack';
-import { productionContainer } from '../../di/production.config';
-import { TYPES } from '../../di/TYPES';
 import { Track } from '../../modules/Track/Track';
 import { getPredefinedWagonConfig } from '../../structs/Actuals/Wagon/ActualWagonConfigs';
 import { Store } from '../../structs/Interfaces/Store';
@@ -14,11 +12,7 @@ import { GENERATE_ID } from '../../structs/Actuals/Store/Command/CommandLog';
 export class CreateEngineInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
 
-  private store: Store;
-
-  constructor() {
-    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
-
+  constructor(private store: Store) {
     const mat = new BABYLON.StandardMaterial('boxMat', null);
     mat.diffuseColor = new BABYLON.Color3(0, 1, 1);
 

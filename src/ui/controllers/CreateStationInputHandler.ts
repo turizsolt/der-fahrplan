@@ -1,17 +1,17 @@
 import * as BABYLON from 'babylonjs';
 import { InputHandler } from './InputHandler';
 import { InputProps } from './InputProps';
-import { productionContainer } from '../../di/production.config';
 import { TYPES } from '../../di/TYPES';
 import { CoordinateToBabylonVector3 } from '../babylon/converters/CoordinateToBabylonVector3';
 import { Station } from '../../structs/Scheduling/Station';
 import { Circle } from '../../structs/Geometry/Circle';
+import { Store } from '../../structs/Interfaces/Store';
 
 export class CreateStationInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
   private toMesh: BABYLON.Mesh;
 
-  constructor() {
+  constructor(private store: Store) {
     this.fromMesh = BABYLON.MeshBuilder.CreateBox(
       'name',
       { height: 1, width: 1, depth: 1 },
@@ -73,7 +73,7 @@ export class CreateStationInputHandler implements InputHandler {
     }
   }
 
-  click(downProps: InputProps, event: PointerEvent): void { }
+  click(downProps: InputProps, event: PointerEvent): void {}
 
   up(downProps: InputProps, props: InputProps, event: PointerEvent): void {
     if (
@@ -85,7 +85,7 @@ export class CreateStationInputHandler implements InputHandler {
         downProps.snappedJointOnTrack.position === 0 ||
         downProps.snappedJointOnTrack.position === 1)
     ) {
-      const station = productionContainer.get<Station>(TYPES.Station);
+      const station = this.store.create<Station>(TYPES.Station);
       const diam = downProps.snappedPoint.coord.distance2d(
         props.snappedPoint.coord
       );

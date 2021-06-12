@@ -1,4 +1,5 @@
 import * as BABYLON from 'babylonjs';
+import 'babylonjs-loaders';
 import { injectable } from 'inversify';
 import { Ray } from '../../structs/Geometry/Ray';
 import { CoordinateToBabylonVector3 } from './converters/CoordinateToBabylonVector3';

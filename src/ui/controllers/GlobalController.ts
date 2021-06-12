@@ -6,27 +6,19 @@ import {
   snapPositionOnTrack,
   snapJoint
 } from '../../structs/Geometry/Snap';
-import { productionContainer } from '../../di/production.config';
-import { TYPES } from '../../di/TYPES';
 import { ActualTrack } from '../../modules/Track/ActualTrack';
 import { TrackBase } from '../../modules/Track/TrackBase';
 import { TrackJoint } from '../../modules/Track/TrackJoint/TrackJoint';
 import { ActualTrackJoint } from '../../modules/Track/TrackJoint/ActualTrackJoint';
 import { InputProps } from './InputProps';
-import { BaseBrick } from '../../structs/Interfaces/BaseBrick';
 import { ActualTrackSwitch } from '../../modules/Track/ActualTrackSwitch';
 import { Store } from '../../structs/Interfaces/Store';
-import { Wagon } from '../../structs/Interfaces/Wagon';
-import { BaseStorable } from '../../structs/Interfaces/BaseStorable';
 import { VueSidebar } from './VueSidebar';
 import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
 import { TickInputProps } from './TickInputProps';
 import { VueViewbox } from './VueViewbox';
 import { VueTestPanel } from './VueTestPanel';
-import { Train } from '../../modules/Train/Train';
-import { SpeedPedal } from '../../modules/Train/SpeedPedal';
-import { CommandCreator } from '../../structs/Actuals/Store/Command/CommandCreator';
 /*
 import { CreateTrackInputHandler } from './CreateTrackInputHandler';
 import { CameraInputHandler } from './CameraInputHandler';
@@ -67,7 +59,6 @@ export enum InputMode {
 export class GlobalController {
   private mode: InputMode = InputMode.CAMERA;
   private viewMode: string = 'terrain';
-  private store: Store;
 
   private inputHandler: InputHandler;
   private inputHandlers: Record<any, InputHandler>;
@@ -93,8 +84,10 @@ export class GlobalController {
 
   private ih: NewInputHandler;
 
-  constructor(private specificController: GUISpecificController) {
-    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
+  constructor(
+    private store: Store,
+    private specificController: GUISpecificController
+  ) {
     this.vueSidebar = new VueSidebar(this.store);
     this.vueBigScreen = new VueBigscreen(this.store);
     this.vueToolbox = new VueToolbox(this);
@@ -341,7 +334,7 @@ export class GlobalController {
   }
 
   selectMode(mode: InputMode) {
-    this.inputHandler.cancel();
+    // todo this.inputHandler.cancel();
     this.mode = mode;
     this.inputHandler = this.inputHandlers[this.mode];
     this.vueToolbox.setSelected(mode);
@@ -430,7 +423,8 @@ export class GlobalController {
       this.targetPassengerCount = 9999999;
     }
 
-    if (this.inputHandler.tick) {
+    if (this.inputHandler && this.inputHandler.tick) {
+      // todo move to cam
       const ize: TickInputProps = {
         canvasWidth: (document.getElementById(
           'renderCanvas'

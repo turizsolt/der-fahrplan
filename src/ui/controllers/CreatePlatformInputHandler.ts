@@ -7,22 +7,16 @@ import { BezierCreater } from '../../structs/Geometry/Bezier/BezierCreater';
 import { CoordinateToBabylonVector3 } from '../../ui/babylon/converters/CoordinateToBabylonVector3';
 import { ActualTrack } from '../../modules/Track/ActualTrack';
 import { Platform } from '../../structs/Interfaces/Platform';
-import { productionContainer } from '../../di/production.config';
 import { TYPES } from '../../di/TYPES';
 import { Side } from '../../structs/Interfaces/Side';
+import { Store } from '../../structs/Interfaces/Store';
 
 export class CreatePlatformInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
   private toMesh: BABYLON.Mesh;
   private pathMesh: BABYLON.Mesh;
 
-  private platformFactory: () => Platform;
-
-  constructor() {
-    this.platformFactory = productionContainer.get<() => Platform>(
-      TYPES.FactoryOfPlatform
-    );
-
+  constructor(private store: Store) {
     const mat = new BABYLON.StandardMaterial('boxMat', null);
     mat.diffuseColor = new BABYLON.Color3(0, 1, 0);
 
@@ -151,13 +145,15 @@ export class CreatePlatformInputHandler implements InputHandler {
 
       // console.log(side, p.x, p.y, p.z);
 
-      const pl = this.platformFactory().init(
-        pot.track,
-        Math.min(pot.position, dpot.position),
-        Math.max(pot.position, dpot.position),
-        side > 0 ? Side.Left : Side.Right,
-        7.5
-      );
+      const pl = this.store
+        .create<Platform>(TYPES.Platform)
+        .init(
+          pot.track,
+          Math.min(pot.position, dpot.position),
+          Math.max(pot.position, dpot.position),
+          side > 0 ? Side.Left : Side.Right,
+          7.5
+        );
     }
 
     this.fromMesh.setEnabled(false);
