@@ -344,6 +344,12 @@ export class GlobalController {
   }
 
   keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    this.ih.handle({
+        input: Input.KeyboardDown,
+        type: key,
+        mod: mods.shift ? ( mods.ctrl? InputMod.Both : InputMod.Shift) : ( mods.ctrl? InputMod.Ctrl : InputMod.None)
+    });
+
     switch (key) {
       case 'X':
         this.wheelRotation += 45;
@@ -377,37 +383,6 @@ export class GlobalController {
           // todo this.select(list[newIndex].getWagons()[0]);
         }
         break;
-    }
-
-    if (!this.getSelected()) return;
-
-    switch (key) {
-      case 'ArrowUp':
-        if (this.getSelected().getType() === TYPES.Wagon) {
-            const train = ((this.getSelected() as Wagon).getTrain());
-            this.store.getCommandLog().addAction(
-                CommandCreator.pedalTrain(
-                    train.getId(),
-                    train.getSpeed().getPedal(),
-                    SpeedPedal.Throttle
-                )
-            );
-        }
-        break;
-
-      case 'ArrowDown':
-      if (this.getSelected().getType() === TYPES.Wagon) {
-        const train = ((this.getSelected() as Wagon).getTrain());
-        this.store.getCommandLog().addAction(
-            CommandCreator.pedalTrain(
-                train.getId(),
-                train.getSpeed().getPedal(),
-                SpeedPedal.Brake
-            )
-        );
-    }
-        break;
-  
     }
   }
 
@@ -446,81 +421,6 @@ export class GlobalController {
     if (!this.getSelected()) return;
 
     switch (key) {
-      case 'ArrowLeft':
-      case 'ArrowRight':
-        if (this.getSelected().getType() === TYPES.Wagon) {
-            const wagon = this.getSelected() as Wagon;
-            this.store.getCommandLog().addAction(CommandCreator.reverseTrain(
-                wagon.getTrain().getId(),
-            ));
-        }
-        break;
-
-      case 'ArrowUp':
-      case 'ArrowDown':
-        if (this.getSelected().getType() === TYPES.Wagon) {
-            const train = ((this.getSelected() as Wagon).getTrain());
-            this.store.getCommandLog().addAction(
-                CommandCreator.pedalTrain(
-                    train.getId(),
-                    train.getSpeed().getPedal(),
-                    SpeedPedal.Neutral
-                )
-            );
-        }
-        break;
-
-
-      case 'Z':
-      if (this.getSelected().getType() === TYPES.Wagon) {
-        const wagon = this.getSelected() as Wagon;
-        this.store.getCommandLog().addAction(CommandCreator.reverseWagonFacing(
-          wagon.getId(),
-        ));
-      }
-        break;
-
-      case 'M':
-      if (this.getSelected().getType() === TYPES.Wagon) {
-        const wagon = this.getSelected() as Wagon;
-        const isShunting = wagon.getTrain().getSpeed().isShunting();
-        this.store.getCommandLog().addAction(
-          isShunting ?
-            CommandCreator.unshuntingTrain(
-              wagon.getTrain().getId(),
-            ) :
-            CommandCreator.shuntingTrain(
-              wagon.getTrain().getId(),
-            )
-        );
-        wagon.getTrain().getWagons().map(wagon => wagon.update());
-      }
-        break;
-
-        case 'A':
-          if (this.getSelected().getType() === TYPES.Wagon) {
-            const wagon = this.getSelected() as Wagon;
-            wagon.getTrain().setAutoMode(!wagon.getTrain().getAutoMode());
-          }
-        break;
-
-      case '/':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('detach');
-        break;
-
-      case 'Delete':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('delete');
-        break;
-
-      case 'Enter':
-        if(this.getSelectedBrick().getType() === TYPES.Wagon) {
-            (this.getSelectedBrick() as Wagon).stop();
-        }
-        break;
 
         case 'D':
         this.getSelectedBrick()
@@ -539,27 +439,11 @@ export class GlobalController {
   }
 
   keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    if (!this.getSelected()) return;
-
-    switch (key) {
-      case 'C':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('shuntForward');
-        break;
-
-      case 'V':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('backward');
-        break;
-
-      case 'B':
-        this.getSelectedBrick()
-          .getRenderer()
-          .process('shuntBackward');
-        break;
-    }
+    this.ih.handle({
+        input: Input.KeyboardHold,
+        type: key,
+        mod: mods.shift ? ( mods.ctrl? InputMod.Both : InputMod.Shift) : ( mods.ctrl? InputMod.Ctrl : InputMod.None)
+    });
   }
 
   tick() {
