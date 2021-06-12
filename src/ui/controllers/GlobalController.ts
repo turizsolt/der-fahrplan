@@ -212,114 +212,61 @@ export class GlobalController {
   }
 
   down(event: PointerEvent) {
-    const props = this.convert(event);
-    this.downProps = props;
-    // this.inputHandler.down(props, event);
-    this.ih.handle(
-      {
-        input: Input.MouseDown,
-        type:
-          event.button === 0
-            ? InputType.MouseLeft
-            : event.button === 2
-            ? InputType.MouseRight
-            : InputType.MouseMiddle,
-        mod: InputMod.None
-      },
-      props
-    );
-
+    this.downProps = this.convert(event);
     this.downAt = new Date().getTime();
+    this.handleMouse(Input.MouseDown, event);
   }
 
   move(event: PointerEvent) {
     const now = new Date().getTime();
     if (now - this.downAt < 500) return;
 
-    const props = this.convert(event);
     if (this.downProps) {
-      // this.inputHandler.move(this.downProps, props, event);
-      this.ih.handle(
-        {
-          input: Input.MouseMove,
-          type:
-            event.button === 0
-              ? InputType.MouseLeft
-              : event.button === 2
-              ? InputType.MouseRight
-              : InputType.MouseMiddle,
-          mod: InputMod.None
-        },
-        { ...props, downProps: this.downProps }
-      );
+      this.handleMouse(Input.MouseMove, event);
     } else {
-      // this.inputHandler.roam(props, event);
-      this.ih.handle(
-        {
-          input: Input.MouseRoam,
-          type:
-            event.button === 0
-              ? InputType.MouseLeft
-              : event.button === 2
-              ? InputType.MouseRight
-              : InputType.MouseMiddle,
-          mod: InputMod.None
-        },
-        props
-      );
+      this.handleMouse(Input.MouseRoam, event);
     }
   }
 
   up(event: PointerEvent) {
     if (!this.downProps) return;
 
-    let props = this.convert(event);
     const now = new Date().getTime();
-
-    if (
-      //this.downProps.point && (
-      now - this.downAt <
-      500
-      // ||
-      //(props.point &&
-      //  this.downProps.point.coord.equalsTo(props.point.coord)))
-    ) {
-      // let ready = (this.mode === InputMode.CREATE_BLOCK || this.mode === InputMode.ALLOW_PATH || this.mode === InputMode.CREATE_PATH || this.mode === InputMode.CREATE_SECTION) ? false : this.selectIfPossible(event);
-      // if (ready) {
-      // this.inputHandler.cancel();
-      //} else {
-      // this.inputHandler.click(this.downProps, event);
-      this.ih.handle(
-        {
-          input: Input.MouseClick,
-          type:
-            event.button === 0
-              ? InputType.MouseLeft
-              : event.button === 2
-              ? InputType.MouseRight
-              : InputType.MouseMiddle,
-          mod: InputMod.None
-        },
-        { ...props, downProps: this.downProps }
-      );
-      //}
+    if (now - this.downAt < 500) {
+      this.handleMouse(Input.MouseClick, event);
     } else {
-      // this.inputHandler.up(this.downProps, props, event);
-      this.ih.handle(
-        {
-          input: Input.MouseUp,
-          type:
-            event.button === 0
-              ? InputType.MouseLeft
-              : event.button === 2
-              ? InputType.MouseRight
-              : InputType.MouseMiddle,
-          mod: InputMod.None
-        },
-        { ...props, downProps: this.downProps }
-      );
+      this.handleMouse(Input.MouseUp, event);
     }
     this.downProps = null;
+  }
+
+  private handleMouse(input: Input, event: PointerEvent): void {
+    this.ih.handle(
+      {
+        input,
+        type: this.getMouseButton(event),
+        mod: this.getMouseMods(event)
+      },
+      { ...this.convert(event), downProps: this.downProps }
+    );
+  }
+
+  private getMouseMods(event: PointerEvent): InputMod {
+    return event.ctrlKey
+      ? event.shiftKey
+        ? InputMod.Both
+        : InputMod.Ctrl
+      : event.shiftKey
+      ? InputMod.Shift
+      : InputMod.None;
+  }
+
+  private getMouseButton(event: PointerEvent): InputType {
+    return event.button === 0
+      ? InputType.MouseLeft
+      : event.button === 2
+      ? InputType.MouseRight
+      : InputType.MouseMiddle;
   }
 
   private wheelRotation = 0;
