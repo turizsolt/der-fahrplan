@@ -1,9 +1,9 @@
-import { GlobalController } from './ui/controllers/GlobalController';
+import { InputController } from './ui/controllers/InputController';
 
 export class KeyboardInputs {
   private map: Record<string, boolean> = {};
 
-  constructor(private globalController: GlobalController) {
+  constructor(private inputController: InputController) {
     this.keyUp = this.keyUp.bind(this);
     this.keyDown = this.keyDown.bind(this);
     document.addEventListener('keydown', this.keyDown);
@@ -13,7 +13,7 @@ export class KeyboardInputs {
   fireKeyHolds(): void {
     for (let key of Object.keys(this.map)) {
       if (this.map[key] && !this.modifier(key)) {
-        this.globalController.keyHold(key, {
+        this.inputController.keyHold(key, {
           shift: this.map['Shift'],
           ctrl: this.map['Control']
         });
@@ -25,7 +25,7 @@ export class KeyboardInputs {
     const key = this.upper(event.key);
     if (!this.map[key]) {
       if (!this.modifier(key)) {
-        this.globalController.keyDown(key, {
+        this.inputController.keyDown(key, {
           shift: this.map['Shift'],
           ctrl: this.map['Control']
         });
@@ -37,7 +37,7 @@ export class KeyboardInputs {
   private keyUp(event: KeyboardEvent): void {
     const key = this.upper(event.key);
     if (!this.modifier(key)) {
-      this.globalController.keyUp(key, {
+      this.inputController.keyUp(key, {
         shift: this.map['Shift'],
         ctrl: this.map['Control']
       });

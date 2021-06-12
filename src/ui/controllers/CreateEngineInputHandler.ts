@@ -55,18 +55,16 @@ export class CreateEngineInputHandler implements InputHandler {
     const dpot = downProps.snappedPositionOnTrack;
 
     if (dpot && dpot.track.constructor.name === ActualTrack.name) {
-      this.store
-        .getCommandLog()
-        .addAction(
-          CommandCreator.createTrain(
-            GENERATE_ID,
-            GENERATE_ID,
-            getPredefinedWagonConfig(downProps.wagonType),
-            (dpot.track as Track).getId(),
-            dpot.position,
-            1
-          )
-        );
+      this.store.getCommandLog().addAction(
+        CommandCreator.createTrain(
+          GENERATE_ID,
+          GENERATE_ID,
+          getPredefinedWagonConfig('wagon'), // todo downProps.wagonType),
+          (dpot.track as Track).getId(),
+          dpot.position,
+          1
+        )
+      );
     }
 
     this.fromMesh.setEnabled(false);

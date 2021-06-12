@@ -24,6 +24,24 @@ export class GeneralInputHandler extends NewInputHandler {
       const wagon = this.getSelectedBrick() as Wagon;
       this.specificController.setFollowCam(wagon.getRay().coord);
     }
+
+    if (this.inputHandler && this.inputHandler.tick) {
+      // todo move to cam
+      const ize: TickInputProps = {
+        canvasWidth: (document.getElementById(
+          'renderCanvas'
+        ) as HTMLCanvasElement).width,
+        canvasHeight: (document.getElementById(
+          'renderCanvas'
+        ) as HTMLCanvasElement).height,
+        setFollowCamOff: this.followCam
+          ? () => {
+              this.followCam = false;
+            }
+          : () => {}
+      };
+      this.inputHandler.tick(ize);
+    }
     */
 
     this.reg(keyDown('PageUp'), () => {

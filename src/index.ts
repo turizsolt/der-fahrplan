@@ -54,6 +54,7 @@ if (globalThis.startParam === '2d') {
     const specificController = new PixiController();
     const store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
     const globalController = new GlobalController(store, specificController);
+    const inputController = globalController.getInputController();
     const land = productionContainer.get<Land>(TYPES.Land);
     land.init(globalController);
 
@@ -65,7 +66,7 @@ if (globalThis.startParam === '2d') {
       const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
       event.data.global.x = x;
       event.data.global.y = y;
-      globalController.down({ ...event, button: event.data.button } as any);
+      inputController.down({ ...event, button: event.data.button } as any);
     });
 
     app.stage.on('pointerup', (event: PIXI.InteractionEvent) => {
@@ -73,7 +74,7 @@ if (globalThis.startParam === '2d') {
       const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
       event.data.global.x = x;
       event.data.global.y = y;
-      globalController.up({ ...event, button: event.data.button } as any);
+      inputController.up({ ...event, button: event.data.button } as any);
     });
 
     app.stage.on('pointermove', (event: PIXI.InteractionEvent) => {
@@ -81,7 +82,7 @@ if (globalThis.startParam === '2d') {
       const y = (event.data.global.y - app.stage.y) / app.stage.scale.y;
       event.data.global.x = x;
       event.data.global.y = y;
-      globalController.move({ ...event, button: event.data.button } as any);
+      inputController.move({ ...event, button: event.data.button } as any);
     });
 
     app.stage.interactive = true; // This can't be forgotten
@@ -95,7 +96,7 @@ if (globalThis.startParam === '2d') {
     );
 
     window.addEventListener('mousewheel', (event: any) => {
-      globalController.wheel(event);
+      inputController.wheel(event);
     });
 
     document.addEventListener('contextmenu', e => {
@@ -150,7 +151,7 @@ if (globalThis.startParam === '2d') {
       false
     );
 
-    const keyboardInputs = new KeyboardInputs(globalController);
+    const keyboardInputs = new KeyboardInputs(inputController);
     app.ticker.add(delta => () => {
       keyboardInputs.fireKeyHolds();
       globalController.tick();
@@ -196,7 +197,7 @@ if (globalThis.startParam === '2d') {
 
       scene.actionManager = new BABYLON.ActionManager(scene);
 
-      const keyboardInputs = new KeyboardInputs(globalController);
+      const keyboardInputs = new KeyboardInputs(inputController);
       scene.registerAfterRender(() => {
         keyboardInputs.fireKeyHolds();
         globalController.tick();
@@ -209,6 +210,7 @@ if (globalThis.startParam === '2d') {
     const specificController = new BabylonController(scene, camera);
     const store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
     const globalController = new GlobalController(store, specificController);
+    const inputController = globalController.getInputController();
     const land = productionContainer.get<Land>(TYPES.Land);
     land.init(globalController);
 
@@ -221,7 +223,7 @@ if (globalThis.startParam === '2d') {
     });
 
     canvas.addEventListener('pointerdown', e => {
-      globalController.down(e);
+      inputController.down(e);
       if (e.button === 1) {
         e.preventDefault();
         return false;
@@ -229,17 +231,17 @@ if (globalThis.startParam === '2d') {
     });
 
     canvas.addEventListener('pointerup', e => {
-      globalController.up(e);
+      inputController.up(e);
     });
 
     canvas.addEventListener('pointermove', e => {
-      globalController.move(e);
+      inputController.move(e);
     });
 
     canvas.addEventListener('pointerenter', () => {});
 
     canvas.addEventListener('pointerleave', e => {
-      globalController.up(e);
+      inputController.up(e);
     });
 
     canvas.addEventListener('focus', () => {});
@@ -247,7 +249,7 @@ if (globalThis.startParam === '2d') {
     canvas.addEventListener('blur', () => {});
 
     window.addEventListener('wheel', e => {
-      globalController.wheel(e);
+      inputController.wheel(e);
     });
 
     document.addEventListener('contextmenu', e => {

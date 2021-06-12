@@ -22,7 +22,5 @@ export interface InputProps {
     segment: string;
   };
 
-  wagonType: string;
-
   downProps?: InputProps;
 }

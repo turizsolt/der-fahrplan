@@ -1,22 +1,8 @@
 import { InputHandler } from './InputHandler';
-import { BabylonVector3ToCoordinate } from '../babylon/converters/BabylonVector3ToCoordinate';
-import { Ray } from '../../structs/Geometry/Ray';
-import {
-  snapHexaXZ,
-  snapPositionOnTrack,
-  snapJoint
-} from '../../structs/Geometry/Snap';
-import { ActualTrack } from '../../modules/Track/ActualTrack';
-import { TrackBase } from '../../modules/Track/TrackBase';
-import { TrackJoint } from '../../modules/Track/TrackJoint/TrackJoint';
-import { ActualTrackJoint } from '../../modules/Track/TrackJoint/ActualTrackJoint';
-import { InputProps } from './InputProps';
-import { ActualTrackSwitch } from '../../modules/Track/ActualTrackSwitch';
 import { Store } from '../../structs/Interfaces/Store';
 import { VueSidebar } from './VueSidebar';
 import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
-import { TickInputProps } from './TickInputProps';
 import { VueViewbox } from './VueViewbox';
 import { VueTestPanel } from './VueTestPanel';
 /*
@@ -35,11 +21,8 @@ import { CreateSectionInputHandler } from './CreateSectionInputHandler';
 */
 import { GUISpecificController } from './GUISpecificController';
 import { NewInputHandler } from './InputHandlers/NewInputHandler';
-import { Input } from './InputHandlers/Interfaces/Input';
-import { InputType } from './InputHandlers/Interfaces/InputType';
-import { InputMod } from './InputHandlers/Interfaces/InputMod';
 import { ChainedInputHandler } from './InputHandlers/ChainedInputHandler';
-import { InputHandlerProp } from './InputHandlers/Interfaces/InputHandlerProp';
+import { InputController } from './InputController';
 
 export enum InputMode {
   CAMERA = 'CAMERA',
@@ -63,26 +46,16 @@ export class GlobalController {
   private inputHandler: InputHandler;
   private inputHandlers: Record<any, InputHandler>;
 
-  private downProps: InputProps;
-
-  private mouseButtons: boolean[] = [];
-
   private vueToolbox: VueToolbox;
   private vueViewbox: VueViewbox;
   private vueBigScreen: VueBigscreen;
   private vueSidebar: VueSidebar;
   private vueTestPanel: VueTestPanel;
 
-  private followCam: boolean = false;
-  private timeLimit: number = 12;
-  private originalTimeLimit: number = 12;
-  private shortTimeLimit: number = 6;
-
   private targetPassengerCount: number = 9999999;
 
-  private downAt: number = 0;
-
   private ih: NewInputHandler;
+  private inputController: InputController;
 
   constructor(
     private store: Store,
@@ -94,6 +67,11 @@ export class GlobalController {
     this.vueViewbox = new VueViewbox(this);
 
     this.ih = new ChainedInputHandler(this.store, this.vueSidebar, this);
+    this.inputController = new InputController(
+      this.store,
+      this.ih,
+      this.specificController
+    );
 
     this.vueTestPanel = new VueTestPanel(this.store);
     this.store.getCommandLog().setInputController(this);
@@ -141,123 +119,14 @@ export class GlobalController {
     this.vueViewbox.addButton({ id: 'schedule', text: 'Schedule' });
     this.vueViewbox.addButton({ id: 'builder', text: 'Builder' });
     this.vueViewbox.setSelected('terrain');
+  }
 
-    this.downProps = null;
+  getInputController(): InputController {
+    return this.inputController;
   }
 
   setTargetPassenger(count: number): void {
     this.targetPassengerCount = count;
-  }
-
-  convert(event: PointerEvent): InputProps {
-    const { pickedPoint, pickedMesh } = this.specificController.pick(event);
-
-    if (!pickedPoint) {
-      return {
-        point: null,
-        mesh: pickedMesh,
-        snappedPoint: null,
-        snappedPositionOnTrack: null,
-        snappedJoint: null,
-        snappedJointOnTrack: null,
-        wagonType: this.vueToolbox.getWagon()
-      };
-    }
-
-    const point: Ray = new Ray(BabylonVector3ToCoordinate(pickedPoint), 0);
-    const list = this.store.getAll();
-    const trackList: TrackBase[] = [];
-    const jointList: TrackJoint[] = [];
-    for (let elem of Object.keys(list)) {
-      if (
-        list[elem].constructor.name === ActualTrack.name ||
-        list[elem].constructor.name === ActualTrackSwitch.name
-      ) {
-        trackList.push(list[elem] as TrackBase);
-      }
-      if (list[elem].constructor.name === ActualTrackJoint.name) {
-        jointList.push(list[elem] as TrackJoint);
-      }
-    }
-
-    return {
-      point: point, // only at Platform, deciding the side
-      mesh: pickedMesh, // to actually get the selected
-
-      // snap - 6 different uses it, should place inside them
-      snappedPoint: snapHexaXZ(point),
-      snappedPositionOnTrack: snapPositionOnTrack(point, trackList),
-      snappedJoint: snapJoint(point, jointList),
-      snappedJointOnTrack: snapPositionOnTrack(snapHexaXZ(point), trackList),
-      wagonType: this.vueToolbox.getWagon() //Wagon
-    };
-  }
-
-  down(event: PointerEvent) {
-    this.downProps = this.convert(event);
-    this.downAt = new Date().getTime();
-    this.handleMouse(Input.MouseDown, event);
-  }
-
-  move(event: PointerEvent) {
-    const now = new Date().getTime();
-    if (now - this.downAt < 500) return;
-
-    if (this.downProps) {
-      this.handleMouse(Input.MouseMove, event);
-    } else {
-      this.handleMouse(Input.MouseRoam, event);
-    }
-  }
-
-  up(event: PointerEvent) {
-    if (!this.downProps) return;
-
-    const now = new Date().getTime();
-    if (now - this.downAt < 500) {
-      this.handleMouse(Input.MouseClick, event);
-    } else {
-      this.handleMouse(Input.MouseUp, event);
-    }
-    this.downProps = null;
-  }
-
-  private handleMouse(input: Input, event: PointerEvent): void {
-    this.ih.handle(
-      {
-        input,
-        type: this.getMouseButton(event),
-        mod: this.getMouseMods(event)
-      },
-      { ...this.convert(event), downProps: this.downProps }
-    );
-  }
-
-  private getMouseMods(event: PointerEvent | WheelEvent): InputMod {
-    return event.ctrlKey
-      ? event.shiftKey
-        ? InputMod.Both
-        : InputMod.Ctrl
-      : event.shiftKey
-      ? InputMod.Shift
-      : InputMod.None;
-  }
-
-  private getMouseButton(event: PointerEvent): InputType {
-    return event.button === 0
-      ? InputType.MouseLeft
-      : event.button === 2
-      ? InputType.MouseRight
-      : InputType.MouseMiddle;
-  }
-
-  wheel(event: WheelEvent) {
-    this.ih.handle({
-      input: Input.Wheel,
-      type:
-        Math.sign(event.deltaY) > 0 ? InputType.WheelPos : InputType.WheelNeg,
-      mod: this.getMouseMods(event)
-    });
   }
 
   selectMode(mode: InputMode) {
@@ -286,44 +155,6 @@ export class GlobalController {
     }
   }
 
-  // keyboard handling
-
-  keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    this.ih.handle(this.getHandle(Input.KeyboardDown, key, mods));
-  }
-
-  keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    this.ih.handle(this.getHandle(Input.KeyboardUp, key, mods));
-  }
-
-  keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
-    this.ih.handle(this.getHandle(Input.KeyboardHold, key, mods));
-  }
-
-  private getHandle(
-    input: Input,
-    key: string,
-    mods: { shift: boolean; ctrl: boolean }
-  ): InputHandlerProp {
-    return {
-      input: input,
-      type: key,
-      mod: this.getMods(mods)
-    };
-  }
-
-  private getMods(mods: { shift: boolean; ctrl: boolean }): InputMod {
-    return mods.shift
-      ? mods.ctrl
-        ? InputMod.Both
-        : InputMod.Shift
-      : mods.ctrl
-      ? InputMod.Ctrl
-      : InputMod.None;
-  }
-
-  // end of keyboard handling
-
   tick() {
     const speed = this.store.getTickSpeed();
     this.store.tick();
@@ -348,24 +179,6 @@ export class GlobalController {
     if (passengerStats.arrivedCount >= this.targetPassengerCount) {
       alert('Nyertél! Elvittél ' + this.targetPassengerCount + ' utast.');
       this.targetPassengerCount = 9999999;
-    }
-
-    if (this.inputHandler && this.inputHandler.tick) {
-      // todo move to cam
-      const ize: TickInputProps = {
-        canvasWidth: (document.getElementById(
-          'renderCanvas'
-        ) as HTMLCanvasElement).width,
-        canvasHeight: (document.getElementById(
-          'renderCanvas'
-        ) as HTMLCanvasElement).height,
-        setFollowCamOff: this.followCam
-          ? () => {
-              this.followCam = false;
-            }
-          : () => {}
-      };
-      this.inputHandler.tick(ize);
     }
   }
 

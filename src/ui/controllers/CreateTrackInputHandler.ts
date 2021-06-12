@@ -62,7 +62,7 @@ export class CreateTrackInputHandler implements InputHandler {
         props.snappedPoint.coord
       );
       this.fromMesh.position.y = 0.75;
-      this.fromMesh.rotation.y = props.wheelRad;
+      this.fromMesh.rotation.y = 0; // todo props.wheelRad;
     }
 
     this.toMesh.setEnabled(
@@ -70,7 +70,7 @@ export class CreateTrackInputHandler implements InputHandler {
     );
     this.toMesh.position = CoordinateToBabylonVector3(props.snappedPoint.coord);
     this.toMesh.position.y = 0.75;
-    this.toMesh.rotation.y = props.wheelRad;
+    this.toMesh.rotation.y = 0; // todo props.wheelRad;
 
     this.pathMesh = curveToTube(
       BezierCreater.Create([props.snappedPoint.coord, props.snappedPoint.coord])
@@ -90,7 +90,7 @@ export class CreateTrackInputHandler implements InputHandler {
       );
       this.fromMesh.position.y = 0.75;
     }
-    this.fromMesh.rotation.y = props.wheelRad;
+    this.fromMesh.rotation.y = 0; // todo props.wheelRad;
     this.fromMesh.setEnabled(
       !props.snappedJoint && !props.snappedPositionOnTrack
     );
@@ -99,7 +99,7 @@ export class CreateTrackInputHandler implements InputHandler {
   move(downProps: InputProps, props: InputProps, event: PointerEvent): void {
     this.toMesh.position = CoordinateToBabylonVector3(props.snappedPoint.coord);
     this.toMesh.position.y = 0.75;
-    this.toMesh.rotation.y = props.wheelRad;
+    this.toMesh.rotation.y = 0; // todo props.wheelRad;
     this.toMesh.setEnabled(!props.snappedJoint);
 
     if (props.snappedJoint) {
@@ -134,7 +134,7 @@ export class CreateTrackInputHandler implements InputHandler {
         GENERATE_ID,
         downProps.snappedPoint.coord.x,
         downProps.snappedPoint.coord.z,
-        downProps.wheelRad
+        0 // todo downProps.wheelRad
       ));
     }
   }
@@ -163,13 +163,13 @@ export class CreateTrackInputHandler implements InputHandler {
             downProps.snappedPoint.coord.x,
             0,
             downProps.snappedPoint.coord.z,
-            downProps.wheelRad
+            0 // todo downProps.wheelRad
           ));
         actions.push(CommandCreator.createTrackJoint(
           GENERATE_ID,
           downProps.snappedPoint.coord.x,
           downProps.snappedPoint.coord.z,
-          downProps.wheelRad
+          0 // todo downProps.wheelRad
         ));
         deletable.push(j1);
       }
@@ -183,13 +183,13 @@ export class CreateTrackInputHandler implements InputHandler {
             props.snappedPoint.coord.x,
             0,
             props.snappedPoint.coord.z,
-            props.wheelRad
+            0 // todo props.wheelRad
           ));
         actions.push(CommandCreator.createTrackJoint(
           GENERATE_ID,
           props.snappedPoint.coord.x,
           props.snappedPoint.coord.z,
-          props.wheelRad
+          0 // todo props.wheelRad
         ));
         deletable.push(j2);
       }
