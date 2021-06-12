@@ -153,20 +153,15 @@ export class GlobalController {
     const { pickedPoint, pickedMesh } = this.specificController.pick(event);
 
     if (!pickedPoint) {
-      const ret: InputProps = {
+      return {
         point: null,
         mesh: pickedMesh,
         snappedPoint: null,
         snappedPositionOnTrack: null,
         snappedJoint: null,
         snappedJointOnTrack: null,
-        // wheelDeg: this.wheelRotation,
-        wheelRad: (this.wheelRotation / 180) * Math.PI,
-        // selected: this.store.getSelected(),
         wagonType: this.vueToolbox.getWagon()
       };
-
-      return ret;
     }
 
     const point: Ray = new Ray(BabylonVector3ToCoordinate(pickedPoint), 0);
@@ -185,8 +180,7 @@ export class GlobalController {
       }
     }
 
-    const ret: InputProps = {
-      // pick
+    return {
       point: point, // only at Platform, deciding the side
       mesh: pickedMesh, // to actually get the selected
 
@@ -195,20 +189,8 @@ export class GlobalController {
       snappedPositionOnTrack: snapPositionOnTrack(point, trackList),
       snappedJoint: snapJoint(point, jointList),
       snappedJointOnTrack: snapPositionOnTrack(snapHexaXZ(point), trackList),
-
-      // wheel, only for track placement
-      // wheelDeg: this.wheelRotation, // nobody uses this
-      wheelRad: (this.wheelRotation / 180) * Math.PI, // Track
-
-      // nobody uses this
-      // selected: this.store.getSelected(),
-
-      // only for wagon placement
       wagonType: this.vueToolbox.getWagon() //Wagon
     };
-    ret.snappedPoint.dirXZ = ret.wheelRad;
-
-    return ret;
   }
 
   down(event: PointerEvent) {
@@ -251,7 +233,7 @@ export class GlobalController {
     );
   }
 
-  private getMouseMods(event: PointerEvent): InputMod {
+  private getMouseMods(event: PointerEvent | WheelEvent): InputMod {
     return event.ctrlKey
       ? event.shiftKey
         ? InputMod.Both
@@ -269,14 +251,12 @@ export class GlobalController {
       : InputType.MouseMiddle;
   }
 
-  private wheelRotation = 0;
-
   wheel(event: WheelEvent) {
     this.ih.handle({
       input: Input.Wheel,
       type:
         Math.sign(event.deltaY) > 0 ? InputType.WheelPos : InputType.WheelNeg,
-      mod: InputMod.None
+      mod: this.getMouseMods(event)
     });
   }
 
