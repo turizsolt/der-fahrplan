@@ -55,7 +55,7 @@ export class TrackSwitchPixiRenderer extends BasePixiRenderer
         (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
       event.data.global.x = x;
       event.data.global.y = y;
-      globalThis.globalController.down({
+      globalThis.inputController.down({
         ...event,
         meshId: 'clickable-trackswitch-' + this.sw.getId(),
         button: event.data.button
@@ -72,7 +72,7 @@ export class TrackSwitchPixiRenderer extends BasePixiRenderer
         (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
       event.data.global.x = x;
       event.data.global.y = y;
-      globalThis.globalController.up({
+      globalThis.inputController.up({
         ...event,
         meshId: 'clickable-trackswitch-' + this.sw.getId(),
         button: event.data.button

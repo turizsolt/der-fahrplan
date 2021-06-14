@@ -28,7 +28,7 @@ export class TrackJointPixiRenderer extends BasePixiRenderer
         (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
       event.data.global.x = x;
       event.data.global.y = y;
-      globalThis.globalController.down({
+      globalThis.inputController.down({
         ...event,
         meshId: 'clickable-trackjoint-' + data.id,
         button: event.data.button
@@ -45,7 +45,7 @@ export class TrackJointPixiRenderer extends BasePixiRenderer
         (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
       event.data.global.x = x;
       event.data.global.y = y;
-      globalThis.globalController.up({
+      globalThis.inputController.up({
         ...event,
         meshId: 'clickable-trackjoint-' + data.id,
         button: event.data.button

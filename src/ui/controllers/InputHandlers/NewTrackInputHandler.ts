@@ -1,13 +1,10 @@
-import * as PIXI from 'pixi.js';
 import { NewInputHandler } from './NewInputHandler';
 import {
   MouseLeft,
-  MouseRight,
   WheelPos,
   WheelNeg
 } from './Interfaces/InputType';
 import {
-  keyUp,
   click,
   drag,
   drop,
@@ -22,103 +19,64 @@ import {
   GENERATE_ID
 } from '../../../structs/Actuals/Store/Command/CommandLog';
 import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
-import { snapHexaXZ } from '../../../structs/Geometry/Snap';
 import { TrackJoint } from '../../../modules/Track/TrackJoint/TrackJoint';
 import { Command } from '../../../structs/Actuals/Store/Command/Command';
 import { TYPES } from '../../../di/TYPES';
 import { Ray } from '../../../structs/Geometry/Ray';
 import { TrackJointConnector } from '../../../modules/Track/TrackJoint/TrackJointConnector';
-import { Coordinate } from '../../../structs/Geometry/Coordinate';
-import { BezierCreater } from '../../../structs/Geometry/Bezier/BezierCreater';
-import { Left, Right } from '../../../structs/Geometry/Directions';
+import { TrackInputHandlerPlugin } from './TrackInputHandlerPlugin';
+import { TrackInputHandlerPixi } from './TrackInputHandlerPixi';
+import { TrackInputHandlerBabylon } from './TrackInputHandlerBabylon';
 
+// @injectable()
 export class NewTrackInputHandler extends NewInputHandler {
   private commandLog: CommandLog;
-  private wheelRad: number = Math.PI / 2;
-  private downWheelRad: number = Math.PI / 2;
-  private line: PIXI.Graphics;
+  private wheelRad: number = 0;
+  private downWheelRad: number = 0;
+
+  // @inject(TYPES.TrackInputHandler) 
+  private plugin:TrackInputHandlerPlugin;
+  private isRoam:boolean = true;
+  private props: InputProps;
+  private downProps: InputProps;
 
   constructor(private store: Store) {
     super();
 
+    // todo inject
+    this.plugin = globalThis.startParam === '2d' ? new TrackInputHandlerPixi() : new TrackInputHandlerBabylon();
+    this.plugin.init();
     this.commandLog = store.getCommandLog();
-
-    /* todo remove to separate file
-    const point = new PIXI.Graphics();
-    point.beginFill(0xff0000); //0x0bef47);
-    point.drawRect(-0.5, -1.5, 1, 3);
-    point.endFill();
-    point.rotation = -this.wheelRad;
-    globalThis.stage.addChild(point);
-
-    let line = new PIXI.Graphics();
-    line.lineStyle(1, 0x0000FF, 1);
-    globalThis.stage.addChild(line);
-    */
-
-    // todo copy from old
-    // todo put BAB/PIX dependecies into a separate class
 
     this.reg(wheel(WheelPos), () => {
       this.wheelRad -= Math.PI / 6;
-      // todo point.rotation = -this.wheelRad;
+      this.plugin.wheel(this.wheelRad);
+      if(this.isRoam) {
+        this.plugin.roam(this.props);
+      } else {
+        this.move(this.props);
+      }
     });
 
     this.reg(wheel(WheelNeg), () => {
       this.wheelRad += Math.PI / 6;
-      // todo point.rotation = -this.wheelRad;
+      this.plugin.wheel(this.wheelRad);
+      if(this.isRoam) {
+        this.plugin.roam(this.props);
+      } else {
+        this.move(this.props);
+      }
     });
 
     this.reg(move(), (legacyProp: InputProps) => {
-      const ray = snapHexaXZ(legacyProp.point);
-      // todo point.x = ray.coord.x;
-      // todo point.y = ray.coord.z;
-
-      const props = legacyProp;
-      const downProps = legacyProp.downProps;
-      props.snappedPoint.dirXZ = this.wheelRad;
-      downProps.snappedPoint.dirXZ = this.downWheelRad;
-      if(props.snappedJoint) {
-        props.snappedPoint.dirXZ = props.snappedJoint.getRotation();
-      }
-      if(downProps.snappedJoint) {
-        downProps.snappedPoint.dirXZ = downProps.snappedJoint.getRotation();
-      }
-      const midpoint = downProps.snappedPoint.computeMidpoint(props.snappedPoint);
-      const midpointCoord: Coordinate = midpoint === false ? undefined : midpoint;
-      const chain = BezierCreater.Create([
-        downProps.snappedPoint.coord,
-        midpointCoord,
-        props.snappedPoint.coord
-      ])
-        .getLineSegmentChain();
-    
-        /* todo
-        const rays1 = chain.getRays().map(r => r.fromHere(Left, 0.25));
-        const rays2 = chain
-          .getRays()
-          .map(r => r.fromHere(Right, 0.25))
-          .reverse();
-    
-        const coords = rays1.map(r => new PIXI.Point(r.coord.x, r.coord.z));
-        coords.push(...rays2.map(r => new PIXI.Point(r.coord.x, r.coord.z)));
-        const polygon = new PIXI.Polygon(coords);
-    
-        line.clear();
-        line.hitArea = polygon;
-        line.beginFill(0x0000ff);
-        line.drawPolygon(polygon);
-        line.endFill();
-        line.zIndex = 2; */
+      this.move(legacyProp);
+      this.props = legacyProp;
     });
 
     this.reg(roam(), (legacyProp: InputProps) => {
-      /* todo
-      const ray = snapHexaXZ(legacyProp.point);
-      point.x = ray.coord.x;
-      point.y = ray.coord.z;
-      line.clear();
-      */
+      this.plugin.roam(legacyProp);
+
+      this.props = legacyProp;
     });
 
     this.reg(click(MouseLeft), (legacyProp: InputProps) => {
@@ -136,13 +94,22 @@ export class NewTrackInputHandler extends NewInputHandler {
       return false;
     });
 
-    this.reg(drag(MouseLeft), () => {
+    this.reg(drag(MouseLeft), (legacyProp: InputProps) => {
         this.downWheelRad = this.wheelRad;
+        this.plugin.down(legacyProp);
+        this.isRoam = false;
+
+        this.downProps = legacyProp.downProps;
+        this.props = legacyProp;
     });
 
     this.reg(drop(MouseLeft), (legacyProp: InputProps) => {
         const props = legacyProp;
         const downProps = legacyProp.downProps;
+        this.isRoam = true;
+
+        this.downProps = null;
+        this.props = legacyProp;
     
         // only if the point is not on a track, except the two ends
         if (
@@ -231,9 +198,24 @@ export class NewTrackInputHandler extends NewInputHandler {
               });
             }
           }
-          
+      this.plugin.up(legacyProp.downProps, legacyProp);    
       return true;
       
     });
+  }
+
+  move(legacyProp: InputProps): void {
+    const props = legacyProp;
+    const downProps = legacyProp.downProps;
+    props.snappedPoint.dirXZ = this.wheelRad;
+    downProps.snappedPoint.dirXZ = this.downWheelRad;
+    if(props.snappedJoint) {
+      props.snappedPoint.dirXZ = props.snappedJoint.getRotation();
+    }
+    if(downProps.snappedJoint) {
+      downProps.snappedPoint.dirXZ = downProps.snappedJoint.getRotation();
+    }
+    
+    this.plugin.move(downProps, props);
   }
 }

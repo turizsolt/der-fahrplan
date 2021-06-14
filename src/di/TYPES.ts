@@ -87,5 +87,7 @@ export const TYPES = {
   Sensor: Symbol.for('Sensor'),
   SensorRenderer: Symbol.for('SensorRenderer'),
   FactoryOfSensor: Symbol.for('Factory<Sensor>'),
-  FactoryOfSensorRenderer: Symbol.for('Factory<SensorRenderer>')
+  FactoryOfSensorRenderer: Symbol.for('Factory<SensorRenderer>'),
+
+  TrackInputHandler: Symbol.for('TrackInputHandler')
 };

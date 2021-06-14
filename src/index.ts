@@ -60,6 +60,7 @@ if (globalThis.startParam === '2d') {
 
     // todo global
     globalThis.globalController = globalController;
+    globalThis.inputController = inputController;
 
     app.stage.on('pointerdown', (event: PIXI.InteractionEvent) => {
       const x = (event.data.global.x - app.stage.x) / app.stage.scale.x;
