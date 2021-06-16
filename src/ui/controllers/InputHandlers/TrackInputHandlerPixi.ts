@@ -8,35 +8,70 @@ import { Left, Right } from '../../../structs/Geometry/Directions';
 
 export class TrackInputHandlerPixi implements TrackInputHandlerPlugin {
   private line: PIXI.Graphics;
-  private point: PIXI.Graphics;
+  private toPoint: PIXI.Graphics;
+  private fromPoint: PIXI.Graphics;
+  private dir: number = 0;
 
   constructor() {}
   init() {
-    this.point = new PIXI.Graphics();
-    this.point.beginFill(0xff0000); //0x0bef47);
-    this.point.drawRect(-0.5, -1.5, 1, 3);
-    this.point.endFill();
-    this.point.rotation = 0;
-    globalThis.stage.addChild(this.point);
+    this.toPoint = new PIXI.Graphics();
+    this.toPoint.beginFill(0xff0000); //0x0bef47);
+    this.toPoint.drawRect(-0.5, -1.5, 1, 3);
+    this.toPoint.endFill();
+    this.toPoint.rotation = 0;
+    this.toPoint.renderable = false;
+    globalThis.stage.addChild(this.toPoint);
+
+    this.fromPoint = new PIXI.Graphics();
+    this.fromPoint.beginFill(0xff0000); //0x0bef47);
+    this.fromPoint.drawRect(-0.5, -1.5, 1, 3);
+    this.fromPoint.endFill();
+    this.fromPoint.rotation = 0;
+    this.fromPoint.renderable = false;
+    globalThis.stage.addChild(this.fromPoint);
 
     this.line = new PIXI.Graphics();
     this.line.lineStyle(1, 0x0000ff, 1);
     globalThis.stage.addChild(this.line);
   }
 
-  down(props: InputProps) {}
+  down(props: InputProps) {
+    if (!props.snappedJoint) {
+      this.fromPoint.renderable =
+        !props.snappedJoint && !props.snappedPositionOnTrack;
+      this.fromPoint.position.x = props.snappedPoint.coord.x;
+      this.fromPoint.position.y = props.snappedPoint.coord.z;
+      this.fromPoint.rotation = -this.dir;
+    }
+
+    this.toPoint.renderable =
+      !props.snappedJoint && !props.snappedPositionOnTrack;
+    this.toPoint.position.x = props.snappedPoint.coord.x;
+    this.toPoint.position.y = props.snappedPoint.coord.z;
+    this.toPoint.rotation = -this.dir;
+
+    this.line.renderable = true;
+  }
 
   roam(props: InputProps) {
     const ray = snapHexaXZ(props.point);
-    this.point.x = ray.coord.x;
-    this.point.y = ray.coord.z;
+
     this.line.clear();
+
+    if (props.snappedPoint) {
+      this.fromPoint.x = ray.coord.x;
+      this.fromPoint.y = ray.coord.z;
+    }
+    this.fromPoint.rotation = -this.dir;
+    this.fromPoint.renderable =
+      !props.snappedJoint && !props.snappedPositionOnTrack;
   }
 
   move(downProps: InputProps, props: InputProps) {
     const ray = snapHexaXZ(props.point);
-    this.point.x = ray.coord.x;
-    this.point.y = ray.coord.z;
+    this.toPoint.x = ray.coord.x;
+    this.toPoint.y = ray.coord.z;
+    this.toPoint.renderable = !props.snappedJoint;
 
     const midpoint = downProps.snappedPoint.computeMidpoint(props.snappedPoint);
     const midpointCoord: Coordinate = midpoint === false ? undefined : midpoint;
@@ -64,11 +99,20 @@ export class TrackInputHandlerPixi implements TrackInputHandlerPlugin {
     this.line.zIndex = 2;
   }
 
-  up(downProps: InputProps, props: InputProps) {}
+  up(downProps: InputProps, props: InputProps) {
+    this.fromPoint.renderable = false;
+    this.toPoint.renderable = false;
+    this.line.renderable = false;
+  }
 
-  cancel() {}
+  cancel() {
+    this.fromPoint.renderable = false;
+    this.toPoint.renderable = false;
+    this.line.renderable = false;
+  }
 
   wheel(dir: number): void {
-    this.point.rotation = -dir;
+    this.toPoint.rotation = -dir;
+    this.dir = dir;
   }
 }
