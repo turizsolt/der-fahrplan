@@ -97,6 +97,8 @@ export class TrackInputHandlerPixi implements TrackInputHandlerPlugin {
     this.line.drawPolygon(polygon);
     this.line.endFill();
     this.line.zIndex = 2;
+
+    this.line.renderable = midpoint !== false;
   }
 
   up(downProps: InputProps, props: InputProps) {
