@@ -66,7 +66,12 @@ export class GlobalController {
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
 
-    this.ih = new ChainedInputHandler(this.store, this.vueSidebar, this);
+    this.ih = new ChainedInputHandler(
+      this.store,
+      this.vueSidebar,
+      this,
+      this.specificController
+    );
     this.inputController = new InputController(
       this.store,
       this.ih,

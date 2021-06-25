@@ -27,6 +27,7 @@ import { TrackJointConnector } from '../../../modules/Track/TrackJoint/TrackJoin
 import { TrackInputHandlerPlugin } from './TrackInputHandlerPlugin';
 import { TrackInputHandlerPixi } from './TrackInputHandlerPixi';
 import { TrackInputHandlerBabylon } from './TrackInputHandlerBabylon';
+import { InputMod } from './Interfaces/InputMod';
 
 // @injectable()
 export class NewTrackInputHandler extends NewInputHandler {
@@ -48,7 +49,7 @@ export class NewTrackInputHandler extends NewInputHandler {
     this.plugin.init();
     this.commandLog = store.getCommandLog();
 
-    this.reg(wheel(WheelPos), () => {
+    this.reg(wheel(WheelPos, InputMod.None), () => {
       this.wheelRad -= Math.PI / 6;
       this.plugin.wheel(this.wheelRad);
       if(this.isRoam) {
@@ -58,7 +59,7 @@ export class NewTrackInputHandler extends NewInputHandler {
       }
     });
 
-    this.reg(wheel(WheelNeg), () => {
+    this.reg(wheel(WheelNeg, InputMod.None), () => {
       this.wheelRad += Math.PI / 6;
       this.plugin.wheel(this.wheelRad);
       if(this.isRoam) {
