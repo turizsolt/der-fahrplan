@@ -22,6 +22,7 @@ import { GUISpecificController } from './GUISpecificController';
 export class InputController {
   private downProps: InputProps = null;
   private downAt: number = 0;
+  private mouseDownEvent: PointerEvent = null;
 
   constructor(
     private store: Store,
@@ -75,6 +76,7 @@ export class InputController {
     this.downProps = this.convert(event);
     this.downAt = new Date().getTime();
     this.handleMouse(Input.MouseDown, event);
+    this.mouseDownEvent = event;
   }
 
   move(event: PointerEvent) {
@@ -82,7 +84,13 @@ export class InputController {
     if (now - this.downAt < 500) return;
 
     if (this.downProps) {
-      this.handleMouse(Input.MouseMove, event);
+      const event2 = {
+        ...event,
+        button: this.mouseDownEvent.button,
+        ctrlKey: this.mouseDownEvent.ctrlKey,
+        shiftKey: this.mouseDownEvent.shiftKey
+      };
+      this.handleMouse(Input.MouseMove, event2);
     } else {
       this.handleMouse(Input.MouseRoam, event);
     }

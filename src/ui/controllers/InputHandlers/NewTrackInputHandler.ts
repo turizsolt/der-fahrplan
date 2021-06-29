@@ -69,7 +69,7 @@ export class NewTrackInputHandler extends NewInputHandler {
       }
     });
 
-    this.reg(move(), (legacyProp: InputProps) => {
+    this.reg(move(MouseLeft), (legacyProp: InputProps) => {
       this.move(legacyProp);
       this.props = legacyProp;
     });
