@@ -155,6 +155,7 @@ if (globalThis.startParam === '2d') {
     const keyboardInputs = new KeyboardInputs(inputController);
     app.ticker.add(delta => () => {
       keyboardInputs.fireKeyHolds();
+      inputController.tick();
       globalController.tick();
     });
   });
@@ -198,12 +199,6 @@ if (globalThis.startParam === '2d') {
 
       scene.actionManager = new BABYLON.ActionManager(scene);
 
-      const keyboardInputs = new KeyboardInputs(inputController);
-      scene.registerAfterRender(() => {
-        keyboardInputs.fireKeyHolds();
-        globalController.tick();
-      });
-
       return { scene, camera };
     };
     const { scene, camera } = createScene();
@@ -212,6 +207,14 @@ if (globalThis.startParam === '2d') {
     const store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
     const globalController = new GlobalController(store, specificController);
     const inputController = globalController.getInputController();
+
+    const keyboardInputs = new KeyboardInputs(inputController);
+    scene.registerAfterRender(() => {
+      keyboardInputs.fireKeyHolds();
+      inputController.tick();
+      globalController.tick();
+    });
+
     const land = productionContainer.get<Land>(TYPES.Land);
     land.init(globalController);
 

@@ -7,5 +7,6 @@ export enum Input {
   Wheel = 'Wheel',
   KeyboardUp = 'KeyboardUp',
   KeyboardDown = 'KeyboardDown',
-  KeyboardHold = 'KeyboardHold'
+  KeyboardHold = 'KeyboardHold',
+  Tick = 'Tick'
 }

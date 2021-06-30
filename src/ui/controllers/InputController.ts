@@ -160,6 +160,12 @@ export class InputController {
     this.inputHandler.handle(this.getHandle(Input.KeyboardHold, key, mods));
   }
 
+  // tick
+
+  tick() {
+    this.inputHandler.handle(this.getTick());
+  }
+
   private getHandle(
     input: Input,
     key: string,
@@ -180,5 +186,13 @@ export class InputController {
       : mods.ctrl
       ? InputMod.Ctrl
       : InputMod.None;
+  }
+
+  private getTick(): InputHandlerProp {
+    return {
+      input: Input.Tick,
+      type: InputType.MouseAny,
+      mod: InputMod.DontCare
+    };
   }
 }

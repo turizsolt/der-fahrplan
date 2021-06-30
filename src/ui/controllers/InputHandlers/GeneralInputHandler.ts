@@ -12,38 +12,6 @@ export class GeneralInputHandler extends NewInputHandler {
   constructor(private store: Store, private globalController: GlobalController) {
     super();
 
-    // todo put into CameraInputHandler when it exists again
-    // this.reg(keyDown('ScrollLock'), () => this.inputHandlers.CAMERA.setPanLock());
-    // this.reg(keyDown('Home'), () => this.followCam = !this.followCam);
-    /*
-     if (
-      this.followCam &&
-      this.getSelectedBrick() &&
-      this.getSelectedBrick().getType() === Symbol.for('Wagon')
-    ) {
-      const wagon = this.getSelectedBrick() as Wagon;
-      this.specificController.setFollowCam(wagon.getRay().coord);
-    }
-
-    if (this.inputHandler && this.inputHandler.tick) {
-      // todo move to cam
-      const ize: TickInputProps = {
-        canvasWidth: (document.getElementById(
-          'renderCanvas'
-        ) as HTMLCanvasElement).width,
-        canvasHeight: (document.getElementById(
-          'renderCanvas'
-        ) as HTMLCanvasElement).height,
-        setFollowCamOff: this.followCam
-          ? () => {
-              this.followCam = false;
-            }
-          : () => {}
-      };
-      this.inputHandler.tick(ize);
-    }
-    */
-
     this.reg(keyDown('PageUp'), () => {
         const list = this.store.getAllOf<Train>(Symbol.for('Train'));
         const wagon = this.getSelected()?.getType() === Symbol.for('Wagon') ? (this.getSelected() as Wagon) : null;

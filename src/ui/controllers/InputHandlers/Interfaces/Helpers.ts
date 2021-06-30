@@ -56,3 +56,10 @@ export const roam = (button?: InputType, mod?: InputMod):InputHandlerProp => ({
     type: button ?? InputType.MouseAny,
     mod: mod ?? InputMod.DontCare
 });
+
+export const tick = (button?: InputType, mod?: InputMod):InputHandlerProp => ({
+    input: Input.Tick,
+    type: button ?? InputType.MouseAny,
+    mod: mod ?? InputMod.DontCare
+});
+
