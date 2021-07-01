@@ -1,14 +1,21 @@
 import * as BABYLON from 'babylonjs';
 import { NewInputHandler } from './NewInputHandler';
 import { WheelNeg, WheelPos, MouseMiddle } from './Interfaces/InputType';
-import { wheel, move, drag, tick, keyDown } from './Interfaces/Helpers';
+import {
+  wheel,
+  move,
+  drag,
+  tick,
+  keyDown,
+  keyHold
+} from './Interfaces/Helpers';
 import { Store } from '../../../structs/Interfaces/Store';
 import { GUISpecificController } from '../GUISpecificController';
 import { BabylonController } from '../BabylonController';
 import { InputMod } from './Interfaces/InputMod';
-import { Vector3 } from 'babylonjs';
 import { TickInputProps } from '../TickInputProps';
 import { Wagon } from '../../../structs/Interfaces/Wagon';
+import { PanObject } from './PanObject';
 
 export class NewCameraInputHandler extends NewInputHandler {
   // todo babylon
@@ -17,6 +24,7 @@ export class NewCameraInputHandler extends NewInputHandler {
   private cameraDownProps: any;
   private panLock: boolean = true;
   private followCam: boolean = false;
+  private panObject: PanObject;
 
   constructor(
     private store: Store,
@@ -31,6 +39,7 @@ export class NewCameraInputHandler extends NewInputHandler {
 
       this.babylonController = this.specificController as BabylonController;
       this.camera = this.babylonController.getCamera();
+      this.panObject = new PanObject(this.camera);
 
       // zoom
 
@@ -85,71 +94,62 @@ export class NewCameraInputHandler extends NewInputHandler {
           (cameraProps.pointerY - this.cameraDownProps.pointerY);
       });
     }
+
+    this.reg(keyHold('W'), () => {
+      this.panObject.initVars();
+      this.panObject.up(1);
+      this.panObject.updateCamera(this.getPanProperties());
+    });
+
+    this.reg(keyHold('A'), () => {
+      this.panObject.initVars();
+      this.panObject.left(1);
+      this.panObject.updateCamera(this.getPanProperties());
+    });
+
+    this.reg(keyHold('S'), () => {
+      this.panObject.initVars();
+      this.panObject.down(1);
+      this.panObject.updateCamera(this.getPanProperties());
+    });
+
+    this.reg(keyHold('D'), () => {
+      this.panObject.initVars();
+      this.panObject.right(1);
+      this.panObject.updateCamera(this.getPanProperties());
+    });
   }
 
   private pan() {
     if (this.panLock) return;
 
-    const props: TickInputProps = {
-      canvasWidth: (document.getElementById(
-        'renderCanvas'
-      ) as HTMLCanvasElement).width,
-      canvasHeight: (document.getElementById(
-        'renderCanvas'
-      ) as HTMLCanvasElement).height,
-      setFollowCamOff: this.followCam
-        ? () => {
-            this.followCam = false;
-          }
-        : () => {}
-    };
+    const props = this.getPanProperties();
 
-    const cameraProps = this.babylonController.getProps();
+    this.panObject.initVars();
 
-    const alpha = this.camera.alpha;
-    const scale = this.camera.radius / 70;
-    let dx = 0;
-    let dz = 0;
-
-    if (props.canvasWidth - cameraProps.pointerX < 20) {
-      const offset = props.canvasWidth - cameraProps.pointerX;
+    if (props.canvasWidth - props.camera.pointerX < 20) {
+      const offset = props.canvasWidth - props.camera.pointerX;
       const modifier = (20 - offset) / 20;
-      dx += -Math.sin(alpha) * scale * modifier;
-      dz += Math.cos(alpha) * scale * modifier;
+      this.panObject.right(modifier);
     }
 
-    if (cameraProps.pointerX < 20) {
-      const modifier = (20 - cameraProps.pointerX) / 20;
-      dx += -Math.sin(alpha + Math.PI) * scale * modifier;
-      dz += Math.cos(alpha + Math.PI) * scale * modifier;
+    if (props.camera.pointerX < 20) {
+      const modifier = (20 - props.camera.pointerX) / 20;
+      this.panObject.left(modifier);
     }
 
-    if (props.canvasHeight - cameraProps.pointerY < 20) {
-      const offset = props.canvasHeight - cameraProps.pointerY;
+    if (props.canvasHeight - props.camera.pointerY < 20) {
+      const offset = props.canvasHeight - props.camera.pointerY;
       const modifier = (20 - offset) / 20;
-      dx += -Math.sin(alpha + (Math.PI / 2) * 3) * scale * modifier;
-      dz += Math.cos(alpha + (Math.PI / 2) * 3) * scale * modifier;
+      this.panObject.down(modifier);
     }
 
-    if (cameraProps.pointerY < 20) {
-      const modifier = (20 - cameraProps.pointerY) / 20;
-      dx += -Math.sin(alpha + Math.PI / 2) * scale * modifier;
-      dz += Math.cos(alpha + Math.PI / 2) * scale * modifier;
+    if (props.camera.pointerY < 20) {
+      const modifier = (20 - props.camera.pointerY) / 20;
+      this.panObject.up(modifier);
     }
 
-    if (dz !== 0 || dx !== 0) {
-      this.camera.setPosition(
-        new Vector3(
-          cameraProps.fromX + dx,
-          cameraProps.fromY,
-          cameraProps.fromZ + dz
-        )
-      );
-      this.camera.setTarget(
-        new Vector3(cameraProps.targetX + dx, 0, cameraProps.targetZ + dz)
-      );
-      props.setFollowCamOff();
-    }
+    this.panObject.updateCamera(props);
   }
 
   private follow() {
@@ -162,5 +162,22 @@ export class NewCameraInputHandler extends NewInputHandler {
       const wagon = selected as Wagon;
       this.specificController.setFollowCam(wagon.getRay().coord);
     }
+  }
+
+  private getPanProperties(): TickInputProps {
+    return {
+      canvasWidth: (document.getElementById(
+        'renderCanvas'
+      ) as HTMLCanvasElement).width,
+      canvasHeight: (document.getElementById(
+        'renderCanvas'
+      ) as HTMLCanvasElement).height,
+      setFollowCamOff: this.followCam
+        ? () => {
+            this.followCam = false;
+          }
+        : () => {},
+      camera: this.babylonController.getProps()
+    };
   }
 }
