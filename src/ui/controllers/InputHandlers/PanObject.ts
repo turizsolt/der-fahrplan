@@ -40,6 +40,11 @@ export class PanObject {
     this.dz += Math.cos(this.alpha) * this.scale * modifier;
   }
 
+  move(dx: number, dy: number): void {
+    this.left(dx);
+    this.up(dy);
+  }
+
   updateCamera(props: TickInputProps) {
     if (this.dz !== 0 || this.dx !== 0) {
       this.camera.setPosition(

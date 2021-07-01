@@ -16,12 +16,14 @@ import { InputMod } from './Interfaces/InputMod';
 import { TickInputProps } from '../TickInputProps';
 import { Wagon } from '../../../structs/Interfaces/Wagon';
 import { PanObject } from './PanObject';
+import { CameraInputProps } from './CameraInputProps';
 
 export class NewCameraInputHandler extends NewInputHandler {
   // todo babylon
   private camera: BABYLON.ArcRotateCamera;
   private babylonController: BabylonController;
-  private cameraDownProps: any;
+  private cameraDownPropsCamera: CameraInputProps;
+  private cameraDownProps: TickInputProps;
   private panLock: boolean = true;
   private followCam: boolean = false;
   private panObject: PanObject;
@@ -65,18 +67,19 @@ export class NewCameraInputHandler extends NewInputHandler {
       // orbit
 
       this.reg(drag(MouseMiddle), () => {
-        this.cameraDownProps = this.babylonController.getProps();
+        this.cameraDownPropsCamera = this.babylonController.getProps();
+        this.cameraDownProps = this.getPanProperties();
       });
 
       this.reg(move(MouseMiddle, InputMod.Shift), () => {
         const cameraProps = this.babylonController.getProps();
         this.camera.alpha =
-          this.cameraDownProps.cameraAlpha +
-          (cameraProps.pointerX - this.cameraDownProps.pointerX) / 100;
+          this.cameraDownPropsCamera.cameraAlpha +
+          (cameraProps.pointerX - this.cameraDownPropsCamera.pointerX) / 100;
 
         this.camera.beta =
-          this.cameraDownProps.cameraBeta +
-          (cameraProps.pointerY - this.cameraDownProps.pointerY) / 300;
+          this.cameraDownPropsCamera.cameraBeta +
+          (cameraProps.pointerY - this.cameraDownPropsCamera.pointerY) / 300;
         if (this.camera.beta > Math.PI * 0.45) {
           this.camera.beta = Math.PI * 0.45;
         }
@@ -90,8 +93,19 @@ export class NewCameraInputHandler extends NewInputHandler {
       this.reg(move(MouseMiddle, InputMod.Ctrl), () => {
         const cameraProps = this.babylonController.getProps();
         this.camera.radius =
-          this.cameraDownProps.cameraRadius +
-          (cameraProps.pointerY - this.cameraDownProps.pointerY);
+          this.cameraDownPropsCamera.cameraRadius +
+          (cameraProps.pointerY - this.cameraDownPropsCamera.pointerY);
+      });
+
+      // pan2
+
+      this.reg(move(MouseMiddle), () => {
+        const props = this.getPanProperties();
+        const dx = this.cameraDownProps.camera.pointerX - props.camera.pointerX;
+        const dy = this.cameraDownProps.camera.pointerY - props.camera.pointerY;
+        this.panObject.initVars();
+        this.panObject.move(dx, dy);
+        this.panObject.updateCamera(this.cameraDownProps);
       });
     }
 
