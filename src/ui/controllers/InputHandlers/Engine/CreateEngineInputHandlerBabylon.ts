@@ -1,7 +1,7 @@
 import * as BABYLON from 'babylonjs';
-import { CoordinateToBabylonVector3 } from '../../babylon/converters/CoordinateToBabylonVector3';
+import { CoordinateToBabylonVector3 } from '../../../babylon/converters/CoordinateToBabylonVector3';
 import { CreateEngineInputHandlerPlugin } from './CreateEngineInputHandlerPlugin';
-import { Coordinate } from '../../../structs/Geometry/Coordinate';
+import { Coordinate } from '../../../../structs/Geometry/Coordinate';
 
 export class CreateEngineInputHandlerBabylon
   implements CreateEngineInputHandlerPlugin {

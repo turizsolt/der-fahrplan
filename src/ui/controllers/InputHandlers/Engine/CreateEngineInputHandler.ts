@@ -1,17 +1,17 @@
-import { NewInputHandler } from './NewInputHandler';
-import { roam, click } from './Interfaces/Helpers';
-import { Store } from '../../../structs/Interfaces/Store';
+import { InputHandler } from '../InputHandler';
+import { roam, click } from '../Interfaces/Helpers';
+import { Store } from '../../../../structs/Interfaces/Store';
 import { CreateEngineInputHandlerPlugin } from './CreateEngineInputHandlerPlugin';
 import { CreateEngineInputHandlerPixi } from './CreateEngineInputHandlerPixi';
 import { CreateEngineInputHandlerBabylon } from './CreateEngineInputHandlerBabylon';
-import { ActualTrack } from '../../../modules/Track/ActualTrack';
-import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
-import { GENERATE_ID } from '../../../structs/Actuals/Store/Command/CommandLog';
-import { getPredefinedWagonConfig } from '../../../structs/Actuals/Wagon/ActualWagonConfigs';
-import { Track } from '../../../modules/Track/Track';
-import { InputProps } from '../InputProps';
+import { ActualTrack } from '../../../../modules/Track/ActualTrack';
+import { CommandCreator } from '../../../../structs/Actuals/Store/Command/CommandCreator';
+import { GENERATE_ID } from '../../../../structs/Actuals/Store/Command/CommandLog';
+import { getPredefinedWagonConfig } from '../../../../structs/Actuals/Wagon/ActualWagonConfigs';
+import { Track } from '../../../../modules/Track/Track';
+import { InputProps } from '../../InputProps';
 
-export class NewCreateEngineInputHandler extends NewInputHandler {
+export class CreateEngineInputHandler extends InputHandler {
   private plugin: CreateEngineInputHandlerPlugin;
 
   constructor(private store: Store) {

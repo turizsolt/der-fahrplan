@@ -1,9 +1,9 @@
 import * as BABYLON from 'babylonjs';
-import { curveToTube } from '../../babylon/TrackBabylonRenderer';
-import { BezierCreater } from '../../../structs/Geometry/Bezier/BezierCreater';
-import { Coordinate } from '../../../structs/Geometry/Coordinate';
-import { CoordinateToBabylonVector3 } from '../../babylon/converters/CoordinateToBabylonVector3';
-import { InputProps } from '../InputProps';
+import { curveToTube } from '../../../babylon/TrackBabylonRenderer';
+import { BezierCreater } from '../../../../structs/Geometry/Bezier/BezierCreater';
+import { Coordinate } from '../../../../structs/Geometry/Coordinate';
+import { CoordinateToBabylonVector3 } from '../../../babylon/converters/CoordinateToBabylonVector3';
+import { InputProps } from '../../InputProps';
 import { TrackInputHandlerPlugin } from './TrackInputHandlerPlugin';
 
 export class TrackInputHandlerBabylon implements TrackInputHandlerPlugin {

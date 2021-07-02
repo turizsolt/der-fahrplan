@@ -1,8 +1,8 @@
-import { NewInputHandler } from './NewInputHandler';
+import { InputHandler } from './InputHandler';
 import { keyUp } from './Interfaces/Helpers';
 import { Store } from '../../../structs/Interfaces/Store';
 
-export class GameSpeedInputHandler extends NewInputHandler {
+export class GameSpeedInputHandler extends InputHandler {
   constructor(private store: Store) {
     super();
 

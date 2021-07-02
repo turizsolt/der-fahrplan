@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { CreateEngineInputHandlerPlugin } from './CreateEngineInputHandlerPlugin';
-import { Coordinate } from '../../../structs/Geometry/Coordinate';
+import { Coordinate } from '../../../../structs/Geometry/Coordinate';
 
 export class CreateEngineInputHandlerPixi
   implements CreateEngineInputHandlerPlugin {

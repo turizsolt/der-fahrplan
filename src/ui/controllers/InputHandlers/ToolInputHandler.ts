@@ -1,15 +1,15 @@
-import { NewInputHandler } from './NewInputHandler';
+import { InputHandler } from './InputHandler';
 import { InputMode } from './InputMode';
 import { VueToolbox } from '../VueToolbox';
 import { InputHandlerProp } from './Interfaces/InputHandlerProp';
 import { InputProps } from '../InputProps';
-import { NewTrackInputHandler } from './NewTrackInputHandler';
+import { TrackInputHandler } from './Track/TrackInputHandler';
 import { Store } from '../../../structs/Interfaces/Store';
-import { NewCreateEngineInputHandler } from './NewCreateEngineInputHandler';
+import { CreateEngineInputHandler } from './Engine/CreateEngineInputHandler';
 
-export class ToolInputHandler extends NewInputHandler {
-  private inputHandler: NewInputHandler;
-  private inputHandlers: Record<any, NewInputHandler>;
+export class ToolInputHandler extends InputHandler {
+  private inputHandler: InputHandler;
+  private inputHandlers: Record<any, InputHandler>;
   private mode: InputMode;
 
   constructor(private vueToolbox: VueToolbox, private store: Store) {
@@ -17,8 +17,8 @@ export class ToolInputHandler extends NewInputHandler {
 
     this.inputHandlers = {
       [InputMode.CAMERA]: null,
-      [InputMode.CREATE_TRACK]: new NewTrackInputHandler(store),
-      [InputMode.CREATE_ENGINE]: new NewCreateEngineInputHandler(store)
+      [InputMode.CREATE_TRACK]: new TrackInputHandler(store),
+      [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(store)
     };
 
     const modeNames: Record<InputMode, string> = {

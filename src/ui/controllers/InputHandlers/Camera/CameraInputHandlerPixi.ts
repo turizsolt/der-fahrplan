@@ -1,4 +1,4 @@
-import { WheelNeg, WheelPos, MouseMiddle } from './Interfaces/InputType';
+import { WheelNeg, WheelPos, MouseMiddle } from '../Interfaces/InputType';
 import {
   wheel,
   move,
@@ -6,16 +6,16 @@ import {
   keyDown,
   keyHold,
   tick
-} from './Interfaces/Helpers';
-import { Store } from '../../../structs/Interfaces/Store';
-import { GUISpecificController } from '../GUISpecificController';
-import { InputMod } from './Interfaces/InputMod';
-import { TickInputProps } from '../TickInputProps';
-import { NewCameraInputHandlerPlugin } from './NewCameraInputHandlerPlugin';
-import { NewCameraInputHandler } from './NewCameraInputHandler';
-import { PixiController } from '../PixiController';
+} from '../Interfaces/Helpers';
+import { Store } from '../../../../structs/Interfaces/Store';
+import { GUISpecificController } from '../../GUISpecificController';
+import { InputMod } from '../Interfaces/InputMod';
+import { TickInputProps } from '../../TickInputProps';
+import { CameraInputHandlerPlugin } from './CameraInputHandlerPlugin';
+import { CameraInputHandler } from './CameraInputHandler';
+import { PixiController } from '../../PixiController';
 
-export class NewCameraInputHandlerPixi implements NewCameraInputHandlerPlugin {
+export class CameraInputHandlerPixi implements CameraInputHandlerPlugin {
   private panLock: boolean = true;
   private followCam: boolean = false;
 
@@ -26,7 +26,7 @@ export class NewCameraInputHandlerPixi implements NewCameraInputHandlerPlugin {
   constructor(
     private store: Store,
     private specificController: GUISpecificController,
-    private cameraHandler: NewCameraInputHandler
+    private cameraHandler: CameraInputHandler
   ) {
     this.pixiController = this.specificController as PixiController;
   }

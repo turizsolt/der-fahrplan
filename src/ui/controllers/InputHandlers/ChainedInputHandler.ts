@@ -1,19 +1,19 @@
-import { NewInputHandler } from './NewInputHandler';
+import { InputHandler } from './InputHandler';
 import { Store } from '../../../structs/Interfaces/Store';
 import { VueSidebar } from '../VueSidebar';
 import { InputProps } from '../InputProps';
 import { InputHandlerProp } from './Interfaces/InputHandlerProp';
-import { NewSelectInputHandler } from './NewSelectInputHandler';
+import { SelectInputHandler } from './SelectInputHandler';
 import { GameSpeedInputHandler } from './GameSpeedInputHandler';
 import { TrainInputHandler } from './TrainInputHandler';
 import { GlobalController } from '../GlobalController';
 import { GeneralInputHandler } from './GeneralInputHandler';
-import { NewCameraInputHandler } from './NewCameraInputHandler';
+import { CameraInputHandler } from './Camera/CameraInputHandler';
 import { GUISpecificController } from '../GUISpecificController';
 import { ToolInputHandler } from './ToolInputHandler';
 
-export class ChainedInputHandler extends NewInputHandler {
-  private handlers: NewInputHandler[] = [];
+export class ChainedInputHandler extends InputHandler {
+  private handlers: InputHandler[] = [];
 
   constructor(
     store: Store,
@@ -25,8 +25,8 @@ export class ChainedInputHandler extends NewInputHandler {
     super();
 
     this.handlers.push(toolInputHandler);
-    this.handlers.push(new NewSelectInputHandler(store, vueSidebar));
-    this.handlers.push(new NewCameraInputHandler(store, specificController));
+    this.handlers.push(new SelectInputHandler(store, vueSidebar));
+    this.handlers.push(new CameraInputHandler(store, specificController));
     this.handlers.push(new GameSpeedInputHandler(store));
     this.handlers.push(new TrainInputHandler(store));
     this.handlers.push(new GeneralInputHandler(store, globalController));

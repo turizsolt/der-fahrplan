@@ -1,5 +1,5 @@
 import * as BABYLON from 'babylonjs';
-import { WheelNeg, WheelPos, MouseMiddle } from './Interfaces/InputType';
+import { WheelNeg, WheelPos, MouseMiddle } from '../Interfaces/InputType';
 import {
   wheel,
   move,
@@ -7,20 +7,19 @@ import {
   tick,
   keyDown,
   keyHold
-} from './Interfaces/Helpers';
-import { Store } from '../../../structs/Interfaces/Store';
-import { GUISpecificController } from '../GUISpecificController';
-import { BabylonController } from '../BabylonController';
-import { InputMod } from './Interfaces/InputMod';
-import { TickInputProps } from '../TickInputProps';
-import { Wagon } from '../../../structs/Interfaces/Wagon';
+} from '../Interfaces/Helpers';
+import { Store } from '../../../../structs/Interfaces/Store';
+import { GUISpecificController } from '../../GUISpecificController';
+import { BabylonController } from '../../BabylonController';
+import { InputMod } from '../Interfaces/InputMod';
+import { TickInputProps } from '../../TickInputProps';
+import { Wagon } from '../../../../structs/Interfaces/Wagon';
 import { PanObject } from './PanObject';
 import { CameraInputProps } from './CameraInputProps';
-import { NewCameraInputHandlerPlugin } from './NewCameraInputHandlerPlugin';
-import { NewCameraInputHandler } from './NewCameraInputHandler';
+import { CameraInputHandlerPlugin } from './CameraInputHandlerPlugin';
+import { CameraInputHandler } from './CameraInputHandler';
 
-export class NewCameraInputHandlerBabylon
-  implements NewCameraInputHandlerPlugin {
+export class CameraInputHandlerBabylon implements CameraInputHandlerPlugin {
   private camera: BABYLON.ArcRotateCamera;
   private babylonController: BabylonController;
   private cameraDownPropsCamera: CameraInputProps;
@@ -32,7 +31,7 @@ export class NewCameraInputHandlerBabylon
   constructor(
     private store: Store,
     private specificController: GUISpecificController,
-    private cameraHandler: NewCameraInputHandler
+    private cameraHandler: CameraInputHandler
   ) {}
 
   init() {

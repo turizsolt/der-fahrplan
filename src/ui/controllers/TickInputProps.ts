@@ -1,4 +1,4 @@
-import { CameraInputProps } from './InputHandlers/CameraInputProps';
+import { CameraInputProps } from './InputHandlers/Camera/CameraInputProps';
 
 export interface TickInputProps {
   canvasWidth: number;

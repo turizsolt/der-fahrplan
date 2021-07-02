@@ -12,7 +12,7 @@ import {
   snapJoint
 } from '../../structs/Geometry/Snap';
 import { Input } from './InputHandlers/Interfaces/Input';
-import { NewInputHandler } from './InputHandlers/NewInputHandler';
+import { InputHandler } from './InputHandlers/InputHandler';
 import { InputMod } from './InputHandlers/Interfaces/InputMod';
 import { InputType } from './InputHandlers/Interfaces/InputType';
 import { InputHandlerProp } from './InputHandlers/Interfaces/InputHandlerProp';
@@ -26,7 +26,7 @@ export class InputController {
 
   constructor(
     private store: Store,
-    private inputHandler: NewInputHandler,
+    private inputHandler: InputHandler,
     private specificController: GUISpecificController
   ) {}
 

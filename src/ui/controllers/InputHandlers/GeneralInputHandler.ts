@@ -1,4 +1,4 @@
-import { NewInputHandler } from './NewInputHandler';
+import { InputHandler } from './InputHandler';
 import { keyUp, keyDown } from './Interfaces/Helpers';
 import { Store } from '../../../structs/Interfaces/Store';
 import { Wagon } from '../../../structs/Interfaces/Wagon';
@@ -8,7 +8,7 @@ import { BaseBrick } from '../../../structs/Interfaces/BaseBrick';
 import { Train } from '../../../modules/Train/Train';
 import { GlobalController } from '../GlobalController';
 
-export class GeneralInputHandler extends NewInputHandler {
+export class GeneralInputHandler extends InputHandler {
   constructor(private store: Store, private globalController: GlobalController) {
     super();
 

@@ -1,10 +1,10 @@
 import * as PIXI from 'pixi.js';
 import { TrackInputHandlerPlugin } from './TrackInputHandlerPlugin';
-import { InputProps } from '../InputProps';
-import { snapHexaXZ } from '../../../structs/Geometry/Snap';
-import { Coordinate } from '../../../structs/Geometry/Coordinate';
-import { BezierCreater } from '../../../structs/Geometry/Bezier/BezierCreater';
-import { Left, Right } from '../../../structs/Geometry/Directions';
+import { InputProps } from '../../InputProps';
+import { snapHexaXZ } from '../../../../structs/Geometry/Snap';
+import { Coordinate } from '../../../../structs/Geometry/Coordinate';
+import { BezierCreater } from '../../../../structs/Geometry/Bezier/BezierCreater';
+import { Left, Right } from '../../../../structs/Geometry/Directions';
 
 export class TrackInputHandlerPixi implements TrackInputHandlerPlugin {
   private line: PIXI.Graphics;

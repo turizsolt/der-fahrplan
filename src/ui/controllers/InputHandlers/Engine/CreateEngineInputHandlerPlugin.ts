@@ -1,4 +1,4 @@
-import { Coordinate } from '../../../structs/Geometry/Coordinate';
+import { Coordinate } from '../../../../structs/Geometry/Coordinate';
 
 export interface CreateEngineInputHandlerPlugin {
   init(): void;

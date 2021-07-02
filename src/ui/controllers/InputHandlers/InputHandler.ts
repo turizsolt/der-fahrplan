@@ -5,7 +5,7 @@ import { InputMod } from './Interfaces/InputMod';
 import { InputType } from './Interfaces/InputType';
 import { InputProps } from '../InputProps';
 
-export class NewInputHandler {
+export class InputHandler {
   private registeredHandlers: RegisteredInputHandler[] = [];
 
   reg(prop: InputHandlerProp, fn: InputHandlerFunction): void {

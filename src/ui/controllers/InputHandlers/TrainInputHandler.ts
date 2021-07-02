@@ -1,4 +1,4 @@
-import { NewInputHandler } from './NewInputHandler';
+import { InputHandler } from './InputHandler';
 import { keyUp, keyDown } from './Interfaces/Helpers';
 import { Store } from '../../../structs/Interfaces/Store';
 import { TYPES } from '../../../di/TYPES';
@@ -8,7 +8,7 @@ import { SpeedPedal } from '../../../modules/Train/SpeedPedal';
 import { BaseStorable } from '../../../structs/Interfaces/BaseStorable';
 import { BaseBrick } from '../../../structs/Interfaces/BaseBrick';
 
-export class TrainInputHandler extends NewInputHandler {
+export class TrainInputHandler extends InputHandler {
   constructor(private store: Store) {
     super();
 

@@ -1,9 +1,9 @@
-import { NewInputHandler } from './NewInputHandler';
+import { InputHandler } from '../InputHandler';
 import {
   MouseLeft,
   WheelPos,
   WheelNeg
-} from './Interfaces/InputType';
+} from '../Interfaces/InputType';
 import {
   click,
   drag,
@@ -11,26 +11,26 @@ import {
   wheel,
   move,
   roam
-} from './Interfaces/Helpers';
-import { Store } from '../../../structs/Interfaces/Store';
-import { InputProps } from '../InputProps';
+} from '../Interfaces/Helpers';
+import { Store } from '../../../../structs/Interfaces/Store';
+import { InputProps } from '../../InputProps';
 import {
   CommandLog,
   GENERATE_ID
-} from '../../../structs/Actuals/Store/Command/CommandLog';
-import { CommandCreator } from '../../../structs/Actuals/Store/Command/CommandCreator';
-import { TrackJoint } from '../../../modules/Track/TrackJoint/TrackJoint';
-import { Command } from '../../../structs/Actuals/Store/Command/Command';
-import { TYPES } from '../../../di/TYPES';
-import { Ray } from '../../../structs/Geometry/Ray';
-import { TrackJointConnector } from '../../../modules/Track/TrackJoint/TrackJointConnector';
+} from '../../../../structs/Actuals/Store/Command/CommandLog';
+import { CommandCreator } from '../../../../structs/Actuals/Store/Command/CommandCreator';
+import { TrackJoint } from '../../../../modules/Track/TrackJoint/TrackJoint';
+import { Command } from '../../../../structs/Actuals/Store/Command/Command';
+import { TYPES } from '../../../../di/TYPES';
+import { Ray } from '../../../../structs/Geometry/Ray';
+import { TrackJointConnector } from '../../../../modules/Track/TrackJoint/TrackJointConnector';
 import { TrackInputHandlerPlugin } from './TrackInputHandlerPlugin';
 import { TrackInputHandlerPixi } from './TrackInputHandlerPixi';
 import { TrackInputHandlerBabylon } from './TrackInputHandlerBabylon';
-import { InputMod } from './Interfaces/InputMod';
+import { InputMod } from '../Interfaces/InputMod';
 
 // @injectable()
-export class NewTrackInputHandler extends NewInputHandler {
+export class TrackInputHandler extends InputHandler {
   private commandLog: CommandLog;
   private wheelRad: number = 0;
   private downWheelRad: number = 0;

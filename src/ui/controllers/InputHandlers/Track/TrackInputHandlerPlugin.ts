@@ -1,4 +1,4 @@
-import { InputProps } from '../InputProps';
+import { InputProps } from '../../InputProps';
 
 export interface TrackInputHandlerPlugin {
   init(): void;

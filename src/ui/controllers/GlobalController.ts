@@ -5,7 +5,7 @@ import { VueToolbox } from './VueToolbox';
 import { VueViewbox } from './VueViewbox';
 import { VueTestPanel } from './VueTestPanel';
 import { GUISpecificController } from './GUISpecificController';
-import { NewInputHandler } from './InputHandlers/NewInputHandler';
+import { InputHandler } from './InputHandlers/InputHandler';
 import { ChainedInputHandler } from './InputHandlers/ChainedInputHandler';
 import { InputController } from './InputController';
 import { InputMode } from './InputHandlers/InputMode';
@@ -23,7 +23,7 @@ export class GlobalController {
 
   private targetPassengerCount: number = 9999999;
 
-  private ih: NewInputHandler;
+  private ih: InputHandler;
   private inputController: InputController;
 
   constructor(

@@ -1,6 +1,6 @@
 import * as BABYLON from 'babylonjs';
 import { Vector3 } from 'babylonjs';
-import { TickInputProps } from '../TickInputProps';
+import { TickInputProps } from '../../TickInputProps';
 
 export class PanObject {
   private dx: number = 0;
