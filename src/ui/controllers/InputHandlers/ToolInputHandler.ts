@@ -6,6 +6,7 @@ import { InputProps } from '../InputProps';
 import { TrackInputHandler } from './Track/TrackInputHandler';
 import { Store } from '../../../structs/Interfaces/Store';
 import { CreateEngineInputHandler } from './Engine/CreateEngineInputHandler';
+import { CreatePlatformInputHandler } from './Platform/CreatePlatformInputHandler';
 
 export class ToolInputHandler extends InputHandler {
   private inputHandler: InputHandler;
@@ -18,7 +19,8 @@ export class ToolInputHandler extends InputHandler {
     this.inputHandlers = {
       [InputMode.CAMERA]: null,
       [InputMode.CREATE_TRACK]: new TrackInputHandler(store),
-      [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(store)
+      [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(store),
+      [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(store)
     };
 
     const modeNames: Record<InputMode, string> = {
