@@ -1,8 +1,7 @@
 import * as BABYLON from 'babylonjs';
 import { CoordinateToBabylonVector3 } from '../../babylon/converters/CoordinateToBabylonVector3';
-import { InputProps } from '../InputProps';
 import { CreateEngineInputHandlerPlugin } from './CreateEngineInputHandlerPlugin';
-import { ActualTrack } from '../../../modules/Track/ActualTrack';
+import { Coordinate } from '../../../structs/Geometry/Coordinate';
 
 export class CreateEngineInputHandlerBabylon
   implements CreateEngineInputHandlerPlugin {
@@ -29,19 +28,11 @@ export class CreateEngineInputHandlerBabylon
     this.fromMesh.isPickable = false;
   }
 
-  roam(props: InputProps) {
-    const pot = props.snappedPositionOnTrack;
-    if (pot && pot.track.constructor.name === ActualTrack.name) {
-      this.fromMesh.position = CoordinateToBabylonVector3(
-        pot.track
-          .getCurve()
-          .getBezier()
-          .getPoint(pot.position)
-      );
+  roam(renderable: boolean, point?: Coordinate): void {
+    this.fromMesh.setEnabled(renderable);
 
-      this.fromMesh.setEnabled(!!pot);
-    } else {
-      this.fromMesh.setEnabled(false);
+    if (point) {
+      this.fromMesh.position = CoordinateToBabylonVector3(point);
     }
   }
 

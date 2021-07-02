@@ -44,7 +44,17 @@ export class NewCreateEngineInputHandler extends NewInputHandler {
     });
 
     this.reg(roam(), (legacyProps: InputProps) => {
-      this.plugin.roam(legacyProps);
+      const pot = legacyProps.snappedPositionOnTrack;
+      if (pot && pot.track.constructor.name === ActualTrack.name) {
+        const point = pot.track
+          .getCurve()
+          .getBezier()
+          .getPoint(pot.position);
+
+        this.plugin.roam(!!pot, point);
+      } else {
+        this.plugin.roam(false);
+      }
     });
   }
 
