@@ -1,5 +1,5 @@
 import { WheelNeg, WheelPos, MouseMiddle } from './Interfaces/InputType';
-import { wheel, move, drag, keyDown } from './Interfaces/Helpers';
+import { wheel, move, drag, keyDown, keyHold } from './Interfaces/Helpers';
 import { Store } from '../../../structs/Interfaces/Store';
 import { GUISpecificController } from '../GUISpecificController';
 import { InputMod } from './Interfaces/InputMod';
@@ -28,13 +28,13 @@ export class NewCameraInputHandlerPixi implements NewCameraInputHandlerPlugin {
     // zoom
 
     this.cameraHandler.reg(wheel(WheelNeg), () => {
-      globalThis.stage.scale.x /= 1.2;
-      globalThis.stage.scale.y /= 1.2;
+      globalThis.stage.scale.x *= 1.2;
+      globalThis.stage.scale.y *= 1.2;
     });
 
     this.cameraHandler.reg(wheel(WheelPos), () => {
-      globalThis.stage.scale.x *= 1.2;
-      globalThis.stage.scale.y *= 1.2;
+      globalThis.stage.scale.x /= 1.2;
+      globalThis.stage.scale.y /= 1.2;
     });
 
     // pan
@@ -84,32 +84,30 @@ export class NewCameraInputHandlerPixi implements NewCameraInputHandlerPlugin {
         this.panObject.move(dx, dy);
         this.panObject.updateCamera(this.cameraDownProps);
       });
+      */
 
-    this.reg(keyHold('W'), () => {
-      this.panObject.initVars();
-      this.panObject.up(1);
-      this.panObject.updateCamera(this.getPanProperties());
+    this.cameraHandler.reg(keyHold('W'), () => {
+      globalThis.stage.y += 10 / globalThis.stage.scale.x;
+      return false;
     });
 
-    this.reg(keyHold('A'), () => {
-      this.panObject.initVars();
-      this.panObject.left(1);
-      this.panObject.updateCamera(this.getPanProperties());
+    this.cameraHandler.reg(keyHold('A'), () => {
+      globalThis.stage.x += 10 / globalThis.stage.scale.x;
+      return false;
     });
 
-    this.reg(keyHold('S'), () => {
-      this.panObject.initVars();
-      this.panObject.down(1);
-      this.panObject.updateCamera(this.getPanProperties());
+    this.cameraHandler.reg(keyHold('S'), () => {
+      globalThis.stage.y -= 10 / globalThis.stage.scale.x;
+      return false;
     });
 
-    this.reg(keyHold('D'), () => {
-      this.panObject.initVars();
-      this.panObject.right(1);
-      this.panObject.updateCamera(this.getPanProperties());
+    this.cameraHandler.reg(keyHold('D'), () => {
+      globalThis.stage.x -= 10 / globalThis.stage.scale.x;
+      return false;
     });
   }
 
+  /*
   private pan() {
     if (this.panLock) return;
 
@@ -153,8 +151,8 @@ export class NewCameraInputHandlerPixi implements NewCameraInputHandlerPlugin {
       this.specificController.setFollowCam(wagon.getRay().coord);
     }
   }
-  */
-  }
+  
+  }*/
 
   private getPanProperties(): TickInputProps {
     return {
