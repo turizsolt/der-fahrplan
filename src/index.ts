@@ -48,6 +48,7 @@ if (globalThis.startParam === '2d') {
   app.stage.addChild(line);
   // todo global
   globalThis.stage = app.stage;
+  globalThis.renderer = app.renderer;
 
   // listeners
   window.addEventListener('DOMContentLoaded', () => {
@@ -95,6 +96,17 @@ if (globalThis.startParam === '2d') {
       1000, // window.innerWidth,
       1000 // window.innerHeight
     );
+
+    const onMouseUpdate = e => {
+      globalThis.pointer = { x: e.pageX, y: e.pageY };
+    };
+
+    const canvas: BABYLON.Nullable<HTMLCanvasElement> = document.getElementById(
+      'renderCanvas'
+    ) as HTMLCanvasElement;
+
+    canvas.addEventListener('mousemove', onMouseUpdate, false);
+    canvas.addEventListener('mouseenter', onMouseUpdate, false);
 
     window.addEventListener('mousewheel', (event: any) => {
       inputController.wheel(event);

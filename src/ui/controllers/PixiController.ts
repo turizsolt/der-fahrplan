@@ -9,7 +9,13 @@ export class PixiController implements GUISpecificController {
   }
 
   getProps() {
-    return null;
+    return {
+      scale: globalThis.stage.scale.x,
+      x: globalThis.stage.x,
+      y: globalThis.stage.y,
+      pointerX: globalThis.pointer.x,
+      pointerY: globalThis.pointer.y
+    };
   }
 
   pick(event: any): any {

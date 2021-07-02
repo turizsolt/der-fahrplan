@@ -119,12 +119,13 @@ export class InputController {
     );
   }
 
+  // todo clean up any-s
   private getMouseMods(event: PointerEvent | WheelEvent): InputMod {
-    return event.ctrlKey
-      ? event.shiftKey
+    return (event.ctrlKey || (event as any)?.data?.originalEvent?.ctrlKey)
+      ? (event.shiftKey  || (event as any)?.data?.originalEvent?.shiftKey)
         ? InputMod.Both
         : InputMod.Ctrl
-      : event.shiftKey
+      : (event.shiftKey  || (event as any)?.data?.originalEvent?.shiftKey)
       ? InputMod.Shift
       : InputMod.None;
   }
