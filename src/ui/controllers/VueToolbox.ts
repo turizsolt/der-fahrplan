@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import { GlobalController, InputMode } from './GlobalController';
+import { GlobalController } from './GlobalController';
+import { InputMode } from './InputHandlers/InputMode';
 
 export class VueToolbox {
   private vm: any;

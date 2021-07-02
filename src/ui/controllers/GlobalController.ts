@@ -1,56 +1,25 @@
-import { InputHandler } from './InputHandler';
 import { Store } from '../../structs/Interfaces/Store';
 import { VueSidebar } from './VueSidebar';
 import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
 import { VueViewbox } from './VueViewbox';
 import { VueTestPanel } from './VueTestPanel';
-/*
-import { CreateTrackInputHandler } from './CreateTrackInputHandler';
-import { CameraInputHandler } from './CameraInputHandler';
-import { SelectInputHandler } from './SelectInputHandler';
-import { CreatePlatformInputHandler } from './CreatePlatformInputHandler';
-import { CreateEngineInputHandler } from './CreateEngineInputHandler';
-import { CreateStationInputHandler } from './CreateStationInputHandler';
-import { CreateSignalInputHandler } from './CreateSignalInputHandler';
-import { CreateBlockJointInputHandler } from './CreateBlockJointInputHandler';
-import { CreateBlockInputHandler } from './CreateBlockInputHandler';
-import { AllowPathInputHandler } from './AllowPathInputHandler';
-import { CreatePathInputHandler } from './CreatePathInputHandler';
-import { CreateSectionInputHandler } from './CreateSectionInputHandler';
-*/
 import { GUISpecificController } from './GUISpecificController';
 import { NewInputHandler } from './InputHandlers/NewInputHandler';
 import { ChainedInputHandler } from './InputHandlers/ChainedInputHandler';
 import { InputController } from './InputController';
-
-export enum InputMode {
-  CAMERA = 'CAMERA',
-  SELECT = 'SELECT',
-  CREATE_TRACK = 'CREATE_TRACK',
-  CREATE_PLATFORM = 'CREATE_PLATFORM',
-  CREATE_ENGINE = 'CREATE_ENGINE',
-  CREATE_STATION = 'CREATE_STATION',
-  CREATE_SIGNAL = 'CREATE_SIGNAL',
-  CREATE_BLOCK_JOINT = 'CREATE_BLOCK_JOINT',
-  CREATE_BLOCK = 'CREATE_BLOCK',
-  CREATE_SECTION = 'CREATE_SECTION',
-  CREATE_PATH = 'CREATE_PATH',
-  ALLOW_PATH = 'ALLOW_PATH'
-}
+import { InputMode } from './InputHandlers/InputMode';
+import { ToolInputHandler } from './InputHandlers/ToolInputHandler';
 
 export class GlobalController {
-  private mode: InputMode = InputMode.CAMERA;
   private viewMode: string = 'terrain';
-
-  private inputHandler: InputHandler;
-  private inputHandlers: Record<any, InputHandler>;
 
   private vueToolbox: VueToolbox;
   private vueViewbox: VueViewbox;
   private vueBigScreen: VueBigscreen;
   private vueSidebar: VueSidebar;
   private vueTestPanel: VueTestPanel;
+  private toolInputHandler: ToolInputHandler;
 
   private targetPassengerCount: number = 9999999;
 
@@ -66,11 +35,14 @@ export class GlobalController {
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
 
+    this.toolInputHandler = new ToolInputHandler(this.vueToolbox, this.store);
+
     this.ih = new ChainedInputHandler(
       this.store,
       this.vueSidebar,
       this,
-      this.specificController
+      this.specificController,
+      this.toolInputHandler
     );
     this.inputController = new InputController(
       this.store,
@@ -80,45 +52,6 @@ export class GlobalController {
 
     this.vueTestPanel = new VueTestPanel(this.store);
     this.store.getCommandLog().setInputController(this);
-
-    this.inputHandlers = {
-      /*
-      [InputMode.CAMERA]: new CameraInputHandler(this.specificController),
-      [InputMode.SELECT]: new SelectInputHandler(),
-      [InputMode.CREATE_TRACK]: new CreateTrackInputHandler(this.store),
-      [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(),
-      [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(),
-      [InputMode.CREATE_STATION]: new CreateStationInputHandler(),
-      [InputMode.CREATE_SIGNAL]: new CreateSignalInputHandler(),
-      [InputMode.CREATE_BLOCK_JOINT]: new CreateBlockJointInputHandler(),
-      [InputMode.CREATE_BLOCK]: new CreateBlockInputHandler(),
-      [InputMode.CREATE_SECTION]: new CreateSectionInputHandler(),
-      [InputMode.CREATE_PATH]: new CreatePathInputHandler(),
-      [InputMode.ALLOW_PATH]: new AllowPathInputHandler()
-      */
-    };
-
-    const modeNames: Record<InputMode, string> = {
-      [InputMode.CAMERA]: 'Cam',
-      [InputMode.SELECT]: 'Sel',
-      [InputMode.CREATE_TRACK]: '+Trac',
-      [InputMode.CREATE_PLATFORM]: '+Plat',
-      [InputMode.CREATE_ENGINE]: '+Eng',
-      [InputMode.CREATE_STATION]: '+Stat',
-      [InputMode.CREATE_SIGNAL]: '+Sign',
-      [InputMode.CREATE_BLOCK_JOINT]: '+BJnt',
-      [InputMode.CREATE_BLOCK]: '+Blck',
-      [InputMode.CREATE_SECTION]: '+Sect',
-      [InputMode.CREATE_PATH]: '+Path',
-      [InputMode.ALLOW_PATH]: 'Allow'
-    };
-
-    for (let mode of Object.keys(this.inputHandlers)) {
-      this.vueToolbox.addButton({ id: mode, text: modeNames[mode] });
-    }
-    this.vueToolbox.setSelected(this.mode);
-
-    this.inputHandler = this.inputHandlers[this.mode];
 
     this.vueViewbox.addButton({ id: 'terrain', text: 'Terrain' });
     this.vueViewbox.addButton({ id: 'schedule', text: 'Schedule' });
@@ -134,11 +67,8 @@ export class GlobalController {
     this.targetPassengerCount = count;
   }
 
-  selectMode(mode: InputMode) {
-    // todo this.inputHandler.cancel();
-    this.mode = mode;
-    this.inputHandler = this.inputHandlers[this.mode];
-    this.vueToolbox.setSelected(mode);
+  selectMode(mode: InputMode): void {
+    this.toolInputHandler.selectMode(mode);
   }
 
   selectView(mode: string) {
