@@ -8,7 +8,7 @@ export class CreateEngineInputHandlerPixi
 
   init() {
     this.point = new PIXI.Graphics();
-    this.point.beginFill(0x0bef47);
+    this.point.beginFill(0x0befff);
     this.point.drawCircle(0, 0, 3);
     this.point.endFill();
     this.point.renderable = false;

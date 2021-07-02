@@ -9,7 +9,6 @@ import { TrackSwitchRenderer } from '../structs/Renderers/TrackSwitchRenderer';
 import { PlatformRenderer } from '../structs/Renderers/PlatformRenderer';
 import { PlatformDummyRenderer } from '../../test/dummies/PlatformDummyRenderer';
 import { WagonRenderer } from '../structs/Renderers/WagonRenderer';
-import { WagonDummyRenderer } from '../../test/dummies/WagonDummyRenderer';
 import { StationRenderer } from '../structs/Renderers/StationRenderer';
 import { StationDummyRenderer } from '../../test/dummies/StationDummyRenderer';
 import { addCommonMaps } from './common';
@@ -31,6 +30,7 @@ import { ActualLand } from '../structs/Actuals/ActualLand';
 import { Land } from '../structs/Interfaces/Land';
 import { TrackJointPixiRenderer } from '../ui/babylon/TrackJointPixiRenderer';
 import { TrackSwitchPixiRenderer } from '../ui/babylon/TrackSwitchPixiRenderer';
+import { WagonPixiRenderer } from '../ui/babylon/WagonPixiRenderer';
 
 export const productionContainer2d = new Container();
 const ioc = new DependencyContainer(productionContainer2d);
@@ -50,7 +50,7 @@ ioc.fm<TrackJointRenderer>(
 ioc.fm<WagonRenderer>(
   T.FactoryOfWagonRenderer,
   T.WagonRenderer,
-  WagonDummyRenderer
+  WagonPixiRenderer
 );
 ioc.fm<SignalRenderer>(
   T.FactoryOfSignalRenderer,
