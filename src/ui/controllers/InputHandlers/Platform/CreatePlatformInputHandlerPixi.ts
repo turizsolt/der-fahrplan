@@ -4,35 +4,57 @@ import { Coordinate } from '../../../../structs/Geometry/Coordinate';
 
 export class CreatePlatformInputHandlerPixi
   implements CreatePlatformInputHandlerPlugin {
-  private point: PIXI.Graphics;
+  private fromPoint: PIXI.Graphics;
+  private toPoint: PIXI.Graphics;
 
   init() {
-    this.point = new PIXI.Graphics();
-    this.point.beginFill(0x0befff);
-    this.point.drawCircle(0, 0, 3);
-    this.point.endFill();
-    this.point.renderable = false;
-    globalThis.stage.addChild(this.point);
+    this.fromPoint = new PIXI.Graphics();
+    this.fromPoint.beginFill(0x0befff);
+    this.fromPoint.drawCircle(0, 0, 3);
+    this.fromPoint.endFill();
+    this.fromPoint.renderable = false;
+    globalThis.stage.addChild(this.fromPoint);
+
+    this.toPoint = new PIXI.Graphics();
+    this.toPoint.beginFill(0x0befff);
+    this.toPoint.drawCircle(0, 0, 3);
+    this.toPoint.endFill();
+    this.toPoint.renderable = false;
+    globalThis.stage.addChild(this.toPoint);
   }
 
-  roam(renderable: boolean, point?: Coordinate): void {
-    this.point.renderable = renderable;
+  down(renderable: boolean, point?: Coordinate): void {
+    this.fromPoint.renderable = renderable;
 
     if (point) {
-      this.point.x = point.x;
-      this.point.y = point.z;
+      this.fromPoint.x = point.x;
+      this.fromPoint.y = point.z;
     }
   }
 
-  down(renderable: boolean, point?: Coordinate): void {}
-  move(renderable: boolean, point?: Coordinate): void {}
-  up(): void {}
+  roam(renderable: boolean, point?: Coordinate): void {
+    this.down(renderable, point);
+  }
+
+  move(renderable: boolean, point?: Coordinate): void {
+    this.toPoint.renderable = renderable;
+
+    if (point) {
+      this.toPoint.x = point.x;
+      this.toPoint.y = point.z;
+    }
+  }
+
+  up(): void {
+    this.cancel();
+  }
 
   click(): void {
-    this.point.renderable = false;
+    this.cancel();
   }
 
   cancel(): void {
-    this.point.renderable = false;
+    this.fromPoint.renderable = false;
+    this.toPoint.renderable = false;
   }
 }
