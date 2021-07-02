@@ -1,5 +1,12 @@
 import { WheelNeg, WheelPos, MouseMiddle } from './Interfaces/InputType';
-import { wheel, move, drag, keyDown, keyHold } from './Interfaces/Helpers';
+import {
+  wheel,
+  move,
+  drag,
+  keyDown,
+  keyHold,
+  tick
+} from './Interfaces/Helpers';
 import { Store } from '../../../structs/Interfaces/Store';
 import { GUISpecificController } from '../GUISpecificController';
 import { InputMod } from './Interfaces/InputMod';
@@ -43,12 +50,10 @@ export class NewCameraInputHandlerPixi implements NewCameraInputHandlerPlugin {
       this.panLock = !this.panLock;
     });
 
-    /*
-      this.reg(tick(), () => {
-        this.pan();
-        this.follow();
-      });
-*/
+    this.cameraHandler.reg(tick(), () => {
+      this.pan();
+      this.follow();
+    });
 
     // down
 
@@ -75,16 +80,19 @@ export class NewCameraInputHandlerPixi implements NewCameraInputHandlerPlugin {
 
     // pan2
 
-    /*
-      this.reg(move(MouseMiddle), () => {
-        const props = this.getPanProperties();
-        const dx = this.cameraDownProps.camera.pointerX - props.camera.pointerX;
-        const dy = this.cameraDownProps.camera.pointerY - props.camera.pointerY;
-        this.panObject.initVars();
-        this.panObject.move(dx, dy);
-        this.panObject.updateCamera(this.cameraDownProps);
-      });
-      */
+    this.cameraHandler.reg(move(MouseMiddle), () => {
+      const props = this.getPanProperties();
+      const dx =
+        this.cameraDownProps.camera2d.pointerX - props.camera2d.pointerX;
+      const dy =
+        this.cameraDownProps.camera2d.pointerY - props.camera2d.pointerY;
+      globalThis.stage.x =
+        this.cameraDownProps.camera2d.x + (dx * 10) / globalThis.stage.scale.x;
+      globalThis.stage.y =
+        this.cameraDownProps.camera2d.y + (dy * 10) / globalThis.stage.scale.x;
+    });
+
+    // pan3
 
     this.cameraHandler.reg(keyHold('W'), () => {
       globalThis.stage.y += 10 / globalThis.stage.scale.x;
@@ -107,40 +115,37 @@ export class NewCameraInputHandlerPixi implements NewCameraInputHandlerPlugin {
     });
   }
 
-  /*
   private pan() {
     if (this.panLock) return;
 
     const props = this.getPanProperties();
 
-    this.panObject.initVars();
-
-    if (props.canvasWidth - props.camera.pointerX < 20) {
-      const offset = props.canvasWidth - props.camera.pointerX;
+    if (props.canvasWidth - props.camera2d.pointerX < 20) {
+      const offset = props.canvasWidth - props.camera2d.pointerX;
       const modifier = (20 - offset) / 20;
-      this.panObject.right(modifier);
+      globalThis.stage.x -= (modifier * 10) / globalThis.stage.scale.x;
     }
 
-    if (props.camera.pointerX < 20) {
-      const modifier = (20 - props.camera.pointerX) / 20;
-      this.panObject.left(modifier);
+    if (props.camera2d.pointerX < 20) {
+      const modifier = (20 - props.camera2d.pointerX) / 20;
+      globalThis.stage.x += (modifier * 10) / globalThis.stage.scale.x;
     }
 
-    if (props.canvasHeight - props.camera.pointerY < 20) {
-      const offset = props.canvasHeight - props.camera.pointerY;
+    if (props.canvasHeight - props.camera2d.pointerY < 20) {
+      const offset = props.canvasHeight - props.camera2d.pointerY;
       const modifier = (20 - offset) / 20;
-      this.panObject.down(modifier);
+      globalThis.stage.y -= (modifier * 10) / globalThis.stage.scale.y;
     }
 
-    if (props.camera.pointerY < 20) {
-      const modifier = (20 - props.camera.pointerY) / 20;
-      this.panObject.up(modifier);
+    if (props.camera2d.pointerY < 20) {
+      const modifier = (20 - props.camera2d.pointerY) / 20;
+      globalThis.stage.y += (modifier * 10) / globalThis.stage.scale.y;
     }
-
-    this.panObject.updateCamera(props);
   }
 
+  // todo center view, handle the box, handle resize etc...
   private follow() {
+    /*
     const selected = this.store.getSelected();
     if (
       this.followCam &&
@@ -150,17 +155,16 @@ export class NewCameraInputHandlerPixi implements NewCameraInputHandlerPlugin {
       const wagon = selected as Wagon;
       this.specificController.setFollowCam(wagon.getRay().coord);
     }
+    */
   }
-  
-  }*/
 
   private getPanProperties(): TickInputProps {
     return {
       canvasWidth: (document.getElementById(
-        'renderCanvas'
+        'renderCanvasInner'
       ) as HTMLCanvasElement).width,
       canvasHeight: (document.getElementById(
-        'renderCanvas'
+        'renderCanvasInner'
       ) as HTMLCanvasElement).height,
       setFollowCamOff: this.followCam
         ? () => {

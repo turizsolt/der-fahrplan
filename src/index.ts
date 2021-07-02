@@ -26,6 +26,7 @@ if (globalThis.startParam === '2d') {
   app.renderer.view.style.display = 'block';
   app.renderer.resize(window.innerWidth, window.innerHeight);
   app.renderer.view.style.zIndex = '0';
+  app.view.id = 'renderCanvasInner';
 
   // draw the grid
   const HEIGHT = (10 * Math.sqrt(3)) / 2;
