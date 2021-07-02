@@ -9,7 +9,6 @@ import { TrackSwitchRenderer } from '../structs/Renderers/TrackSwitchRenderer';
 import { PlatformRenderer } from '../structs/Renderers/PlatformRenderer';
 import { WagonRenderer } from '../structs/Renderers/WagonRenderer';
 import { StationRenderer } from '../structs/Renderers/StationRenderer';
-import { StationDummyRenderer } from '../../test/dummies/StationDummyRenderer';
 import { addCommonMaps } from './common';
 import { DependencyContainer } from './DependencyContainer';
 import { SignalRenderer } from '../structs/Renderers/SignalRenderer';
@@ -31,6 +30,7 @@ import { TrackJointPixiRenderer } from '../ui/babylon/TrackJointPixiRenderer';
 import { TrackSwitchPixiRenderer } from '../ui/babylon/TrackSwitchPixiRenderer';
 import { WagonPixiRenderer } from '../ui/babylon/WagonPixiRenderer';
 import { PlatformPixiRenderer } from '../ui/babylon/PlatformPixiRenderer';
+import { StationPixiRenderer } from '../ui/babylon/StationPixiRenderer';
 
 export const productionContainer2d = new Container();
 const ioc = new DependencyContainer(productionContainer2d);
@@ -38,7 +38,7 @@ addCommonMaps(ioc);
 ioc.map<Land>(T.Land, ActualLand);
 ioc.map<TrackRenderer>(T.TrackRenderer, TrackPixiRenderer);
 ioc.map<TrackSwitchRenderer>(T.TrackSwitchRenderer, TrackSwitchPixiRenderer);
-ioc.map<StationRenderer>(T.StationRenderer, StationDummyRenderer);
+ioc.map<StationRenderer>(T.StationRenderer, StationPixiRenderer);
 ioc.map<PlatformRenderer>(T.PlatformRenderer, PlatformPixiRenderer);
 ioc.map<PassengerRenderer>(T.PassengerRenderer, PassengerDummyRenderer);
 
