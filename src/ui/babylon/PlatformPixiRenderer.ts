@@ -8,10 +8,12 @@ import { Platform } from '../../structs/Interfaces/Platform';
 export class PlatformPixiRenderer extends BasePixiRenderer
   implements PlatformRenderer {
   private rect: PIXI.Graphics;
+  private platform: Platform;
 
   private inited: boolean = false;
 
   init(platform: Platform) {
+    this.platform = platform;
     this.rect = new PIXI.Graphics();
     this.rect.interactive = true;
     this.rect.buttonMode = true;
@@ -57,21 +59,22 @@ export class PlatformPixiRenderer extends BasePixiRenderer
     globalThis.stage.addChild(this.rect);
 
     this.inited = true;
-    this.update(platform);
+    this.update();
   }
 
-  update(platform: Platform) {
+  update() {
     if (!this.inited) return;
+    if (!this.platform) return;
 
-    const color = platform.getColor();
+    const color = this.platform.getColor();
     const fillColor =
       color.red * 256 * 256 * 255 + color.green * 256 * 255 + color.blue * 255;
     this.rect.beginFill(fillColor);
     this.rect.drawRect(
-      -platform.getWidth() / 2,
-      -platform.getLength() / 2,
-      platform.getWidth(),
-      platform.getLength()
+      -this.platform.getWidth() / 2,
+      -this.platform.getLength() / 2,
+      this.platform.getWidth(),
+      this.platform.getLength()
     );
     this.rect.endFill();
   }

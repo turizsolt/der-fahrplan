@@ -7,7 +7,7 @@ import { Track } from '../Track';
 
 export class TrackJointConnector {
   static connect(one: TrackJoint, other: TrackJoint) {
-    const midpoint = one.getRay().computeMidpoint(other.getRay());
+    const midpoint = one.getRay().computeMidpointIfAwayEnough(other.getRay());
 
     if (midpoint === false) {
       return false;
