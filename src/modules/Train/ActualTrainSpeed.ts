@@ -3,7 +3,7 @@ import { TrainSpeed } from './TrainSpeed';
 
 export class ActualTrainSpeed implements TrainSpeed {
   private speed: number = 0;
-  private accelerateBy: number = 0.015625;
+  private accelerateBy: number = 0.015625 * 2;
   private topSpeed: number = 4; // 3
   private shuntingSpeed: number = 1;
   private allowedSpeed: number = 4; // 3
