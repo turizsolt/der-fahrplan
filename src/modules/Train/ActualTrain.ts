@@ -30,7 +30,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
   private wagons: Wagon[] = [];
   private speed: TrainSpeed = null;
-  private autoMode:boolean = true;
+  private autoMode: boolean = true;
   private trips: Trip[] = [];
 
   init(pot: PositionOnTrack, wagons: Wagon[]): Train {
@@ -99,8 +99,8 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   reverse(): void {
-    if(this.speed.getSpeed() !== 0) return;
-    
+    if (this.speed.getSpeed() !== 0) return;
+
     this.wagons = this.wagons.reverse();
     this.wagons.map(wagon => wagon.axleReverse());
     this.position = this.wagons[0].getAxlePosition(WhichEnd.A);
@@ -115,15 +115,15 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private setMarkers(): void {
     const start = this.position.getDirectedTrack();
     const end = this.getEndPosition().getDirectedTrack();
-    start.addMarkerBothDirections(this.position.getPosition(), {type: 'Train', train: this});
-    end.addMarkerBothDirections(this.getEndPosition().getPosition(), {type: 'Train', train: this});
+    start.addMarkerBothDirections(this.position.getPosition(), { type: 'Train', train: this });
+    end.addMarkerBothDirections(this.getEndPosition().getPosition(), { type: 'Train', train: this });
   }
 
   private clearMarkers(): void {
     const start = this.position.getDirectedTrack();
     const end = this.getEndPosition().getDirectedTrack();
-    start.removeMarkerBothDirections({type: 'Train', train: this});
-    end.removeMarkerBothDirections({type: 'Train', train: this});
+    start.removeMarkerBothDirections({ type: 'Train', train: this });
+    end.removeMarkerBothDirections({ type: 'Train', train: this });
   }
 
   private alignAxles(): void {
@@ -134,7 +134,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
     // checkouts
     let iter = this.getEndPosition()?.getDirectedTrack();
-    if(iter) {
+    if (iter) {
       const start = this.position.getDirectedTrack();
       while (iter !== start) {
         iter.getTrack().checkout(this);
@@ -176,33 +176,33 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
     // block checkout
 
-    if(formerEnd) {
+    if (formerEnd) {
       const iter = MarkerIterator.fromPositionOnTrack(formerEnd, currentEnd);
-      let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
-      while(next && next.value) {
-        const bjend:BlockEnd = next.value.blockJoint.getEnd(convert2(next.directedTrack.getDirection()));
-        const send:SectionEnd = next.value.blockJoint.getSectionEnd(convert2(next.directedTrack.getDirection()));
-        if(bjend) {
+      let next: { value: TrackMarker, directedTrack: DirectedTrack } = iter.nextOfFull('BlockJoint');
+      while (next && next.value) {
+        const bjend: BlockEnd = next.value.blockJoint.getEnd(convert2(next.directedTrack.getDirection()));
+        const send: SectionEnd = next.value.blockJoint.getSectionEnd(convert2(next.directedTrack.getDirection()));
+        if (bjend) {
           bjend.checkout(this);
         }
-        if(send) {
+        if (send) {
           send.checkout(this);
         }
         next = iter.nextOfFull('BlockJoint');
       }
     }
-    
+
     // block checkin
-    if(formerStart) {
+    if (formerStart) {
       const iter = MarkerIterator.fromPositionOnTrack(formerStart, currentStart);
-      let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
-      while(next && next.value) {
-        const bjend:BlockEnd = next.value.blockJoint.getEnd(convert(next.directedTrack.getDirection()));
-        const send:SectionEnd = next.value.blockJoint.getSectionEnd(convert(next.directedTrack.getDirection()));
-        if(bjend) {
+      let next: { value: TrackMarker, directedTrack: DirectedTrack } = iter.nextOfFull('BlockJoint');
+      while (next && next.value) {
+        const bjend: BlockEnd = next.value.blockJoint.getEnd(convert(next.directedTrack.getDirection()));
+        const send: SectionEnd = next.value.blockJoint.getSectionEnd(convert(next.directedTrack.getDirection()));
+        if (bjend) {
           bjend.checkin(this);
         }
-        if(send) {
+        if (send) {
           send.checkin(this);
         }
         next = iter.nextOfFull('BlockJoint');
@@ -210,14 +210,14 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }
 
     // sensor checkin
-    if(formerStart) {
-        const iter = MarkerIterator.fromPositionOnTrack(formerStart, currentStart);
-        let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('Sensor');
-        while(next && next.value) {
-          const sensor = next.value.sensor;
-          sensor.checkin(this);
-          next = iter.nextOfFull('Sensor');
-        }
+    if (formerStart) {
+      const iter = MarkerIterator.fromPositionOnTrack(formerStart, currentStart);
+      let next: { value: TrackMarker, directedTrack: DirectedTrack } = iter.nextOfFull('Sensor');
+      while (next && next.value) {
+        const sensor = next.value.sensor;
+        sensor.checkin(this);
+        next = iter.nextOfFull('Sensor');
+      }
     }
   }
 
@@ -243,7 +243,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 
   getAutoMode(): boolean {
-      return this.autoMode;
+    return this.autoMode;
   }
 
   private lastSpeed: number = -1;
@@ -308,74 +308,84 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private justPlatformStopped: Platform = null;
   private remainingStopTime: number = 0;
   private shouldTurn: boolean = false;
+  private forgetTime: number = -1;
 
   tick(): void {
     const nextPosition = this.position.clone();
-    
+
     this.nearestEnd = Nearest.end(nextPosition);
     this.nearestTrain = Nearest.train(nextPosition);
     this.nearestSignal = Nearest.signal(nextPosition);
     this.nearestPlatform = Nearest.platform(nextPosition);
- 
-    if(this.autoMode) {
-        let pedal = SpeedPedal.Throttle;
-        if(this.nearestSignal.signal) {
-            if(this.nearestSignal.signal.getSignal() === SignalSignal.Red &&
-            (this.speed.getStoppingDistance() + 5) >= this.nearestSignal.distance) {
-                pedal = SpeedPedal.Brake;
-            }
-        }
-        
 
-        if(this.nearestPlatform.platform 
-            && this.nearestPlatform.platform !== this.lastPlatformStopped) {
-            if(
-                ((this.speed.getStoppingDistance() + 5 >= this.nearestPlatform.distance) 
-                && this.speed.getSpeed() > 1)
-                || (this.speed.getStoppingDistance() + 2 >= this.nearestPlatform.distance)) {
-                
-                pedal = SpeedPedal.Brake;
-                
-                if(!this.nextPlatformToStop) {
-                    this.nextPlatformToStop = this.nearestPlatform.platform;
-                    this.remainingStopTime = 60; // todo constant
-                }
-            } 
+    if (this.forgetTime > 0) {
+      this.forgetTime--;
+    }
+
+    if (this.forgetTime === 0) {
+      this.forgetTime = -1;
+      this.lastPlatformStopped = null;
+    }
+
+    if (this.autoMode) {
+      let pedal = SpeedPedal.Throttle;
+      if (this.nearestSignal.signal) {
+        if (this.nearestSignal.signal.getSignal() === SignalSignal.Red &&
+          (this.speed.getStoppingDistance() + 5) >= this.nearestSignal.distance) {
+          pedal = SpeedPedal.Brake;
         }
-        this.speed.setPedal(pedal);
+      }
+
+
+      if (this.nearestPlatform.platform
+        && this.nearestPlatform.platform !== this.lastPlatformStopped) {
+        if (
+          ((this.speed.getStoppingDistance() + 5 >= this.nearestPlatform.distance)
+            && this.speed.getSpeed() > 1)
+          || (this.speed.getStoppingDistance() + 2 >= this.nearestPlatform.distance)) {
+
+          pedal = SpeedPedal.Brake;
+
+          if (!this.nextPlatformToStop) {
+            this.nextPlatformToStop = this.nearestPlatform.platform;
+            this.remainingStopTime = 60; // todo constant
+          }
+        }
+      }
+      this.speed.setPedal(pedal);
     }
 
     this.speed.tick();
-    if(this.speed.getSpeed() === 0 && this.lastSpeed === 0) {
+    if (this.speed.getSpeed() === 0 && this.lastSpeed === 0) {
       this.wagons.map(wagon => wagon.update());
     }
     this.lastSpeed = this.speed.getSpeed();
 
     if (this.speed.getSpeed() === 0 && this.nextPlatformToStop) {
-        this.remainingStopTime--;
-        if(!this.justPlatformStopped) {
-            this.justPlatformStopped = this.nextPlatformToStop;
-            this.startStopping();
-        }
-        if(this.remainingStopTime < 1 && this.isTimeToGo()) {
-            this.lastPlatformStopped = this.nextPlatformToStop;
-            this.nextPlatformToStop = null;
+      this.remainingStopTime--;
+      if (!this.justPlatformStopped) {
+        this.justPlatformStopped = this.nextPlatformToStop;
+        this.startStopping();
+      }
+      if (this.remainingStopTime < 1 && this.isTimeToGo()) {
+        this.lastPlatformStopped = this.nextPlatformToStop;
+        this.nextPlatformToStop = null;
 
-            this.endStopping();
-            this.justPlatformStopped = null;
-        }
+        this.endStopping();
+        this.justPlatformStopped = null;
+      }
     }
 
     if (this.speed.getSpeed() === 0) {
-        return;
+      return;
     }
 
     nextPosition.move(this.speed.getSpeed());
 
-    if(this.nearestTrain.distance < WAGON_GAP) {
+    if (this.nearestTrain.distance < WAGON_GAP) {
       const frontDist = this.nearestTrain.train.getPosition().getRay().coord.distance2d(this.position.getRay().coord);
       const rearDist = this.nearestTrain.train.getEndPosition().getRay().coord.distance2d(this.position.getRay().coord);
-      if(frontDist < rearDist) {
+      if (frontDist < rearDist) {
         this.nearestTrain.train.reverse();
       }
 
@@ -392,62 +402,63 @@ export class ActualTrain extends ActualBaseStorable implements Train {
             this.id,
             this.position.persist(),
             nextPosition.persist()
-        )
-      );
+          )
+        );
     }
 
     this.moveBoardedPassengers();
   }
 
   private isTimeToGo(): boolean {
-    if(this.trips.length === 0) return true;
-    const depTime:number = this.trips[0].getStationDepartureTime(this.justPlatformStopped.getStation());
+    if (this.trips.length === 0) return true;
+    const depTime: number = this.trips[0].getStationDepartureTime(this.justPlatformStopped.getStation());
     return !depTime || depTime <= this.store.getTickCount();
   }
 
   private startStopping(): void {
     this.shouldTurn = false;
-    if(this.justPlatformStopped.getStation()) {
-        this.trips.map(t => t.setStationServed(this.justPlatformStopped.getStation()));
+    if (this.justPlatformStopped.getStation()) {
+      this.trips.map(t => t.setStationServed(this.justPlatformStopped.getStation()));
     }
     this.wagons[0].stop();
     const lastStop = this.trips.length > 0 ? Util.last(this.trips[0].getStops()) : null;
-    if(lastStop && lastStop.station === this.justPlatformStopped.getStation()) {
-        this.arrivedToLastStation();
+    if (lastStop && lastStop.station === this.justPlatformStopped.getStation()) {
+      this.arrivedToLastStation();
     }
   }
 
   private arrivedToLastStation() {
     const newTrip = this.trips.length > 0 ? this.trips[0].getNextTrip() : null;
-    if(newTrip) {
-        this.assignTrip(null);
-        this.assignTrip(newTrip);
-        this.shouldTurn = true;
+    if (newTrip) {
+      this.assignTrip(null);
+      this.assignTrip(newTrip);
+      this.shouldTurn = true;
     }
   }
 
   private endStopping(): void {
-    if(this.justPlatformStopped.getStation()) {
-        this.trips.map(t => t.setAtStation(null));
+    if (this.justPlatformStopped.getStation()) {
+      this.trips.map(t => t.setAtStation(null));
     }
     this.wagons[0].stop();
-    if(this.shouldTurn) {
-        this.reverse();
+    if (this.shouldTurn) {
+      this.reverse();
     }
+    this.forgetTime = 300;
   }
 
   persist(): Object {
     return {
-        id: this.id,
-        type: 'Train',
-        autoMode: this.getAutoMode(),
-        position: this.position?.persist(),
-        speed: this.speed?.persist(),
-        wagons: this.wagons.map(wagon => ({
-            wagon: wagon.getId(),
-            trip: wagon.getTrip()?.getId()
-        })),
-        trips: this.trips.map(t => t.getId())
+      id: this.id,
+      type: 'Train',
+      autoMode: this.getAutoMode(),
+      position: this.position?.persist(),
+      speed: this.speed?.persist(),
+      wagons: this.wagons.map(wagon => ({
+        wagon: wagon.getId(),
+        trip: wagon.getTrip()?.getId()
+      })),
+      trips: this.trips.map(t => t.getId())
     };
   }
 
@@ -513,35 +524,35 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
 
   load(obj: any, store: Store): void {
-    const m:Record<string, Trip> = {};
-    const wagons:Wagon[] = obj.wagons.map(wagon => {
-        const ret:Wagon = store.get(wagon.wagon) as Wagon;
-        m[wagon.wagon] = store.get(wagon.trip) as Trip;
-        return ret;
+    const m: Record<string, Trip> = {};
+    const wagons: Wagon[] = obj.wagons.map(wagon => {
+      const ret: Wagon = store.get(wagon.wagon) as Wagon;
+      m[wagon.wagon] = store.get(wagon.trip) as Trip;
+      return ret;
     });
     this.presetId(obj.id);
     this.init(
-      PositionOnTrack.fromData(obj.position as PositionData, store), 
+      PositionOnTrack.fromData(obj.position as PositionData, store),
       wagons
     );
     this.speed.load(obj.speed);
     this.setAutoMode(obj.autoMode);
     this.wagons.map(wagon => {
-        wagon.setTrain(this);
-        this.assignTrip(m[wagon.getId()], [wagon]);
-        wagon.update();
+      wagon.setTrain(this);
+      this.assignTrip(m[wagon.getId()], [wagon]);
+      wagon.update();
     });
   }
 }
 
 function convert2(t: TrackDirection): WhichEnd {
-    if (t === TrackDirection.AB) return WhichEnd.B;
-    if (t === TrackDirection.BA) return WhichEnd.A;
-    return null;
-  }
-  
-  function convert(t: TrackDirection): WhichEnd {
-    if (t === TrackDirection.AB) return WhichEnd.A;
-    if (t === TrackDirection.BA) return WhichEnd.B;
-    return null;
-  }
+  if (t === TrackDirection.AB) return WhichEnd.B;
+  if (t === TrackDirection.BA) return WhichEnd.A;
+  return null;
+}
+
+function convert(t: TrackDirection): WhichEnd {
+  if (t === TrackDirection.AB) return WhichEnd.A;
+  if (t === TrackDirection.BA) return WhichEnd.B;
+  return null;
+}
