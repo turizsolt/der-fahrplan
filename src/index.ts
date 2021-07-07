@@ -19,7 +19,7 @@ const productionContainer =
 
 if (globalThis.startParam === '2d') {
   // init PIXI
-  const app = new PIXI.Application({ width: 512, height: 512 });
+  const app = new PIXI.Application({ width: 5120, height: 5120 });
   document.getElementById('renderCanvas').appendChild(app.view);
   app.renderer.backgroundColor = 0xcceecc;
   app.renderer.view.style.position = 'absolute';
@@ -34,15 +34,15 @@ if (globalThis.startParam === '2d') {
 
   let line = new PIXI.Graphics();
   line.lineStyle(0.25, 0x000000, 0.25);
-  for (let i = -50; i < 50; i++) {
-    line.moveTo(-50 * WIDTH, i * HEIGHT);
-    line.lineTo(50 * WIDTH, i * HEIGHT);
+  for (let i = -150; i < 150; i++) {
+    line.moveTo(-150 * WIDTH, i * HEIGHT);
+    line.lineTo(150 * WIDTH, i * HEIGHT);
 
-    line.moveTo((-50 * WIDTH) / 2 + i * WIDTH, -50 * HEIGHT);
-    line.lineTo((50 * WIDTH) / 2 + i * WIDTH, 50 * HEIGHT);
+    line.moveTo((-150 * WIDTH) / 2 + i * WIDTH, -150 * HEIGHT);
+    line.lineTo((150 * WIDTH) / 2 + i * WIDTH, 150 * HEIGHT);
 
-    line.moveTo((50 * WIDTH) / 2 + i * WIDTH, -50 * HEIGHT);
-    line.lineTo((-50 * WIDTH) / 2 + i * WIDTH, 50 * HEIGHT);
+    line.moveTo((150 * WIDTH) / 2 + i * WIDTH, -150 * HEIGHT);
+    line.lineTo((-150 * WIDTH) / 2 + i * WIDTH, 150 * HEIGHT);
   }
   app.stage.scale.x = 3;
   app.stage.scale.y = 3;
@@ -92,10 +92,10 @@ if (globalThis.startParam === '2d') {
     app.stage.sortableChildren = true;
 
     app.stage.hitArea = new PIXI.Rectangle(
-      -500,
-      -500,
-      1000, // window.innerWidth,
-      1000 // window.innerHeight
+      -1500,
+      -1500,
+      3000, // window.innerWidth,
+      3000 // window.innerHeight
     );
 
     const onMouseUpdate = e => {
@@ -119,7 +119,7 @@ if (globalThis.startParam === '2d') {
     });
     document.addEventListener(
       'dragover',
-      function(event) {
+      function (event) {
         event.preventDefault();
       },
       false
@@ -127,7 +127,7 @@ if (globalThis.startParam === '2d') {
 
     document.addEventListener(
       'drop',
-      function(event) {
+      function (event) {
         // cancel default actions
         event.preventDefault();
 
@@ -137,7 +137,7 @@ if (globalThis.startParam === '2d') {
 
         for (; i < len; i++) {
           var reader = new FileReader();
-          reader.onload = function(event) {
+          reader.onload = function (event) {
             var contents = (event.target as any).result;
 
             try {
@@ -153,7 +153,7 @@ if (globalThis.startParam === '2d') {
             }
           };
 
-          reader.onerror = function(event) {
+          reader.onerror = function (event) {
             console.error(
               'File could not be read! Code ' + (event.target as any).error.code
             );
@@ -255,15 +255,15 @@ if (globalThis.startParam === '2d') {
       inputController.move(e);
     });
 
-    canvas.addEventListener('pointerenter', () => {});
+    canvas.addEventListener('pointerenter', () => { });
 
     canvas.addEventListener('pointerleave', e => {
       inputController.up(e);
     });
 
-    canvas.addEventListener('focus', () => {});
+    canvas.addEventListener('focus', () => { });
 
-    canvas.addEventListener('blur', () => {});
+    canvas.addEventListener('blur', () => { });
 
     window.addEventListener('wheel', e => {
       inputController.wheel(e);
@@ -275,7 +275,7 @@ if (globalThis.startParam === '2d') {
     });
     document.addEventListener(
       'dragover',
-      function(event) {
+      function (event) {
         event.preventDefault();
       },
       false
@@ -283,7 +283,7 @@ if (globalThis.startParam === '2d') {
 
     document.addEventListener(
       'drop',
-      function(event) {
+      function (event) {
         // cancel default actions
         event.preventDefault();
 
@@ -293,7 +293,7 @@ if (globalThis.startParam === '2d') {
 
         for (; i < len; i++) {
           var reader = new FileReader();
-          reader.onload = function(event) {
+          reader.onload = function (event) {
             var contents = (event.target as any).result;
 
             try {
@@ -309,7 +309,7 @@ if (globalThis.startParam === '2d') {
             }
           };
 
-          reader.onerror = function(event) {
+          reader.onerror = function (event) {
             console.error(
               'File could not be read! Code ' + (event.target as any).error.code
             );

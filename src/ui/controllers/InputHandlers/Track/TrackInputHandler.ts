@@ -36,8 +36,8 @@ export class TrackInputHandler extends InputHandler {
   private downWheelRad: number = 0;
 
   // @inject(TYPES.TrackInputHandler) 
-  private plugin:TrackInputHandlerPlugin;
-  private isRoam:boolean = true;
+  private plugin: TrackInputHandlerPlugin;
+  private isRoam: boolean = true;
   private props: InputProps;
   private downProps: InputProps;
 
@@ -52,7 +52,7 @@ export class TrackInputHandler extends InputHandler {
     this.reg(wheel(WheelPos, InputMod.None), () => {
       this.wheelRad -= Math.PI / 6;
       this.plugin.wheel(this.wheelRad);
-      if(this.isRoam) {
+      if (this.isRoam) {
         this.plugin.roam(this.props);
       } else {
         this.move(this.props);
@@ -62,7 +62,7 @@ export class TrackInputHandler extends InputHandler {
     this.reg(wheel(WheelNeg, InputMod.None), () => {
       this.wheelRad += Math.PI / 6;
       this.plugin.wheel(this.wheelRad);
-      if(this.isRoam) {
+      if (this.isRoam) {
         this.plugin.roam(this.props);
       } else {
         this.move(this.props);
@@ -90,118 +90,125 @@ export class TrackInputHandler extends InputHandler {
             this.wheelRad
           )
         );
-        return true;
+        // return true;
       }
-      return false;
+      // return false;
+
+      this.downProps = null;
+      this.plugin.up(legacyProp.downProps, legacyProp);
+      this.isRoam = true;
     });
 
     this.reg(drag(MouseLeft), (legacyProp: InputProps) => {
-        this.downWheelRad = this.wheelRad;
-        this.plugin.down(legacyProp);
-        this.isRoam = false;
+      this.downWheelRad = this.wheelRad;
+      this.plugin.down(legacyProp);
+      this.isRoam = false;
 
-        this.downProps = legacyProp.downProps;
-        this.props = legacyProp;
+      this.downProps = legacyProp.downProps;
+      this.props = legacyProp;
     });
 
     this.reg(drop(MouseLeft), (legacyProp: InputProps) => {
-        const props = legacyProp;
-        const downProps = legacyProp.downProps;
-        this.isRoam = true;
+      console.log('drop');
+      const props = legacyProp;
+      const downProps = legacyProp.downProps;
+      this.isRoam = true;
 
-        this.downProps = null;
-        this.props = legacyProp;
-    
-        // only if the point is not on a track, except the two ends
-        if (
-            !downProps.snappedPoint.coord.equalsTo(props.snappedPoint.coord) &&
-            (!props.snappedJointOnTrack ||
-              props.snappedJointOnTrack.position === 0 ||
-              props.snappedJointOnTrack.position === 1) &&
-            (!downProps.snappedJointOnTrack ||
-              downProps.snappedJointOnTrack.position === 0 ||
-              downProps.snappedJointOnTrack.position === 1)
-          ) {
-            let j1, j2: TrackJoint;
-            const deletable: TrackJoint[] = [];
-            const actions: Command[] = [];
+      this.downProps = null;
+      this.props = legacyProp;
 
-            // if there is a joint to snap, then do not create a new
-            if (downProps.snappedJoint) {
-              j1 = downProps.snappedJoint;
-            } else {
-              j1 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
-                Ray.from(
-                  downProps.snappedPoint.coord.x,
-                  0,
-                  downProps.snappedPoint.coord.z,
-                  this.downWheelRad
-                ));
-              actions.push(CommandCreator.createTrackJoint(
-                GENERATE_ID,
-                downProps.snappedPoint.coord.x,
-                downProps.snappedPoint.coord.z,
-                this.downWheelRad
-              ));
-              deletable.push(j1);
+      // only if the point is not on a track, except the two ends
+      if (
+        !downProps.snappedPoint.coord.equalsTo(props.snappedPoint.coord) &&
+        (!props.snappedJointOnTrack ||
+          props.snappedJointOnTrack.position === 0 ||
+          props.snappedJointOnTrack.position === 1) &&
+        (!downProps.snappedJointOnTrack ||
+          downProps.snappedJointOnTrack.position === 0 ||
+          downProps.snappedJointOnTrack.position === 1)
+      ) {
+        let j1, j2: TrackJoint;
+        const deletable: TrackJoint[] = [];
+        const actions: Command[] = [];
+        console.log('ok');
+
+        // if there is a joint to snap, then do not create a new
+        if (downProps.snappedJoint) {
+          j1 = downProps.snappedJoint;
+        } else {
+          j1 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
+            Ray.from(
+              downProps.snappedPoint.coord.x,
+              0,
+              downProps.snappedPoint.coord.z,
+              this.downWheelRad
+            ));
+          actions.push(CommandCreator.createTrackJoint(
+            GENERATE_ID,
+            downProps.snappedPoint.coord.x,
+            downProps.snappedPoint.coord.z,
+            this.downWheelRad
+          ));
+          deletable.push(j1);
+        }
+
+        if (props.snappedJoint) {
+          j2 = props.snappedJoint;
+        } else {
+          j2 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
+            Ray.from(
+              props.snappedPoint.coord.x,
+              0,
+              props.snappedPoint.coord.z,
+              this.wheelRad
+            ));
+          actions.push(CommandCreator.createTrackJoint(
+            GENERATE_ID,
+            props.snappedPoint.coord.x,
+            props.snappedPoint.coord.z,
+            this.wheelRad
+          ));
+          deletable.push(j2);
+        }
+
+        const ret = TrackJointConnector.connect(j1, j2);
+        console.log('ret', ret);
+
+        const replacementIds = deletable.map(j => j.getId());
+
+        // if created, we should delete, so we can create it again officially
+        // then we need to map the id-s in the command, and replace them ??? 
+        deletable.map(j => j.remove());
+
+        if (ret) {
+          const actionIds = actions.map(a => this.commandLog.addAction(a));
+          const idMapping = replacementIds.reduce(function (result, field, index) {
+            result[field] = actionIds[index].returnValue.getId();
+            return result;
+          }, {});
+
+          ret.map(a => {
+            const b = { ...a };
+
+            if (b.function === 'joinTrackJoints') {
+              b.params[2] = idMapping[b.params[2]] ?? b.params[2];
+              b.params[4] = idMapping[b.params[4]] ?? b.params[4];
             }
-      
-            if (props.snappedJoint) {
-              j2 = props.snappedJoint;
-            } else {
-              j2 = this.store.create<TrackJoint>(TYPES.TrackJoint).init(
-                Ray.from(
-                  props.snappedPoint.coord.x,
-                  0,
-                  props.snappedPoint.coord.z,
-                  this.wheelRad
-                ));
-              actions.push(CommandCreator.createTrackJoint(
-                GENERATE_ID,
-                props.snappedPoint.coord.x,
-                props.snappedPoint.coord.z,
-                this.wheelRad
-              ));
-              deletable.push(j2);
+
+            if (b.function === 'joinTrackJoints3') {
+              b.params[3] = idMapping[b.params[3]] ?? b.params[3];
+              b.params[5] = idMapping[b.params[5]] ?? b.params[5];
+              b.params[7] = idMapping[b.params[7]] ?? b.params[7];
+              b.params[9] = idMapping[b.params[9]] ?? b.params[9];
             }
-      
-            const ret = TrackJointConnector.connect(j1, j2);
-      
-            const replacementIds = deletable.map(j => j.getId());
-      
-            // if created, we should delete, so we can create it again officially
-            // then we need to map the id-s in the command, and replace them ??? 
-            deletable.map(j => j.remove());
-      
-            if (ret) {
-              const actionIds = actions.map(a => this.commandLog.addAction(a));
-              const idMapping = replacementIds.reduce(function (result, field, index) {
-                result[field] = actionIds[index].returnValue.getId();
-                return result;
-              }, {});
-      
-              ret.map(a => {
-                const b = { ...a };
-      
-                if (b.function === 'joinTrackJoints') {
-                  b.params[2] = idMapping[b.params[2]] ?? b.params[2];
-                  b.params[4] = idMapping[b.params[4]] ?? b.params[4];
-                }
-      
-                if (b.function === 'joinTrackJoints3') {
-                  b.params[3] = idMapping[b.params[3]] ?? b.params[3];
-                  b.params[5] = idMapping[b.params[5]] ?? b.params[5];
-                  b.params[7] = idMapping[b.params[7]] ?? b.params[7];
-                  b.params[9] = idMapping[b.params[9]] ?? b.params[9];
-                }
-      
-                this.commandLog.addAction(b)
-              });
-            }
-          }
-      this.plugin.up(legacyProp.downProps, legacyProp);    
+
+            this.commandLog.addAction(b)
+          });
+        }
+      }
+      this.plugin.up(legacyProp.downProps, legacyProp);
       return true;
-      
+
     });
   }
 
@@ -210,13 +217,13 @@ export class TrackInputHandler extends InputHandler {
     const downProps = legacyProp.downProps;
     props.snappedPoint.dirXZ = this.wheelRad;
     downProps.snappedPoint.dirXZ = this.downWheelRad;
-    if(props.snappedJoint) {
+    if (props.snappedJoint) {
       props.snappedPoint.dirXZ = props.snappedJoint.getRotation();
     }
-    if(downProps.snappedJoint) {
+    if (downProps.snappedJoint) {
       downProps.snappedPoint.dirXZ = downProps.snappedJoint.getRotation();
     }
-    
+
     this.plugin.move(downProps, props);
   }
 }
