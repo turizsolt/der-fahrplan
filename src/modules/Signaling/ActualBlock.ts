@@ -14,6 +14,7 @@ import { LineSegmentChain } from '../../structs/Geometry/LineSegmentChain';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { BlockEnd } from './BlockEnd';
 import { BlockJoint } from './BlockJoint';
+import { PositionOnTrack } from '../Train/PositionOnTrack';
 
 export interface ActualBlock extends Emitable {}
 const doApply = () => applyMixins(ActualBlock, [Emitable]);
@@ -26,25 +27,28 @@ export class ActualBlock extends ActualBaseBrick implements Block {
 
     this.segment = new ActualBlockSegment(this, segmentData);
 
-    const start = this.segment
+    const start: PositionOnTrack = this.segment
       .getEnd(WhichEnd.A)
       .getJointEnd()
       .joint.getPosition();
-    const end = this.segment
+    const end: PositionOnTrack = this.segment
       .getEnd(WhichEnd.B)
       .getJointEnd()
       .joint.getPosition();
 
     // coords
     const lsc =
-      this.sameCoords(start, end) ||
+      this.sameCoords(start, end, x => x) ||
+      this.sameCoords(start, end, x => x.reverse()) ||
       this.findCoords(start, end, x => x) ||
       this.findCoords(start, end, x => x.reverse());
-    if (lsc && lsc.length) {
+    if (lsc && lsc.length && lsc.length > 1) {
       const x = lsc.map(x => x.getRays().map(y => y.coord));
       this.coords = [].concat(...x);
     } else {
-      console.error('no lsc found');
+      console.info('no lsc found');
+      // CoordinateToBabylonVector3(Ray.fromData(data.rayA).setY(1.5).coord),
+      // CoordinateToBabylonVector3(Ray.fromData(data.rayB).setY(1.5).coord)
       this.coords = [start.getRay().coord, end.getRay().coord];
     }
 
@@ -56,7 +60,7 @@ export class ActualBlock extends ActualBaseBrick implements Block {
     this.emit('remove', this.id);
   }
 
-  private findCoords(start, end, fx) {
+  private findCoords(start: PositionOnTrack, end: PositionOnTrack, fx) {
     const lsc: LineSegmentChain[] = [];
     let iter = fx(start.getDirectedTrack());
     const line = iter
@@ -84,11 +88,11 @@ export class ActualBlock extends ActualBaseBrick implements Block {
     return null;
   }
 
-  private sameCoords(start, end) {
-    if (start.getDirectedTrack() !== end.getDirectedTrack()) return null;
+  private sameCoords(start: PositionOnTrack, end: PositionOnTrack, fx) {
+    let iter = fx(start.getDirectedTrack());
+    if (iter !== end.getDirectedTrack()) return null;
 
     const lsc: LineSegmentChain[] = [];
-    let iter = start.getDirectedTrack();
     const { s, e } =
       start.getPosition() < end.getPosition()
         ? { s: start, e: end }

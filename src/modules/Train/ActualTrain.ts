@@ -25,6 +25,7 @@ import { Trip } from '../../structs/Scheduling/Trip';
 import { Passenger } from '../../structs/Interfaces/Passenger';
 import { Station } from '../../structs/Scheduling/Station';
 import { Platform } from '../../structs/Interfaces/Platform';
+import { BlockJoint } from '../Signaling/BlockJoint';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
@@ -178,15 +179,18 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
     if(formerEnd) {
       const iter = MarkerIterator.fromPositionOnTrack(formerEnd, currentEnd);
-      let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
+      let next: {value: TrackMarker, directedTrack: DirectedTrack, position: number, positionOnTrack: PositionOnTrack} = iter.nextOfFull('BlockJoint');
       while(next && next.value) {
-        const bjend:BlockEnd = next.value.blockJoint.getEnd(convert2(next.directedTrack.getDirection()));
-        const send:SectionEnd = next.value.blockJoint.getSectionEnd(convert2(next.directedTrack.getDirection()));
+        const bjend:BlockEnd = next.value.blockJoint.getEnd(convertTo(next.value.blockJoint, next.positionOnTrack));
+        const send:SectionEnd = next.value.blockJoint.getSectionEnd(convertTo(next.value.blockJoint, next.positionOnTrack));
         if(bjend) {
-          bjend.checkout(this);
+            // console.log('bjend out', bjend.getHash());
+            bjend.checkout(this);
         }
         if(send) {
-          send.checkout(this);
+            // console.log('send out', send.getSection().getId());
+            send.checkout(this);
+
         }
         next = iter.nextOfFull('BlockJoint');
       }
@@ -195,14 +199,16 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     // block checkin
     if(formerStart) {
       const iter = MarkerIterator.fromPositionOnTrack(formerStart, currentStart);
-      let next: {value: TrackMarker, directedTrack: DirectedTrack} = iter.nextOfFull('BlockJoint');
+      let next: {value: TrackMarker, directedTrack: DirectedTrack, position: number, positionOnTrack: PositionOnTrack} = iter.nextOfFull('BlockJoint');
       while(next && next.value) {
-        const bjend:BlockEnd = next.value.blockJoint.getEnd(convert(next.directedTrack.getDirection()));
-        const send:SectionEnd = next.value.blockJoint.getSectionEnd(convert(next.directedTrack.getDirection()));
+        const bjend:BlockEnd = next.value.blockJoint.getEnd(convertFrom(next.value.blockJoint, next.positionOnTrack));
+        const send:SectionEnd = next.value.blockJoint.getSectionEnd(convertFrom(next.value.blockJoint, next.positionOnTrack));
         if(bjend) {
+            // console.log('bjend in', bjend.getHash());
           bjend.checkin(this);
         }
         if(send) {
+            // console.log('send in', send.getSection().getId());
           send.checkin(this);
         }
         next = iter.nextOfFull('BlockJoint');
@@ -534,14 +540,30 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 }
 
-function convert2(t: TrackDirection): WhichEnd {
-    if (t === TrackDirection.AB) return WhichEnd.B;
-    if (t === TrackDirection.BA) return WhichEnd.A;
-    return null;
+function convertFrom(bj: BlockJoint, pos: PositionOnTrack): WhichEnd {
+    const tdbj = bj
+      .getPosition()
+      .getDirectedTrack()
+      .getDirection();
+    const tdpos = pos.getDirectedTrack().getDirection();
+  
+    if (tdbj === tdpos) {
+      return WhichEnd.B;
+    } else {
+      return WhichEnd.A;
+    }
   }
   
-  function convert(t: TrackDirection): WhichEnd {
-    if (t === TrackDirection.AB) return WhichEnd.A;
-    if (t === TrackDirection.BA) return WhichEnd.B;
-    return null;
+  function convertTo(bj: BlockJoint, pos: PositionOnTrack): WhichEnd {
+    const tdbj = bj
+      .getPosition()
+      .getDirectedTrack()
+      .getDirection();
+    const tdpos = pos.getDirectedTrack().getDirection();
+  
+    if (tdbj === tdpos) {
+      return WhichEnd.A;
+    } else {
+      return WhichEnd.B;
+    }
   }

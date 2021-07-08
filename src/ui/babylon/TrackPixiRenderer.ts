@@ -27,18 +27,10 @@ export class TrackPixiRenderer extends BasePixiRenderer
     line.hitArea = polygon;
     line.interactive = true;
     line.buttonMode = true;
-    line.beginFill(0x0bef47);
+    line.beginFill(0xa6bdac);
     line.drawPolygon(polygon);
     line.endFill();
     line.zIndex = 0;
-
-    /*
-    line.moveTo(rays[0].coord.x, rays[0].coord.z);
-    for (let ray of rays) {
-      line.lineTo(ray.coord.x, ray.coord.z);
-    }
-    */
-    //line.lineStyle(4, 0xff0000, 1);
 
     line.on('pointerdown', (event: PIXI.InteractionEvent) => {
       const x =

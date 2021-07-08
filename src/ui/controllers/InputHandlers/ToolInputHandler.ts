@@ -9,6 +9,7 @@ import { CreateEngineInputHandler } from './Engine/CreateEngineInputHandler';
 import { CreatePlatformInputHandler } from './Platform/CreatePlatformInputHandler';
 import { CreateStationInputHandler } from './Station/CreateStationInputHandler';
 import { BlockJointInputHandler } from './BlockJoint/BlockJointInputHandler';
+import { BlockWizardInputHandler } from './BlockWizard/BlockWizardInputHandler';
 
 export class ToolInputHandler extends InputHandler {
   private inputHandler: InputHandler;
@@ -24,7 +25,8 @@ export class ToolInputHandler extends InputHandler {
       [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(store),
       [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(store),
       [InputMode.CREATE_STATION]: new CreateStationInputHandler(store),
-      [InputMode.CREATE_BLOCK_JOINT]: new BlockJointInputHandler(store)
+      [InputMode.CREATE_BLOCK_JOINT]: new BlockJointInputHandler(store),
+      [InputMode.BLOCK_WIZARD]: new BlockWizardInputHandler(store)
     };
 
     const modeNames: Record<InputMode, string> = {
@@ -39,7 +41,8 @@ export class ToolInputHandler extends InputHandler {
       [InputMode.CREATE_BLOCK]: '+Blck',
       [InputMode.CREATE_SECTION]: '+Sect',
       [InputMode.CREATE_PATH]: '+Path',
-      [InputMode.ALLOW_PATH]: 'Allow'
+      [InputMode.ALLOW_PATH]: 'Allow',
+      [InputMode.BLOCK_WIZARD]: 'BWiz'
     };
 
     for (let mode of Object.keys(this.inputHandlers)) {

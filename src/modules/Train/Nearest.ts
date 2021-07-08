@@ -4,6 +4,7 @@ import { NearestData } from './NearestData';
 import { Signal } from '../Signaling/Signal';
 import { BlockJoint } from '../Signaling/BlockJoint';
 import { Platform } from '../../structs/Interfaces/Platform';
+import { ActualTrack } from '../Track/ActualTrack';
 
 export class Nearest {
   static end(pot: PositionOnTrack): NearestData {
@@ -21,6 +22,30 @@ export class Nearest {
 
     return {
       distance: ttl ? distance : Number.POSITIVE_INFINITY,
+      segmentCount
+    };
+  }
+
+  static singleEnd(pot: PositionOnTrack): NearestData {
+    let segmentCount = 1;
+    let distance = pot.getTrack().getLength() - pot.getPosition();
+    let iter = pot.getDirectedTrack();
+    let ttl = 999;
+
+    while (
+      iter.next() &&
+      iter.next().getTrack().constructor.name === ActualTrack.name &&
+      ttl
+    ) {
+      iter = iter.next();
+      distance += iter.getLength();
+      segmentCount++;
+      ttl--;
+    }
+
+    return {
+      distance: ttl ? distance : Number.POSITIVE_INFINITY,
+      position: ttl ? new PositionOnTrack(iter, iter.getLength()) : null,
       segmentCount
     };
   }

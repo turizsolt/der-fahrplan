@@ -21,7 +21,7 @@ export class WagonPixiRenderer extends BasePixiRenderer
     this.rect.drawRect(-7, -2, 14, 4);
     this.rect.rotation = 0;
     this.rect.endFill();
-    this.rect.zIndex = 5;
+    this.rect.zIndex = 15;
 
     this.rect.on('pointerdown', (event: PIXI.InteractionEvent) => {
       const x =

@@ -26,14 +26,14 @@ export class MarkerIterator {
     );
   }
 
-  next(): TrackMarker {
+  next(): PositionedTrackMarker {
     let value:PositionedTrackMarker = null;
     do {
       value = this.innerNext();
     }
     while(value && !this.conditions(value));
 
-    return value && value.marker;
+    return value;
   }
 
   conditions(value: PositionedTrackMarker): boolean {
@@ -67,26 +67,28 @@ export class MarkerIterator {
     return markers && markers[this.currentIndex];
   }
 
-  nextOf(type: string): TrackMarker {
-      let value:TrackMarker = null;
+  nextOf(type: string): PositionedTrackMarker {
+      let value:PositionedTrackMarker = null;
       do {
         value = this.next();
       }
-      while(value && value.type !== type);
+      while(value && value.marker && value.marker.type !== type);
 
       return value;
   }
 
-  nextOfFull(type: string): {value: TrackMarker, directedTrack: DirectedTrack} {
-    let value:TrackMarker = null;
+  nextOfFull(type: string): {value: TrackMarker, directedTrack: DirectedTrack, position: number, positionOnTrack: PositionOnTrack} {
+    let value:PositionedTrackMarker = null;
     do {
       value = this.next();
     }
-    while(value && value.type !== type);
+    while(value && value.marker && value.marker.type !== type);
 
     return {
-        value,
-        directedTrack: this.currentDirectedTrack
+        value: value?.marker,
+        position: value?.position,
+        directedTrack: this.currentDirectedTrack,
+        positionOnTrack: value && new PositionOnTrack(this.currentDirectedTrack, value.position)
     };
   }
 }

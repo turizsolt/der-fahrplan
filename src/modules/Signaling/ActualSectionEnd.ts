@@ -45,6 +45,10 @@ export class ActualSectionEnd implements SectionEnd {
     return this.jointEnd;
   }
 
+  getSection(): Section {
+    return this.section;
+  }
+
   connect(): void {
     this.jointEnd.joint.setOneSectionEnd(this.jointEnd.end, this);
   }
