@@ -16,7 +16,6 @@ import { SignalDummyRenderer } from '../../test/dummies/SignalDummyRenderer';
 import { BlockRenderer } from '../structs/Renderers/BlockRenderer';
 import { BlockDummyRenderer } from '../../test/dummies/BlockDummyRenderer';
 import { BlockJointRenderer } from '../structs/Renderers/BlockJointRenderer';
-import { BlockJointDummyRenderer } from '../../test/dummies/BlockJointDummyRenderer';
 import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
 import { PathBlockDummyRenderer } from '../../test/dummies/PathBlockDummyRenderer';
 import { SectionRenderer } from '../structs/Renderers/SectionRenderer';
@@ -31,6 +30,7 @@ import { TrackSwitchPixiRenderer } from '../ui/babylon/TrackSwitchPixiRenderer';
 import { WagonPixiRenderer } from '../ui/babylon/WagonPixiRenderer';
 import { PlatformPixiRenderer } from '../ui/babylon/PlatformPixiRenderer';
 import { StationPixiRenderer } from '../ui/babylon/StationPixiRenderer';
+import { BlockJointPixiRenderer } from '../ui/babylon/BlockJointPixiRenderer';
 
 export const productionContainer2d = new Container();
 const ioc = new DependencyContainer(productionContainer2d);
@@ -70,7 +70,7 @@ ioc.fm<BlockRenderer>(
 ioc.fm<BlockJointRenderer>(
   T.FactoryOfBlockJointRenderer,
   T.BlockJointRenderer,
-  BlockJointDummyRenderer
+  BlockJointPixiRenderer
 );
 ioc.fm<PathBlockRenderer>(
   T.FactoryOfPathBlockRenderer,

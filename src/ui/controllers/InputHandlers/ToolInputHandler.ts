@@ -8,6 +8,7 @@ import { Store } from '../../../structs/Interfaces/Store';
 import { CreateEngineInputHandler } from './Engine/CreateEngineInputHandler';
 import { CreatePlatformInputHandler } from './Platform/CreatePlatformInputHandler';
 import { CreateStationInputHandler } from './Station/CreateStationInputHandler';
+import { BlockJointInputHandler } from './BlockJoint/BlockJointInputHandler';
 
 export class ToolInputHandler extends InputHandler {
   private inputHandler: InputHandler;
@@ -22,7 +23,8 @@ export class ToolInputHandler extends InputHandler {
       [InputMode.CREATE_TRACK]: new TrackInputHandler(store),
       [InputMode.CREATE_ENGINE]: new CreateEngineInputHandler(store),
       [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(store),
-      [InputMode.CREATE_STATION]: new CreateStationInputHandler(store)
+      [InputMode.CREATE_STATION]: new CreateStationInputHandler(store),
+      [InputMode.CREATE_BLOCK_JOINT]: new BlockJointInputHandler(store)
     };
 
     const modeNames: Record<InputMode, string> = {
