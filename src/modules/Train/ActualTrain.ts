@@ -540,7 +540,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   }
 }
 
-function convertFrom(bj: BlockJoint, pos: PositionOnTrack): WhichEnd {
+export function convertFrom(bj: BlockJoint, pos: PositionOnTrack): WhichEnd {
     const tdbj = bj
       .getPosition()
       .getDirectedTrack()
@@ -554,7 +554,7 @@ function convertFrom(bj: BlockJoint, pos: PositionOnTrack): WhichEnd {
     }
   }
   
-  function convertTo(bj: BlockJoint, pos: PositionOnTrack): WhichEnd {
+export function convertTo(bj: BlockJoint, pos: PositionOnTrack): WhichEnd {
     const tdbj = bj
       .getPosition()
       .getDirectedTrack()

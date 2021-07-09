@@ -19,6 +19,13 @@ import { Block } from '../../../../modules/Signaling/Block';
 import { Section } from '../../../../modules/Signaling/Section';
 import { BlockJointEnd } from '../../../../modules/Signaling/BlockJointEnd';
 import { SignalSignal } from '../../../../modules/Signaling/SignalSignal';
+import { TrackBase } from '../../../../modules/Track/TrackBase';
+import { TrackSwitch } from '../../../../modules/Track/TrackSwitch';
+import { DirectedTrack } from '../../../../modules/Track/DirectedTrack';
+import { MarkerIterator } from '../../../../modules/Train/MarkerIterator';
+import { PathBlock } from '../../../../modules/Signaling/PathBlock';
+import { Sensor } from '../../../../modules/Signaling/Sensor';
+import { convertFrom, convertTo } from '../../../../modules/Train/ActualTrain';
 
 // @injectable()
 export class BlockWizardInputHandler extends InputHandler {
@@ -160,35 +167,59 @@ export class BlockWizardInputHandler extends InputHandler {
   }
 
   wizardPathBlock(position: PositionOnTrack): void {
-    console.error('wizard path');
-  }
-}
+    const track:TrackBase = position.getTrack();
+    const queue: TrackBase[] = [track];
+    const visited: Record<string, DirectedTrack> = {[track.getId()]: position.getDirectedTrack()};
+    const blockJointEnds: BlockJointEnd[] = [];
 
-function convertFrom(bj: BlockJoint, pos: PositionOnTrack): WhichEnd {
-  const tdbj = bj
-    .getPosition()
-    .getDirectedTrack()
-    .getDirection();
-  const tdpos = pos.getDirectedTrack().getDirection();
+    while(queue.length > 0) {
+      const next:TrackBase = queue.shift();
 
-  if (tdbj === tdpos) {
-    return WhichEnd.B;
-  } else {
-    return WhichEnd.A;
-  }
-}
+      if(next.getType() === TYPES.TrackSwitch) {
+        const ts = next as TrackSwitch;
+        const dts:DirectedTrack[] = ts.getAdjacentDirectedTracks();
+        for(const dt of dts) {
+          const track = dt.getTrack();
 
-function convertTo(bj: BlockJoint, pos: PositionOnTrack): WhichEnd {
-  const tdbj = bj
-    .getPosition()
-    .getDirectedTrack()
-    .getDirection();
-  const tdpos = pos.getDirectedTrack().getDirection();
+          if(!visited[track.getId()]) {
+            visited[track.getId()] = dt;
+            queue.push(track);
+          }
+        }
+      } else if(next.getType() === TYPES.Track) {
+        const dt = visited[next.getId()];
+        const iter = new MarkerIterator(dt, undefined, undefined, undefined, (dt) => dt?.getTrack().getType() === TYPES.Track);
+        const ret = iter.nextOfFull('BlockJoint');
 
-  if (tdbj === tdpos) {
-    return WhichEnd.A;
-  } else {
-    return WhichEnd.B;
+        if(ret.value) {
+          blockJointEnds.push({joint: ret.value.blockJoint, end: convertTo(ret.value.blockJoint, ret.positionOnTrack)});
+        }
+      }
+    }
+
+    //
+    const pb = this.store
+      .create<PathBlock>(TYPES.PathBlock)
+      .init(blockJointEnds);
+
+    // connect all
+    pb.getPathBlockEnds().map(pbe => pbe.pathConnect());
+            
+    // create sensors
+    pb.getPathBlockEnds().map(pbe => {
+      const bj = pbe.getJointEnd().joint;
+      const pot = bj.getPosition().clone();
+      if (pbe.getJointEnd().end === WhichEnd.A) {
+        pot.reverse();
+      }
+      pot.move(30);
+      pot.reverse();
+
+      this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
+    });
+
+    // create signals
+    createSignals(blockJointEnds, SignalSignal.Red, this.store);
   }
 }
 

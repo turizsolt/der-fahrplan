@@ -11,10 +11,15 @@ export class MarkerIterator {
     private startDirectedTrack: DirectedTrack, 
     private startPosition?: number, 
     private endDirectedTrack?: DirectedTrack, 
-    private endPosition?: number
+    private endPosition?: number,
+    private dtCondition?: (dt:DirectedTrack) => boolean
   ) {
     this.currentDirectedTrack = startDirectedTrack;
     this.currentIndex = -1;
+
+    if(!dtCondition) {
+        this.dtCondition = (dt:DirectedTrack) => true;
+    }
   }
 
   static fromPositionOnTrack(startPoT: PositionOnTrack, endPoT?: PositionOnTrack): MarkerIterator {
@@ -36,7 +41,7 @@ export class MarkerIterator {
     return value;
   }
 
-  conditions(value: PositionedTrackMarker): boolean {
+  private conditions(value: PositionedTrackMarker): boolean {
       if(this.startPosition &&
         this.currentDirectedTrack === this.startDirectedTrack
          && value.position < this.startPosition) {
@@ -62,6 +67,10 @@ export class MarkerIterator {
         return undefined;
       }
       this.currentDirectedTrack = this.currentDirectedTrack.next();
+      // finish, if dt is not ok
+      if(!this.dtCondition(this.currentDirectedTrack)) {
+        return undefined;
+      }
       markers = this.currentDirectedTrack?.getMarkers();
     }
     return markers && markers[this.currentIndex];
