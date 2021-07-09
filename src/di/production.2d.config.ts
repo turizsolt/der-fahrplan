@@ -12,7 +12,6 @@ import { StationRenderer } from '../structs/Renderers/StationRenderer';
 import { addCommonMaps } from './common';
 import { DependencyContainer } from './DependencyContainer';
 import { SignalRenderer } from '../structs/Renderers/SignalRenderer';
-import { SignalDummyRenderer } from '../../test/dummies/SignalDummyRenderer';
 import { BlockRenderer } from '../structs/Renderers/BlockRenderer';
 import { BlockJointRenderer } from '../structs/Renderers/BlockJointRenderer';
 import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
@@ -31,6 +30,7 @@ import { StationPixiRenderer } from '../ui/babylon/StationPixiRenderer';
 import { BlockJointPixiRenderer } from '../ui/babylon/BlockJointPixiRenderer';
 import { BlockPixiRenderer } from '../ui/babylon/BlockPixiRenderer';
 import { SectionPixiRenderer } from '../ui/babylon/SectionPixiRenderer';
+import { SignalPixiRenderer } from '../ui/babylon/SignalPixiRenderer';
 
 export const productionContainer2d = new Container();
 const ioc = new DependencyContainer(productionContainer2d);
@@ -55,7 +55,7 @@ ioc.fm<WagonRenderer>(
 ioc.fm<SignalRenderer>(
   T.FactoryOfSignalRenderer,
   T.SignalRenderer,
-  SignalDummyRenderer
+  SignalPixiRenderer
 );
 ioc.fm<SensorRenderer>(
   T.FactoryOfSensorRenderer,

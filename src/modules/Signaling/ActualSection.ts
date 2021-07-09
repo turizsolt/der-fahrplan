@@ -40,7 +40,7 @@ export class ActualSection extends ActualBaseBrick implements Section {
     const posA: PositionOnTrack = this.ends.A.getJointEnd()
       .joint.getPosition()
       .clone();
-    if (this.ends.A.getJointEnd().end === WhichEnd.B) {
+    if (this.ends.A.getJointEnd().end === WhichEnd.A) {
       posA.reverse();
     }
     posA.move(5);
@@ -49,7 +49,7 @@ export class ActualSection extends ActualBaseBrick implements Section {
     const posB: PositionOnTrack = this.ends.B.getJointEnd()
       .joint.getPosition()
       .clone();
-    if (this.ends.B.getJointEnd().end === WhichEnd.B) {
+    if (this.ends.B.getJointEnd().end === WhichEnd.A) {
       posB.reverse();
     }
     posB.move(5);

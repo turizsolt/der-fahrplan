@@ -15,6 +15,7 @@ export class SectionPixiRenderer extends BasePixiRenderer
   init(data: any): void {
     const rayA = Ray.fromData(data.rayA);
     this.circleA = new PIXI.Graphics();
+    this.circleA.lineStyle(0.25, 0x000000, 0.5);
     this.circleA.beginFill(0x77ffff);
     this.circleA.drawCircle(0, 0, 2);
     this.circleA.endFill();
@@ -24,6 +25,7 @@ export class SectionPixiRenderer extends BasePixiRenderer
 
     const rayB = Ray.fromData(data.rayB);
     this.circleB = new PIXI.Graphics();
+    this.circleB.lineStyle(0.25, 0x000000, 0.5);
     this.circleB.beginFill(0x77ffff);
     this.circleB.drawCircle(0, 0, 2);
     this.circleB.endFill();
@@ -38,6 +40,7 @@ export class SectionPixiRenderer extends BasePixiRenderer
   update(data: any) {
     const bothFree = data.isFreeA && data.isFreeB;
     this.circleA.clear();
+    this.circleA.lineStyle(0.25, 0x000000, 0.5);
     this.circleA.beginFill(
       bothFree ? 0x77ffff : data.isFreeA ? 0x00ff00 : 0xff0000
     );
@@ -45,6 +48,7 @@ export class SectionPixiRenderer extends BasePixiRenderer
     this.circleA.endFill();
 
     this.circleB.clear();
+    this.circleB.lineStyle(0.25, 0x000000, 0.5);
     this.circleB.beginFill(
       bothFree ? 0x77ffff : data.isFreeB ? 0x00ff00 : 0xff0000
     );

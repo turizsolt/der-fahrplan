@@ -18,6 +18,7 @@ import { Signal } from '../../../../modules/Signaling/Signal';
 import { Block } from '../../../../modules/Signaling/Block';
 import { Section } from '../../../../modules/Signaling/Section';
 import { BlockJointEnd } from '../../../../modules/Signaling/BlockJointEnd';
+import { SignalSignal } from '../../../../modules/Signaling/SignalSignal';
 
 // @injectable()
 export class BlockWizardInputHandler extends InputHandler {
@@ -148,12 +149,14 @@ export class BlockWizardInputHandler extends InputHandler {
       });
       blocks.push(block);
       block.getSegment().connect();
+      createSignals([joints[i], joints[i+1]], SignalSignal.Green, this.store);
     }
 
     const section = this.store
       .create<Section>(TYPES.Section)
       .init(joints[0], joints[joints.length - 1]);
     section.connect();
+    createSignals([joints[0], joints[joints.length - 1]], SignalSignal.Green, this.store);
   }
 
   wizardPathBlock(position: PositionOnTrack): void {
@@ -188,3 +191,34 @@ function convertTo(bj: BlockJoint, pos: PositionOnTrack): WhichEnd {
     return WhichEnd.B;
   }
 }
+
+function createSignals(jointEnds: BlockJointEnd[], startSignal: SignalSignal, store: Store) {
+    jointEnds.map(x => {
+      const position = x.joint.getPosition().clone();
+      if (x.end === WhichEnd.A) {
+        position.reverse();
+      }
+
+      const dt = position.getDirectedTrack();
+      const pos = position.getPosition();
+      const signal:Signal = dt
+        .getMarkers()
+        .find(m => m.marker.type === 'Signal' && m.position === pos)?.marker.signal;
+
+      const sectionEnd = x.joint.getSectionEnd(x.end);
+      const blockEnd = x.joint.getEnd(x.end);
+
+      if (signal) {
+        if(sectionEnd) {
+          signal.addSectionEmitter(sectionEnd);
+        }
+        if(blockEnd) {
+          signal.addBlockEmitter(blockEnd);
+        }
+      } else {
+        store
+          .create<Signal>(TYPES.Signal)
+          .init(position, blockEnd, sectionEnd, startSignal);
+      }
+    });
+  }
