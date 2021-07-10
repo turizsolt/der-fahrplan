@@ -1,7 +1,15 @@
 <template>
   <div>
-    <div>{{ obj.name }} #{{ idt }}</div>
-    Almafa PB
+    <div>PathBlock #{{ idt }}</div>
+    <div v-for="(rule, index) in obj.queue.rules" :key="index">
+      <div>
+        {{obj.key[rule.from.joint+'-'+rule.from.end]}}
+        =>
+        <span v-for="(option, index) in rule.toOptions" :key="index">
+          <span v-if="index !== 0">,</span> <span>{{obj.key[option.joint+'-'+option.end]}}</span>
+        </span>
+      </div>
+    </div>
   </div>
 </template>
 

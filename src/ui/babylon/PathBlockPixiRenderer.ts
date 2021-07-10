@@ -3,6 +3,8 @@ import { injectable } from 'inversify';
 import { BasePixiRenderer } from './BasePixiRenderer';
 import { Ray } from '../../structs/Geometry/Ray';
 import { PathBlockRenderer } from '../../structs/Renderers/PathBlockRenderer';
+import { ITextStyle } from 'pixi.js';
+import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 
 @injectable()
 export class PathBlockPixiRenderer extends BasePixiRenderer
@@ -58,6 +60,28 @@ export class PathBlockPixiRenderer extends BasePixiRenderer
     });
 
     globalThis.stage.addChild(this.circle);
+
+    const settings: Partial<ITextStyle> = {
+      fontFamily: 'Arial',
+      fontSize: 5,
+      fill: 0x000000,
+      align: 'center'
+    };
+
+    for (let i = 0; i < data.jointEnds.length; i++) {
+      let text = new PIXI.Text(i.toString(), settings);
+      const ray = Ray.fromData(data.jointEnds[i].ray).fromHere(
+        data.jointEnds[i].end === WhichEnd.B ? 0 : Math.PI,
+        3
+      );
+      text.x = ray.coord.x;
+      text.y = ray.coord.z;
+      text.zIndex = 30;
+      text.resolution = 10;
+      text.anchor.x = 0.5;
+      text.anchor.y = 0.5;
+      globalThis.stage.addChild(text);
+    }
   }
 
   update(data: any) {}

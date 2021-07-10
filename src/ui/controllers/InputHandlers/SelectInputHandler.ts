@@ -13,6 +13,7 @@ import { BaseBrick } from '../../../structs/Interfaces/BaseBrick';
 import { BaseStorable } from '../../../structs/Interfaces/BaseStorable';
 import { VueSidebar } from '../VueSidebar';
 import { InputProps } from '../InputProps';
+import { Emitable } from '../../../mixins/Emitable';
 
 export class SelectInputHandler extends InputHandler {
   constructor(private store: Store, private vueSidebar: VueSidebar) {
@@ -108,19 +109,19 @@ export class SelectInputHandler extends InputHandler {
     if (
         this.selectCallback && 
         selected &&
-        selected.getType() === TYPES.Wagon
+        (selected.getType() === TYPES.Wagon || selected.getType() === TYPES.PathBlock)
       ) {
-        (selected as Wagon).off('info', this.selectCallback);
+        (selected as unknown as Emitable).off('info', this.selectCallback);
       }
   }
 
   // TODO - should work for all, not just wagons...
   private setCallbackOn(selected: BaseStorable) {
-    if (selected && selected.getType() === Symbol.for('Wagon')) {
+    if (selected && (selected.getType() === TYPES.Wagon || selected.getType() === TYPES.PathBlock)) {
       this.selectCallback = (obj: Object): void => {
         this.vueSidebar.setData('selected', obj);
       };
-      (selected as Wagon).on('info', this.selectCallback);
+      (selected as unknown as Emitable).on('info', this.selectCallback);
     }
   }
 

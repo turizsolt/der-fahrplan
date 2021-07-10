@@ -31,7 +31,7 @@ export class BlockJointPixiRenderer extends BasePixiRenderer
       event.data.global.y = y;
       globalThis.inputController.down({
         ...event,
-        meshId: 'clickable-trackjoint-' + data.id,
+        meshId: 'clickable-blockjoint-' + data.id + '-jointA',
         button: event.data.button
       });
 
@@ -48,7 +48,7 @@ export class BlockJointPixiRenderer extends BasePixiRenderer
       event.data.global.y = y;
       globalThis.inputController.up({
         ...event,
-        meshId: 'clickable-trackjoint-' + data.id,
+        meshId: 'clickable-blockjoint-' + data.id + '-jointA',
         button: event.data.button
       });
       event.stopPropagation();
@@ -78,7 +78,7 @@ export class BlockJointPixiRenderer extends BasePixiRenderer
       event.data.global.y = y;
       globalThis.inputController.down({
         ...event,
-        meshId: 'clickable-blockjoint-' + data.id + '-jointA',
+        meshId: 'clickable-blockjoint-' + data.id + '-jointB',
         button: event.data.button
       });
 

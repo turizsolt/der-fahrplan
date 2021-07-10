@@ -27,6 +27,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
   private allowedPathes: AllowedPath[] = [];
   private queue: PathQueue;
   private coord: Coordinate;
+  private key: Record<string, number> = {};
 
   init(jointEnds: BlockJointEnd[]): PathBlock {
     this.initStore(TYPES.PathBlock);
@@ -37,6 +38,10 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     this.coord = jointEnds.map(je => je.joint.getPosition().getRay().coord).reduce((a, b) => new Coordinate(a.x+b.x, a.y+b.y, a.z+b.z), new Coordinate(0, 0, 0));
     const n = jointEnds.length;
     this.coord = new Coordinate(this.coord.x/n, this.coord.y/n, this.coord.z/n);
+
+    for(let i=0;i<this.pathBlockEnds.length;i++) {
+        this.key[this.pathBlockEnds[i].getJointEnd().joint.getId()+'-'+this.pathBlockEnds[i].getJointEnd().end] = i;
+    }
 
     this.emit('init', this.persist());
     return this;
@@ -172,6 +177,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
 
   addRule(rule: PathRule): void {
     this.queue.addRule(rule);
+
+    this.emit('info', this.persist());
   }
 
   requestPath(pathBlockEnd: PathBlockEnd, train: Train): void {
@@ -204,7 +211,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
       jointEnds: this.pathBlockEnds.map(pbe => persistBlockJointEnd(pbe.getJointEnd())),
       queue: this.queue.persist(),
       allowedPathes: this.allowedPathes.map(this.persistAllowedPath),
-      coord: {x: this.getCoord().x, y: this.getCoord().y, z: this.getCoord().z}
+      coord: {x: this.getCoord().x, y: this.getCoord().y, z: this.getCoord().z},
+      key: this.key
     };
   }
 

@@ -10,6 +10,7 @@ import { CreatePlatformInputHandler } from './Platform/CreatePlatformInputHandle
 import { CreateStationInputHandler } from './Station/CreateStationInputHandler';
 import { BlockJointInputHandler } from './BlockJoint/BlockJointInputHandler';
 import { BlockWizardInputHandler } from './BlockWizard/BlockWizardInputHandler';
+import { PathInputHandler } from './Path/PathInputHandler';
 
 export class ToolInputHandler extends InputHandler {
   private inputHandler: InputHandler;
@@ -26,7 +27,8 @@ export class ToolInputHandler extends InputHandler {
       [InputMode.CREATE_PLATFORM]: new CreatePlatformInputHandler(store),
       [InputMode.CREATE_STATION]: new CreateStationInputHandler(store),
       [InputMode.CREATE_BLOCK_JOINT]: new BlockJointInputHandler(store),
-      [InputMode.BLOCK_WIZARD]: new BlockWizardInputHandler(store)
+      [InputMode.BLOCK_WIZARD]: new BlockWizardInputHandler(store),
+      [InputMode.CREATE_PATH]: new PathInputHandler(store)
     };
 
     const modeNames: Record<InputMode, string> = {

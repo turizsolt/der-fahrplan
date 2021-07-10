@@ -78,7 +78,11 @@ export class PathQueue {
 export const persistBlockJointEnd = (bje: BlockJointEnd): any => {
   return {
     joint: bje.joint.getId(),
-    end: bje.end
+    end: bje.end,
+    ray: bje.joint
+      .getPosition()
+      .getRay()
+      .persist()
   };
 };
 
