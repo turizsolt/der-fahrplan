@@ -209,7 +209,7 @@ export class BlockWizardInputHandler extends InputHandler {
     pb.getPathBlockEnds().map(pbe => {
       const bj = pbe.getJointEnd().joint;
       const pot = bj.getPosition().clone();
-      if (pbe.getJointEnd().end === WhichEnd.A) {
+      if (pbe.getJointEnd().end === WhichEnd.B) {
         pot.reverse();
       }
       pot.move(30);

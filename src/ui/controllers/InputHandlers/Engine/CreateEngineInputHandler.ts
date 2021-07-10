@@ -32,7 +32,7 @@ export class CreateEngineInputHandler extends InputHandler {
           CommandCreator.createTrain(
             GENERATE_ID,
             GENERATE_ID,
-            getPredefinedWagonConfig('wagon'), // todo legacyProps.wagonType),
+            getPredefinedWagonConfig('mot'), // todo legacyProps.wagonType),
             (dpot.track as Track).getId(),
             dpot.position,
             1
