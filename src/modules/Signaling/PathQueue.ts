@@ -61,6 +61,10 @@ export class PathQueue {
     this.rules.splice(index, 1);
   }
 
+  setFilterToRule(index: number, filter: string): void {
+    this.rules[index].filter = filter;
+  }
+
   persist(): Object {
     return {
       rules: this.rules.map(r => ({

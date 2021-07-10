@@ -182,10 +182,16 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
   }
 
   removeRule(index: number): void {
-      this.queue.removeRule(index);
+    this.queue.removeRule(index);
 
-      this.emit('info', this.persist());
-    }
+    this.emit('info', this.persist());
+  }
+
+  setFilterToRule(index: number, filter: string): void {
+    this.queue.setFilterToRule(index, filter);
+
+    this.emit('info', this.persist());
+  }
 
   requestPath(pathBlockEnd: PathBlockEnd, train: Train): void {
     this.queue.push(pathBlockEnd, train);
