@@ -3,7 +3,7 @@
     <div>PathBlock #{{ idt }}</div>
     <table id="ruleTable">
       <tr v-for="(rule, index) in obj.queue.rules" :key="index">
-        <td>all</td>
+        <td>{{rule.filter}}</td>
         <td>
           {{obj.key[rule.from.joint+'-'+rule.from.end]}}
           =>

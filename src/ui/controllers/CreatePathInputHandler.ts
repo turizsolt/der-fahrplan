@@ -41,7 +41,8 @@ export class CreatePathInputHandler implements InputHandler {
           const pathBlock = pathBlockEnd.getPathBlock();
           pathBlock.addRule({
             from: pathBlocksEnds[0],
-            toOptions: pathBlocksEnds.slice(1)
+            toOptions: pathBlocksEnds.slice(1),
+            filter: ''
           });
           this.jointEnds = [];
         }

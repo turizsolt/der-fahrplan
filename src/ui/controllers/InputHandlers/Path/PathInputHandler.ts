@@ -52,6 +52,7 @@ export class PathInputHandler extends InputHandler {
         const pathBlockEnd = blockEnd as PathBlockEnd;
         const pathBlock = pathBlockEnd.getPathBlock();
         pathBlock.addRule({
+          filter: '',  
           from: pathBlocksEnds[0],
           toOptions: pathBlocksEnds.slice(1)
         });

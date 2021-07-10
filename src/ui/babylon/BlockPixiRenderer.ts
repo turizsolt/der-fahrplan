@@ -31,4 +31,9 @@ export class BlockPixiRenderer extends BasePixiRenderer
       this.line.lineTo(this.coords[i].x, this.coords[i].z);
     }
   }
+
+  remove() {
+    this.line.clear();
+    this.line.renderable = false;
+  }
 }

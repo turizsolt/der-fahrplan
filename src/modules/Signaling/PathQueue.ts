@@ -15,7 +15,16 @@ export class PathQueue {
   constructor(private pathBlock: PathBlock) {}
 
   push(pathBlockEnd: PathBlockEnd, train: Train) {
-    const found = this.rules.find(r => r.from === pathBlockEnd);
+    const found = this.rules.find(
+      r =>
+        r.from === pathBlockEnd &&
+        (!r.filter ||
+          r.filter ===
+            train
+              ?.getTrips()[0]
+              ?.getRoute()
+              ?.getName())
+    );
     if (found) {
       this.queue.push({
         from: pathBlockEnd,
@@ -55,6 +64,7 @@ export class PathQueue {
   persist(): Object {
     return {
       rules: this.rules.map(r => ({
+        filter: r.filter,
         from: persistPathBlockEnd(r.from),
         toOptions: r.toOptions.map(o => persistPathBlockEnd(o))
       })),
@@ -68,6 +78,7 @@ export class PathQueue {
 
   load(obj: any, store: Store): void {
     this.rules = obj.rules.map(r => ({
+      filter: r.filter,
       from: loadPathBlockEnd(r.from, store),
       toOptions: r.toOptions.map(o => loadPathBlockEnd(o, store))
     }));
