@@ -3,6 +3,7 @@ import { BlockJointEnd } from './BlockJointEnd';
 import { PathBlockEnd } from './PathBlockEnd';
 import { Train } from '../Train/Train';
 import { PathRule } from './PathRule';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
 
 export interface PathBlock extends BaseBrick {
   init(jointEnds: BlockJointEnd[]): PathBlock;
@@ -17,4 +18,5 @@ export interface PathBlock extends BaseBrick {
   addRule(rule: PathRule): void;
   getPathBlockEnds(): PathBlockEnd[];
   tick(): void;
+  getCoord(): Coordinate;
 }

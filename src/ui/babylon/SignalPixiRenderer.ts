@@ -28,7 +28,9 @@ export class SignalPixiRenderer extends BasePixiRenderer
 
     this.circle = new PIXI.Graphics();
     // this.circle.lineStyle(0.25, 0x000000);
-    this.circle.beginFill(0x00ff00);
+    this.circle.beginFill(
+      data.signal === SignalSignal.Green ? 0x00ff00 : 0xff0000
+    );
     this.circle.drawCircle(0, 0, 2);
     this.circle.endFill();
     this.circle.zIndex = 10;

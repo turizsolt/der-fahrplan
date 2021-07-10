@@ -141,6 +141,21 @@ export class MeshProvider {
     return mesh;
   }
 
+  createPathBlockMesh(name: string): BABYLON.AbstractMesh {
+    const mesh = BABYLON.MeshBuilder.CreateCylinder(
+      name,
+      {
+        diameterTop: 6,
+        diameterBottom: 6,
+        tessellation: 12,
+        height: 1
+      },
+      null
+    );
+    mesh.material = this.bedGray;
+    return mesh;
+  }
+
   createStationMesh(name: string, radius): BABYLON.AbstractMesh {
     const mesh = BABYLON.MeshBuilder.CreateTorus(
       name,

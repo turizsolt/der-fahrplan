@@ -128,6 +128,7 @@ export class SelectInputHandler extends InputHandler {
     if(type === Symbol.for('Passenger')) return 'passenger';
     if(type === Symbol.for('Wagon')) return 'wagon';
     if(type === Symbol.for('Station')) return 'station';
+    if(type === Symbol.for('PathBlock')) return 'pathblock';
     return 'idtext';
   }
 

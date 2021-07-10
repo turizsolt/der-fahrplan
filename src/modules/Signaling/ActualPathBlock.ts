@@ -18,6 +18,7 @@ import { Train } from '../Train/Train';
 import { PathRule } from './PathRule';
 import { PathQueue, persistBlockJointEnd, loadBlockJointEnd } from './PathQueue';
 import { BlockJoint } from './BlockJoint';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
 
 export interface ActualPathBlock extends Emitable {}
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -25,6 +26,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
   private pathBlockEnds: PathBlockEnd[] = [];
   private allowedPathes: AllowedPath[] = [];
   private queue: PathQueue;
+  private coord: Coordinate;
 
   init(jointEnds: BlockJointEnd[]): PathBlock {
     this.initStore(TYPES.PathBlock);
@@ -32,9 +34,16 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     this.queue = new PathQueue(this);
 
     this.pathBlockEnds = jointEnds.map(je => new ActualPathBlockEnd(je, this));
+    this.coord = jointEnds.map(je => je.joint.getPosition().getRay().coord).reduce((a, b) => new Coordinate(a.x+b.x, a.y+b.y, a.z+b.z), new Coordinate(0, 0, 0));
+    const n = jointEnds.length;
+    this.coord = new Coordinate(this.coord.x/n, this.coord.y/n, this.coord.z/n);
 
     this.emit('init', this.persist());
     return this;
+  }
+
+  getCoord():Coordinate {
+    return this.coord;
   }
 
   getPathBlockEnds(): PathBlockEnd[] {
@@ -194,7 +203,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
       type: 'PathBlock',
       jointEnds: this.pathBlockEnds.map(pbe => persistBlockJointEnd(pbe.getJointEnd())),
       queue: this.queue.persist(),
-      allowedPathes: this.allowedPathes.map(this.persistAllowedPath)
+      allowedPathes: this.allowedPathes.map(this.persistAllowedPath),
+      coord: {x: this.getCoord().x, y: this.getCoord().y, z: this.getCoord().z}
     };
   }
 

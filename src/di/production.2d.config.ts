@@ -15,7 +15,6 @@ import { SignalRenderer } from '../structs/Renderers/SignalRenderer';
 import { BlockRenderer } from '../structs/Renderers/BlockRenderer';
 import { BlockJointRenderer } from '../structs/Renderers/BlockJointRenderer';
 import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
-import { PathBlockDummyRenderer } from '../../test/dummies/PathBlockDummyRenderer';
 import { SectionRenderer } from '../structs/Renderers/SectionRenderer';
 import { SensorRenderer } from '../structs/Renderers/SensorRenderer';
 import { SensorDummyRenderer } from '../../test/dummies/SensorDummyRenderer';
@@ -31,6 +30,7 @@ import { BlockJointPixiRenderer } from '../ui/babylon/BlockJointPixiRenderer';
 import { BlockPixiRenderer } from '../ui/babylon/BlockPixiRenderer';
 import { SectionPixiRenderer } from '../ui/babylon/SectionPixiRenderer';
 import { SignalPixiRenderer } from '../ui/babylon/SignalPixiRenderer';
+import { PathBlockPixiRenderer } from '../ui/babylon/PathBlockPixiRenderer';
 
 export const productionContainer2d = new Container();
 const ioc = new DependencyContainer(productionContainer2d);
@@ -75,7 +75,7 @@ ioc.fm<BlockJointRenderer>(
 ioc.fm<PathBlockRenderer>(
   T.FactoryOfPathBlockRenderer,
   T.PathBlockRenderer,
-  PathBlockDummyRenderer
+  PathBlockPixiRenderer
 );
 ioc.fm<SectionRenderer>(
   T.FactoryOfSectionRenderer,
