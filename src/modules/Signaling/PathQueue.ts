@@ -48,6 +48,10 @@ export class PathQueue {
     this.rules.push(rule);
   }
 
+  removeRule(index: number): void {
+    this.rules.splice(index, 1);
+  }
+
   persist(): Object {
     return {
       rules: this.rules.map(r => ({
