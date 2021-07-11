@@ -20,7 +20,7 @@ import { PathQueue, persistBlockJointEnd, loadBlockJointEnd } from './PathQueue'
 import { BlockJoint } from './BlockJoint';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 
-export interface ActualPathBlock extends Emitable {}
+export interface ActualPathBlock extends Emitable { }
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
 export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
   private pathBlockEnds: PathBlockEnd[] = [];
@@ -35,24 +35,24 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     this.queue = new PathQueue(this);
 
     this.pathBlockEnds = jointEnds.map(je => new ActualPathBlockEnd(je, this));
-    this.coord = jointEnds.map(je => je.joint.getPosition().getRay().coord).reduce((a, b) => new Coordinate(a.x+b.x, a.y+b.y, a.z+b.z), new Coordinate(0, 0, 0));
+    this.coord = jointEnds.map(je => je.joint.getPosition().getRay().coord).reduce((a, b) => new Coordinate(a.x + b.x, a.y + b.y, a.z + b.z), new Coordinate(0, 0, 0));
     const n = jointEnds.length;
-    this.coord = new Coordinate(this.coord.x/n, this.coord.y/n, this.coord.z/n);
+    this.coord = new Coordinate(this.coord.x / n, this.coord.y / n, this.coord.z / n);
 
-    for(let i=0;i<this.pathBlockEnds.length;i++) {
-        this.key[this.pathBlockEnds[i].getJointEnd().joint.getId()+'-'+this.pathBlockEnds[i].getJointEnd().end] = i;
+    for (let i = 0; i < this.pathBlockEnds.length; i++) {
+      this.key[this.pathBlockEnds[i].getJointEnd().joint.getId() + '-' + this.pathBlockEnds[i].getJointEnd().end] = i;
     }
 
     this.emit('init', this.persist());
     return this;
   }
 
-  getCoord():Coordinate {
+  getCoord(): Coordinate {
     return this.coord;
   }
 
   getPathBlockEnds(): PathBlockEnd[] {
-      return this.pathBlockEnds;
+    return this.pathBlockEnds;
   }
 
   allow(
@@ -71,8 +71,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     if (found) return false;
     const other = endPathBlockEnd.getJointEnd().joint.getEnd(endPathBlockEnd.getJointEnd().end === WhichEnd.A ? WhichEnd.B : WhichEnd.A);
     const otherSeg = endPathBlockEnd.getJointEnd().joint.getSectionEnd(endPathBlockEnd.getJointEnd().end === WhichEnd.A ? WhichEnd.B : WhichEnd.A);
-    if(other?.getSignal() === SignalSignal.Red) return false;
-    if(otherSeg?.getSignal() === SignalSignal.Red) return false;
+    if (other?.getSignal() === SignalSignal.Red) return false;
+    if (otherSeg?.getSignal() === SignalSignal.Red) return false;
 
     const startDt: DirectedTrack = startPathBlockEnd
       .getJointEnd()
@@ -89,12 +89,12 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     queue.push(startDt.reverse());
     info[startDt.getHash()] = null;
     info[startDt.reverse().getHash()] = null;
-    
+
     let backFromHere: DirectedTrack = null;
 
     while (queue.length > 0) {
       const dt = queue.shift();
-    
+
       if (dt === endDt || dt === endDt.reverse()) {
         backFromHere = dt;
         break;
@@ -108,7 +108,9 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
           // then skip
         } else {
           queue.push(next);
-          info[next.getHash()] = dt;
+          if (!info[next.getHash()]) {
+            info[next.getHash()] = dt;
+          }
         }
       }
     }
@@ -125,8 +127,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         startJointEnd: startPathBlockEnd.getJointEnd(),
         endJointEnd: endPathBlockEnd.getJointEnd()
       });
-      
-      const allowedPath:AllowedPath = {
+
+      const allowedPath: AllowedPath = {
         startPathBlockEnd,
         endPathBlockEnd,
         switches,
@@ -137,8 +139,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
       this.allowBlock(allowedPath);
       this.allowedPathes.push(allowedPath);
 
-      if(train && otherSeg) {
-          otherSeg.checkin(train);
+      if (train && otherSeg) {
+        otherSeg.checkin(train);
       }
     }
 
@@ -223,7 +225,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
       jointEnds: this.pathBlockEnds.map(pbe => persistBlockJointEnd(pbe.getJointEnd())),
       queue: this.queue.persist(),
       allowedPathes: this.allowedPathes.map(this.persistAllowedPath),
-      coord: {x: this.getCoord().x, y: this.getCoord().y, z: this.getCoord().z},
+      coord: { x: this.getCoord().x, y: this.getCoord().y, z: this.getCoord().z },
       key: this.key
     };
   }
@@ -246,7 +248,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
       startPathBlockEnd: loadPathBlockEnd(obj.startPathBlockEnd, store),
       endPathBlockEnd: loadPathBlockEnd(obj.endPathBlockEnd, store),
     };
-}
+  }
 
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
@@ -260,7 +262,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
 }
 doApply();
 
-export const loadPathBlockEnd = (obj: any, store: Store):PathBlockEnd => {
-    const joint = store.get(obj.joint) as BlockJoint;
-    return joint.getEnd(obj.end) as PathBlockEnd;
+export const loadPathBlockEnd = (obj: any, store: Store): PathBlockEnd => {
+  const joint = store.get(obj.joint) as BlockJoint;
+  return joint.getEnd(obj.end) as PathBlockEnd;
 };
