@@ -10,6 +10,10 @@ import { GENERATE_ID } from '../../../../structs/Actuals/Store/Command/CommandLo
 import { getPredefinedWagonConfig } from '../../../../structs/Actuals/Wagon/ActualWagonConfigs';
 import { Track } from '../../../../modules/Track/Track';
 import { InputProps } from '../../InputProps';
+import { BaseBrick } from '../../../../structs/Interfaces/BaseBrick';
+import { MeshInfo } from '../../MeshInfo';
+import { TYPES } from '../../../../di/TYPES';
+import { Wagon } from '../../../../structs/Interfaces/Wagon';
 
 export class CreateEngineInputHandler extends InputHandler {
   private plugin: CreateEngineInputHandlerPlugin;
@@ -27,7 +31,13 @@ export class CreateEngineInputHandler extends InputHandler {
     this.reg(click(), (legacyProps: InputProps) => {
       const dpot = legacyProps.snappedPositionOnTrack;
 
-      if (dpot && dpot.track.constructor.name === ActualTrack.name) {
+      const meshInfo = this.getMeshInfo(legacyProps?.mesh?.id);
+      if (meshInfo?.storedBrick?.getType() === TYPES.Wagon) {
+        const wagon = meshInfo?.storedBrick as Wagon;
+        // todo commandise
+        wagon.getTrain().createWagonAtEnd(getPredefinedWagonConfig('mot'));
+
+      } else if (dpot && dpot.track.constructor.name === ActualTrack.name) {
         this.store.getCommandLog().addAction(
           CommandCreator.createTrain(
             GENERATE_ID,
@@ -61,4 +71,24 @@ export class CreateEngineInputHandler extends InputHandler {
   // todo cancel(): void {
   //   this.plugin.cancel();
   // }
+
+  // todo reduce duplications of this
+  private getMeshInfo(meshId: string): MeshInfo {
+    if (!meshId) return null;
+
+    if (meshId.includes('.')) {
+      meshId = meshId.slice(0, meshId.indexOf('.'));
+    }
+
+    if (meshId.startsWith('clickable-')) {
+      const [_, type, id, command] = meshId.split('-');
+      const storedObj = this.store.get(id);
+      const storedBrick = storedObj as BaseBrick;
+      return {
+        typeString: type, id, command, storedBrick, type: storedBrick?.getType()
+      };
+    }
+
+    return null;
+  }
 }

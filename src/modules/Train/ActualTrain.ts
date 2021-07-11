@@ -26,6 +26,7 @@ import { Passenger } from '../../structs/Interfaces/Passenger';
 import { Station } from '../../structs/Scheduling/Station';
 import { Platform } from '../../structs/Interfaces/Platform';
 import { BlockJoint } from '../Signaling/BlockJoint';
+import { WagonConfig } from '../../structs/Actuals/Wagon/WagonConfig';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
@@ -82,6 +83,15 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.wagons.push(...otherTrain.getWagons());
     otherTrain.getWagons().map(wagon => wagon.setTrain(this));
     otherTrain.removeAndKeepWagons();
+    this.alignAxles();
+    this.wagons.map(wagon => wagon.update());
+  }
+
+  createWagonAtEnd(config: WagonConfig): void {
+    const wagon = this.store.create(TYPES.Wagon) as Wagon;
+    wagon.init(config, this);
+    wagon.setTrip(this.trips?.[0]);
+    this.wagons.push(wagon);
     this.alignAxles();
     this.wagons.map(wagon => wagon.update());
   }
