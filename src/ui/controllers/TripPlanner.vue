@@ -78,6 +78,11 @@ export default class TripPlanner extends Vue {
             .map(x => x.persistDeep());
           this.stations = getAllOfStorable<Station>(TYPES.Station)
             .map(x => Object.freeze(x.persistDeep()));
+            this.stations.sort((a, b) => {
+              if(a.name < b.name) return -1;
+              if(a.name > b.name) return 1;
+              return 0;
+            });
           if (this.selectedRoute) {
             this.selectedRoute = (getStorable(
               this.selectedRoute.id
@@ -165,5 +170,9 @@ export default class TripPlanner extends Vue {
 <style>
 .big-screen-one {
     display: flex;
+}
+.column-add-stops {
+  height: 500px; /* todo arbitrary number */
+  overflow-y: scroll;
 }
 </style>
