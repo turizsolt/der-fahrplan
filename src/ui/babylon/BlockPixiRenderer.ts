@@ -25,6 +25,7 @@ export class BlockPixiRenderer extends BasePixiRenderer
   }
 
   update(data: any) {
+    this.line.clear();
     this.line.lineStyle(2, data.isFree ? 0x00ff00 : 0xff0000, 1);
     this.line.moveTo(this.coords[0].x, this.coords[0].z);
     for (let i = 1; i < this.coords.length; i++) {
