@@ -26,6 +26,7 @@ import { MarkerIterator } from '../../../../modules/Train/MarkerIterator';
 import { PathBlock } from '../../../../modules/Signaling/PathBlock';
 import { Sensor } from '../../../../modules/Signaling/Sensor';
 import { convertFrom, convertTo } from '../../../../modules/Train/ActualTrain';
+import { SectionEnd } from '../../../../modules/Signaling/SectionEnd';
 
 // @injectable()
 export class BlockWizardInputHandler extends InputHandler {
@@ -148,6 +149,12 @@ export class BlockWizardInputHandler extends InputHandler {
       end: convertTo(forward.blockJoint, forward.position)
     });
 
+    const section = this.store
+      .create<Section>(TYPES.Section)
+      .init(joints[0], joints[joints.length - 1]);
+    section.connect();
+    createSignals([joints[0], joints[joints.length - 1]], SignalSignal.Green, this.store);
+
     const blocks = [] as Block[];
     for (i = 0; i < joints.length; i += 2) {
       const block = this.store.create<Block>(TYPES.Block).init({
@@ -156,14 +163,8 @@ export class BlockWizardInputHandler extends InputHandler {
       });
       blocks.push(block);
       block.getSegment().connect();
-      createSignals([joints[i], joints[i + 1]], SignalSignal.Green, this.store);
+      createSignals([joints[i], joints[i + 1]], SignalSignal.Green, this.store, joints);
     }
-
-    const section = this.store
-      .create<Section>(TYPES.Section)
-      .init(joints[0], joints[joints.length - 1]);
-    section.connect();
-    createSignals([joints[0], joints[joints.length - 1]], SignalSignal.Green, this.store);
   }
 
   wizardPathBlock(position: PositionOnTrack): void {
@@ -229,8 +230,8 @@ export class BlockWizardInputHandler extends InputHandler {
   }
 }
 
-function createSignals(jointEnds: BlockJointEnd[], startSignal: SignalSignal, store: Store) {
-  jointEnds.map(x => {
+function createSignals(jointEnds: BlockJointEnd[], startSignal: SignalSignal, store: Store, wholeJointEnds?: BlockJointEnd[]) {
+  jointEnds.map((x, ind) => {
     const position = x.joint.getPosition().clone();
     if (x.end === WhichEnd.A) {
       position.reverse();
@@ -242,7 +243,16 @@ function createSignals(jointEnds: BlockJointEnd[], startSignal: SignalSignal, st
       .getMarkers()
       .find(m => m.marker.type === 'Signal' && m.position === pos)?.marker.signal;
 
-    const sectionEnd = x.joint.getSectionEnd(x.end);
+    // set inner signals also red, if the entry signal is red in the section
+    let altSection: SectionEnd = null;
+    if (wholeJointEnds) {
+      const section0 = wholeJointEnds?.[0].joint.getSectionEnd(wholeJointEnds?.[0].end);
+      const n = wholeJointEnds.length - 1;
+      const section1 = wholeJointEnds?.[n].joint.getSectionEnd(wholeJointEnds?.[n].end);
+
+      altSection = (ind % 2 === 0 && section0) || (ind % 2 === 1 && section1);
+    }
+    const sectionEnd = x.joint.getSectionEnd(x.end) || altSection;
     const blockEnd = x.joint.getEnd(x.end);
 
     if (signal) {
