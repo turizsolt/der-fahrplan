@@ -11,6 +11,7 @@ import { CreateStationInputHandler } from './Station/CreateStationInputHandler';
 import { BlockJointInputHandler } from './BlockJoint/BlockJointInputHandler';
 import { BlockWizardInputHandler } from './BlockWizard/BlockWizardInputHandler';
 import { PathInputHandler } from './Path/PathInputHandler';
+import { CapacityCapInputHandler } from './CapacityCap/CapacityCapInputHandler';
 
 export class ToolInputHandler extends InputHandler {
   private inputHandler: InputHandler;
@@ -28,7 +29,8 @@ export class ToolInputHandler extends InputHandler {
       [InputMode.CREATE_STATION]: new CreateStationInputHandler(store),
       [InputMode.CREATE_BLOCK_JOINT]: new BlockJointInputHandler(store),
       [InputMode.BLOCK_WIZARD]: new BlockWizardInputHandler(store),
-      [InputMode.CREATE_PATH]: new PathInputHandler(store)
+      [InputMode.CREATE_PATH]: new PathInputHandler(store),
+      [InputMode.CREATE_CAPACITY_CAP]: new CapacityCapInputHandler(store),
     };
 
     const modeNames: Record<InputMode, string> = {
@@ -44,7 +46,8 @@ export class ToolInputHandler extends InputHandler {
       [InputMode.CREATE_SECTION]: '+Sect',
       [InputMode.CREATE_PATH]: '+Path',
       [InputMode.ALLOW_PATH]: 'Allow',
-      [InputMode.BLOCK_WIZARD]: 'BWiz'
+      [InputMode.BLOCK_WIZARD]: 'BWiz',
+      [InputMode.CREATE_CAPACITY_CAP]: 'CCap'
     };
 
     for (let mode of Object.keys(this.inputHandlers)) {

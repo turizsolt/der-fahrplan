@@ -27,6 +27,7 @@ import { Station } from '../../structs/Scheduling/Station';
 import { Platform } from '../../structs/Interfaces/Platform';
 import { BlockJoint } from '../Signaling/BlockJoint';
 import { WagonConfig } from '../../structs/Actuals/Wagon/WagonConfig';
+import { CapacityCap } from '../Signaling/CapacityCap/CapacityCap';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
@@ -193,13 +194,16 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       while (next && next.value) {
         const bjend: BlockEnd = next.value.blockJoint.getEnd(convertTo(next.value.blockJoint, next.positionOnTrack));
         const send: SectionEnd = next.value.blockJoint.getSectionEnd(convertTo(next.value.blockJoint, next.positionOnTrack));
+        const ccap: CapacityCap = next.value.blockJoint.getCapacityCap(convertTo(next.value.blockJoint, next.positionOnTrack));
         if (bjend) {
-          // console.log('bjend out', bjend.getHash());
           bjend.checkout(this);
         }
         if (send) {
-          // console.log('send out', send.getSection().getId());
           send.checkout(this);
+
+        }
+        if (ccap) {
+          ccap.checkout(this);
 
         }
         next = iter.nextOfFull('BlockJoint');
@@ -213,13 +217,16 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       while (next && next.value) {
         const bjend: BlockEnd = next.value.blockJoint.getEnd(convertFrom(next.value.blockJoint, next.positionOnTrack));
         const send: SectionEnd = next.value.blockJoint.getSectionEnd(convertFrom(next.value.blockJoint, next.positionOnTrack));
+        const ccap: CapacityCap = next.value.blockJoint.getCapacityCap(convertFrom(next.value.blockJoint, next.positionOnTrack));
         if (bjend) {
-          // console.log('bjend in', bjend.getHash());
           bjend.checkin(this);
         }
         if (send) {
-          // console.log('send in', send.getSection().getId());
           send.checkin(this);
+        }
+        if (ccap) {
+          ccap.checkin(this);
+
         }
         next = iter.nextOfFull('BlockJoint');
       }

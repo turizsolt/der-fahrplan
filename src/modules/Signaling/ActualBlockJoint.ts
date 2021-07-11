@@ -9,14 +9,16 @@ import { PositionOnTrack } from '../Train/PositionOnTrack';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { BlockEnd } from './BlockEnd';
 import { SectionEnd } from './SectionEnd';
+import { CapacityCap } from './CapacityCap/CapacityCap';
 
-export interface ActualBlockJoint extends Emitable {}
+export interface ActualBlockJoint extends Emitable { }
 const doApply = () => applyMixins(ActualBlockJoint, [Emitable]);
 export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
   private position: PositionOnTrack = null;
   private opposition: PositionOnTrack = null;
   private ends: Record<WhichEnd, BlockEnd>;
   private sectionEnds: Record<WhichEnd, SectionEnd>;
+  private capacityCaps: Record<WhichEnd, CapacityCap>;
 
   init(position: PositionOnTrack): BlockJoint {
     this.initStore(TYPES.BlockJoint);
@@ -36,6 +38,11 @@ export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
       A: null,
       B: null
     };
+
+    this.capacityCaps = {
+      A: null,
+      B: null
+    }
 
     this.emit('init', this.persist());
     return this;
@@ -70,10 +77,23 @@ export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
   }
 
   removeSectionEnd(sectionEnd: SectionEnd): void {
-    if(this.sectionEnds[WhichEnd.A] === sectionEnd) {
+    if (this.sectionEnds[WhichEnd.A] === sectionEnd) {
       this.sectionEnds[WhichEnd.A] = null;
-    } else if(this.sectionEnds[WhichEnd.B] === sectionEnd) {
+    } else if (this.sectionEnds[WhichEnd.B] === sectionEnd) {
       this.sectionEnds[WhichEnd.B] = null;
+    }
+  }
+
+  setOneCapacityCap(jointEnd: WhichEnd, capacityCap: CapacityCap): void {
+    this.capacityCaps[jointEnd] = capacityCap;
+  }
+
+  // todo third repetition is this
+  removeCapacityCap(capacityCap: CapacityCap): void {
+    if (this.capacityCaps[WhichEnd.A] === capacityCap) {
+      this.capacityCaps[WhichEnd.A] = null;
+    } else if (this.capacityCaps[WhichEnd.B] === capacityCap) {
+      this.capacityCaps[WhichEnd.B] = null;
     }
   }
 
@@ -83,6 +103,10 @@ export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
 
   getSectionEnd(whichEnd: WhichEnd): SectionEnd {
     return this.sectionEnds[whichEnd];
+  }
+
+  getCapacityCap(whichEnd: WhichEnd): CapacityCap {
+    return this.capacityCaps[whichEnd];
   }
 
   getPosition(): PositionOnTrack {

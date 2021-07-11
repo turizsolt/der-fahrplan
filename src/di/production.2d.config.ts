@@ -31,6 +31,8 @@ import { BlockPixiRenderer } from '../ui/babylon/BlockPixiRenderer';
 import { SectionPixiRenderer } from '../ui/babylon/SectionPixiRenderer';
 import { SignalPixiRenderer } from '../ui/babylon/SignalPixiRenderer';
 import { PathBlockPixiRenderer } from '../ui/babylon/PathBlockPixiRenderer';
+import { CapacityCapDummyRenderer } from '../../test/dummies/CapacityCapDummyRenderer';
+import { CapacityCapRenderer } from '../structs/Renderers/CapacityCapRenderer';
 
 export const productionContainer2d = new Container();
 const ioc = new DependencyContainer(productionContainer2d);
@@ -82,3 +84,9 @@ ioc.fm<SectionRenderer>(
   T.SectionRenderer,
   SectionPixiRenderer
 );
+ioc.fm<CapacityCapRenderer>(
+  T.FactoryOfCapacityCapRenderer,
+  T.CapacityCapRenderer,
+  CapacityCapDummyRenderer
+);
+
