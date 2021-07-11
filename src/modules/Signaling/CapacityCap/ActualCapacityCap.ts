@@ -9,6 +9,9 @@ import { Store } from '../../../structs/Interfaces/Store';
 import { ActualBaseBrick } from '../../../structs/Actuals/ActualBaseBrick';
 import { BaseRenderer } from '../../../structs/Renderers/BaseRenderer';
 import { BlockJoint } from '../BlockJoint';
+import { Ray } from '../../../structs/Geometry/Ray';
+import { PositionOnTrack } from '../../Train/PositionOnTrack';
+import { WhichEnd } from '../../../structs/Interfaces/WhichEnd';
 
 export interface ActualCapacityCap extends Emitable { }
 const doApply = () => applyMixins(ActualCapacityCap, [Emitable]);
@@ -17,6 +20,7 @@ export class ActualCapacityCap extends ActualBaseBrick implements CapacityCap {
     private trainCount: number = 0;
     private signal: SignalSignal = SignalSignal.Red;
     private jointEnds: BlockJointEnd[] = [];
+    private jointRays: Ray[] = [];
 
     init(jointEnds: BlockJointEnd[]): CapacityCap {
         this.initStore(TYPES.CapacityCap);
@@ -25,6 +29,15 @@ export class ActualCapacityCap extends ActualBaseBrick implements CapacityCap {
         this.updateSignal();
 
         this.jointEnds.map(j => j.joint.setOneCapacityCap(j.end, this));
+
+        this.jointRays = this.jointEnds.map(je => {
+            const pos: PositionOnTrack = je.joint.getPosition().clone();
+            if (je.end === WhichEnd.A) {
+                pos.reverse();
+            }
+            pos.move(13);
+            return pos.getRay();
+        });
 
         this.emit('init', this.persist());
 
@@ -87,6 +100,7 @@ export class ActualCapacityCap extends ActualBaseBrick implements CapacityCap {
                 joint: j.joint.getId(),
                 end: j.end
             })),
+            rays: this.jointRays.map(r => r.persist())
         }
     }
 

@@ -20,7 +20,7 @@ export class BlockJointPixiRenderer extends BasePixiRenderer
     this.rectangle.x = data.ray.x;
     this.rectangle.y = data.ray.z;
     this.rectangle.rotation = -data.ray.dirXZ;
-    this.rectangle.zIndex = 1;
+    this.rectangle.zIndex = 10;
 
     this.rectangle.on('pointerdown', (event: PIXI.InteractionEvent) => {
       const x =
@@ -67,7 +67,7 @@ export class BlockJointPixiRenderer extends BasePixiRenderer
     this.rectangle2.x = data.ray.x;
     this.rectangle2.y = data.ray.z;
     this.rectangle2.rotation = -data.ray.dirXZ;
-    this.rectangle2.zIndex = 1;
+    this.rectangle2.zIndex = 10;
 
     this.rectangle2.on('pointerdown', (event: PIXI.InteractionEvent) => {
       const x =
@@ -107,7 +107,7 @@ export class BlockJointPixiRenderer extends BasePixiRenderer
     globalThis.stage.addChild(this.rectangle2);
   }
 
-  update() {}
+  update() { }
 
   remove() {
     this.rectangle.renderable = false;

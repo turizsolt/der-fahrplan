@@ -15,7 +15,7 @@ import { BlockJoint } from './BlockJoint';
 import { Ray } from '../../structs/Geometry/Ray';
 import { PositionOnTrack } from '../Train/PositionOnTrack';
 
-export interface ActualSection extends Emitable {}
+export interface ActualSection extends Emitable { }
 const doApply = () => applyMixins(ActualSection, [Emitable]);
 export class ActualSection extends ActualBaseBrick implements Section {
   private direction: TrackDirection = undefined;
@@ -43,7 +43,7 @@ export class ActualSection extends ActualBaseBrick implements Section {
     if (this.ends.A.getJointEnd().end === WhichEnd.A) {
       posA.reverse();
     }
-    posA.move(5);
+    posA.move(8);
     this.signageA = posA.getRay();
 
     const posB: PositionOnTrack = this.ends.B.getJointEnd()
@@ -52,7 +52,7 @@ export class ActualSection extends ActualBaseBrick implements Section {
     if (this.ends.B.getJointEnd().end === WhichEnd.A) {
       posB.reverse();
     }
-    posB.move(5);
+    posB.move(8);
     this.signageB = posB.getRay();
 
     this.emit('init', this.persist());
