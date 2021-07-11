@@ -200,7 +200,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
       from: this.from.getId(),
       to: this.to.getId(),
 
-      place: this.place.getId()
+      place: this.place?.getId()
     };
   }
 
