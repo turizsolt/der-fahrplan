@@ -142,6 +142,7 @@ export class Nearest {
     let iter = pot.getDirectedTrack();
     let ttl = 100;
     let foundPlatform: Platform = null;
+    let foundPosition: PositionOnTrack = null;  // todo added extra
 
     for (let marker of iter.getMarkers()) {
       if (
@@ -150,6 +151,7 @@ export class Nearest {
       ) {
         distance = marker.position - pot.getPosition();
         foundPlatform = marker.marker.platform;
+        foundPosition = new PositionOnTrack(iter, marker.position); // todo added extra
         break;
       }
     }
@@ -160,6 +162,7 @@ export class Nearest {
         if (marker.marker.type === 'Platform') {
           distance += marker.position;
           foundPlatform = marker.marker.platform;
+          foundPosition = new PositionOnTrack(iter, marker.position); // todo added extra
           break;
         }
       }
@@ -175,7 +178,8 @@ export class Nearest {
     return {
       distance: foundPlatform ? distance : Number.POSITIVE_INFINITY,
       segmentCount,
-      platform: foundPlatform
+      platform: foundPlatform,
+      position: foundPosition // todo added extra  
     };
   }
 

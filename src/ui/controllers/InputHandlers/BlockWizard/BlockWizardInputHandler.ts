@@ -156,7 +156,7 @@ export class BlockWizardInputHandler extends InputHandler {
       });
       blocks.push(block);
       block.getSegment().connect();
-      createSignals([joints[i], joints[i+1]], SignalSignal.Green, this.store);
+      createSignals([joints[i], joints[i + 1]], SignalSignal.Green, this.store);
     }
 
     const section = this.store
@@ -167,32 +167,32 @@ export class BlockWizardInputHandler extends InputHandler {
   }
 
   wizardPathBlock(position: PositionOnTrack): void {
-    const track:TrackBase = position.getTrack();
+    const track: TrackBase = position.getTrack();
     const queue: TrackBase[] = [track];
-    const visited: Record<string, DirectedTrack> = {[track.getId()]: position.getDirectedTrack()};
+    const visited: Record<string, DirectedTrack> = { [track.getId()]: position.getDirectedTrack() };
     const blockJointEnds: BlockJointEnd[] = [];
 
-    while(queue.length > 0) {
-      const next:TrackBase = queue.shift();
+    while (queue.length > 0) {
+      const next: TrackBase = queue.shift();
 
-      if(next.getType() === TYPES.TrackSwitch) {
+      if (next.getType() === TYPES.TrackSwitch) {
         const ts = next as TrackSwitch;
-        const dts:DirectedTrack[] = ts.getAdjacentDirectedTracks();
-        for(const dt of dts) {
+        const dts: DirectedTrack[] = ts.getAdjacentDirectedTracks();
+        for (const dt of dts) {
           const track = dt.getTrack();
 
-          if(!visited[track.getId()]) {
+          if (!visited[track.getId()]) {
             visited[track.getId()] = dt;
             queue.push(track);
           }
         }
-      } else if(next.getType() === TYPES.Track) {
+      } else if (next.getType() === TYPES.Track) {
         const dt = visited[next.getId()];
         const iter = new MarkerIterator(dt, undefined, undefined, undefined, (dt) => dt?.getTrack().getType() === TYPES.Track);
         const ret = iter.nextOfFull('BlockJoint');
 
-        if(ret.value) {
-          blockJointEnds.push({joint: ret.value.blockJoint, end: convertTo(ret.value.blockJoint, ret.positionOnTrack)});
+        if (ret.value) {
+          blockJointEnds.push({ joint: ret.value.blockJoint, end: convertTo(ret.value.blockJoint, ret.positionOnTrack) });
         }
       }
     }
@@ -204,7 +204,7 @@ export class BlockWizardInputHandler extends InputHandler {
 
     // connect all
     pb.getPathBlockEnds().map(pbe => pbe.pathConnect());
-            
+
     // create sensors
     pb.getPathBlockEnds().map(pbe => {
       const bj = pbe.getJointEnd().joint;
@@ -215,7 +215,13 @@ export class BlockWizardInputHandler extends InputHandler {
       pot.move(30);
       pot.reverse();
 
-      this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
+      const nearestData = Nearest.platform(pot.clone());
+      console.log(nearestData);
+      if (nearestData?.distance < 30) {
+        this.store.create<Sensor>(TYPES.Sensor).init(nearestData.position, pb, pbe);
+      } else {
+        this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
+      }
     });
 
     // create signals
@@ -224,32 +230,32 @@ export class BlockWizardInputHandler extends InputHandler {
 }
 
 function createSignals(jointEnds: BlockJointEnd[], startSignal: SignalSignal, store: Store) {
-    jointEnds.map(x => {
-      const position = x.joint.getPosition().clone();
-      if (x.end === WhichEnd.A) {
-        position.reverse();
+  jointEnds.map(x => {
+    const position = x.joint.getPosition().clone();
+    if (x.end === WhichEnd.A) {
+      position.reverse();
+    }
+
+    const dt = position.getDirectedTrack();
+    const pos = position.getPosition();
+    const signal: Signal = dt
+      .getMarkers()
+      .find(m => m.marker.type === 'Signal' && m.position === pos)?.marker.signal;
+
+    const sectionEnd = x.joint.getSectionEnd(x.end);
+    const blockEnd = x.joint.getEnd(x.end);
+
+    if (signal) {
+      if (sectionEnd) {
+        signal.addSectionEmitter(sectionEnd);
       }
-
-      const dt = position.getDirectedTrack();
-      const pos = position.getPosition();
-      const signal:Signal = dt
-        .getMarkers()
-        .find(m => m.marker.type === 'Signal' && m.position === pos)?.marker.signal;
-
-      const sectionEnd = x.joint.getSectionEnd(x.end);
-      const blockEnd = x.joint.getEnd(x.end);
-
-      if (signal) {
-        if(sectionEnd) {
-          signal.addSectionEmitter(sectionEnd);
-        }
-        if(blockEnd) {
-          signal.addBlockEmitter(blockEnd);
-        }
-      } else {
-        store
-          .create<Signal>(TYPES.Signal)
-          .init(position, blockEnd, sectionEnd, startSignal);
+      if (blockEnd) {
+        signal.addBlockEmitter(blockEnd);
       }
-    });
-  }
+    } else {
+      store
+        .create<Signal>(TYPES.Signal)
+        .init(position, blockEnd, sectionEnd, startSignal);
+    }
+  });
+}
