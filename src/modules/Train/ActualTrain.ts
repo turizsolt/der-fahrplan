@@ -31,7 +31,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
   private wagons: Wagon[] = [];
   private speed: TrainSpeed = null;
-  private autoMode: boolean = true;
+  private autoMode: boolean = false;
   private trips: Trip[] = [];
 
   init(pot: PositionOnTrack, wagons: Wagon[]): Train {
