@@ -430,9 +430,19 @@ export class ActualTrain extends ActualBaseStorable implements Train {
       this.trips.map(t => t.setStationServed(this.justPlatformStopped.getStation()));
     }
     this.wagons[0].stop();
+
+    // reverse at the end of the trip, and also get the next trip
     const lastStop = this.trips.length > 0 ? Util.last(this.trips[0].getStops()) : null;
     if (lastStop && lastStop.station === this.justPlatformStopped.getStation()) {
       this.arrivedToLastStation();
+    }
+
+    // reverse if needed to
+    const thisStop = this.trips.length > 0 ? this.trips[0].getRoute().getStops().find(x => x.getStation() === this.justPlatformStopped.getStation()) : null;
+    if (thisStop) {
+      if (thisStop.isReverseStop()) {
+        this.shouldTurn = true;
+      }
     }
   }
 

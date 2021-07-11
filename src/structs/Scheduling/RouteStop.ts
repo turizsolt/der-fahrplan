@@ -17,4 +17,6 @@ export interface RouteStop extends BaseStorable {
 
   setArrivalTime(time: number): void;
   setDepartureTime(time: number): void;
+  toggleReverseStop(): void;
+  isReverseStop(): boolean;
 }

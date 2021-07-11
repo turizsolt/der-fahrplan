@@ -26,7 +26,7 @@
                     Stops:<br />
                     <route-stop v-for="(stop, index) in selectedRoute.stops" :key="stop.id" :route="selectedRoute"
                         :stop="stop" :index="index" candelete :canmove="index !== 0" @delete="deleteStop(stop)"
-                        @move="swapStop(stop)">
+                        @move="swapStop(stop)" @reverse="reverseStop(stop)">
                     </route-stop>
                 </div>
                 <div class="route-details route-create-holder">
@@ -129,6 +129,12 @@ export default class TripPlanner extends Vue {
           const stop = getStorable(vStop.id) as RouteStop;
           const route = getStorable(this.selectedRoute.id) as Route;
           route.removeStop(stop);
+          this.load();
+        };
+
+        reverseStop(vStop) {
+          const stop = getStorable(vStop.id) as RouteStop;
+          stop.toggleReverseStop();
           this.load();
         };
 
