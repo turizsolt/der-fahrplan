@@ -10,6 +10,7 @@ import { BasePixiRenderer } from './BasePixiRenderer';
 export class WagonPixiRenderer extends BasePixiRenderer
   implements WagonRenderer {
   private rect: PIXI.Graphics;
+  private front: PIXI.Graphics;
 
   private inited: boolean = false;
 
@@ -22,6 +23,14 @@ export class WagonPixiRenderer extends BasePixiRenderer
     this.rect.rotation = 0;
     this.rect.endFill();
     this.rect.zIndex = 15;
+
+    this.front = new PIXI.Graphics();
+    this.front.interactive = true;
+    this.front.buttonMode = true;
+    this.front.beginFill(0x000000);
+    this.front.drawCircle(0, 0, 2);
+    this.front.endFill();
+    this.front.zIndex = 16;
 
     this.rect.on('pointerdown', (event: PIXI.InteractionEvent) => {
       const x =
@@ -58,6 +67,7 @@ export class WagonPixiRenderer extends BasePixiRenderer
     });
 
     globalThis.stage.addChild(this.rect);
+    globalThis.stage.addChild(this.front);
 
     this.inited = true;
     this.update(wagon);
@@ -74,6 +84,10 @@ export class WagonPixiRenderer extends BasePixiRenderer
       -ray.dirXZ +
       Math.PI / 2 +
       (wagon.appearanceFacing === TrackDirection.BA ? Math.PI : 0);
+
+    const rayFront = Ray.fromData(wagon.rayA);
+    this.front.x = rayFront.coord.x;
+    this.front.y = rayFront.coord.z;
 
     // todo - port the rest
 
