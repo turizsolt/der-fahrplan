@@ -71,8 +71,10 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     if (found) return false;
     const other = endPathBlockEnd.getJointEnd().joint.getEnd(endPathBlockEnd.getJointEnd().end === WhichEnd.A ? WhichEnd.B : WhichEnd.A);
     const otherSeg = endPathBlockEnd.getJointEnd().joint.getSectionEnd(endPathBlockEnd.getJointEnd().end === WhichEnd.A ? WhichEnd.B : WhichEnd.A);
+    const otherCap = endPathBlockEnd.getJointEnd().joint.getCapacityCap(endPathBlockEnd.getJointEnd().end === WhichEnd.A ? WhichEnd.B : WhichEnd.A);
     if (other?.getSignal() === SignalSignal.Red) return false;
     if (otherSeg?.getSignal() === SignalSignal.Red) return false;
+    if (otherCap?.getSignal() === SignalSignal.Red) return false;
 
     const startDt: DirectedTrack = startPathBlockEnd
       .getJointEnd()
