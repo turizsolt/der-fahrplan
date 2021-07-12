@@ -10,12 +10,14 @@ import { TYPES } from '../../di/TYPES';
 import { BlockEnd } from './BlockEnd';
 import { BlockJoint } from './BlockJoint';
 import { SectionEnd } from './SectionEnd';
+import { CapacityCap } from './CapacityCap/CapacityCap';
 
-export interface ActualSignal extends Emitable {}
+export interface ActualSignal extends Emitable { }
 const doApply = () => applyMixins(ActualSignal, [Emitable]);
 export class ActualSignal extends ActualBaseBrick implements Signal {
   private blockSignal: SignalSignal = SignalSignal.Green;
   private sectionSignal: SignalSignal = SignalSignal.Green;
+  private capacitySignal: SignalSignal = SignalSignal.Green;
   private signal: SignalSignal = SignalSignal.Red;
   private hidden: boolean = false;
   private position: PositionOnTrack = null;
@@ -23,8 +25,11 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
   private blockSubscribe: (data: any) => void;
   private sectionEnd: SectionEnd = null;
   private sectionSubscribe: (data: any) => void;
+  private capacityCap: CapacityCap = null;
+  private capacitySubscribe: (data: any) => void;
 
-  init(position: PositionOnTrack, blockEnd?: BlockEnd, sectionEnd?: SectionEnd, startSignal?: SignalSignal): Signal {
+  init(position: PositionOnTrack, blockEnd?: BlockEnd, sectionEnd?: SectionEnd, startSignal?: SignalSignal,
+    capacityCap?: CapacityCap): Signal {
     this.signal = startSignal || SignalSignal.Red;
     this.initStore(TYPES.Signal);
     this.position = position;
@@ -33,11 +38,14 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
       signal: this
     });
 
-    if(sectionEnd) {
+    if (sectionEnd) {
       this.addSectionEmitter(sectionEnd);
     }
-    if(blockEnd) {
+    if (blockEnd) {
       this.addBlockEmitter(blockEnd);
+    }
+    if (capacityCap) {
+      this.addCapacityEmitter(capacityCap);
     }
 
     this.emit('init', this.persist());
@@ -49,7 +57,7 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
       this.setSectionSignal(data.signal);
     };
     this.sectionSubscribe.bind(this);
-  
+
     this.sectionEnd = sectionEnd;
     this.sectionEnd?.on('update', this.sectionSubscribe);
   }
@@ -57,18 +65,29 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
   addBlockEmitter(blockEnd: BlockEnd): void {
     this.blockSubscribe = (data: any) => {
       this.setBlockSignal(data.signal);
-      if(data.hidden) {
+      if (data.hidden) {
         this.setHidden();
       }
     };
     this.blockSubscribe.bind(this);
-  
+
     this.blockEnd = blockEnd;
     this.blockEnd?.on('update', this.blockSubscribe);
     const blockEndHidden = this.blockEnd?.persist().hidden;
-    if(blockEndHidden) { 
+    if (blockEndHidden) {
       this.hidden = true;
     }
+  }
+
+
+  addCapacityEmitter(capacityCap: CapacityCap): void {
+    this.capacitySubscribe = (data: any) => {
+      this.setCapacitySignal(data.signal);
+    };
+    this.capacitySubscribe.bind(this);
+
+    this.capacityCap = capacityCap;
+    this.capacityCap?.on('update', this.capacitySubscribe);
   }
 
   setHidden(): void {
@@ -90,9 +109,15 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
     this.setSignal();
   }
 
+  setCapacitySignal(signal: SignalSignal): void {
+    this.capacitySignal = signal;
+    this.setSignal();
+  }
+
   private setSignal() {
-    this.signal = (this.blockSignal === SignalSignal.Green 
-      && this.sectionSignal === SignalSignal.Green)
+    this.signal = (this.blockSignal === SignalSignal.Green
+      && this.sectionSignal === SignalSignal.Green
+      && this.capacitySignal === SignalSignal.Green)
       ? SignalSignal.Green
       : SignalSignal.Red;
     this.emit('update', this.persist());
@@ -111,30 +136,36 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
       ray: this.position.getRay().persist(),
       positionOnTrack: this.position.persist(),
       blockEnd: this.blockEnd?.persist(),
-      sectionEnd: this.sectionEnd?.persist()
+      sectionEnd: this.sectionEnd?.persist(),
+      capacityCap: this.capacityCap?.getId()
     };
   }
 
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
-    let blockEnd:BlockEnd = undefined;
-    if(obj.blockEnd) {
-        const joint = store.get(obj.blockEnd.joint) as BlockJoint;
-        blockEnd = joint.getEnd(obj.blockEnd.end);
+    let blockEnd: BlockEnd = undefined;
+    if (obj.blockEnd) {
+      const joint = store.get(obj.blockEnd.joint) as BlockJoint;
+      blockEnd = joint.getEnd(obj.blockEnd.end);
     }
-    let sectionEnd:SectionEnd = undefined;
-    if(obj.sectionEnd) {
-        const joint = store.get(obj.sectionEnd.joint) as BlockJoint;
-        sectionEnd = joint.getSectionEnd(obj.sectionEnd.end);
+    let sectionEnd: SectionEnd = undefined;
+    if (obj.sectionEnd) {
+      const joint = store.get(obj.sectionEnd.joint) as BlockJoint;
+      sectionEnd = joint.getSectionEnd(obj.sectionEnd.end);
     }
-    this.init(PositionOnTrack.fromData(obj.positionOnTrack, store), blockEnd, sectionEnd, obj.signal);
-    if(obj.hidden) { this.setHidden(); }
+    let capacityCap: CapacityCap = undefined;
+    if (obj.capacityCap) {
+      capacityCap = store.get(obj.capacityCap) as CapacityCap;
+    }
+    this.init(PositionOnTrack.fromData(obj.positionOnTrack, store), blockEnd, sectionEnd, obj.signal, capacityCap);
+    if (obj.hidden) { this.setHidden(); }
   }
 
   remove() {
     super.remove();
     this.blockEnd?.off('update', this.blockSubscribe);
     this.sectionEnd?.off('update', this.sectionSubscribe);
+    this.capacityCap?.off('update', this.capacitySubscribe);
   }
 }
 doApply();

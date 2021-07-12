@@ -7,9 +7,10 @@ import { Track } from '../Track';
 
 export class TrackJointConnector {
   static connect(one: TrackJoint, other: TrackJoint) {
-    const midpoint = one.getRay().computeMidpoint(other.getRay());
+    const midpoint = one.getRay().computeMidpointIfAwayEnough(other.getRay());
 
     if (midpoint === false) {
+      console.log('no midpoint false');
       return false;
     }
 
@@ -22,6 +23,8 @@ export class TrackJointConnector {
       .getRay()
       .whichEnd(midpoint || one.getPosition());
     const otherEnd = other.getEnd(otherEndLetter);
+
+    console.log('data', oneEndLetter, oneEnd, otherEndLetter, otherEnd, coordinates);
 
     if (TrackJointConnector.areBothEndsEmpty(oneEnd, otherEnd)) {
       return [
@@ -42,7 +45,12 @@ export class TrackJointConnector {
     ) {
       const oldTrack: Track = ((oneEnd && oneEnd.getTrack()) ||
         (otherEnd && otherEnd.getTrack())) as Track;
-      if (oldTrack.constructor.name === ActualTrackSwitch.name) return false;
+      console.log('oldTrack', oldTrack, (oneEnd && oneEnd.getTrack()),
+        (otherEnd && otherEnd.getTrack()));
+      if (oldTrack.constructor.name === ActualTrackSwitch.name) {
+        console.log('switch false');
+        return false;
+      }
 
       const oldCoordinates = oldTrack.getCurve().getCoordinates();
       const j1 = oldTrack.getAx().getJointEnd().joint;
@@ -73,6 +81,7 @@ export class TrackJointConnector {
       ];
     }
 
+    console.log('unknown false');
     return false;
   }
 

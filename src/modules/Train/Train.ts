@@ -6,6 +6,7 @@ import { NearestData } from './NearestData';
 import { Trip } from '../../structs/Scheduling/Trip';
 import { Station } from '../../structs/Scheduling/Station';
 import { Platform } from '../../structs/Interfaces/Platform';
+import { WagonConfig } from '../../structs/Actuals/Wagon/WagonConfig';
 
 export interface Train extends BaseStorable {
   init(pot: PositionOnTrack, wagons: Wagon[]): Train;
@@ -35,4 +36,6 @@ export interface Train extends BaseStorable {
   stoppedAt(station: Station, platform: Platform): void;
   getFreeWagon(): Wagon;
   moveBoardedPassengers(): void;
+
+  createWagonAtEnd(config: WagonConfig): void;
 }

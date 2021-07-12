@@ -108,6 +108,15 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     return this.segmentRight.getCurve();
   }
 
+  getAdjacentDirectedTracks(): DirectedTrack[] {
+    return [
+      ...this.segmentLeft.getDirected(TrackDirection.AB).permaNexts(),
+      ...this.segmentLeft.getDirected(TrackDirection.BA).permaNexts(),
+      ...this.segmentRight.getDirected(TrackDirection.AB).permaNexts(),
+      ...this.segmentRight.getDirected(TrackDirection.BA).permaNexts()
+    ];
+  }
+
   remove(): boolean {
     const removable = super.remove();
     if (removable) {

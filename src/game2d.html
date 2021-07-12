@@ -4,6 +4,9 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        globalThis.startParam = '2d';
+    </script>
     <title>Der Fahrplan</title>
     <style>
         html,
@@ -163,6 +166,7 @@
             display: flex;
             justify-content: space-between;
             flex-direction: column;
+            z-index: 1;
         }
 
         .to-menu {
@@ -380,7 +384,7 @@
             v-bind:class="{ selected: selected === button.id }">{{button.text}}</button>
     </div>
     <div id="info-box">
-        <component v-if="selected" :is="type" :idt="selected.id" :obj="selected" :opts="opts"></component>
+        <component v-if="selected" :is="type" :idt="selected.id" :obj="selected"></component>
         <div v-if="!selected"></div>
         <div class="to-menu">
             Time: <span>{{tickCount}}</span> ({{tickSpeed}}x) (fps:{{fps}})<br />
@@ -393,6 +397,7 @@
         <trip-planner></trip-planner>
         <trip-planner></trip-planner>
     </div>
+
     <!--<div v-cloak id="test-panel" v-if="show">
         <div>
             Test panel ({{mode}})
@@ -415,8 +420,12 @@
             </div>
         </div>
     </div>-->
+    <!-- temp off
     <canvas id="renderCanvas">
     </canvas>
+    -->
+    <div id="renderCanvas"></div>
+    
     <div id="canvasBorder" class="stopped">
         <div id="canvasBorderLeft"></div>
         <div id="canvasBorderRight"></div>

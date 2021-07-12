@@ -29,6 +29,8 @@ import { SectionRenderer } from '../structs/Renderers/SectionRenderer';
 import { SectionDummyRenderer } from '../../test/dummies/SectionDummyRenderer';
 import { SensorRenderer } from '../structs/Renderers/SensorRenderer';
 import { SensorDummyRenderer } from '../../test/dummies/SensorDummyRenderer';
+import { CapacityCapRenderer } from '../structs/Renderers/CapacityCapRenderer';
+import { CapacityCapDummyRenderer } from '../../test/dummies/CapacityCapDummyRenderer';
 
 export const testContainer = new Container();
 const ioc = new DependencyContainer(testContainer);
@@ -78,4 +80,9 @@ ioc.fm<SectionRenderer>(
   T.FactoryOfSectionRenderer,
   T.SectionRenderer,
   SectionDummyRenderer
+);
+ioc.fm<CapacityCapRenderer>(
+  T.FactoryOfCapacityCapRenderer,
+  T.CapacityCapRenderer,
+  CapacityCapDummyRenderer
 );

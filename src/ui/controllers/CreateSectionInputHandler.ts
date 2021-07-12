@@ -1,6 +1,5 @@
 import { InputHandler } from './InputHandler';
 import { InputProps } from './InputProps';
-import { productionContainer } from '../../di/production.config';
 import { TYPES } from '../../di/TYPES';
 import { Store } from '../../structs/Interfaces/Store';
 import { BlockJoint } from '../../modules/Signaling/BlockJoint';
@@ -11,12 +10,9 @@ import { SignalSignal } from '../../modules/Signaling/SignalSignal';
 import { Section } from '../../modules/Signaling/Section';
 
 export class CreateSectionInputHandler implements InputHandler {
-  private store: Store;
   private jointEnds: BlockJointEnd[] = [];
 
-  constructor() {
-    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
-  }
+  constructor(private store: Store) {}
 
   down(props: InputProps, event: PointerEvent): void {}
 

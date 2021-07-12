@@ -26,7 +26,7 @@
                     Stops:<br />
                     <route-stop v-for="(stop, index) in selectedRoute.stops" :key="stop.id" :route="selectedRoute"
                         :stop="stop" :index="index" candelete :canmove="index !== 0" @delete="deleteStop(stop)"
-                        @move="swapStop(stop)">
+                        @move="swapStop(stop)" @reverse="reverseStop(stop)">
                     </route-stop>
                 </div>
                 <div class="route-details route-create-holder">
@@ -78,6 +78,11 @@ export default class TripPlanner extends Vue {
             .map(x => x.persistDeep());
           this.stations = getAllOfStorable<Station>(TYPES.Station)
             .map(x => Object.freeze(x.persistDeep()));
+            this.stations.sort((a, b) => {
+              if(a.name < b.name) return -1;
+              if(a.name > b.name) return 1;
+              return 0;
+            });
           if (this.selectedRoute) {
             this.selectedRoute = (getStorable(
               this.selectedRoute.id
@@ -127,6 +132,12 @@ export default class TripPlanner extends Vue {
           this.load();
         };
 
+        reverseStop(vStop) {
+          const stop = getStorable(vStop.id) as RouteStop;
+          stop.toggleReverseStop();
+          this.load();
+        };
+
         swapStop(vStop) {
           const stop = getStorable(vStop.id) as RouteStop;
           const route = getStorable(this.selectedRoute.id) as Route;
@@ -165,5 +176,9 @@ export default class TripPlanner extends Vue {
 <style>
 .big-screen-one {
     display: flex;
+}
+.column-add-stops {
+  height: 500px; /* todo arbitrary number */
+  overflow-y: scroll;
 }
 </style>

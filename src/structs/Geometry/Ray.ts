@@ -1,10 +1,14 @@
 import { Coordinate } from './Coordinate';
-import { almost, almostDirection } from './Almost';
+import { almost, almostOrLess, almostDirection } from './Almost';
 import { WhichEnd } from '../Interfaces/WhichEnd';
 import { RayData } from './RayData';
 
+const MINIMUM = (Math.sqrt(3) / 2) * 10;
+
 export class Ray {
-  constructor(public coord: Coordinate, public dirXZ: number) {}
+  constructor(public coord: Coordinate, public dirXZ: number) {
+    this.onlyIfAwayEnough = this.onlyIfAwayEnough.bind(this);
+  }
 
   static from(x: number, y: number, z: number, dirXZ: number): Ray {
     return new Ray(new Coordinate(x, y, z), dirXZ);
@@ -37,6 +41,17 @@ export class Ray {
   }
 
   computeMidpoint(otherRay: Ray): undefined | false | Coordinate {
+    return this.computeMidpointHelper(otherRay, this.id);
+  }
+
+  computeMidpointIfAwayEnough(otherRay: Ray): undefined | false | Coordinate {
+    return this.computeMidpointHelper(otherRay, this.onlyIfAwayEnough);
+  }
+
+  private computeMidpointHelper(
+    otherRay: Ray,
+    fx: (c: Coordinate, r: Ray) => undefined | false | Coordinate
+  ): undefined | false | Coordinate {
     const e1 = this.equ();
     const e2 = otherRay.equ();
 
@@ -46,13 +61,15 @@ export class Ray {
     if (e1.a === Infinity) {
       const x = e2.a * e1.z + e2.b;
       const z = e1.z;
-      return new Coordinate(x, 0, z);
+
+      return fx(new Coordinate(x, 0, z), otherRay);
     }
 
     if (e2.a === Infinity) {
       const x = e1.a * e2.z + e1.b;
       const z = e2.z;
-      return new Coordinate(x, 0, z);
+
+      return fx(new Coordinate(x, 0, z), otherRay);
     }
 
     if (almost(e1.a, e2.a)) {
@@ -61,7 +78,23 @@ export class Ray {
 
     const z = (e2.b - e1.b) / (e1.a - e2.a);
     const x = e1.a * z + e1.b;
-    return new Coordinate(x, 0, z);
+
+    return fx(new Coordinate(x, 0, z), otherRay);
+  }
+
+  private id(coord: Coordinate, ray: Ray): Coordinate {
+    return coord;
+  }
+
+  private onlyIfAwayEnough(
+    coord: Coordinate,
+    otherRay: Ray
+  ): Coordinate | false | undefined {
+    const d1 = this.getPosition().distance2d(coord);
+    const d2 = otherRay.getPosition().distance2d(coord);
+    return almostOrLess(d1, MINIMUM) || almostOrLess(d2, MINIMUM)
+      ? false
+      : coord;
   }
 
   getPosition(): Coordinate {

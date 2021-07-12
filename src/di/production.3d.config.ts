@@ -32,9 +32,11 @@ import { SectionRenderer } from '../structs/Renderers/SectionRenderer';
 import { SectionBabylonRenderer } from '../ui/babylon/SectionBabylonRenderer';
 import { SensorRenderer } from '../structs/Renderers/SensorRenderer';
 import { SensorBabylonRenderer } from '../ui/babylon/SensorBabylonRenderer';
+import { CapacityCapDummyRenderer } from '../../test/dummies/CapacityCapDummyRenderer';
+import { CapacityCapRenderer } from '../structs/Renderers/CapacityCapRenderer';
 
-export const productionContainer = new Container();
-const ioc = new DependencyContainer(productionContainer);
+export const productionContainer3d = new Container();
+const ioc = new DependencyContainer(productionContainer3d);
 addCommonMaps(ioc);
 ioc.map<Land>(T.Land, ActualLand);
 ioc.sng<MeshProvider>(T.FactoryOfMeshProvider, T.MeshProvider, MeshProvider);
@@ -83,4 +85,9 @@ ioc.fm<SectionRenderer>(
   T.FactoryOfSectionRenderer,
   T.SectionRenderer,
   SectionBabylonRenderer
+);
+ioc.fm<CapacityCapRenderer>(
+  T.FactoryOfCapacityCapRenderer,
+  T.CapacityCapRenderer,
+  CapacityCapDummyRenderer
 );

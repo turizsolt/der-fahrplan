@@ -84,8 +84,15 @@ export const TYPES = {
   BlockEnd: Symbol.for('BlockEnd'),
   SectionEnd: Symbol.for('SectionEnd'),
 
+  CapacityCap: Symbol.for('CapacityCap'),
+  CapacityCapRenderer: Symbol.for('CapacityCapRenderer'),
+  FactoryOfCapacityCap: Symbol.for('Factory<CapacityCap>'),
+  FactoryOfCapacityCapRenderer: Symbol.for('Factory<CapacityCapRenderer>'),
+
   Sensor: Symbol.for('Sensor'),
   SensorRenderer: Symbol.for('SensorRenderer'),
   FactoryOfSensor: Symbol.for('Factory<Sensor>'),
-  FactoryOfSensorRenderer: Symbol.for('Factory<SensorRenderer>')
+  FactoryOfSensorRenderer: Symbol.for('Factory<SensorRenderer>'),
+
+  TrackInputHandler: Symbol.for('TrackInputHandler')
 };

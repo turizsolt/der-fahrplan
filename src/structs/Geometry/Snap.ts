@@ -15,6 +15,26 @@ function snap(p) {
   return p;
 }
 
+export function snapHexaXZ(p: Ray): Ray {
+  const a = snapHexaHeight(p.coord.z) / HEIGHT;
+  const par = a % 2 === 0 ? 0 : WIDTH / 2;
+  return new Ray(
+    new Coordinate(snapHexaWidth(p.coord.x, par), 0, snapHexaHeight(p.coord.z)),
+    p.dirXZ
+  );
+}
+
+const HEIGHT = (10 * Math.sqrt(3)) / 2;
+const WIDTH = 10;
+
+function snapHexaHeight(p) {
+  return Math.round(p / HEIGHT) * HEIGHT;
+}
+
+function snapHexaWidth(p, par) {
+  return Math.round((p - par) / WIDTH) * WIDTH + par;
+}
+
 export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
   let distance = Infinity;
   let track = null;
@@ -83,7 +103,7 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
 }
 
 export function snapJoint(p: Ray, jointList: TrackJoint[]) {
-  const snapped = snapXZ(p);
+  const snapped = snapHexaXZ(p);
 
   for (let joint of jointList) {
     if (joint.getPosition().equalsTo(snapped.coord)) return joint;

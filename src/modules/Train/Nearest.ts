@@ -4,6 +4,7 @@ import { NearestData } from './NearestData';
 import { Signal } from '../Signaling/Signal';
 import { BlockJoint } from '../Signaling/BlockJoint';
 import { Platform } from '../../structs/Interfaces/Platform';
+import { ActualTrack } from '../Track/ActualTrack';
 
 export class Nearest {
   static end(pot: PositionOnTrack): NearestData {
@@ -21,6 +22,30 @@ export class Nearest {
 
     return {
       distance: ttl ? distance : Number.POSITIVE_INFINITY,
+      segmentCount
+    };
+  }
+
+  static singleEnd(pot: PositionOnTrack): NearestData {
+    let segmentCount = 1;
+    let distance = pot.getTrack().getLength() - pot.getPosition();
+    let iter = pot.getDirectedTrack();
+    let ttl = 999;
+
+    while (
+      iter.next() &&
+      iter.next().getTrack().constructor.name === ActualTrack.name &&
+      ttl
+    ) {
+      iter = iter.next();
+      distance += iter.getLength();
+      segmentCount++;
+      ttl--;
+    }
+
+    return {
+      distance: ttl ? distance : Number.POSITIVE_INFINITY,
+      position: ttl ? new PositionOnTrack(iter, iter.getLength()) : null,
       segmentCount
     };
   }
@@ -117,6 +142,7 @@ export class Nearest {
     let iter = pot.getDirectedTrack();
     let ttl = 100;
     let foundPlatform: Platform = null;
+    let foundPosition: PositionOnTrack = null;  // todo added extra
 
     for (let marker of iter.getMarkers()) {
       if (
@@ -125,6 +151,7 @@ export class Nearest {
       ) {
         distance = marker.position - pot.getPosition();
         foundPlatform = marker.marker.platform;
+        foundPosition = new PositionOnTrack(iter, marker.position); // todo added extra
         break;
       }
     }
@@ -135,6 +162,7 @@ export class Nearest {
         if (marker.marker.type === 'Platform') {
           distance += marker.position;
           foundPlatform = marker.marker.platform;
+          foundPosition = new PositionOnTrack(iter, marker.position); // todo added extra
           break;
         }
       }
@@ -150,7 +178,8 @@ export class Nearest {
     return {
       distance: foundPlatform ? distance : Number.POSITIVE_INFINITY,
       segmentCount,
-      platform: foundPlatform
+      platform: foundPlatform,
+      position: foundPosition // todo added extra  
     };
   }
 

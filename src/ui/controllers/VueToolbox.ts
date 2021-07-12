@@ -1,10 +1,11 @@
 import Vue from 'vue';
-import { InputController, InputMode } from './InputController';
+import { GlobalController } from './GlobalController';
+import { InputMode } from './InputHandlers/InputMode';
 
 export class VueToolbox {
   private vm: any;
 
-  constructor(private inputController: InputController) {
+  constructor(private globalController: GlobalController) {
     const _this = this;
     this.vm = new Vue({
       el: '#button-holder',
@@ -15,10 +16,10 @@ export class VueToolbox {
         show: false
       },
       methods: {
-        handleClick: function (event) {
-          _this.inputController.selectMode(event.target.id);
+        handleClick: function(event) {
+          _this.globalController.selectMode(event.target.id);
         },
-        handleWagonClick: function (event) {
+        handleWagonClick: function(event) {
           this.wagon = event.target.value;
         }
       }

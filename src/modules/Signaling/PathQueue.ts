@@ -15,7 +15,16 @@ export class PathQueue {
   constructor(private pathBlock: PathBlock) {}
 
   push(pathBlockEnd: PathBlockEnd, train: Train) {
-    const found = this.rules.find(r => r.from === pathBlockEnd);
+    const found = this.rules.find(
+      r =>
+        r.from === pathBlockEnd &&
+        (!r.filter ||
+          r.filter ===
+            train
+              ?.getTrips()[0]
+              ?.getRoute()
+              ?.getName())
+    );
     if (found) {
       this.queue.push({
         from: pathBlockEnd,
@@ -48,9 +57,18 @@ export class PathQueue {
     this.rules.push(rule);
   }
 
+  removeRule(index: number): void {
+    this.rules.splice(index, 1);
+  }
+
+  setFilterToRule(index: number, filter: string): void {
+    this.rules[index].filter = filter;
+  }
+
   persist(): Object {
     return {
       rules: this.rules.map(r => ({
+        filter: r.filter,
         from: persistPathBlockEnd(r.from),
         toOptions: r.toOptions.map(o => persistPathBlockEnd(o))
       })),
@@ -64,6 +82,7 @@ export class PathQueue {
 
   load(obj: any, store: Store): void {
     this.rules = obj.rules.map(r => ({
+      filter: r.filter,
       from: loadPathBlockEnd(r.from, store),
       toOptions: r.toOptions.map(o => loadPathBlockEnd(o, store))
     }));
@@ -78,7 +97,11 @@ export class PathQueue {
 export const persistBlockJointEnd = (bje: BlockJointEnd): any => {
   return {
     joint: bje.joint.getId(),
-    end: bje.end
+    end: bje.end,
+    ray: bje.joint
+      .getPosition()
+      .getRay()
+      .persist()
   };
 };
 

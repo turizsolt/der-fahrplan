@@ -32,6 +32,8 @@ import { PathBlockRenderer } from '../../Renderers/PathBlockRenderer';
 import { SectionRenderer } from '../../Renderers/SectionRenderer';
 import { Sensor } from '../../../modules/Signaling/Sensor';
 import { SensorRenderer } from '../../Renderers/SensorRenderer';
+import { CapacityCap } from '../../../modules/Signaling/CapacityCap/CapacityCap';
+import { CapacityCapRenderer } from '../../Renderers/CapacityCapRenderer';
 
 @injectable()
 export class ActualStore implements Store {
@@ -53,6 +55,7 @@ export class ActualStore implements Store {
   private BlockJointFactory: () => BlockJoint;
   @inject(TYPES.FactoryOfPathBlock) private PathBlockFactory: () => PathBlock;
   @inject(TYPES.FactoryOfSection) private SectionFactory: () => Section;
+  @inject(TYPES.FactoryOfCapacityCap) private CapacityCapFactory: () => CapacityCap;
 
   @inject(TYPES.FactoryOfTrain) private TrainFactory: () => Train;
   @inject(TYPES.FactoryOfTrack) private TrackFactory: () => Track;
@@ -79,6 +82,7 @@ export class ActualStore implements Store {
   private PathBlockRendererFactory: () => PathBlockRenderer;
   @inject(TYPES.FactoryOfSectionRenderer)
   private SectionRendererFactory: () => SectionRenderer;
+  @inject(TYPES.FactoryOfCapacityCapRenderer) private CapacityCapRendererFactory: () => CapacityCapRenderer;
 
   @inject(TYPES.FactoryOfPassengerGenerator)
   private PassengerGeneratorFactory: () => PassengerGenerator;
@@ -108,7 +112,8 @@ export class ActualStore implements Store {
       [TYPES.Block]: this.BlockFactory,
       [TYPES.BlockJoint]: this.BlockJointFactory,
       [TYPES.PathBlock]: this.PathBlockFactory,
-      [TYPES.Section]: this.SectionFactory
+      [TYPES.Section]: this.SectionFactory,
+      [TYPES.CapacityCap]: this.CapacityCapFactory
     };
     // higher number (12) loads first
     this.typeOrder = {
@@ -129,7 +134,8 @@ export class ActualStore implements Store {
       [TYPES.PathBlock]: -12,
       [TYPES.Sensor]: -14,
       [TYPES.Section]: -15,
-      [TYPES.Signal]: -16
+      [TYPES.CapacityCap]: -16,
+      [TYPES.Signal]: -17
     };
 
     this.renderers = {
@@ -140,7 +146,8 @@ export class ActualStore implements Store {
       [TYPES.Block]: [this.BlockRendererFactory],
       [TYPES.BlockJoint]: [this.BlockJointRendererFactory],
       [TYPES.PathBlock]: [this.PathBlockRendererFactory],
-      [TYPES.Section]: [this.SectionRendererFactory]
+      [TYPES.Section]: [this.SectionRendererFactory],
+      [TYPES.CapacityCap]: [this.CapacityCapRendererFactory]
     };
 
     shortid.characters(

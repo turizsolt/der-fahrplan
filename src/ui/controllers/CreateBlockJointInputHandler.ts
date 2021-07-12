@@ -3,25 +3,17 @@ import { InputHandler } from './InputHandler';
 import { InputProps } from './InputProps';
 import { CoordinateToBabylonVector3 } from '../babylon/converters/CoordinateToBabylonVector3';
 import { ActualTrack } from '../../modules/Track/ActualTrack';
-import { productionContainer } from '../../di/production.config';
 import { TYPES } from '../../di/TYPES';
 import { Store } from '../../structs/Interfaces/Store';
 import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
 import { TrackDirection } from '../../modules/Track/TrackDirection';
 import { BlockJoint } from '../../modules/Signaling/BlockJoint';
-import { Nearest } from '../../modules/Train/Nearest';
-import { Block } from '../../modules/Signaling/Block';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
-import { Signal } from '../../modules/Signaling/Signal';
 
 export class CreateBlockJointInputHandler implements InputHandler {
   private fromMesh: BABYLON.Mesh;
 
-  private store: Store;
-
-  constructor() {
-    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
-
+  constructor(private store: Store) {
     const mat = new BABYLON.StandardMaterial('boxMat', null);
     mat.diffuseColor = new BABYLON.Color3(0, 1, 1);
 

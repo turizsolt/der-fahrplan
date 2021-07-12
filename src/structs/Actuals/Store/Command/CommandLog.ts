@@ -7,7 +7,7 @@ import {
   ProcessableCommand,
   StatementCommand
 } from './Command';
-import { InputController } from '../../../../ui/controllers/InputController';
+import { GlobalController } from '../../../../ui/controllers/GlobalController';
 import { CommandProcessor } from './CommandProcessor';
 import { CommandResultWithValue } from './CommandResultWithValue';
 import { CommandMode } from './CommandMode';
@@ -20,7 +20,7 @@ export class CommandLog {
   private actions: Command[] = [];
   private replayTick: number = 0;
   private replayIndex: number = 0;
-  private inputController: InputController;
+  private globalController: GlobalController;
   private nextAction: number = 0;
   private mode: CommandMode;
   private processor: CommandProcessor;
@@ -37,8 +37,8 @@ export class CommandLog {
     this.mode = mode;
   }
 
-  setInputController(ic: InputController) {
-    this.inputController = ic;
+  setInputController(gc: GlobalController) {
+    this.globalController = gc;
   }
 
   setActions(actions: Command[]): void {

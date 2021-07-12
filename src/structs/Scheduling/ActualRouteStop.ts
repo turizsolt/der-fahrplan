@@ -11,6 +11,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
   private platform: Platform;
   private arrivalTime: number;
   private departureTime: number;
+  private reverseStop: boolean;
 
   init(
     station: Station,
@@ -23,6 +24,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     this.platform = platform;
     this.arrivalTime = arrivalTime;
     this.departureTime = departureTime;
+    this.reverseStop = false;
     return this;
   }
 
@@ -54,6 +56,14 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     this.departureTime = time;
   }
 
+  toggleReverseStop(): void {
+    this.reverseStop = !this.reverseStop;
+  }
+
+  isReverseStop(): boolean {
+    return this.reverseStop;
+  }
+
   persist(): Object {
     return {
       id: this.id,
@@ -62,6 +72,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       platform: this.platform && this.platform.getId(),
       arrivalTime: this.arrivalTime,
       departureTime: this.departureTime,
+      isReverseStop: this.reverseStop
     };
   }
 
@@ -76,7 +87,8 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       arrivalTime: this.arrivalTime,
       arrivalTimeString: Util.timeToStr(this.arrivalTime, true),
       departureTime: this.departureTime,
-      departureTimeString: Util.timeToStr(this.departureTime, true)
+      departureTimeString: Util.timeToStr(this.departureTime, true),
+      isReverseStop: this.reverseStop
     };
   }
 
@@ -90,5 +102,6 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     );
     this.setArrivalTime(obj.arrivalTime);
     this.setDepartureTime(obj.departureTime);
+    this.reverseStop = !!obj.isReverseStop;
   }
 }

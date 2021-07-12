@@ -46,17 +46,17 @@
     </div>
 
     <div>
-      <div v-if="showTripList && opts && opts.length > 0">
+      <div class="trip-selector" v-if="showTripList && trips && trips.length > 0">
         <div>Útirány kiválasztása...</div>
         <trip-title
           :key="trip.id"
-          v-for="trip in opts"
+          v-for="trip in trips"
           :route="trip.route"
           :trip="trip"
           @click="assignTrip(trip.id)"
         />
       </div>
-      <div v-if="!opts || opts.length === 0">
+      <div v-if="!trips || trips.length === 0">
         <select class="route-select" size="1" disabled>
           <option>Nincs kiválsztható útirány</option>
         </select>
@@ -105,16 +105,17 @@
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { Wagon } from "../../structs/Interfaces/Wagon";
-import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
+import { getStorable, getAllOfStorable } from "../../structs/Actuals/Store/StoreForVue";
 import { Train } from "../../modules/Train/Train";
 import { Trip } from "../../structs/Scheduling/Trip";
+import { TYPES } from "../../di/TYPES";
 
 @Component
 export default class VueWagon extends Vue {
   @Prop() idt: string;
   @Prop() obj: any;
-  @Prop() opts: any[];
-
+  
+  trips: any[] = [];
   selectedWagons: Record<string, boolean> = {};
   selectedCount: number = 0;
   showTripList: boolean = false;
@@ -187,6 +188,10 @@ export default class VueWagon extends Vue {
   }
 
   showTrips() {
+    this.trips = getAllOfStorable<Trip>(TYPES.Trip)
+      .map(x => Object.freeze(x.persistDeep()))
+      .sort((a: any, b: any) => a.departureTime - b.departureTime);
+
     this.showTripList = true;
   }
 }
@@ -315,4 +320,11 @@ export default class VueWagon extends Vue {
     linear-gradient(45deg, var(--bg) 25%, transparent 25%);
   background-size: 10px 10px;
 }
+
+.trip-selector {
+  overflow-y: scroll;
+  height: 800px;
+  overflow-x: hidden;
+}
+
 </style>

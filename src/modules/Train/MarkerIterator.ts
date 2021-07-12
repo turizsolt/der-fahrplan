@@ -11,10 +11,15 @@ export class MarkerIterator {
     private startDirectedTrack: DirectedTrack, 
     private startPosition?: number, 
     private endDirectedTrack?: DirectedTrack, 
-    private endPosition?: number
+    private endPosition?: number,
+    private dtCondition?: (dt:DirectedTrack) => boolean
   ) {
     this.currentDirectedTrack = startDirectedTrack;
     this.currentIndex = -1;
+
+    if(!dtCondition) {
+        this.dtCondition = (dt:DirectedTrack) => true;
+    }
   }
 
   static fromPositionOnTrack(startPoT: PositionOnTrack, endPoT?: PositionOnTrack): MarkerIterator {
@@ -26,17 +31,17 @@ export class MarkerIterator {
     );
   }
 
-  next(): TrackMarker {
+  next(): PositionedTrackMarker {
     let value:PositionedTrackMarker = null;
     do {
       value = this.innerNext();
     }
     while(value && !this.conditions(value));
 
-    return value && value.marker;
+    return value;
   }
 
-  conditions(value: PositionedTrackMarker): boolean {
+  private conditions(value: PositionedTrackMarker): boolean {
       if(this.startPosition &&
         this.currentDirectedTrack === this.startDirectedTrack
          && value.position < this.startPosition) {
@@ -62,31 +67,37 @@ export class MarkerIterator {
         return undefined;
       }
       this.currentDirectedTrack = this.currentDirectedTrack.next();
+      // finish, if dt is not ok
+      if(!this.dtCondition(this.currentDirectedTrack)) {
+        return undefined;
+      }
       markers = this.currentDirectedTrack?.getMarkers();
     }
     return markers && markers[this.currentIndex];
   }
 
-  nextOf(type: string): TrackMarker {
-      let value:TrackMarker = null;
+  nextOf(type: string): PositionedTrackMarker {
+      let value:PositionedTrackMarker = null;
       do {
         value = this.next();
       }
-      while(value && value.type !== type);
+      while(value && value.marker && value.marker.type !== type);
 
       return value;
   }
 
-  nextOfFull(type: string): {value: TrackMarker, directedTrack: DirectedTrack} {
-    let value:TrackMarker = null;
+  nextOfFull(type: string): {value: TrackMarker, directedTrack: DirectedTrack, position: number, positionOnTrack: PositionOnTrack} {
+    let value:PositionedTrackMarker = null;
     do {
       value = this.next();
     }
-    while(value && value.type !== type);
+    while(value && value.marker && value.marker.type !== type);
 
     return {
-        value,
-        directedTrack: this.currentDirectedTrack
+        value: value?.marker,
+        position: value?.position,
+        directedTrack: this.currentDirectedTrack,
+        positionOnTrack: value && new PositionOnTrack(this.currentDirectedTrack, value.position)
     };
   }
 }

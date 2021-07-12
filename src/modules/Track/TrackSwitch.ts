@@ -1,6 +1,7 @@
 import { TrackBase } from './TrackBase';
 import { TrackCurve } from './TrackCurve';
 import { TrackSegmentData } from './TrackSegmentData';
+import { DirectedTrack } from './DirectedTrack';
 
 export interface TrackSwitch extends TrackBase {
   init(
@@ -15,4 +16,5 @@ export interface TrackSwitch extends TrackBase {
 
   getSegmentLeft(): TrackCurve;
   getSegmentRight(): TrackCurve;
+  getAdjacentDirectedTracks(): DirectedTrack[];
 }

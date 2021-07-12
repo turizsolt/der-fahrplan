@@ -1,22 +1,15 @@
 import { InputHandler } from './InputHandler';
 import { InputProps } from './InputProps';
-import { productionContainer } from '../../di/production.config';
-import { TYPES } from '../../di/TYPES';
 import { Store } from '../../structs/Interfaces/Store';
 import { BlockJoint } from '../../modules/Signaling/BlockJoint';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
 import { BlockJointEnd } from '../../modules/Signaling/BlockJointEnd';
-import { Signal } from '../../modules/Signaling/Signal';
-import { SignalSignal } from '../../modules/Signaling/SignalSignal';
 import { PathBlockEnd } from '../../modules/Signaling/PathBlockEnd';
 
 export class CreatePathInputHandler implements InputHandler {
-  private store: Store;
   private jointEnds: BlockJointEnd[] = [];
 
-  constructor() {
-    this.store = productionContainer.get<() => Store>(TYPES.FactoryOfStore)();
-  }
+  constructor(private store: Store) {}
 
   down(props: InputProps, event: PointerEvent): void {}
 
@@ -38,7 +31,6 @@ export class CreatePathInputHandler implements InputHandler {
 
         this.jointEnds.push({ joint, end });
         if (event.button === 2) {
-          console.log('added');
           const pathBlocksEnds = this.jointEnds.map(
             je => je.joint.getEnd(je.end) as PathBlockEnd
           );
@@ -49,7 +41,8 @@ export class CreatePathInputHandler implements InputHandler {
           const pathBlock = pathBlockEnd.getPathBlock();
           pathBlock.addRule({
             from: pathBlocksEnds[0],
-            toOptions: pathBlocksEnds.slice(1)
+            toOptions: pathBlocksEnds.slice(1),
+            filter: ''
           });
           this.jointEnds = [];
         }
