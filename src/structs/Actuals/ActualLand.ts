@@ -40,19 +40,33 @@ export class ActualLand implements Land {
       test: TEST_LEVEL
     };
 
-    if (levels[levelId]) {
-      setTimeout(() => {
-        store.loadAll(levels[levelId].data);
-        if (levels[levelId].camera) {
-          globalController.loadSpecific(levels[levelId]);
-        }
-        if (levels[levelId].target_passenger) {
-          globalController.setTargetPassenger(levels[levelId].target_passenger);
-        }
-        if (levels[levelId].actions) {
-          store.getCommandLog().setActions(levels[levelId].actions);
-        }
-      }, 1000);
+    const loadLevel = () => {
+      if (levels[levelId]) {
+        setTimeout(() => {
+          store.loadAll(levels[levelId].data);
+          if (levels[levelId].camera) {
+            globalController.loadSpecific(levels[levelId]);
+          }
+          if (levels[levelId].target_passenger) {
+            globalController.setTargetPassenger(levels[levelId].target_passenger);
+          }
+          if (levels[levelId].actions) {
+            store.getCommandLog().setActions(levels[levelId].actions);
+          }
+        }, 1000);
+      }
+    };
+
+    if (levelId === 'complex') {
+
+      fetch('complex.json')
+        .then(response => response.text())
+        .then(text => levels['complex'] = JSON.parse(text))
+        .then(() => {
+          loadLevel();
+        });
+    } else {
+      loadLevel();
     }
   }
 }
