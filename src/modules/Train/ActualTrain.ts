@@ -331,6 +331,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private justPlatformStopped: Platform = null;
   private remainingStopTime: number = 0;
   private shouldTurn: boolean = false;
+  private forgetTime: number = -1;
 
   tick(): void {
     const nextPosition = this.position.clone();
@@ -470,6 +471,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     if (this.shouldTurn) {
       this.reverse();
     }
+    this.forgetTime = 300;
   }
 
   persist(): Object {

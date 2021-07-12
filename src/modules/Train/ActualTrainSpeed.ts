@@ -3,14 +3,14 @@ import { TrainSpeed } from './TrainSpeed';
 
 export class ActualTrainSpeed implements TrainSpeed {
   private speed: number = 0;
-  private accelerateBy: number = 0.015625;
+  private accelerateBy: number = 0.015625 * 2;
   private topSpeed: number = 1; // 3
   private shuntingSpeed: number = 1;
   private allowedSpeed: number = 1; // 3
   private shunting: boolean = false;
   private pedal: SpeedPedal = SpeedPedal.Neutral;
 
-  constructor(private canAccelerate: () => boolean) {}
+  constructor(private canAccelerate: () => boolean) { }
 
   setShunting(shunting: boolean): void {
     if (this.speed !== 0) return;
