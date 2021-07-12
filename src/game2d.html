@@ -385,7 +385,15 @@
     </div>
     <div id="info-box">
         <component v-if="selected" :is="type" :idt="selected.id" :obj="selected"></component>
-        <div v-if="!selected"></div>
+        <div v-if="!selected">
+            <big><b>Basic information:</b></big> <br />
+            <hr />
+            <b>Run:</b> press 1 to 5, 1 is slow, 5 is fast simulation <br />
+            <b>Pause:</b> press 0 or space <br />
+            <b>Zoom:</b> with mouse wheel <br />
+            <b>Move:</b> drag while middle mouse button is pressed <br />
+            <b>Move:</b> use WASD keys (a big buggy) <br />
+        </div>
         <div class="to-menu">
             Time: <span>{{tickCount}}</span> ({{tickSpeed}}x) (fps:{{fps}})<br />
             Stats: <span>{{passengerArrivedCount}}</span>/{{passengerCount}} avg: {{passengerAverageArriveSpeed}}
@@ -425,7 +433,7 @@
     </canvas>
     -->
     <div id="renderCanvas"></div>
-    
+
     <div id="canvasBorder" class="stopped">
         <div id="canvasBorderLeft"></div>
         <div id="canvasBorderRight"></div>
