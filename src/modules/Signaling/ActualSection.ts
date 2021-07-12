@@ -135,6 +135,7 @@ export class ActualSection extends ActualBaseBrick implements Section {
       type: 'Section',
       direction: this.direction,
       trainCount: this.trainCount,
+      trains: this.trains.map(t => t.getId()),
       permanentDirection: this.permanentDirection,
       isFreeA: this.isFree(TrackDirection.AB),
       isFreeB: this.isFree(TrackDirection.BA),
@@ -165,6 +166,9 @@ export class ActualSection extends ActualBaseBrick implements Section {
     );
     this.direction = obj.direction;
     this.trainCount = obj.trainCount;
+    if (obj.trains) {
+      this.trains = obj.trains.map(id => store.get(id) as Train);
+    }
     this.permanentDirection = obj.permanentDirection;
     this.connect();
     this.emit('update', this.persist());
