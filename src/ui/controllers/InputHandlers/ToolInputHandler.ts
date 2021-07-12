@@ -54,7 +54,7 @@ export class ToolInputHandler extends InputHandler {
       this.vueToolbox.addButton({ id: mode, text: modeNames[mode] });
     }
 
-    this.selectMode(InputMode.CREATE_TRACK);
+    this.selectMode(InputMode.CAMERA);
   }
 
   selectMode(mode: InputMode) {
