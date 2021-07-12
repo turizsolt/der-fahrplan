@@ -412,6 +412,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         this.getWagons()[0].getId(),
       ));
     } else {
+      /*
       this.store
         .getCommandLog()
         .addAction(
@@ -421,6 +422,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
             nextPosition.persist()
           )
         );
+        */
+      // todo performance change
+      this.setPosition(nextPosition);
     }
 
     this.moveBoardedPassengers();
