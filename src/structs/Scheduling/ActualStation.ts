@@ -39,6 +39,9 @@ export class ActualStation extends ActualBaseBrick implements Station {
   }
 
   addTripToSchedule(trip: Trip): void {
+    // todo performance change
+    return;
+
     if (trip) {
       const departureTime = trip.getStationDepartureTime(this);
       this.scheduledTrips.push({
@@ -99,7 +102,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
             t =>
               t.trip.isStillInFuture(element.station) &&
               element.arrivalTime <
-                t.trip.getStationDepartureTime(element.station)
+              t.trip.getStationDepartureTime(element.station)
           )
           .map(tripIS => {
             const trip = tripIS.trip;
