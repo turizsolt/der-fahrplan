@@ -46,7 +46,7 @@
     </div>
 
     <div>
-      <div v-if="showTripList && trips && trips.length > 0">
+      <div class="trip-selector" v-if="showTripList && trips && trips.length > 0">
         <div>Útirány kiválasztása...</div>
         <trip-title
           :key="trip.id"
@@ -320,4 +320,11 @@ export default class VueWagon extends Vue {
     linear-gradient(45deg, var(--bg) 25%, transparent 25%);
   background-size: 10px 10px;
 }
+
+.trip-selector {
+  overflow-y: scroll;
+  height: 800px;
+  overflow-x: hidden;
+}
+
 </style>
