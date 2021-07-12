@@ -16,7 +16,7 @@ import { BlockEnd } from './BlockEnd';
 import { BlockJoint } from './BlockJoint';
 import { PositionOnTrack } from '../Train/PositionOnTrack';
 
-export interface ActualBlock extends Emitable {}
+export interface ActualBlock extends Emitable { }
 const doApply = () => applyMixins(ActualBlock, [Emitable]);
 export class ActualBlock extends ActualBaseBrick implements Block {
   private segment: BlockSegment = null;
@@ -133,6 +133,7 @@ export class ActualBlock extends ActualBaseBrick implements Block {
       type: 'Block',
       segmentData: this.segment.persist(),
       isFree: this.isFree(),
+      checkedTrains: this.checkedTrains.map(t => t.getId()),
 
       // for visuals
       rayA: this.segment
@@ -178,7 +179,11 @@ export class ActualBlock extends ActualBaseBrick implements Block {
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(toBlockSegmentData(obj.segmentData, store));
+    if (obj.checkedTrains) {
+      this.checkedTrains = obj.checkedTrains.map(id => store.get(id) as Train);
+    }
     this.getSegment().connect();
+    this.emit('update', this.persist());
   }
 }
 doApply();
