@@ -166,6 +166,7 @@ if (globalThis.startParam === '2d') {
     );
 
     const keyboardInputs = new KeyboardInputs(inputController);
+    globalThis.times = [];
     app.ticker.add(delta => {
       keyboardInputs.fireKeyHolds();
       inputController.tick();
