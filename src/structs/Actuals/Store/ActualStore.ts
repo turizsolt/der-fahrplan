@@ -292,16 +292,16 @@ export class ActualStore implements Store {
     }
 
     for (let i = 0; i < this.tickSpeed; i++) {
-      const time = new Date();
+      // const time = new Date();
       const trains = this.getAllOf(TYPES.Train);
       trains.map((train: Train) => {
         train.tick();
       });
-      const time2 = new Date();
+      // const time2 = new Date();
       this.getAllOf(TYPES.PathBlock).map((pb: PathBlock) => {
         pb.tick();
       });
-      const time3 = new Date();
+      // const time3 = new Date();
 
       if ((this.getTickCount() + i) % 120 === 0) {
         if (!this.passengerGenerator) {
@@ -310,7 +310,7 @@ export class ActualStore implements Store {
         this.passengerGenerator.tick();
       }
       const time4 = new Date();
-      globalThis.times.push([time.getTime(), time2.getTime(), time3.getTime(), time4.getTime(), trains.length]);
+      // globalThis.times.push([time.getTime(), time2.getTime(), time3.getTime(), time4.getTime(), trains.length]);
     }
   }
 
