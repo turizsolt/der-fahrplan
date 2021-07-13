@@ -20,6 +20,8 @@ export class StationBabylonRenderer extends BaseBabylonRenderer
   private myMat: BABYLON.StandardMaterial;
 
   init(station: Station): void {
+    return;
+
     this.station = station;
     this.meshProvider = this.meshProviderFactory();
 
@@ -43,6 +45,8 @@ export class StationBabylonRenderer extends BaseBabylonRenderer
   private lastSelected: boolean = false;
 
   update() {
+    return;
+
     if (this.station.isRemoved()) {
       this.meshes.map(mesh => mesh.setEnabled(false));
     } else {

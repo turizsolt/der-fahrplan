@@ -15,6 +15,8 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
   readonly scene: BABYLON.Scene;
 
   init(passenger: Passenger): void {
+    return;
+
     this.passenger = passenger;
 
     this.mesh = BABYLON.MeshBuilder.CreateSphere(
@@ -30,6 +32,8 @@ export class PassengerBabylonRenderer extends BaseBabylonRenderer
   }
 
   update() {
+    return;
+
     if (!this.passenger.getPlace()) {
       this.mesh.setEnabled(false);
     } else {

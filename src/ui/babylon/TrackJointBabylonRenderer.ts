@@ -19,6 +19,8 @@ export class TrackJointBabylonRenderer extends BaseBabylonRenderer
   private meshProvider: MeshProvider;
 
   init(data: any) {
+    return;
+
     this.meshProvider = this.meshProviderFactory();
 
     this.mesh = this.meshProvider.createSleeperJointMesh(
@@ -29,6 +31,8 @@ export class TrackJointBabylonRenderer extends BaseBabylonRenderer
   }
 
   update(data: any): void {
+    return;
+
     this.mesh.material = this.selected
       ? this.meshProvider.getMaterial(MaterialName.SelectorRed)
       : this.meshProvider.getMaterial(MaterialName.RailBlack);

@@ -26,6 +26,8 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
   private right: number = 1;
 
   init(trackSwitch: TrackSwitch): void {
+    return;
+
     this.trackSwitch = trackSwitch;
     this.meshProvider = this.meshProviderFactory();
 
@@ -152,6 +154,8 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
   private lastSelected: boolean = false;
 
   update() {
+    return;
+
     if (!this.trackSwitch.isEmpty()) {
       this.selectableMeshes.map(
         x => (x.material = this.meshProvider.getMaterial(MaterialName.BedGray))
@@ -160,23 +164,23 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
       if (this.selected && !this.lastSelected) {
         this.selectableMeshes.map(
           x =>
-            (x.material = this.meshProvider.getMaterial(
-              MaterialName.SelectorRed
-            ))
+          (x.material = this.meshProvider.getMaterial(
+            MaterialName.SelectorRed
+          ))
         );
       } else if (!this.selected && this.lastSelected) {
         this.selectableMeshes.map(
           x =>
-            (x.material = this.meshProvider.getMaterial(
-              MaterialName.SleeperBrown
-            ))
+          (x.material = this.meshProvider.getMaterial(
+            MaterialName.SleeperBrown
+          ))
         );
       } else {
         this.selectableMeshes.map(
           x =>
-            (x.material = this.meshProvider.getMaterial(
-              MaterialName.SleeperBrown
-            ))
+          (x.material = this.meshProvider.getMaterial(
+            MaterialName.SleeperBrown
+          ))
         );
       }
     }

@@ -18,6 +18,8 @@ export class SectionBabylonRenderer extends BaseBabylonRenderer
   private meshB: BABYLON.AbstractMesh;
 
   init(data: any): void {
+    return;
+
     this.meshProvider = this.meshProviderFactory();
 
     this.meshA = this.meshProvider.createSectionMesh(
@@ -40,20 +42,22 @@ export class SectionBabylonRenderer extends BaseBabylonRenderer
   }
 
   update(data: any): void {
+    return;
+
     const bothFree = data.isFreeA && data.isFreeB;
     this.meshA.material = this.meshProvider.getMaterial(
       bothFree
         ? MaterialName.SelectorRed
         : data.isFreeA
-        ? MaterialName.AllowingGreen
-        : MaterialName.ShuntingRed
+          ? MaterialName.AllowingGreen
+          : MaterialName.ShuntingRed
     );
     this.meshB.material = this.meshProvider.getMaterial(
       bothFree
         ? MaterialName.SelectorRed
         : data.isFreeB
-        ? MaterialName.AllowingGreen
-        : MaterialName.ShuntingRed
+          ? MaterialName.AllowingGreen
+          : MaterialName.ShuntingRed
     );
   }
 }

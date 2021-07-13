@@ -19,6 +19,8 @@ export class BlockJointBabylonRenderer extends BaseBabylonRenderer
   private meshB: BABYLON.AbstractMesh;
 
   init(data: any): void {
+    return;
+
     this.meshProvider = this.meshProviderFactory();
     this.mesh = this.meshProvider.createBlockJointMesh(
       'clickable-blockjoint-' + data.id
@@ -49,5 +51,5 @@ export class BlockJointBabylonRenderer extends BaseBabylonRenderer
     this.meshes = [this.mesh, this.meshA, this.meshB];
   }
 
-  update(data: any): void {}
+  update(data: any): void { }
 }

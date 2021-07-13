@@ -16,6 +16,8 @@ export class SensorBabylonRenderer extends BaseBabylonRenderer
   private dotMesh: BABYLON.AbstractMesh;
 
   init(data: any): void {
+    return;
+
     this.meshProvider = this.meshProviderFactory();
     const ray = Ray.fromData(data.ray);
     this.dotMesh = this.meshProvider.createSensorMesh(
@@ -26,5 +28,5 @@ export class SensorBabylonRenderer extends BaseBabylonRenderer
     this.meshes = [this.dotMesh];
   }
 
-  update(data: any): void {}
+  update(data: any): void { }
 }

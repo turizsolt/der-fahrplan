@@ -22,6 +22,8 @@ export class BlockBabylonRenderer extends BaseBabylonRenderer
   private inited = false;
 
   init(data: any): void {
+    return;
+
     this.meshProvider = this.meshProviderFactory();
     this.meshA = this.meshProvider.createBlockMesh(
       'clickable-block-' + data.id
@@ -60,6 +62,8 @@ export class BlockBabylonRenderer extends BaseBabylonRenderer
   }
 
   update(data: any): void {
+    return;
+
     if (!this.inited) return;
 
     const matName = data.isFree
