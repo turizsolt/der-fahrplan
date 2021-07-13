@@ -18,6 +18,8 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
   private selectableMeshes: BABYLON.AbstractMesh[];
 
   init(track: Track): void {
+    return;
+
     this.track = track;
     this.meshProvider = this.meshProviderFactory();
     const chain = this.track.getCurve().getLineSegmentChain();
@@ -56,6 +58,8 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
   private lastSelected: boolean = false;
 
   update() {
+    return;
+
     if (!this.track.isEmpty()) {
       this.selectableMeshes.map(
         x => (x.material = this.meshProvider.getMaterial(MaterialName.BedGray))
@@ -64,23 +68,23 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
       if (this.selected && !this.lastSelected) {
         this.selectableMeshes.map(
           x =>
-            (x.material = this.meshProvider.getMaterial(
-              MaterialName.SelectorRed
-            ))
+          (x.material = this.meshProvider.getMaterial(
+            MaterialName.SelectorRed
+          ))
         );
       } else if (!this.selected && this.lastSelected) {
         this.selectableMeshes.map(
           x =>
-            (x.material = this.meshProvider.getMaterial(
-              MaterialName.SleeperBrown
-            ))
+          (x.material = this.meshProvider.getMaterial(
+            MaterialName.SleeperBrown
+          ))
         );
       } else {
         this.selectableMeshes.map(
           x =>
-            (x.material = this.meshProvider.getMaterial(
-              MaterialName.SleeperBrown
-            ))
+          (x.material = this.meshProvider.getMaterial(
+            MaterialName.SleeperBrown
+          ))
         );
       }
     }

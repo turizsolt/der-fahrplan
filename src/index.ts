@@ -166,7 +166,7 @@ if (globalThis.startParam === '2d') {
     );
 
     const keyboardInputs = new KeyboardInputs(inputController);
-    globalThis.times = [];
+    // globalThis.times = [];
     app.ticker.add(delta => {
       keyboardInputs.fireKeyHolds();
       inputController.tick();
@@ -194,8 +194,8 @@ if (globalThis.startParam === '2d') {
         'Camera',
         0,
         0.8,
-        70,
-        new BABYLON.Vector3(0, 0, 30),
+        1500,
+        new BABYLON.Vector3(1000, 0, 30),
         scene
       );
 
@@ -207,9 +207,11 @@ if (globalThis.startParam === '2d') {
 
       (window as any).switches = [];
 
+      /*
       const gridDrawer = new GridDrawer();
       gridDrawer.setScene(scene);
       gridDrawer.drawGrid();
+      */
 
       scene.actionManager = new BABYLON.ActionManager(scene);
 

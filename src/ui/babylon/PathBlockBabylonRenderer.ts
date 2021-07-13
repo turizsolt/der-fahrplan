@@ -15,6 +15,8 @@ export class PathBlockBabylonRenderer extends BaseBabylonRenderer
   private button: BABYLON.AbstractMesh;
 
   init(data: any): void {
+    return;
+
     this.meshProvider = this.meshProviderFactory();
     this.button = this.meshProvider.createPathBlockMesh(
       'clickable-pathBlock-' + data.id
@@ -25,5 +27,5 @@ export class PathBlockBabylonRenderer extends BaseBabylonRenderer
     this.meshes = [this.button];
   }
 
-  update(data: any): void {}
+  update(data: any): void { }
 }

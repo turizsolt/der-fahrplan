@@ -21,6 +21,8 @@ export class SignalBabylonRenderer extends BaseBabylonRenderer
   private greenMesh: BABYLON.AbstractMesh;
 
   init(data: any): void {
+    return;
+
     this.meshProvider = this.meshProviderFactory();
     const rayPost = Ray.fromData(data.ray).fromHere(Right, 4);
     const rayRed = rayPost.fromHere(0, -0.5);
@@ -44,6 +46,8 @@ export class SignalBabylonRenderer extends BaseBabylonRenderer
   }
 
   update(data: any): void {
+    return;
+
     this.redMesh.material = this.meshProvider.getMaterial(
       data.signal === SignalSignal.Red
         ? MaterialName.ShuntingRed
