@@ -23,6 +23,7 @@ export class MeshProvider {
   private amber: BABYLON.StandardMaterial;
   private blue: BABYLON.StandardMaterial;
   private white: BABYLON.StandardMaterial;
+  private selectorMesh: BABYLON.AbstractMesh;
 
   public getMaterial(name: MaterialName) {
     return this.materials[name];
@@ -49,6 +50,8 @@ export class MeshProvider {
           newMeshes[0].setEnabled(false);
 
           this.library[name] = newMeshes[0];
+          this.library[name].material.freeze();
+          this.library[name].freezeWorldMatrix();
         }
       );
     });
@@ -59,6 +62,7 @@ export class MeshProvider {
       62 / 255,
       25 / 255
     );
+    this.sleeperBrown.freeze();
 
     this.bedGray = new BABYLON.StandardMaterial('bedGray', null);
     this.bedGray.diffuseColor = new BABYLON.Color3(
@@ -66,6 +70,7 @@ export class MeshProvider {
       97 / 255,
       72 / 255
     );
+    this.bedGray.freeze();
 
     this.railBlack = new BABYLON.StandardMaterial('railBlack', null);
     this.railBlack.diffuseColor = new BABYLON.Color3(
@@ -73,6 +78,7 @@ export class MeshProvider {
       23 / 255,
       18 / 255
     );
+    this.railBlack.freeze();
 
     this.selectorRed = new BABYLON.StandardMaterial('selectorRed', null);
     this.selectorRed.diffuseColor = new BABYLON.Color3(
@@ -80,6 +86,7 @@ export class MeshProvider {
       206 / 255,
       209 / 255
     );
+    this.selectorRed.freeze();
 
     this.shuntingRed = new BABYLON.StandardMaterial('shuntingRed', null);
     this.shuntingRed.diffuseColor = new BABYLON.Color3(
@@ -87,6 +94,7 @@ export class MeshProvider {
       0 / 255,
       0 / 255
     );
+    this.shuntingRed.freeze();
 
     this.allowingGreen = new BABYLON.StandardMaterial('allowingGreen', null);
     this.allowingGreen.diffuseColor = new BABYLON.Color3(
@@ -94,12 +102,15 @@ export class MeshProvider {
       255 / 255,
       0 / 255
     );
+    this.allowingGreen.freeze();
 
     this.amber = new BABYLON.StandardMaterial('amber', null);
     this.amber.diffuseColor = new BABYLON.Color3(255 / 255, 255 / 255, 0 / 255);
+    this.amber.freeze();
 
     this.blue = new BABYLON.StandardMaterial('blue', null);
     this.blue.diffuseColor = new BABYLON.Color3(0 / 255, 0 / 255, 255 / 255);
+    this.blue.freeze();
 
     this.white = new BABYLON.StandardMaterial('white', null);
     this.white.diffuseColor = new BABYLON.Color3(
@@ -107,6 +118,7 @@ export class MeshProvider {
       255 / 255,
       255 / 255
     );
+    this.white.freeze();
 
     this.materials = {
       [MaterialName.BedGray]: this.bedGray,
@@ -119,15 +131,8 @@ export class MeshProvider {
       [MaterialName.Blue]: this.blue,
       [MaterialName.White]: this.white
     };
-  }
 
-  createWagonMesh(id: string, name: string): BABYLON.AbstractMesh {
-    const clone = this.library[id].clone(name, null);
-    return clone;
-  }
-
-  createSelectorMesh(): BABYLON.AbstractMesh {
-    const mesh = BABYLON.MeshBuilder.CreateCylinder(
+    this.selectorMesh = BABYLON.MeshBuilder.CreateCylinder(
       'selector',
       {
         diameterTop: 3,
@@ -137,8 +142,17 @@ export class MeshProvider {
       },
       null
     );
-    mesh.material = this.selectorRed;
-    return mesh;
+    this.selectorMesh.material = this.selectorRed;
+    this.selectorMesh.material.freeze();
+    this.selectorMesh.freezeWorldMatrix();
+  }
+
+  createWagonMesh(id: string, name: string): BABYLON.AbstractMesh {
+    return this.library[id].clone(name, null);
+  }
+
+  createSelectorMesh(): BABYLON.AbstractMesh {
+    return this.selectorMesh.clone('', null);
   }
 
   createPathBlockMesh(name: string): BABYLON.AbstractMesh {
@@ -431,6 +445,8 @@ export class MeshProvider {
     vertexData.indices = ind(triangles);
     vertexData.applyToMesh(mesh);
     mesh.material = this.bedGray;
+    mesh.material.freeze();
+    mesh.freezeWorldMatrix();
     return mesh;
   }
 }

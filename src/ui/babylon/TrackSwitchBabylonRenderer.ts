@@ -26,8 +26,6 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
   private right: number = 1;
 
   init(trackSwitch: TrackSwitch): void {
-    return;
-
     this.trackSwitch = trackSwitch;
     this.meshProvider = this.meshProviderFactory();
 
@@ -44,90 +42,93 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
       .getRayPairs()
       .map(v => this.meshProvider.createBedSegmentMesh(v, name));
 
-    const leftRailMeshes = chainE
-      .copyMove(Left, 1)
-      .getRayPairs()
-      .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
+    /*
+  const leftRailMeshes = chainE
+    .copyMove(Left, 1)
+    .getRayPairs()
+    .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
-    const rightRailMeshes = chainF
-      .copyMove(Right, 1)
-      .getRayPairs()
-      .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
+  const rightRailMeshes = chainF
+    .copyMove(Right, 1)
+    .getRayPairs()
+    .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
-    const [peakPoint, peak2] = this.naturalSplitPoints();
+  const [peakPoint, peak2] = this.naturalSplitPoints();
 
-    // todo is the following two mandatory?
-    const innerLeftRailMeshes = chainE
-      .copyMove(Right, 1)
-      .getRayPairsFromPoint(peakPoint.coord)
-      .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
+  // todo is the following two mandatory?
+  const innerLeftRailMeshes = chainE
+    .copyMove(Right, 1)
+    .getRayPairsFromPoint(peakPoint.coord)
+    .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
-    const innerRightRailMeshes = chainF
-      .copyMove(Left, 1)
-      .getRayPairsFromPoint(peakPoint.coord)
-      .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
+  const innerRightRailMeshes = chainF
+    .copyMove(Left, 1)
+    .getRayPairsFromPoint(peakPoint.coord)
+    .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
-    const maxRad1 = this.trackSwitch
-      .getSegmentLeft()
-      .getFirstPoint()
-      .distance2d(peakPoint.coord);
+  const maxRad1 = this.trackSwitch
+    .getSegmentLeft()
+    .getFirstPoint()
+    .distance2d(peakPoint.coord);
 
-    const maxRad2 = this.trackSwitch
-      .getSegmentLeft()
-      .getFirstPoint()
-      .distance2d(peak2.coord);
+  const maxRad2 = this.trackSwitch
+    .getSegmentLeft()
+    .getFirstPoint()
+    .distance2d(peak2.coord);
 
-    const maxRad = (maxRad1 + maxRad2) / 2;
+  const maxRad = (maxRad1 + maxRad2) / 2;
 
-    const sleeperPointsE = chainE.getRadiallySpacedRays(
-      maxRad,
-      maxRad / Math.floor(maxRad)
-    );
+  const sleeperPointsE = chainE.getRadiallySpacedRays(
+    maxRad,
+    maxRad / Math.floor(maxRad)
+  );
 
-    const sleeperPointsF = chainF.getRadiallySpacedRays(
-      maxRad,
-      maxRad / Math.floor(maxRad)
-    );
+  const sleeperPointsF = chainF.getRadiallySpacedRays(
+    maxRad,
+    maxRad / Math.floor(maxRad)
+  );
 
-    const sleeperMeshesTogether = zip(sleeperPointsE, sleeperPointsF).map(
-      ([a, b]) => this.meshProvider.createSwitchSleeperMesh(a, b, name)
-    );
+  const sleeperMeshesTogether = zip(sleeperPointsE, sleeperPointsF).map(
+    ([a, b]) => this.meshProvider.createSwitchSleeperMesh(a, b, name)
+  );
 
-    const lastE = sleeperPointsE.slice(-1)[0];
-    const lastF = sleeperPointsF.slice(-1)[0];
+  const lastE = sleeperPointsE.slice(-1)[0];
+  const lastF = sleeperPointsF.slice(-1)[0];
 
-    const shortChainE = chainE.getChainFromPoint(lastE.coord);
-    const lenE = shortChainE.getLength();
-    const shortChainF = chainF.getChainFromPoint(lastF.coord);
-    const lenF = shortChainF.getLength();
+  const shortChainE = chainE.getChainFromPoint(lastE.coord);
+  const lenE = shortChainE.getLength();
+  const shortChainF = chainF.getChainFromPoint(lastF.coord);
+  const lenF = shortChainF.getLength();
 
-    const magic = x => {
-      return x / (Math.round((x + 1) / 2) * 2 - 1);
-    };
+  const magic = x => {
+    return x / (Math.round((x + 1) / 2) * 2 - 1);
+  };
 
-    const sleeperMeshesE = shortChainE
-      .getEvenlySpacedRays(magic(lenE), true)
-      .map(v => this.meshProvider.createSleeperMesh(v, name));
+  const sleeperMeshesE = shortChainE
+    .getEvenlySpacedRays(magic(lenE), true)
+    .map(v => this.meshProvider.createSleeperMesh(v, name));
 
-    const sleeperMeshesF = shortChainF
-      .getEvenlySpacedRays(magic(lenF), true)
-      .map(v => this.meshProvider.createSleeperMesh(v, name));
+  const sleeperMeshesF = shortChainF
+    .getEvenlySpacedRays(magic(lenF), true)
+    .map(v => this.meshProvider.createSleeperMesh(v, name));
 
-    this.leftMeshes = chainE
-      .copyMove(Right, 1)
-      .getRayPairsToPoint(peakPoint.coord)
-      .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
+  this.leftMeshes = chainE
+    .copyMove(Right, 1)
+    .getRayPairsToPoint(peakPoint.coord)
+    .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
-    this.rightMeshes = chainF
-      .copyMove(Left, 1)
-      .getRayPairsToPoint(peakPoint.coord)
-      .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
+  this.rightMeshes = chainF
+    .copyMove(Left, 1)
+    .getRayPairsToPoint(peakPoint.coord)
+    .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
-    this.ballonMesh = ballon(peak2.setY(1.2).coord, BABYLON.Color3.White);
+  this.ballonMesh = ballon(peak2.setY(1.2).coord, BABYLON.Color3.White);
+*/
 
     this.meshes = [
       ...bedSegmentMeshesE,
       ...bedSegmentMeshesF,
+      /*
       ...leftRailMeshes,
       ...rightRailMeshes,
       ...innerLeftRailMeshes,
@@ -138,12 +139,15 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
       ...this.leftMeshes,
       ...this.rightMeshes,
       this.ballonMesh
+      */
     ];
 
     this.selectableMeshes = [
+      /*
       ...sleeperMeshesTogether,
       ...sleeperMeshesE,
       ...sleeperMeshesF
+      */
     ];
 
     //   sleeperPointsE.map(x => ballon(x.setY(1.2).coord, BABYLON.Color3.White));

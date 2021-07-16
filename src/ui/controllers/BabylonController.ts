@@ -7,7 +7,7 @@ export class BabylonController implements GUISpecificController {
   constructor(
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera
-  ) {}
+  ) { }
 
   getCamera(): BABYLON.ArcRotateCamera {
     return this.camera;
@@ -28,8 +28,9 @@ export class BabylonController implements GUISpecificController {
     };
   }
 
-  pick(event: any): BABYLON.PickingInfo {
-    return this.scene.pick(this.scene.pointerX, this.scene.pointerY);
+  pick(event: any): any {
+    return { pickedPoint: null, pickedMesh: null };
+    //return this.scene.pick(this.scene.pointerX, this.scene.pointerY);
   }
 
   modRadius(value: number): void {

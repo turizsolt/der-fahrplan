@@ -18,8 +18,6 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
   private selectableMeshes: BABYLON.AbstractMesh[];
 
   init(track: Track): void {
-    return;
-
     this.track = track;
     this.meshProvider = this.meshProviderFactory();
     const chain = this.track.getCurve().getLineSegmentChain();
@@ -31,6 +29,7 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
       .getRayPairs()
       .map(v => this.meshProvider.createBedSegmentMesh(v, name));
 
+    /*
     const sleeperMeshes = chain
       .getEvenlySpacedRays(len / Math.floor(len))
       .map(v => this.meshProvider.createSleeperMesh(v, name));
@@ -44,15 +43,17 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
       .copyMove(Right, 1)
       .getRayPairs()
       .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
-
+*/
     this.meshes = [
       ...bedSegmentMeshes,
+      /*
       ...sleeperMeshes,
       ...leftRailMeshes,
       ...rightRailMeshes
+      */
     ];
 
-    this.selectableMeshes = [...sleeperMeshes];
+    this.selectableMeshes = [/*...sleeperMeshes*/];
   }
 
   private lastSelected: boolean = false;

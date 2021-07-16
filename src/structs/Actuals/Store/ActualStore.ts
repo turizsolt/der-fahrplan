@@ -324,6 +324,7 @@ export class ActualStore implements Store {
         document.getElementById('canvasBorder').classList.remove('stopped');
       }
     }
+    // globalThis.scene.freezeActiveMeshes();
   }
 
   getTickSpeed(): number {
