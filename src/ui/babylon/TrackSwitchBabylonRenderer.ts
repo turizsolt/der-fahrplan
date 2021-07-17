@@ -10,6 +10,7 @@ import { CoordinateToBabylonVector3 } from './converters/CoordinateToBabylonVect
 import { MaterialName } from './MaterialName';
 import { Ray } from '../../structs/Geometry/Ray';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { renderTrackType } from './TrackTypeBabylonRenderer';
 
 @injectable()
 export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
@@ -29,18 +30,19 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
     this.trackSwitch = trackSwitch;
     this.meshProvider = this.meshProviderFactory();
 
-    const chainE = this.trackSwitch.getSegmentLeft().getLineSegmentChain();
-    const chainF = this.trackSwitch.getSegmentRight().getLineSegmentChain();
+    const name = 'clickable-trackSwitch-' + this.trackSwitch.getId();
 
-    const name = 'clickable-track-' + this.trackSwitch.getId();
+    const types = this.trackSwitch.getTrackTypes();
+    const bedSegmentMeshes = [
+      ...renderTrackType(types[0], this.trackSwitch.getSegmentLeft(), this.meshProvider, name),
+      ...renderTrackType(types[1], this.trackSwitch.getSegmentRight(), this.meshProvider, name),
+    ];
 
-    const bedSegmentMeshesE = chainE
-      .getRayPairs()
-      .map(v => this.meshProvider.createBedSegmentMesh(v, name));
+    this.meshes = [
+      ...bedSegmentMeshes,
+    ];
 
-    const bedSegmentMeshesF = chainF
-      .getRayPairs()
-      .map(v => this.meshProvider.createBedSegmentMesh(v, name));
+    this.selectableMeshes = [];
 
     /*
   const leftRailMeshes = chainE
@@ -126,8 +128,7 @@ export class TrackSwitchBabylonRenderer extends BaseBabylonRenderer
 */
 
     this.meshes = [
-      ...bedSegmentMeshesE,
-      ...bedSegmentMeshesF,
+      ...bedSegmentMeshes,
       /*
       ...leftRailMeshes,
       ...rightRailMeshes,

@@ -22,6 +22,7 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   private activeSegment: TrackSegment;
   private state: number;
   private locked: boolean = false;
+  protected trackTypes: string[];
 
   @inject(TYPES.TrackSwitchRenderer) private renderer: TrackSwitchRenderer;
 
@@ -31,7 +32,7 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
   ): TrackSwitch {
     super.initStore(TYPES.TrackSwitch);
 
-    console.log('TS-' + detectTrackType(segmentData1) + '-' + detectTrackType(segmentData2));
+    this.trackTypes = [detectTrackType(segmentData1), detectTrackType(segmentData2)];
 
     const [seg1, seg2] = TrackSwitchCoordinates.align(
       segmentData1,
@@ -49,6 +50,10 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     this.renderer.init(this);
 
     return this;
+  }
+
+  getTrackTypes(): string[] {
+    return this.trackTypes;
   }
 
   getState(): number {

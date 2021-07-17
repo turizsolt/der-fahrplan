@@ -7,6 +7,8 @@ import { Left, Right } from '../../structs/Geometry/Directions';
 import { RayPair } from '../../structs/Geometry/RayPair';
 import { Line } from '../../structs/Geometry/Line';
 import { MaterialName } from './MaterialName';
+import { ActualTrackCurve } from '../../modules/Track/ActualTrackCurve';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
 
 @injectable()
 export class MeshProvider {
@@ -24,8 +26,9 @@ export class MeshProvider {
   private blue: BABYLON.StandardMaterial;
   private white: BABYLON.StandardMaterial;
   private selectorMesh: BABYLON.AbstractMesh;
-  private e1: BABYLON.AbstractMesh;
-  private e2: BABYLON.AbstractMesh;
+  private E1: BABYLON.AbstractMesh;
+  private E2: BABYLON.AbstractMesh;
+  private L1: BABYLON.AbstractMesh;
 
   public getMaterial(name: MaterialName) {
     return this.materials[name];
@@ -147,16 +150,32 @@ export class MeshProvider {
     this.selectorMesh.material.freeze();
     this.selectorMesh.freezeWorldMatrix();
 
-    this.e1 = this.createBedSegmentMesh(new RayPair(Ray.from(0, 0, 0, 0), Ray.from(0, 0, 10, 0)), '');
-    this.e2 = this.createBedSegmentMesh(new RayPair(Ray.from(0, 0, 0, 0), Ray.from(0, 0, 20, 0)), '');
+    this.E1 = this.createBedSegmentMesh(new RayPair(Ray.from(0, 0, 0, 0), Ray.from(0, 0, 10, 0)), '', true);
+    this.E2 = this.createBedSegmentMesh(new RayPair(Ray.from(0, 0, 0, 0), Ray.from(0, 0, 20, 0)), '', true);
+
+    const HEIGHT = (10 * Math.sqrt(3)) / 2;
+    const WIDTH = 10;
+    const curve = new ActualTrackCurve([new Coordinate(0, 0, 0), new Coordinate(0, 0, WIDTH), new Coordinate(-HEIGHT, 0, 1.5 * WIDTH)]); // todo get the constants
+    const chain = curve.getLineSegmentChain();
+    console.log(chain);
+
+    this.L1 = this.createBedSegmentMeshes(chain.getRayPairs(), '', true);
+
+    this.E1.setEnabled(false);
+    this.E2.setEnabled(false);
+    this.L1.setEnabled(false);
   }
 
   createE1(name: string): BABYLON.AbstractMesh {
-    return this.e1.clone(name, null);
+    return this.E1.clone(name, null);
   }
 
   createE2(name: string): BABYLON.AbstractMesh {
-    return this.e2.clone(name, null);
+    return this.E2.clone(name, null);
+  }
+
+  createL1(name: string): BABYLON.AbstractMesh {
+    return this.L1.clone(name, null);
   }
 
   createWagonMesh(id: string, name: string): BABYLON.AbstractMesh {
@@ -434,29 +453,35 @@ export class MeshProvider {
     return mesh;
   }
 
-  createBedSegmentMesh(seg: RayPair, name: string): BABYLON.AbstractMesh {
-    const p0 = seg.a.fromHere(Right, 3).setY(0);
-    const p1 = seg.a.fromHere(Right, 2).setY(1);
-    const p2 = seg.a.fromHere(Left, 2).setY(1);
-    const p3 = seg.a.fromHere(Left, 3).setY(0);
+  createBedSegmentMesh(seg: RayPair, name: string, secret: boolean = false): BABYLON.AbstractMesh {
+    return this.createBedSegmentMeshes([seg], name, secret);
+  }
 
-    const q0 = seg.b.fromHere(Right, 3).setY(0);
-    const q1 = seg.b.fromHere(Right, 2).setY(1);
-    const q2 = seg.b.fromHere(Left, 2).setY(1);
-    const q3 = seg.b.fromHere(Left, 3).setY(0);
+  createBedSegmentMeshes(segs: RayPair[], name: string, secret: boolean = false): BABYLON.AbstractMesh {
+    const triangles = [];
+    for (let seg of segs) {
+      const p0 = seg.a.fromHere(Right, 3).setY(0);
+      const p1 = seg.a.fromHere(Right, 2).setY(1);
+      const p2 = seg.a.fromHere(Left, 2).setY(1);
+      const p3 = seg.a.fromHere(Left, 3).setY(0);
 
-    const triangles = [
-      ...rect(p0, q0, p1, q1),
-      ...rect(p1, q1, p2, q2),
-      ...rect(p2, q2, p3, q3)
-    ];
+      const q0 = seg.b.fromHere(Right, 3).setY(0);
+      const q1 = seg.b.fromHere(Right, 2).setY(1);
+      const q2 = seg.b.fromHere(Left, 2).setY(1);
+      const q3 = seg.b.fromHere(Left, 3).setY(0);
+
+      triangles.push(...rect(p0, q0, p1, q1));
+      triangles.push(...rect(p1, q1, p2, q2));
+      triangles.push(...rect(p2, q2, p3, q3));
+    }
 
     const mesh = new BABYLON.Mesh(name, null);
     const vertexData = new BABYLON.VertexData();
     vertexData.positions = triangles;
     vertexData.indices = ind(triangles);
     vertexData.applyToMesh(mesh);
-    mesh.material = this.bedGray;
+    mesh.convertToUnIndexedMesh();
+    mesh.material = secret ? this.amber : this.bedGray;
     mesh.material.freeze();
     mesh.freezeWorldMatrix();
     return mesh;

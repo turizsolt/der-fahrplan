@@ -3,10 +3,10 @@ import { TrackRenderer } from '../../structs/Renderers/TrackRenderer';
 import { injectable, inject } from 'inversify';
 import { Track } from '../../modules/Track/Track';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
-import { Left, Right } from '../../structs/Geometry/Directions';
 import { TYPES } from '../../di/TYPES';
 import { MeshProvider } from './MeshProvider';
 import { MaterialName } from './MaterialName';
+import { renderTrackType } from './TrackTypeBabylonRenderer';
 
 @injectable()
 export class TrackBabylonRenderer extends BaseBabylonRenderer
@@ -23,72 +23,35 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
 
     const name = 'clickable-track-' + this.track.getId();
 
-    if (this.track.getTrackType().startsWith('E')) {
-      const n = Math.round(this.track.getCurve().getLength() / 10);
-      const startRay = this.track.getCurve().getLineSegmentChain().getRays()[0]; // todo maybe better asking for it
-      let nextRay = startRay.fromHere(0, 0);
+    const bedSegmentMeshes = renderTrackType(this.track.getTrackType(), this.track.getCurve(), this.meshProvider, name);
 
-      const bedSegmentMeshes: BABYLON.AbstractMesh[] = [];
+    this.meshes = [
+      ...bedSegmentMeshes,
+    ];
 
-      const m = (n % 2 === 1) ? n - 1 : n;
-      for (let i = 0; i < m; i += 2) {
-        const mesh = this.meshProvider.createE2(name);
-        mesh.position.x = nextRay.coord.x;
-        mesh.position.y = 0;
-        mesh.position.z = nextRay.coord.z;
-        mesh.rotation.y = nextRay.dirXZ;
-        bedSegmentMeshes.push(mesh);
+    this.selectableMeshes = [];
 
-        nextRay = nextRay.fromHere(0, 20);
-      }
+    /*
+    const sleeperMeshes = chain
+      .getEvenlySpacedRays(len / Math.floor(len))
+      .map(v => this.meshProvider.createSleeperMesh(v, name));
 
-      if (n % 2 === 1) {
-        const mesh = this.meshProvider.createE1(name);
-        mesh.position.x = nextRay.coord.x;
-        mesh.position.y = 0;
-        mesh.position.z = nextRay.coord.z;
-        mesh.rotation.y = nextRay.dirXZ;
-        bedSegmentMeshes.push(mesh);
+    const leftRailMeshes = chain
+      .copyMove(Left, 1)
+      .getRayPairs()
+      .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
 
-        nextRay = nextRay.fromHere(0, 10);
-      }
-
-      this.meshes = [...bedSegmentMeshes];
-      this.selectableMeshes = [];
-    } else {
-      const chain = this.track.getCurve().getLineSegmentChain();
-      const len = this.track.getCurve().getLength();
-
-      const bedSegmentMeshes = chain
-        .getRayPairs()
-        .map(v => this.meshProvider.createBedSegmentMesh(v, name));
-
-      /*
-      const sleeperMeshes = chain
-        .getEvenlySpacedRays(len / Math.floor(len))
-        .map(v => this.meshProvider.createSleeperMesh(v, name));
-  
-      const leftRailMeshes = chain
-        .copyMove(Left, 1)
-        .getRayPairs()
-        .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
-  
-      const rightRailMeshes = chain
-        .copyMove(Right, 1)
-        .getRayPairs()
-        .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
-  */
-      this.meshes = [
-        ...bedSegmentMeshes,
-        /*
-        ...sleeperMeshes,
-        ...leftRailMeshes,
-        ...rightRailMeshes
-        */
-      ];
-
-      this.selectableMeshes = [/*...sleeperMeshes*/];
-    }
+    const rightRailMeshes = chain
+      .copyMove(Right, 1)
+      .getRayPairs()
+      .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
+    */
+    /*
+    ...sleeperMeshes,
+    ...leftRailMeshes,
+    ...rightRailMeshes
+    */
+    /*...sleeperMeshes*/
   }
 
   private lastSelected: boolean = false;
