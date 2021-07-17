@@ -19,11 +19,18 @@ import { TrackSegment } from './TrackSegment';
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
   protected segment: ActualTrackSegment;
+  protected trackType: string;
 
   @inject(TYPES.TrackRenderer) private renderer: TrackRenderer;
 
   init(segmentData: TrackSegmentData): Track {
     super.initStore(TYPES.Track);
+
+    if (segmentData.coordinates.length === 2) {
+      this.trackType = 'E';
+    } else {
+      this.trackType = 'R';
+    }
 
     this.segment = new ActualTrackSegment(this, segmentData);
     this.segment.connect();
@@ -31,6 +38,10 @@ export class ActualTrack extends ActualTrackBase implements Track {
     // todo emit
     this.renderer.init(this);
     return this;
+  }
+
+  getTrackType(): string {
+    return this.trackType;
   }
 
   getDirected(direction: TrackDirection): DirectedTrack {

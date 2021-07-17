@@ -24,6 +24,8 @@ export class MeshProvider {
   private blue: BABYLON.StandardMaterial;
   private white: BABYLON.StandardMaterial;
   private selectorMesh: BABYLON.AbstractMesh;
+  private e1: BABYLON.AbstractMesh;
+  private e2: BABYLON.AbstractMesh;
 
   public getMaterial(name: MaterialName) {
     return this.materials[name];
@@ -50,7 +52,6 @@ export class MeshProvider {
           newMeshes[0].setEnabled(false);
 
           this.library[name] = newMeshes[0];
-          this.library[name].material.freeze();
           this.library[name].freezeWorldMatrix();
         }
       );
@@ -145,6 +146,17 @@ export class MeshProvider {
     this.selectorMesh.material = this.selectorRed;
     this.selectorMesh.material.freeze();
     this.selectorMesh.freezeWorldMatrix();
+
+    this.e1 = this.createBedSegmentMesh(new RayPair(Ray.from(0, 0, 0, 0), Ray.from(0, 0, 10, 0)), '');
+    this.e2 = this.createBedSegmentMesh(new RayPair(Ray.from(0, 0, 0, 0), Ray.from(0, 0, 20, 0)), '');
+  }
+
+  createE1(name: string): BABYLON.AbstractMesh {
+    return this.e1.clone(name, null);
+  }
+
+  createE2(name: string): BABYLON.AbstractMesh {
+    return this.e2.clone(name, null);
   }
 
   createWagonMesh(id: string, name: string): BABYLON.AbstractMesh {
