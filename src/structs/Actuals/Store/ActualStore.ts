@@ -309,6 +309,11 @@ export class ActualStore implements Store {
         }
         this.passengerGenerator.tick();
       }
+
+      if ((this.getTickCount() + i) % 60 === 0) {
+        globalThis.scene.unfreezeActiveMeshes();
+        globalThis.scene.freezeActiveMeshes();
+      }
       const time4 = new Date();
       // globalThis.times.push([time.getTime(), time2.getTime(), time3.getTime(), time4.getTime(), trains.length]);
     }
@@ -324,7 +329,6 @@ export class ActualStore implements Store {
         document.getElementById('canvasBorder').classList.remove('stopped');
       }
     }
-    // globalThis.scene.freezeActiveMeshes();
   }
 
   getTickSpeed(): number {
