@@ -13,6 +13,7 @@ import { TrackSegmentData } from './TrackSegmentData';
 import { TrackDirection } from './TrackDirection';
 import { DirectedTrack } from './DirectedTrack';
 import { toSegmentData } from './ActualTrack';
+import { detectTrackType } from './DetectTrackType';
 
 @injectable()
 export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
@@ -29,6 +30,8 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     segmentData2: TrackSegmentData
   ): TrackSwitch {
     super.initStore(TYPES.TrackSwitch);
+
+    console.log('TS-' + detectTrackType(segmentData1) + '-' + detectTrackType(segmentData2));
 
     const [seg1, seg2] = TrackSwitchCoordinates.align(
       segmentData1,

@@ -15,6 +15,7 @@ import { DirectedTrack } from './DirectedTrack';
 import { TrackJoint } from './TrackJoint/TrackJoint';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { TrackSegment } from './TrackSegment';
+import { detectTrackType } from './DetectTrackType';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
@@ -26,11 +27,7 @@ export class ActualTrack extends ActualTrackBase implements Track {
   init(segmentData: TrackSegmentData): Track {
     super.initStore(TYPES.Track);
 
-    if (segmentData.coordinates.length === 2) {
-      this.trackType = 'E';
-    } else {
-      this.trackType = 'R';
-    }
+    this.trackType = detectTrackType(segmentData);
 
     this.segment = new ActualTrackSegment(this, segmentData);
     this.segment.connect();

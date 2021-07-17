@@ -23,14 +23,15 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
 
     const name = 'clickable-track-' + this.track.getId();
 
-    if (this.track.getTrackType() === 'E') {
-      const n = this.track.getCurve().getLength() / 10;
+    if (this.track.getTrackType().startsWith('E')) {
+      const n = Math.round(this.track.getCurve().getLength() / 10);
       const startRay = this.track.getCurve().getLineSegmentChain().getRays()[0]; // todo maybe better asking for it
       let nextRay = startRay.fromHere(0, 0);
 
       const bedSegmentMeshes: BABYLON.AbstractMesh[] = [];
 
-      for (let i = 0; i < n; i += 2) {
+      const m = (n % 2 === 1) ? n - 1 : n;
+      for (let i = 0; i < m; i += 2) {
         const mesh = this.meshProvider.createE2(name);
         mesh.position.x = nextRay.coord.x;
         mesh.position.y = 0;
