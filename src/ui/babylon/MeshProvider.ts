@@ -12,7 +12,7 @@ import { Coordinate } from '../../structs/Geometry/Coordinate';
 
 @injectable()
 export class MeshProvider {
-  private library: { [id: string]: BABYLON.AbstractMesh };
+  private library: { [id: string]: BABYLON.Mesh };
   private scene: BABYLON.Scene;
 
   private materials: Record<MaterialName, BABYLON.StandardMaterial>;
@@ -25,10 +25,12 @@ export class MeshProvider {
   private amber: BABYLON.StandardMaterial;
   private blue: BABYLON.StandardMaterial;
   private white: BABYLON.StandardMaterial;
-  private selectorMesh: BABYLON.AbstractMesh;
-  private E1: BABYLON.AbstractMesh;
-  private E2: BABYLON.AbstractMesh;
-  private L1: BABYLON.AbstractMesh;
+
+  private selectorMesh: BABYLON.Mesh;
+  private E1: BABYLON.Mesh;
+  private E2: BABYLON.Mesh;
+  private L1: BABYLON.Mesh;
+  private defaultEngine: BABYLON.Mesh;
 
   public getMaterial(name: MaterialName) {
     return this.materials[name];
@@ -54,7 +56,7 @@ export class MeshProvider {
           newMeshes[0].rotationQuaternion = null;
           newMeshes[0].setEnabled(false);
 
-          this.library[name] = newMeshes[0];
+          this.library[name] = newMeshes[0] as BABYLON.Mesh;
           this.library[name].freezeWorldMatrix();
         }
       );
@@ -149,6 +151,7 @@ export class MeshProvider {
     this.selectorMesh.material = this.selectorRed;
     this.selectorMesh.material.freeze();
     this.selectorMesh.freezeWorldMatrix();
+    this.selectorMesh.setEnabled(false);
 
     this.E1 = this.createBedSegmentMesh(new RayPair(Ray.from(0, 0, 0, 0), Ray.from(0, 0, 10, 0)), '', true);
     this.E2 = this.createBedSegmentMesh(new RayPair(Ray.from(0, 0, 0, 0), Ray.from(0, 0, 20, 0)), '', true);
@@ -164,29 +167,45 @@ export class MeshProvider {
     this.E1.setEnabled(false);
     this.E2.setEnabled(false);
     this.L1.setEnabled(false);
+
+    this.defaultEngine = BABYLON.MeshBuilder.CreateBox(
+      '',
+      { height: 3.5, width: 14, depth: 3 },
+      this.scene
+    );
+    this.defaultEngine.position.y = -1;
+    this.defaultEngine.material = this.blue;
+    this.defaultEngine.setEnabled(false);
   }
 
-  createE1(name: string): BABYLON.AbstractMesh {
+  createE1(name: string): BABYLON.Mesh {
     return this.E1.clone(name, null);
   }
 
-  createE2(name: string): BABYLON.AbstractMesh {
+  createE2(name: string): BABYLON.Mesh {
     return this.E2.clone(name, null);
   }
 
-  createL1(name: string): BABYLON.AbstractMesh {
+  createL1(name: string): BABYLON.Mesh {
     return this.L1.clone(name, null);
   }
 
-  createWagonMesh(id: string, name: string): BABYLON.AbstractMesh {
-    return this.library[id].clone(name, null);
+  createWagonMesh(id: string, name: string): BABYLON.Mesh {
+    const x = this.defaultEngine.clone(name, null);
+    // const y = this.library[id].clone(name, null);
+    // x.setEnabled(false);
+    // y.addLODLevel(200, x);
+    return x;
   }
 
-  createSelectorMesh(): BABYLON.AbstractMesh {
-    return this.selectorMesh.clone('', null);
+  createSelectorMesh(): BABYLON.Mesh {
+    const x = this.selectorMesh.clone('', null);
+    x.addLODLevel(500, null);
+    return x;
+
   }
 
-  createPathBlockMesh(name: string): BABYLON.AbstractMesh {
+  createPathBlockMesh(name: string): BABYLON.Mesh {
     const mesh = BABYLON.MeshBuilder.CreateCylinder(
       name,
       {
@@ -201,7 +220,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createStationMesh(name: string, radius): BABYLON.AbstractMesh {
+  createStationMesh(name: string, radius): BABYLON.Mesh {
     const mesh = BABYLON.MeshBuilder.CreateTorus(
       name,
       {
@@ -214,7 +233,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createWagonEndMesh(name: string): BABYLON.AbstractMesh {
+  createWagonEndMesh(name: string): BABYLON.Mesh {
     const mesh = BABYLON.MeshBuilder.CreateCylinder(
       name,
       {
@@ -229,7 +248,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createSleeperMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
+  createSleeperMesh(ray: Ray, name: string): BABYLON.Mesh {
     const mesh = BABYLON.MeshBuilder.CreateBox(
       name,
       { height: 0.1, width: 3, depth: 1 },
@@ -241,7 +260,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createSignalMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
+  createSignalMesh(ray: Ray, name: string): BABYLON.Mesh {
     const mesh = BABYLON.MeshBuilder.CreateBox(
       name,
       { height: 5, width: 2.5, depth: 0.5 },
@@ -253,7 +272,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createSignalLight(ray: Ray, name: string): BABYLON.AbstractMesh {
+  createSignalLight(ray: Ray, name: string): BABYLON.Mesh {
     const mesh = BABYLON.MeshBuilder.CreateBox(
       name,
       { height: 1.5, width: 1.5, depth: 0.5 },
@@ -265,7 +284,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createSensorMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
+  createSensorMesh(ray: Ray, name: string): BABYLON.Mesh {
     const mesh = BABYLON.MeshBuilder.CreateCylinder(
       name,
       {
@@ -282,7 +301,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createBlockJointMesh(name: string): BABYLON.AbstractMesh {
+  createBlockJointMesh(name: string): BABYLON.Mesh {
     const mesh = BABYLON.MeshBuilder.CreateCylinder(
       name,
       {
@@ -297,7 +316,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createBlockMesh(name: string): BABYLON.AbstractMesh {
+  createBlockMesh(name: string): BABYLON.Mesh {
     const mesh = BABYLON.MeshBuilder.CreateCylinder(
       name,
       {
@@ -312,7 +331,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createSectionMesh(name: string): BABYLON.AbstractMesh {
+  createSectionMesh(name: string): BABYLON.Mesh {
     const mesh = BABYLON.MeshBuilder.CreateCylinder(
       name,
       {
@@ -327,7 +346,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createSleeperJointMesh(ray: Ray, name: string): BABYLON.AbstractMesh {
+  createSleeperJointMesh(ray: Ray, name: string): BABYLON.Mesh {
     const mesh = BABYLON.MeshBuilder.CreateBox(
       name,
       { height: 1.5, width: 1, depth: 2 },
@@ -339,7 +358,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createSwitchSleeperMesh(a: Ray, b: Ray, name: string): BABYLON.AbstractMesh {
+  createSwitchSleeperMesh(a: Ray, b: Ray, name: string): BABYLON.Mesh {
     const up = 1.1;
     const dn = 1.0;
     const w = 1.5;
@@ -422,7 +441,7 @@ export class MeshProvider {
     return mesh;
   }
 
-  createRailSegmentMesh(rp: RayPair, name: string): BABYLON.AbstractMesh {
+  createRailSegmentMesh(rp: RayPair, name: string): BABYLON.Mesh {
     const up = 1.5;
     const dn = 1.1;
     const w = 0.2;
@@ -453,11 +472,11 @@ export class MeshProvider {
     return mesh;
   }
 
-  createBedSegmentMesh(seg: RayPair, name: string, secret: boolean = false): BABYLON.AbstractMesh {
+  createBedSegmentMesh(seg: RayPair, name: string, secret: boolean = false): BABYLON.Mesh {
     return this.createBedSegmentMeshes([seg], name, secret);
   }
 
-  createBedSegmentMeshes(segs: RayPair[], name: string, secret: boolean = false): BABYLON.AbstractMesh {
+  createBedSegmentMeshes(segs: RayPair[], name: string, secret: boolean = false): BABYLON.Mesh {
     const triangles = [];
     for (let seg of segs) {
       const p0 = seg.a.fromHere(Right, 3).setY(0);
