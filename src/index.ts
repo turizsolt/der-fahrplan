@@ -247,6 +247,9 @@ if (globalThis.startParam === '2d') {
       scene.render();
     });
 
+    // todo it is dirty to do
+    setTimeout(() => globalThis.scene.freezeActiveMeshes(), 5000);
+
     window.addEventListener('resize', () => {
       renderEngine.resize();
     });
