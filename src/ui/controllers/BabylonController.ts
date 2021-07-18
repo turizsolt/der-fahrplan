@@ -29,8 +29,7 @@ export class BabylonController implements GUISpecificController {
   }
 
   pick(event: any): any {
-    return { pickedPoint: null, pickedMesh: null };
-    //return this.scene.pick(this.scene.pointerX, this.scene.pointerY);
+    return this.scene.pick(this.scene.pointerX, this.scene.pointerY);
   }
 
   modRadius(value: number): void {

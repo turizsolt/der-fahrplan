@@ -28,10 +28,12 @@ export class InputController {
     private store: Store,
     private inputHandler: InputHandler,
     private specificController: GUISpecificController
-  ) {}
+  ) { }
 
-  private convert(event: PointerEvent): InputProps {
-    const { pickedPoint, pickedMesh } = this.specificController.pick(event);
+  private convert(event: PointerEvent, isClick: boolean): InputProps {
+    const { pickedPoint, pickedMesh } = isClick
+      ? this.specificController.pick(event)
+      : { pickedMesh: null, pickedPoint: null };
 
     if (!pickedPoint) {
       return {
@@ -73,9 +75,9 @@ export class InputController {
   }
 
   down(event: PointerEvent) {
-    this.downProps = this.convert(event);
+    this.downProps = this.convert(event, true);
     this.downAt = new Date().getTime();
-    this.handleMouse(Input.MouseDown, event);
+    this.handleMouse(Input.MouseDown, event, true);
     this.mouseDownEvent = event;
   }
 
@@ -90,9 +92,9 @@ export class InputController {
         ctrlKey: this.mouseDownEvent.ctrlKey,
         shiftKey: this.mouseDownEvent.shiftKey
       };
-      this.handleMouse(Input.MouseMove, event2);
+      this.handleMouse(Input.MouseMove, event2, false);
     } else {
-      this.handleMouse(Input.MouseRoam, event);
+      this.handleMouse(Input.MouseRoam, event, false);
     }
   }
 
@@ -101,41 +103,41 @@ export class InputController {
 
     const now = new Date().getTime();
     if (now - this.downAt < 500) {
-      this.handleMouse(Input.MouseClick, event);
+      this.handleMouse(Input.MouseClick, event, true);
     } else {
-      this.handleMouse(Input.MouseUp, event);
+      this.handleMouse(Input.MouseUp, event, true);
     }
     this.downProps = null;
   }
 
-  private handleMouse(input: Input, event: PointerEvent): void {
+  private handleMouse(input: Input, event: PointerEvent, isClick: boolean): void {
     this.inputHandler.handle(
       {
         input,
         type: this.getMouseButton(event),
         mod: this.getMouseMods(event)
       },
-      { ...this.convert(event), downProps: this.downProps }
+      { ...this.convert(event, isClick), downProps: this.downProps }
     );
   }
 
   // todo clean up any-s
   private getMouseMods(event: PointerEvent | WheelEvent): InputMod {
     return (event.ctrlKey || (event as any)?.data?.originalEvent?.ctrlKey)
-      ? (event.shiftKey  || (event as any)?.data?.originalEvent?.shiftKey)
+      ? (event.shiftKey || (event as any)?.data?.originalEvent?.shiftKey)
         ? InputMod.Both
         : InputMod.Ctrl
-      : (event.shiftKey  || (event as any)?.data?.originalEvent?.shiftKey)
-      ? InputMod.Shift
-      : InputMod.None;
+      : (event.shiftKey || (event as any)?.data?.originalEvent?.shiftKey)
+        ? InputMod.Shift
+        : InputMod.None;
   }
 
   private getMouseButton(event: PointerEvent): InputType {
     return event.button === 0
       ? InputType.MouseLeft
       : event.button === 2
-      ? InputType.MouseRight
-      : InputType.MouseMiddle;
+        ? InputType.MouseRight
+        : InputType.MouseMiddle;
   }
 
   wheel(event: WheelEvent) {
@@ -185,8 +187,8 @@ export class InputController {
         ? InputMod.Both
         : InputMod.Shift
       : mods.ctrl
-      ? InputMod.Ctrl
-      : InputMod.None;
+        ? InputMod.Ctrl
+        : InputMod.None;
   }
 
   private getTick(): InputHandlerProp {
