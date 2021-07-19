@@ -98,7 +98,7 @@ export class TrackInputHandler extends InputHandler {
       // return false;
 
       this.downProps = null;
-      this.plugin.up(legacyProp.downProps, legacyProp);
+      this.plugin.up(this.downProps, legacyProp);
       this.isRoam = true;
     });
 
@@ -108,17 +108,16 @@ export class TrackInputHandler extends InputHandler {
       this.plugin.down(legacyProp);
       this.isRoam = false;
 
-      this.downProps = legacyProp.downProps;
+      this.downProps = legacyProp;
       this.props = legacyProp;
     });
 
     this.reg(drop(MouseLeft), (legacyEvent: PointerEvent) => {
       const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       const props = legacyProp;
-      const downProps = legacyProp.downProps;
+      const downProps = this.downProps;
       this.isRoam = true;
 
-      this.downProps = null;
       this.props = legacyProp;
 
       // only if the point is not on a track, except the two ends
@@ -210,7 +209,9 @@ export class TrackInputHandler extends InputHandler {
           });
         }
       }
-      this.plugin.up(legacyProp.downProps, legacyProp);
+      this.plugin.up(this.downProps, legacyProp);
+      this.downProps = null;
+
       return true;
 
     });
@@ -218,9 +219,13 @@ export class TrackInputHandler extends InputHandler {
 
   move(legacyProp: InputProps): void {
     const props = legacyProp;
-    const downProps = legacyProp.downProps;
-    props.snappedPoint.dirXZ = this.wheelRad;
-    downProps.snappedPoint.dirXZ = this.downWheelRad;
+    const downProps = this.downProps;
+    if (props.snappedPoint) {
+      props.snappedPoint.dirXZ = this.wheelRad;
+    }
+    if (downProps.snappedPoint) {
+      downProps.snappedPoint.dirXZ = this.downWheelRad;
+    }
     if (props.snappedJoint) {
       props.snappedPoint.dirXZ = props.snappedJoint.getRotation();
     }

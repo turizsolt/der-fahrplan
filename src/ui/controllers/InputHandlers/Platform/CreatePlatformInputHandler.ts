@@ -5,10 +5,6 @@ import { CreatePlatformInputHandlerPlugin } from './CreatePlatformInputHandlerPl
 import { CreatePlatformInputHandlerPixi } from './CreatePlatformInputHandlerPixi';
 import { CreatePlatformInputHandlerBabylon } from './CreatePlatformInputHandlerBabylon';
 import { ActualTrack } from '../../../../modules/Track/ActualTrack';
-import { CommandCreator } from '../../../../structs/Actuals/Store/Command/CommandCreator';
-import { GENERATE_ID } from '../../../../structs/Actuals/Store/Command/CommandLog';
-import { getPredefinedWagonConfig } from '../../../../structs/Actuals/Wagon/ActualWagonConfigs';
-import { Track } from '../../../../modules/Track/Track';
 import { InputProps } from '../../InputProps';
 import { MouseLeft } from '../Interfaces/InputType';
 import { Platform } from '../../../../structs/Interfaces/Platform';
@@ -17,6 +13,7 @@ import { Side } from '../../../../structs/Interfaces/Side';
 
 export class CreatePlatformInputHandler extends InputHandler {
   private plugin: CreatePlatformInputHandlerPlugin;
+  private downProps: InputProps;
 
   constructor(private store: Store) {
     super();
@@ -40,6 +37,8 @@ export class CreatePlatformInputHandler extends InputHandler {
       } else {
         this.plugin.down(false);
       }
+
+      this.downProps = legacyProps;
     });
 
     this.reg(roam(), (legacyEvent: PointerEvent) => {
@@ -86,7 +85,7 @@ export class CreatePlatformInputHandler extends InputHandler {
     this.reg(drop(MouseLeft), (legacyEvent: PointerEvent) => {
       const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const props = legacyProps;
-      const downProps = legacyProps.downProps;
+      const downProps = this.downProps;
 
       const pot = props.snappedPositionOnTrack;
       const dpot = downProps.snappedPositionOnTrack;
@@ -118,6 +117,8 @@ export class CreatePlatformInputHandler extends InputHandler {
           );
       }
       this.plugin.up();
+
+      this.downProps = null;
     });
 
     this.reg(click(MouseLeft), () => {
