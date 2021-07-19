@@ -133,7 +133,6 @@ export class TrackInputHandler extends InputHandler {
         let j1, j2: TrackJoint;
         const deletable: TrackJoint[] = [];
         const actions: Command[] = [];
-        console.log('ok');
 
         // if there is a joint to snap, then do not create a new
         if (downProps.snappedJoint) {
@@ -175,7 +174,6 @@ export class TrackInputHandler extends InputHandler {
         }
 
         const ret = TrackJointConnector.connect(j1, j2);
-        console.log('ret', ret);
 
         const replacementIds = deletable.map(j => j.getId());
 

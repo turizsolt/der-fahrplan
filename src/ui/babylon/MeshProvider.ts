@@ -160,7 +160,6 @@ export class MeshProvider {
     const WIDTH = 10;
     const curve = new ActualTrackCurve([new Coordinate(0, 0, 0), new Coordinate(0, 0, WIDTH), new Coordinate(-HEIGHT, 0, 1.5 * WIDTH)]); // todo get the constants
     const chain = curve.getLineSegmentChain();
-    console.log(chain);
 
     this.L1 = this.createBedSegmentMeshes(chain.getRayPairs(), '', true);
 

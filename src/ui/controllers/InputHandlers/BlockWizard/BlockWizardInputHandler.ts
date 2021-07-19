@@ -91,7 +91,6 @@ export class BlockWizardInputHandler extends InputHandler {
 
   wizardBlock(position: PositionOnTrack): void {
     const opposition = position.opposition();
-    console.log('wizard block');
 
     const nearestForward = Nearest.blockJoint(position);
     const nearestBackward = Nearest.blockJoint(opposition);
@@ -127,8 +126,6 @@ export class BlockWizardInputHandler extends InputHandler {
       Math.floor(wholeDistance / signalMinimumDistance)
     );
     const signalPlantingDistance = wholeDistance / signalCount;
-
-    console.log(wholeDistance, signalCount, signalPlantingDistance);
 
     const pos = backward.position.opposition();
     const joints = [] as BlockJointEnd[];
@@ -219,7 +216,6 @@ export class BlockWizardInputHandler extends InputHandler {
       pot.reverse();
 
       const nearestData = Nearest.platform(pot.clone());
-      console.log(nearestData);
       if (nearestData?.distance < 30) {
         this.store.create<Sensor>(TYPES.Sensor).init(nearestData.position, pb, pbe);
       } else {
