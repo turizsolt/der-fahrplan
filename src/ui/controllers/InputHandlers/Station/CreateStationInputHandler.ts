@@ -23,7 +23,8 @@ export class CreateStationInputHandler extends InputHandler {
         : new CreateStationInputHandlerBabylon();
     this.plugin.init();
 
-    this.reg(drag(MouseLeft), (legacyProps: InputProps) => {
+    this.reg(drag(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       if (!legacyProps.snappedJoint) {
         this.plugin.setFrom(
           !legacyProps.snappedJoint && !legacyProps.snappedPositionOnTrack,
@@ -36,7 +37,8 @@ export class CreateStationInputHandler extends InputHandler {
       );
     });
 
-    this.reg(roam(), (legacyProps: InputProps) => {
+    this.reg(roam(), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       if (legacyProps.snappedPoint) {
         this.plugin.setFrom(
           !legacyProps.snappedJoint && !legacyProps.snappedPositionOnTrack,
@@ -45,7 +47,8 @@ export class CreateStationInputHandler extends InputHandler {
       }
     });
 
-    this.reg(move(MouseLeft), (legacyProps: InputProps) => {
+    this.reg(move(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const props = legacyProps;
       const downProps = legacyProps.downProps;
 
@@ -60,7 +63,8 @@ export class CreateStationInputHandler extends InputHandler {
       }
     });
 
-    this.reg(drop(MouseLeft), (legacyProps: InputProps) => {
+    this.reg(drop(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const props = legacyProps;
       const downProps = legacyProps.downProps;
 

@@ -1,7 +1,6 @@
 import { InputHandler } from './InputHandler';
 import { Store } from '../../../structs/Interfaces/Store';
 import { VueSidebar } from '../VueSidebar';
-import { InputProps } from '../InputProps';
 import { InputHandlerProp } from './Interfaces/InputHandlerProp';
 import { SelectInputHandler } from './SelectInputHandler';
 import { GameSpeedInputHandler } from './GameSpeedInputHandler';
@@ -32,9 +31,9 @@ export class ChainedInputHandler extends InputHandler {
     this.handlers.push(new GeneralInputHandler(store, globalController));
   }
 
-  handle(inputProp: InputHandlerProp, legacyProp?: InputProps): boolean {
+  handle(inputProp: InputHandlerProp, legacyEvent?: PointerEvent): boolean {
     for (const handler of this.handlers) {
-      if (handler.handle(inputProp, legacyProp) !== false) return true;
+      if (handler.handle(inputProp, legacyEvent) !== false) return true;
     }
     return false;
   }

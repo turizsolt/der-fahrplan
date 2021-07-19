@@ -20,7 +20,7 @@ import { Store } from '../../structs/Interfaces/Store';
 import { GUISpecificController } from './GUISpecificController';
 
 export class InputController {
-  private downProps: InputProps = null;
+  private downProps: boolean = false;
   private downAt: number = 0;
   private mouseDownEvent: PointerEvent = null;
 
@@ -28,12 +28,13 @@ export class InputController {
     private store: Store,
     private inputHandler: InputHandler,
     private specificController: GUISpecificController
-  ) { }
+  ) {
+    store.setInputController(this);
+  }
 
-  private convert(event: PointerEvent, isClick: boolean): InputProps {
-    const { pickedPoint, pickedMesh } = isClick
-      ? this.specificController.pick(event)
-      : { pickedMesh: null, pickedPoint: null };
+  // todo proper injection thingy
+  convertEventToProps(event: PointerEvent): InputProps {
+    const { pickedPoint, pickedMesh } = this.specificController.pick(event);
 
     if (!pickedPoint) {
       return {
@@ -75,9 +76,9 @@ export class InputController {
   }
 
   down(event: PointerEvent) {
-    this.downProps = this.convert(event, true);
+    this.downProps = true;
     this.downAt = new Date().getTime();
-    this.handleMouse(Input.MouseDown, event, true);
+    this.handleMouse(Input.MouseDown, event);
     this.mouseDownEvent = event;
   }
 
@@ -92,9 +93,9 @@ export class InputController {
         ctrlKey: this.mouseDownEvent.ctrlKey,
         shiftKey: this.mouseDownEvent.shiftKey
       };
-      this.handleMouse(Input.MouseMove, event2, false);
+      this.handleMouse(Input.MouseMove, event2);
     } else {
-      this.handleMouse(Input.MouseRoam, event, false);
+      this.handleMouse(Input.MouseRoam, event);
     }
   }
 
@@ -103,21 +104,21 @@ export class InputController {
 
     const now = new Date().getTime();
     if (now - this.downAt < 500) {
-      this.handleMouse(Input.MouseClick, event, true);
+      this.handleMouse(Input.MouseClick, event);
     } else {
-      this.handleMouse(Input.MouseUp, event, true);
+      this.handleMouse(Input.MouseUp, event);
     }
-    this.downProps = null;
+    this.downProps = false;
   }
 
-  private handleMouse(input: Input, event: PointerEvent, isClick: boolean): void {
+  private handleMouse(input: Input, event: PointerEvent): void {
     this.inputHandler.handle(
       {
         input,
         type: this.getMouseButton(event),
         mod: this.getMouseMods(event)
       },
-      { ...this.convert(event, isClick), downProps: this.downProps }
+      event
     );
   }
 

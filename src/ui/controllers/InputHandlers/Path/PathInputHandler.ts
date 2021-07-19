@@ -36,51 +36,53 @@ export class PathInputHandler extends InputHandler {
     this.plugin.init();
     this.commandLog = store.getCommandLog();
 
-    this.reg(click(MouseLeft), (legacyProps: InputProps) => {
-        if(!this.canPushAJoint(legacyProps)) return false;
+    this.reg(click(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
+      if (!this.canPushAJoint(legacyProps)) return false;
     });
 
-    this.reg(click(MouseRight), (legacyProps: InputProps) => {
-        if(!this.canPushAJoint(legacyProps)) return false;
+    this.reg(click(MouseRight), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
+      if (!this.canPushAJoint(legacyProps)) return false;
 
-        const pathBlocksEnds = this.jointEnds.map(
-          je => je.joint.getEnd(je.end) as PathBlockEnd
-        );
-        const blockEnd = this.jointEnds[0].joint.getEnd(
-          this.jointEnds[0].end
-        );
-        const pathBlockEnd = blockEnd as PathBlockEnd;
-        const pathBlock = pathBlockEnd.getPathBlock();
-        pathBlock.addRule({
-          filter: '',  
-          from: pathBlocksEnds[0],
-          toOptions: pathBlocksEnds.slice(1)
-        });
-        
-        this.jointEnds = [];
+      const pathBlocksEnds = this.jointEnds.map(
+        je => je.joint.getEnd(je.end) as PathBlockEnd
+      );
+      const blockEnd = this.jointEnds[0].joint.getEnd(
+        this.jointEnds[0].end
+      );
+      const pathBlockEnd = blockEnd as PathBlockEnd;
+      const pathBlock = pathBlockEnd.getPathBlock();
+      pathBlock.addRule({
+        filter: '',
+        from: pathBlocksEnds[0],
+        toOptions: pathBlocksEnds.slice(1)
+      });
+
+      this.jointEnds = [];
     });
   }
 
-  private canPushAJoint(legacyProps: InputProps):boolean {
+  private canPushAJoint(legacyProps: InputProps): boolean {
     const meshInfo = this.getMeshInfo(legacyProps?.mesh?.id);
-    if(!meshInfo || !meshInfo.storedBrick) return false;
-    if(meshInfo.type !== TYPES.BlockJoint) return false;
+    if (!meshInfo || !meshInfo.storedBrick) return false;
+    if (meshInfo.type !== TYPES.BlockJoint) return false;
 
     const joint = this.store.get(meshInfo.id) as BlockJoint;
     const end = meshInfo.command === 'jointA' ? WhichEnd.A : WhichEnd.B;
 
-    if(joint?.getEnd(end)?.getType() !== TYPES.PathBlockEnd) return false;
+    if (joint?.getEnd(end)?.getType() !== TYPES.PathBlockEnd) return false;
 
-    this.jointEnds.push({joint, end});
+    this.jointEnds.push({ joint, end });
     return true;
   }
 
   // todo duplicate from SelectInputHandler
   private getMeshInfo(meshId: string): MeshInfo {
-    if(!meshId) return null;
+    if (!meshId) return null;
 
     if (meshId.includes('.')) {
-        meshId = meshId.slice(0, meshId.indexOf('.'));
+      meshId = meshId.slice(0, meshId.indexOf('.'));
     }
 
     if (meshId.startsWith('clickable-')) {
@@ -88,7 +90,7 @@ export class PathInputHandler extends InputHandler {
       const storedObj = this.store.get(id);
       const storedBrick = storedObj as BaseBrick;
       return {
-          typeString: type, id, command, storedBrick, type: storedBrick?.getType()
+        typeString: type, id, command, storedBrick, type: storedBrick?.getType()
       };
     }
 

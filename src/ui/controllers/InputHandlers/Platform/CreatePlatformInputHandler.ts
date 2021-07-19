@@ -28,7 +28,8 @@ export class CreatePlatformInputHandler extends InputHandler {
         : new CreatePlatformInputHandlerBabylon();
     this.plugin.init();
 
-    this.reg(drag(MouseLeft), (legacyProps: InputProps) => {
+    this.reg(drag(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const pot = legacyProps.snappedPositionOnTrack;
       if (pot && pot.track.constructor.name === ActualTrack.name) {
         const point = pot.track
@@ -41,7 +42,8 @@ export class CreatePlatformInputHandler extends InputHandler {
       }
     });
 
-    this.reg(roam(), (legacyProps: InputProps) => {
+    this.reg(roam(), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const pot = legacyProps.snappedPositionOnTrack;
       if (pot && pot.track.constructor.name === ActualTrack.name) {
         const point = pot.track
@@ -55,7 +57,8 @@ export class CreatePlatformInputHandler extends InputHandler {
       }
     });
 
-    this.reg(move(MouseLeft), (legacyProps: InputProps) => {
+    this.reg(move(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const pot = legacyProps.snappedPositionOnTrack;
       if (pot && pot.track.constructor.name === ActualTrack.name) {
         const point = pot.track
@@ -80,7 +83,8 @@ export class CreatePlatformInputHandler extends InputHandler {
       }
     });
 
-    this.reg(drop(MouseLeft), (legacyProps: InputProps) => {
+    this.reg(drop(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const props = legacyProps;
       const downProps = legacyProps.downProps;
 

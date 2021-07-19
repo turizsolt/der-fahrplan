@@ -34,6 +34,7 @@ import { Sensor } from '../../../modules/Signaling/Sensor';
 import { SensorRenderer } from '../../Renderers/SensorRenderer';
 import { CapacityCap } from '../../../modules/Signaling/CapacityCap/CapacityCap';
 import { CapacityCapRenderer } from '../../Renderers/CapacityCapRenderer';
+import { InputController } from '../../../ui/controllers/InputController';
 
 @injectable()
 export class ActualStore implements Store {
@@ -363,5 +364,15 @@ export class ActualStore implements Store {
 
   getCommandLog(): CommandLog {
     return this.logStore;
+  }
+
+  private ic: InputController = null;
+
+  setInputController(ic: InputController): void {
+    this.ic = ic;
+  }
+
+  getInputController(): InputController {
+    return this.ic;
   }
 }

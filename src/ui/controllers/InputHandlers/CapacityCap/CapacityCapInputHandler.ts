@@ -35,7 +35,8 @@ export class CapacityCapInputHandler extends InputHandler {
     this.plugin.init();
     this.commandLog = store.getCommandLog();
 
-    this.reg(click(MouseLeft), (legacyProps: InputProps) => {
+    this.reg(click(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const meshInfo = this.getMeshInfo(legacyProps?.mesh?.id);
       if (!meshInfo || !meshInfo.storedBrick) return false;
       if (meshInfo.type !== TYPES.BlockJoint) return false;

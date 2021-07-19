@@ -69,18 +69,21 @@ export class TrackInputHandler extends InputHandler {
       }
     });
 
-    this.reg(move(MouseLeft), (legacyProp: InputProps) => {
+    this.reg(move(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       this.move(legacyProp);
       this.props = legacyProp;
     });
 
-    this.reg(roam(), (legacyProp: InputProps) => {
+    this.reg(roam(), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       this.plugin.roam(legacyProp);
 
       this.props = legacyProp;
     });
 
-    this.reg(click(MouseLeft), (legacyProp: InputProps) => {
+    this.reg(click(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       if (!legacyProp.snappedJoint && !legacyProp.snappedPositionOnTrack) {
         this.commandLog.addAction(
           CommandCreator.createTrackJoint(
@@ -99,7 +102,8 @@ export class TrackInputHandler extends InputHandler {
       this.isRoam = true;
     });
 
-    this.reg(drag(MouseLeft), (legacyProp: InputProps) => {
+    this.reg(drag(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       this.downWheelRad = this.wheelRad;
       this.plugin.down(legacyProp);
       this.isRoam = false;
@@ -108,8 +112,8 @@ export class TrackInputHandler extends InputHandler {
       this.props = legacyProp;
     });
 
-    this.reg(drop(MouseLeft), (legacyProp: InputProps) => {
-      console.log('drop');
+    this.reg(drop(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       const props = legacyProp;
       const downProps = legacyProp.downProps;
       this.isRoam = true;

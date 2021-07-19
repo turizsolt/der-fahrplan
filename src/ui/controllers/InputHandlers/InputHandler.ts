@@ -3,7 +3,6 @@ import { InputHandlerFunction } from './Interfaces/InputHandlerFunction';
 import { RegisteredInputHandler } from './Interfaces/RegisteredInputHandler';
 import { InputMod } from './Interfaces/InputMod';
 import { InputType } from './Interfaces/InputType';
-import { InputProps } from '../InputProps';
 
 export class InputHandler {
   private registeredHandlers: RegisteredInputHandler[] = [];
@@ -16,10 +15,10 @@ export class InputHandler {
     this.registeredHandlers.push({ prop, fn });
   }
 
-  handle(inputProp: InputHandlerProp, legacyProp?: InputProps): boolean {
+  handle(inputProp: InputHandlerProp, legacyEvent?: PointerEvent): boolean {
     for (let handler of this.registeredHandlers) {
       if (this.matches(inputProp, handler.prop)) {
-        if (handler.fn(legacyProp) !== false) {
+        if (handler.fn(legacyEvent) !== false) {
           return true;
         }
       }

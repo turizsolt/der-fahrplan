@@ -2,7 +2,6 @@ import { InputHandler } from './InputHandler';
 import { InputMode } from './InputMode';
 import { VueToolbox } from '../VueToolbox';
 import { InputHandlerProp } from './Interfaces/InputHandlerProp';
-import { InputProps } from '../InputProps';
 import { TrackInputHandler } from './Track/TrackInputHandler';
 import { Store } from '../../../structs/Interfaces/Store';
 import { CreateEngineInputHandler } from './Engine/CreateEngineInputHandler';
@@ -63,8 +62,8 @@ export class ToolInputHandler extends InputHandler {
     this.vueToolbox.setSelected(mode);
   }
 
-  handle(inputProp: InputHandlerProp, legacyProp?: InputProps): boolean {
+  handle(inputProp: InputHandlerProp, legacyEvent?: PointerEvent): boolean {
     if (!this.inputHandler) return false;
-    return this.inputHandler.handle(inputProp, legacyProp);
+    return this.inputHandler.handle(inputProp, legacyEvent);
   }
 }
