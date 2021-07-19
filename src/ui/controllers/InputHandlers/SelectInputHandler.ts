@@ -19,29 +19,31 @@ export class SelectInputHandler extends InputHandler {
   constructor(private store: Store, private vueSidebar: VueSidebar) {
     super();
 
-    this.reg(click(MouseLeft), (legacyProp: InputProps) => {
+    this.reg(click(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       const meshInfo = this.getMeshInfo(legacyProp?.mesh?.id);
-      if(!meshInfo || !meshInfo.storedBrick) return false;
+      if (!meshInfo || !meshInfo.storedBrick) return false;
 
-      const {storedBrick} = meshInfo;
+      const { storedBrick } = meshInfo;
       let selected: BaseStorable = this.store.getSelected();
 
-      if(selected) {
+      if (selected) {
         this.deselect(selected);
       }
 
-      if (storedBrick !== selected) {  
+      if (storedBrick !== selected) {
         this.select(storedBrick);
       }
-    
-      return true;  
+
+      return true;
     });
 
-    this.reg(click(MouseRight), (legacyProp: InputProps) => {
+    this.reg(click(MouseRight), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       const meshInfo = this.getMeshInfo(legacyProp?.mesh?.id);
-      if(!meshInfo || !meshInfo.storedBrick) return false;
+      if (!meshInfo || !meshInfo.storedBrick) return false;
 
-      const {command, storedBrick} = meshInfo;
+      const { command, storedBrick } = meshInfo;
 
       // unmerging train
       if (command && command === 'endA') {
@@ -84,12 +86,12 @@ export class SelectInputHandler extends InputHandler {
   // SELECT
 
   private selectCallback: (ob: Object) => void = null;
-  
+
   private getMeshInfo(meshId: string): MeshInfo {
-    if(!meshId) return null;
+    if (!meshId) return null;
 
     if (meshId.includes('.')) {
-        meshId = meshId.slice(0, meshId.indexOf('.'));
+      meshId = meshId.slice(0, meshId.indexOf('.'));
     }
 
     if (meshId.startsWith('clickable-')) {
@@ -97,7 +99,7 @@ export class SelectInputHandler extends InputHandler {
       const storedObj = this.store.get(id);
       const storedBrick = storedObj as BaseBrick;
       return {
-          typeString: type, id, command, storedBrick, type: storedBrick?.getType()
+        typeString: type, id, command, storedBrick, type: storedBrick?.getType()
       };
     }
 
@@ -107,12 +109,12 @@ export class SelectInputHandler extends InputHandler {
   // TODO - should work for all, not just wagons...
   private setCallbackOff(selected: BaseStorable) {
     if (
-        this.selectCallback && 
-        selected &&
-        (selected.getType() === TYPES.Wagon || selected.getType() === TYPES.PathBlock)
-      ) {
-        (selected as unknown as Emitable).off('info', this.selectCallback);
-      }
+      this.selectCallback &&
+      selected &&
+      (selected.getType() === TYPES.Wagon || selected.getType() === TYPES.PathBlock)
+    ) {
+      (selected as unknown as Emitable).off('info', this.selectCallback);
+    }
   }
 
   // TODO - should work for all, not just wagons...
@@ -126,10 +128,10 @@ export class SelectInputHandler extends InputHandler {
   }
 
   convertSymbolToType(type: Symbol): string {
-    if(type === Symbol.for('Passenger')) return 'passenger';
-    if(type === Symbol.for('Wagon')) return 'wagon';
-    if(type === Symbol.for('Station')) return 'station';
-    if(type === Symbol.for('PathBlock')) return 'pathblock';
+    if (type === Symbol.for('Passenger')) return 'passenger';
+    if (type === Symbol.for('Wagon')) return 'wagon';
+    if (type === Symbol.for('Station')) return 'station';
+    if (type === Symbol.for('PathBlock')) return 'pathblock';
     return 'idtext';
   }
 
@@ -149,6 +151,6 @@ export class SelectInputHandler extends InputHandler {
 
     // todo - emiting
     this.vueSidebar.setData('selected', Object.freeze(selectable.persistDeep()));
-    this.vueSidebar.setData('type',this.convertSymbolToType(selectable.getType()));
+    this.vueSidebar.setData('type', this.convertSymbolToType(selectable.getType()));
   }
 }

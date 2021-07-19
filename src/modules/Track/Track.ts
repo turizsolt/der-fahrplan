@@ -7,4 +7,6 @@ export interface Track extends TrackBase {
 
   getAx(): TrackEnd;
   getBx(): TrackEnd;
+
+  getTrackType(): string;
 }

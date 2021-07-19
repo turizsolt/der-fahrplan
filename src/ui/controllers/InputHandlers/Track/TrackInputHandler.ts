@@ -69,18 +69,21 @@ export class TrackInputHandler extends InputHandler {
       }
     });
 
-    this.reg(move(MouseLeft), (legacyProp: InputProps) => {
+    this.reg(move(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       this.move(legacyProp);
       this.props = legacyProp;
     });
 
-    this.reg(roam(), (legacyProp: InputProps) => {
+    this.reg(roam(), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       this.plugin.roam(legacyProp);
 
       this.props = legacyProp;
     });
 
-    this.reg(click(MouseLeft), (legacyProp: InputProps) => {
+    this.reg(click(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       if (!legacyProp.snappedJoint && !legacyProp.snappedPositionOnTrack) {
         this.commandLog.addAction(
           CommandCreator.createTrackJoint(
@@ -95,26 +98,26 @@ export class TrackInputHandler extends InputHandler {
       // return false;
 
       this.downProps = null;
-      this.plugin.up(legacyProp.downProps, legacyProp);
+      this.plugin.up(this.downProps, legacyProp);
       this.isRoam = true;
     });
 
-    this.reg(drag(MouseLeft), (legacyProp: InputProps) => {
+    this.reg(drag(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       this.downWheelRad = this.wheelRad;
       this.plugin.down(legacyProp);
       this.isRoam = false;
 
-      this.downProps = legacyProp.downProps;
+      this.downProps = legacyProp;
       this.props = legacyProp;
     });
 
-    this.reg(drop(MouseLeft), (legacyProp: InputProps) => {
-      console.log('drop');
+    this.reg(drop(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProp = this.store.getInputController().convertEventToProps(legacyEvent);
       const props = legacyProp;
-      const downProps = legacyProp.downProps;
+      const downProps = this.downProps;
       this.isRoam = true;
 
-      this.downProps = null;
       this.props = legacyProp;
 
       // only if the point is not on a track, except the two ends
@@ -130,7 +133,6 @@ export class TrackInputHandler extends InputHandler {
         let j1, j2: TrackJoint;
         const deletable: TrackJoint[] = [];
         const actions: Command[] = [];
-        console.log('ok');
 
         // if there is a joint to snap, then do not create a new
         if (downProps.snappedJoint) {
@@ -172,7 +174,6 @@ export class TrackInputHandler extends InputHandler {
         }
 
         const ret = TrackJointConnector.connect(j1, j2);
-        console.log('ret', ret);
 
         const replacementIds = deletable.map(j => j.getId());
 
@@ -206,7 +207,9 @@ export class TrackInputHandler extends InputHandler {
           });
         }
       }
-      this.plugin.up(legacyProp.downProps, legacyProp);
+      this.plugin.up(this.downProps, legacyProp);
+      this.downProps = null;
+
       return true;
 
     });
@@ -214,9 +217,13 @@ export class TrackInputHandler extends InputHandler {
 
   move(legacyProp: InputProps): void {
     const props = legacyProp;
-    const downProps = legacyProp.downProps;
-    props.snappedPoint.dirXZ = this.wheelRad;
-    downProps.snappedPoint.dirXZ = this.downWheelRad;
+    const downProps = this.downProps;
+    if (props.snappedPoint) {
+      props.snappedPoint.dirXZ = this.wheelRad;
+    }
+    if (downProps.snappedPoint) {
+      downProps.snappedPoint.dirXZ = this.downWheelRad;
+    }
     if (props.snappedJoint) {
       props.snappedPoint.dirXZ = props.snappedJoint.getRotation();
     }

@@ -17,4 +17,6 @@ export interface TrackSwitch extends TrackBase {
   getSegmentLeft(): TrackCurve;
   getSegmentRight(): TrackCurve;
   getAdjacentDirectedTracks(): DirectedTrack[];
+
+  getTrackTypes(): string[];
 }

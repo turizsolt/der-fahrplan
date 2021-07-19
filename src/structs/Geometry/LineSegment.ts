@@ -6,7 +6,7 @@ import { Left } from './Directions';
 import { Circle } from './Circle';
 
 export class LineSegment {
-  private constructor(public a: Coordinate, public b: Coordinate) {}
+  private constructor(public a: Coordinate, public b: Coordinate) { }
 
   static fromTwoPoints(a: Coordinate, b: Coordinate) {
     return new LineSegment(a, b);
@@ -70,7 +70,7 @@ export class LineSegment {
   crossProduct(p: Coordinate) {
     return Math.sign(
       (this.b.x - this.a.x) * (p.z - this.a.z) -
-        (this.b.z - this.a.z) * (p.x - this.a.x)
+      (this.b.z - this.a.z) * (p.x - this.a.x)
     );
   }
 
@@ -96,4 +96,11 @@ export class LineSegment {
       return null;
     }
   }
+}
+
+export function crossProduct(a: Coordinate, b: Coordinate, p: Coordinate) {
+  return Math.sign(
+    (b.x - a.x) * (p.z - a.z) -
+    (b.z - a.z) * (p.x - a.x)
+  );
 }

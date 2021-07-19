@@ -21,6 +21,4 @@ export interface InputProps {
     position: number;
     segment: string;
   };
-
-  downProps?: InputProps;
 }

@@ -20,7 +20,7 @@ import { Store } from '../../structs/Interfaces/Store';
 import { GUISpecificController } from './GUISpecificController';
 
 export class InputController {
-  private downProps: InputProps = null;
+  private downProps: boolean = false;
   private downAt: number = 0;
   private mouseDownEvent: PointerEvent = null;
 
@@ -28,9 +28,12 @@ export class InputController {
     private store: Store,
     private inputHandler: InputHandler,
     private specificController: GUISpecificController
-  ) {}
+  ) {
+    store.setInputController(this);
+  }
 
-  private convert(event: PointerEvent): InputProps {
+  // todo proper injection thingy
+  convertEventToProps(event: PointerEvent): InputProps {
     const { pickedPoint, pickedMesh } = this.specificController.pick(event);
 
     if (!pickedPoint) {
@@ -73,7 +76,7 @@ export class InputController {
   }
 
   down(event: PointerEvent) {
-    this.downProps = this.convert(event);
+    this.downProps = true;
     this.downAt = new Date().getTime();
     this.handleMouse(Input.MouseDown, event);
     this.mouseDownEvent = event;
@@ -105,7 +108,7 @@ export class InputController {
     } else {
       this.handleMouse(Input.MouseUp, event);
     }
-    this.downProps = null;
+    this.downProps = false;
   }
 
   private handleMouse(input: Input, event: PointerEvent): void {
@@ -115,27 +118,27 @@ export class InputController {
         type: this.getMouseButton(event),
         mod: this.getMouseMods(event)
       },
-      { ...this.convert(event), downProps: this.downProps }
+      event
     );
   }
 
   // todo clean up any-s
   private getMouseMods(event: PointerEvent | WheelEvent): InputMod {
     return (event.ctrlKey || (event as any)?.data?.originalEvent?.ctrlKey)
-      ? (event.shiftKey  || (event as any)?.data?.originalEvent?.shiftKey)
+      ? (event.shiftKey || (event as any)?.data?.originalEvent?.shiftKey)
         ? InputMod.Both
         : InputMod.Ctrl
-      : (event.shiftKey  || (event as any)?.data?.originalEvent?.shiftKey)
-      ? InputMod.Shift
-      : InputMod.None;
+      : (event.shiftKey || (event as any)?.data?.originalEvent?.shiftKey)
+        ? InputMod.Shift
+        : InputMod.None;
   }
 
   private getMouseButton(event: PointerEvent): InputType {
     return event.button === 0
       ? InputType.MouseLeft
       : event.button === 2
-      ? InputType.MouseRight
-      : InputType.MouseMiddle;
+        ? InputType.MouseRight
+        : InputType.MouseMiddle;
   }
 
   wheel(event: WheelEvent) {
@@ -185,8 +188,8 @@ export class InputController {
         ? InputMod.Both
         : InputMod.Shift
       : mods.ctrl
-      ? InputMod.Ctrl
-      : InputMod.None;
+        ? InputMod.Ctrl
+        : InputMod.None;
   }
 
   private getTick(): InputHandlerProp {

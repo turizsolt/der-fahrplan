@@ -7,7 +7,7 @@ export class BabylonController implements GUISpecificController {
   constructor(
     private scene: BABYLON.Scene,
     private camera: BABYLON.ArcRotateCamera
-  ) {}
+  ) { }
 
   getCamera(): BABYLON.ArcRotateCamera {
     return this.camera;
@@ -28,7 +28,7 @@ export class BabylonController implements GUISpecificController {
     };
   }
 
-  pick(event: any): BABYLON.PickingInfo {
+  pick(event: any): any {
     return this.scene.pick(this.scene.pointerX, this.scene.pointerY);
   }
 
@@ -52,11 +52,10 @@ export class BabylonController implements GUISpecificController {
     );
   }
 
-  getFps(): string {
+  getFps(): number {
     return this.camera
       .getEngine()
-      .getFps()
-      .toFixed();
+      .getFps();
   }
 
   saveSpecific(): any {

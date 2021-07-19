@@ -90,30 +90,44 @@ export class GlobalController {
     }
   }
 
+  private avgFps: number = 0;
+
   tick() {
     const speed = this.store.getTickSpeed();
-    this.store.tick();
-    const count = Math.floor(this.store.getTickCount() / 60);
-    this.vueSidebar.setData(
-      'tickCount',
-      Math.floor(count / 60) + ':' + (count % 60 < 10 ? '0' : '') + (count % 60)
-    );
-    this.vueSidebar.setData('tickSpeed', speed);
-    this.vueSidebar.setData('fps', this.specificController.getFps());
-    const passengerStats = this.store.getPassengerStats();
-    this.vueSidebar.setData('passengerCount', passengerStats.count);
-    this.vueSidebar.setData(
-      'passengerArrivedCount',
-      passengerStats.arrivedCount
-    );
-    this.vueSidebar.setData(
-      'passengerAverageArriveSpeed',
-      Math.round(passengerStats.averageArriveSpeed * 100) / 100
-    );
 
-    if (passengerStats.arrivedCount >= this.targetPassengerCount) {
-      alert('Nyertél! Elvittél ' + this.targetPassengerCount + ' utast.');
-      this.targetPassengerCount = 9999999;
+    for (let i = 0; i < speed; i++) {
+
+      this.store.tick();
+      const tickCount = this.store.getTickCount();
+      const count = Math.floor(tickCount / 60);
+
+      if (tickCount % 60 === 0) {
+        this.vueSidebar.setData(
+          'tickCount',
+          Math.floor(count / 60) + ':' + (count % 60 < 10 ? '0' : '') + (count % 60)
+        );
+        this.vueSidebar.setData('tickSpeed', speed);
+        this.vueSidebar.setData('fps', (this.avgFps / 60).toFixed(2));
+
+        const passengerStats = this.store.getPassengerStats();
+        this.vueSidebar.setData('passengerCount', passengerStats.count);
+        this.vueSidebar.setData(
+          'passengerArrivedCount',
+          passengerStats.arrivedCount
+        );
+        this.vueSidebar.setData(
+          'passengerAverageArriveSpeed',
+          Math.round(passengerStats.averageArriveSpeed * 100) / 100
+        );
+
+        if (passengerStats.arrivedCount >= this.targetPassengerCount) {
+          alert('Nyertél! Elvittél ' + this.targetPassengerCount + ' utast.');
+          this.targetPassengerCount = 9999999;
+        }
+        this.avgFps = 0;
+      }
+
+      this.avgFps += this.specificController.getFps();
     }
   }
 

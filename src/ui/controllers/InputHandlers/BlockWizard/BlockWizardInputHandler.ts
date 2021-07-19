@@ -46,7 +46,8 @@ export class BlockWizardInputHandler extends InputHandler {
     this.plugin.init();
     this.commandLog = store.getCommandLog();
 
-    this.reg(click(), (legacyProps: InputProps) => {
+    this.reg(click(), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const dpot = legacyProps.snappedPositionOnTrack;
       const position =
         dpot &&
@@ -68,7 +69,8 @@ export class BlockWizardInputHandler extends InputHandler {
       this.plugin.click();
     });
 
-    this.reg(roam(), (legacyProps: InputProps) => {
+    this.reg(roam(), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const pot = legacyProps.snappedPositionOnTrack;
       if (
         pot &&
@@ -89,7 +91,6 @@ export class BlockWizardInputHandler extends InputHandler {
 
   wizardBlock(position: PositionOnTrack): void {
     const opposition = position.opposition();
-    console.log('wizard block');
 
     const nearestForward = Nearest.blockJoint(position);
     const nearestBackward = Nearest.blockJoint(opposition);
@@ -125,8 +126,6 @@ export class BlockWizardInputHandler extends InputHandler {
       Math.floor(wholeDistance / signalMinimumDistance)
     );
     const signalPlantingDistance = wholeDistance / signalCount;
-
-    console.log(wholeDistance, signalCount, signalPlantingDistance);
 
     const pos = backward.position.opposition();
     const joints = [] as BlockJointEnd[];
@@ -217,7 +216,6 @@ export class BlockWizardInputHandler extends InputHandler {
       pot.reverse();
 
       const nearestData = Nearest.platform(pot.clone());
-      console.log(nearestData);
       if (nearestData?.distance < 30) {
         this.store.create<Sensor>(TYPES.Sensor).init(nearestData.position, pb, pbe);
       } else {

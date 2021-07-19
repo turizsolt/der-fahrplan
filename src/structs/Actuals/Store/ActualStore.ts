@@ -34,6 +34,7 @@ import { Sensor } from '../../../modules/Signaling/Sensor';
 import { SensorRenderer } from '../../Renderers/SensorRenderer';
 import { CapacityCap } from '../../../modules/Signaling/CapacityCap/CapacityCap';
 import { CapacityCapRenderer } from '../../Renderers/CapacityCapRenderer';
+import { InputController } from '../../../ui/controllers/InputController';
 
 @injectable()
 export class ActualStore implements Store {
@@ -284,33 +285,31 @@ export class ActualStore implements Store {
   }
 
   private tickSpeed: number = 0;
-  private tickCount: number = 0;
+  private tickCount: number = 4 * 60 * 60;
 
   tick(): void {
-    if (this.tickSpeed) {
-      this.tickCount += this.tickSpeed;
+    this.tickCount++;
+
+    const trains = this.getAllOf(TYPES.Train);
+    trains.map((train: Train) => {
+      train.tick();
+    });
+    this.getAllOf(TYPES.PathBlock).map((pb: PathBlock) => {
+      pb.tick();
+    });
+
+    if (this.getTickCount() % 120 === 0) {
+      if (!this.passengerGenerator) {
+        this.passengerGenerator = this.PassengerGeneratorFactory().init();
+      }
+      this.passengerGenerator.tick();
     }
 
-    for (let i = 0; i < this.tickSpeed; i++) {
-      // const time = new Date();
-      const trains = this.getAllOf(TYPES.Train);
-      trains.map((train: Train) => {
-        train.tick();
-      });
-      // const time2 = new Date();
-      this.getAllOf(TYPES.PathBlock).map((pb: PathBlock) => {
-        pb.tick();
-      });
-      // const time3 = new Date();
-
-      if ((this.getTickCount() + i) % 120 === 0) {
-        if (!this.passengerGenerator) {
-          this.passengerGenerator = this.PassengerGeneratorFactory().init();
-        }
-        this.passengerGenerator.tick();
+    if (globalThis.scene) {
+      if (this.getTickCount() % 60 === 0) {
+        globalThis.scene.unfreezeActiveMeshes();
+        globalThis.scene.freezeActiveMeshes();
       }
-      const time4 = new Date();
-      // globalThis.times.push([time.getTime(), time2.getTime(), time3.getTime(), time4.getTime(), trains.length]);
     }
   }
 
@@ -358,5 +357,15 @@ export class ActualStore implements Store {
 
   getCommandLog(): CommandLog {
     return this.logStore;
+  }
+
+  private ic: InputController = null;
+
+  setInputController(ic: InputController): void {
+    this.ic = ic;
+  }
+
+  getInputController(): InputController {
+    return this.ic;
   }
 }

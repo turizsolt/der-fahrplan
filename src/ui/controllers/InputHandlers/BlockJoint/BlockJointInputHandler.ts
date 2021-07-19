@@ -30,7 +30,8 @@ export class BlockJointInputHandler extends InputHandler {
     this.plugin.init();
     this.commandLog = store.getCommandLog();
 
-    this.reg(click(), (legacyProps: InputProps) => {
+    this.reg(click(), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const dpot = legacyProps.snappedPositionOnTrack;
 
       if (dpot && dpot.track.constructor.name === ActualTrack.name) {
@@ -48,7 +49,8 @@ export class BlockJointInputHandler extends InputHandler {
       this.plugin.click();
     });
 
-    this.reg(roam(), (legacyProps: InputProps) => {
+    this.reg(roam(), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const pot = legacyProps.snappedPositionOnTrack;
       if (pot && pot.track.constructor.name === ActualTrack.name) {
         const point = pot.track

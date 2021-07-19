@@ -12,6 +12,7 @@ import { Circle } from '../../../../structs/Geometry/Circle';
 
 export class CreateStationInputHandler extends InputHandler {
   private plugin: CreateStationInputHandlerPlugin;
+  private downProps: InputProps;
 
   constructor(private store: Store) {
     super();
@@ -23,7 +24,8 @@ export class CreateStationInputHandler extends InputHandler {
         : new CreateStationInputHandlerBabylon();
     this.plugin.init();
 
-    this.reg(drag(MouseLeft), (legacyProps: InputProps) => {
+    this.reg(drag(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       if (!legacyProps.snappedJoint) {
         this.plugin.setFrom(
           !legacyProps.snappedJoint && !legacyProps.snappedPositionOnTrack,
@@ -34,9 +36,12 @@ export class CreateStationInputHandler extends InputHandler {
         !legacyProps.snappedJoint && !legacyProps.snappedPositionOnTrack,
         legacyProps.snappedPoint.coord
       );
+
+      this.downProps = legacyProps;
     });
 
-    this.reg(roam(), (legacyProps: InputProps) => {
+    this.reg(roam(), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       if (legacyProps.snappedPoint) {
         this.plugin.setFrom(
           !legacyProps.snappedJoint && !legacyProps.snappedPositionOnTrack,
@@ -45,9 +50,10 @@ export class CreateStationInputHandler extends InputHandler {
       }
     });
 
-    this.reg(move(MouseLeft), (legacyProps: InputProps) => {
+    this.reg(move(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const props = legacyProps;
-      const downProps = legacyProps.downProps;
+      const downProps = this.downProps;
 
       this.plugin.setTo(!props.snappedJoint, props.snappedPoint.coord);
 
@@ -60,9 +66,10 @@ export class CreateStationInputHandler extends InputHandler {
       }
     });
 
-    this.reg(drop(MouseLeft), (legacyProps: InputProps) => {
+    this.reg(drop(MouseLeft), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const props = legacyProps;
-      const downProps = legacyProps.downProps;
+      const downProps = this.downProps;
 
       if (
         !downProps.snappedPoint.coord.equalsTo(props.snappedPoint.coord) &&
@@ -83,6 +90,8 @@ export class CreateStationInputHandler extends InputHandler {
         station.init(new Circle(pt, diam / 2));
       }
       this.plugin.up();
+
+      this.downProps = null;
     });
 
     this.reg(click(MouseLeft), () => {

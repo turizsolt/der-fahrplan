@@ -50,7 +50,11 @@ export class WagonBabylonRenderer extends BaseBabylonRenderer
 
     const ray = Ray.fromData(wagon.ray);
     this.mesh.position = CoordinateToBabylonVector3(ray.coord);
-    this.mesh.position.y = 4.2;
+    if (this.mesh.getChildren().length > 0) {
+      this.mesh.position.y = 4.2;
+    } else {
+      this.mesh.position.y = 3.2;
+    }
     this.mesh.rotation.y =
       ray.dirXZ +
       Math.PI / 2 +

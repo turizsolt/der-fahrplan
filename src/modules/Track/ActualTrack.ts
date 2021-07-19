@@ -15,15 +15,19 @@ import { DirectedTrack } from './DirectedTrack';
 import { TrackJoint } from './TrackJoint/TrackJoint';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { TrackSegment } from './TrackSegment';
+import { detectTrackType } from './DetectTrackType';
 
 @injectable()
 export class ActualTrack extends ActualTrackBase implements Track {
   protected segment: ActualTrackSegment;
+  protected trackType: string;
 
   @inject(TYPES.TrackRenderer) private renderer: TrackRenderer;
 
   init(segmentData: TrackSegmentData): Track {
     super.initStore(TYPES.Track);
+
+    this.trackType = detectTrackType(segmentData);
 
     this.segment = new ActualTrackSegment(this, segmentData);
     this.segment.connect();
@@ -31,6 +35,10 @@ export class ActualTrack extends ActualTrackBase implements Track {
     // todo emit
     this.renderer.init(this);
     return this;
+  }
+
+  getTrackType(): string {
+    return this.trackType;
   }
 
   getDirected(direction: TrackDirection): DirectedTrack {

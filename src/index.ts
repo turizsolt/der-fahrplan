@@ -182,6 +182,15 @@ if (globalThis.startParam === '2d') {
     const createScene = () => {
       const scene = new BABYLON.Scene(renderEngine);
 
+      // scene.autoClear = false; // Color buffer
+      // scene.autoClearDepthAndStencil = false; // Depth and stencil, obviously
+
+      var eventPrefix = BABYLON.Tools.GetPointerPrefix();
+      const canver = scene.getEngine().getRenderingCanvas() as any;
+      canver.removeEventListener(eventPrefix + "move", scene.onPointerMove);
+
+      globalThis.scene = scene;
+
       const meshProviderFactory = productionContainer.get<() => MeshProvider>(
         TYPES.FactoryOfMeshProvider
       );
@@ -207,11 +216,9 @@ if (globalThis.startParam === '2d') {
 
       (window as any).switches = [];
 
-      /*
       const gridDrawer = new GridDrawer();
       gridDrawer.setScene(scene);
       gridDrawer.drawGrid();
-      */
 
       scene.actionManager = new BABYLON.ActionManager(scene);
 
@@ -237,6 +244,9 @@ if (globalThis.startParam === '2d') {
     renderEngine.runRenderLoop(() => {
       scene.render();
     });
+
+    // todo it is dirty to do
+    setTimeout(() => globalThis.scene.freezeActiveMeshes(), 5000);
 
     window.addEventListener('resize', () => {
       renderEngine.resize();

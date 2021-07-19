@@ -28,7 +28,8 @@ export class CreateEngineInputHandler extends InputHandler {
         : new CreateEngineInputHandlerBabylon();
     this.plugin.init();
 
-    this.reg(click(), (legacyProps: InputProps) => {
+    this.reg(click(), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const dpot = legacyProps.snappedPositionOnTrack;
 
       const meshInfo = this.getMeshInfo(legacyProps?.mesh?.id);
@@ -53,7 +54,8 @@ export class CreateEngineInputHandler extends InputHandler {
       this.plugin.click();
     });
 
-    this.reg(roam(), (legacyProps: InputProps) => {
+    this.reg(roam(), (legacyEvent: PointerEvent) => {
+      const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
       const pot = legacyProps.snappedPositionOnTrack;
       if (pot && pot.track.constructor.name === ActualTrack.name) {
         const point = pot.track

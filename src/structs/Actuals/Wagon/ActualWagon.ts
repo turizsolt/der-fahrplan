@@ -56,9 +56,9 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
 
     // const deep = this.persistDeep();
     this.emit('init', {
-        id: this.id,
-        appearanceId: this.getAppearanceId(),
-        ray: null
+      id: this.id,
+      appearanceId: this.getAppearanceId(),
+      ray: null
     }); //this.persistData());//Object.freeze(deep));
 
     return this;
@@ -105,9 +105,12 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   update() {
     //this.renderer.update();
 
-    const deep = this.persistDeep();
     this.emit('update', this.persistData());
-    this.emit('info', Object.freeze(deep));
+
+    if (this.isSelected()) {
+      const deep = this.persistDeep();
+      this.emit('info', Object.freeze(deep));
+    }
   }
 
   ///////////////////////////
@@ -219,16 +222,16 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
     this.update();
   }
 
-  hasControl(whichEnd: WhichEnd):boolean {
-      return this.axles.hasControl(whichEnd);
+  hasControl(whichEnd: WhichEnd): boolean {
+    return this.axles.hasControl(whichEnd);
   }
 
-  hasEngine():boolean {
+  hasEngine(): boolean {
     return this.axles.hasEngine();
   }
 
-  getFacing():TrackDirection {
-      return this.axles.getFacing();
+  getFacing(): TrackDirection {
+    return this.axles.getFacing();
   }
 
   ///////////////////////
@@ -251,8 +254,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
           B: this.getConnectable(WhichEnd.B)
         },
         control: {
-            A: this.hasControl(WhichEnd.A),
-            B: this.hasControl(WhichEnd.B),
+          A: this.hasControl(WhichEnd.A),
+          B: this.hasControl(WhichEnd.B),
         },
         engine: this.hasEngine(),
         appearanceFacing: this.axles.getFacing()
@@ -278,22 +281,22 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   }
 
   persistData(): WagonData {
-      return {
-          id: this.id,
-          appearanceId: this.getAppearanceId(),
-          appearanceFacing: this.axles.getFacing(),
-          ray: this.getCenterRay().persist(),
-          rayA: this.getAxlePosition(WhichEnd.A).getRay().persist(),
-          rayB: this.getAxlePosition(WhichEnd.B).getRay().persist(),
-          isTrainSelected: this.isSelected(),
-          isFirst: this === Util.first(this.getTrain()?.getWagons()),
-          isShunting: this.getTrain()?.getSpeed()?.isShunting()
-      }
+    return {
+      id: this.id,
+      appearanceId: this.getAppearanceId(),
+      appearanceFacing: this.axles.getFacing(),
+      ray: this.getCenterRay().persist(),
+      rayA: this.getAxlePosition(WhichEnd.A).getRay().persist(),
+      rayB: this.getAxlePosition(WhichEnd.B).getRay().persist(),
+      isTrainSelected: this.isSelected(),
+      isFirst: this === Util.first(this.getTrain()?.getWagons()),
+      isShunting: this.getTrain()?.getSpeed()?.isShunting()
+    }
   }
 
   select(): void {
-      super.select();
-      this.update();
+    super.select();
+    this.update();
   }
 
   deselect(): void {
@@ -304,7 +307,7 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(obj.config);
-    
+
     this.setSeatCount(obj.seatCount, obj.seatColumns);
     this.boardable.load(obj.seats, store);
   }

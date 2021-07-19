@@ -3,10 +3,10 @@ import { TrackRenderer } from '../../structs/Renderers/TrackRenderer';
 import { injectable, inject } from 'inversify';
 import { Track } from '../../modules/Track/Track';
 import { BaseBabylonRenderer } from './BaseBabylonRenderer';
-import { Left, Right } from '../../structs/Geometry/Directions';
 import { TYPES } from '../../di/TYPES';
 import { MeshProvider } from './MeshProvider';
 import { MaterialName } from './MaterialName';
+import { renderTrackType } from './TrackTypeBabylonRenderer';
 
 @injectable()
 export class TrackBabylonRenderer extends BaseBabylonRenderer
@@ -18,19 +18,20 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
   private selectableMeshes: BABYLON.AbstractMesh[];
 
   init(track: Track): void {
-    return;
-
     this.track = track;
     this.meshProvider = this.meshProviderFactory();
-    const chain = this.track.getCurve().getLineSegmentChain();
-    const len = this.track.getCurve().getLength();
 
     const name = 'clickable-track-' + this.track.getId();
 
-    const bedSegmentMeshes = chain
-      .getRayPairs()
-      .map(v => this.meshProvider.createBedSegmentMesh(v, name));
+    const bedSegmentMeshes = renderTrackType(this.track.getTrackType(), this.track.getCurve(), this.meshProvider, name);
 
+    this.meshes = [
+      ...bedSegmentMeshes,
+    ];
+
+    this.selectableMeshes = [];
+
+    /*
     const sleeperMeshes = chain
       .getEvenlySpacedRays(len / Math.floor(len))
       .map(v => this.meshProvider.createSleeperMesh(v, name));
@@ -44,15 +45,13 @@ export class TrackBabylonRenderer extends BaseBabylonRenderer
       .copyMove(Right, 1)
       .getRayPairs()
       .map(rp => this.meshProvider.createRailSegmentMesh(rp, name));
-
-    this.meshes = [
-      ...bedSegmentMeshes,
-      ...sleeperMeshes,
-      ...leftRailMeshes,
-      ...rightRailMeshes
-    ];
-
-    this.selectableMeshes = [...sleeperMeshes];
+    */
+    /*
+    ...sleeperMeshes,
+    ...leftRailMeshes,
+    ...rightRailMeshes
+    */
+    /*...sleeperMeshes*/
   }
 
   private lastSelected: boolean = false;
