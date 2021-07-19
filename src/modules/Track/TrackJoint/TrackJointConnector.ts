@@ -44,7 +44,7 @@ export class TrackJointConnector {
       const oldTrack: Track = ((oneEnd && oneEnd.getTrack()) ||
         (otherEnd && otherEnd.getTrack())) as Track;
       // console.log('oldTrack', oldTrack, (oneEnd && oneEnd.getTrack()),
-      (otherEnd && otherEnd.getTrack()));
+      // (otherEnd && otherEnd.getTrack()));
       if (oldTrack.constructor.name === ActualTrackSwitch.name) {
         // console.log('switch false');
         return false;
