@@ -162,6 +162,10 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return this.route;
   }
 
+  getDepartureTime(): number {
+    return this.departureTime;
+  }
+
   persist(): Object {
     const redefinedProps = {};
     for (let stopId in this.redefinedProps) {

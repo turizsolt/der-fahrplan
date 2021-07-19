@@ -10,6 +10,13 @@
       />
       <button style="width: 80px" @click="addTrip">Add&nbsp;trip</button>
       <button style="width: 80px" @click="update">Update list</button>
+      Headway:
+      <input
+        style="width: 80px"
+        @keyup.stop="handleHeadway"
+        type="text"
+        v-model="headwayStr"
+      />
     </div>
     <div>
       <div class="trip-list">
@@ -17,8 +24,9 @@
           <div class="trip-stop trip-id-header blue" @click="paste(trip.id)">
               {{trip.prevTrip}}
           </div>
-          <div class="trip-stop trip-id-header">
-              {{trip.id}}
+          <div class="trip-stop trip-id-header trip-id-divider">
+              <div class="trip-id">{{trip.id}}</div>
+              <div class="trip-repeat-adder" @click="addRepeatedTrips(trip.id, trip.nextId)">+</div>
           </div>
           <div class="trip-stop">
             <div class="trip-stop-time-header trip-stop-arrival">arr</div>
@@ -61,9 +69,15 @@ export default class RouteTitle extends Vue {
   @Prop() route: any;
   timeStr: string = "";
   time: number = 0;
+  headwayStr: string = "";
+  headway: number = 0;
   tripList: any[] = [];
   get filteredTripList() {
-    return this.tripList.filter((t) => t.routeId === this.route.id);
+    const list = this.tripList.filter((t) => t.routeId === this.route.id).sort((a, b) => a.departureTime - b.departureTime);
+    for(let i=1;i<list.length;i++) {
+      list[i-1] = {...list[i-1], nextId: list[i].id};
+    }
+    return list;
   }
 
   constructor() {
@@ -84,6 +98,21 @@ export default class RouteTitle extends Vue {
     this.update();
   }
 
+  addRepeatedTrips(tripId: string, tripId2: string): void {
+    if(this.headway < 1) return;
+    if(!tripId2) return;
+
+    const trip = getStorable(tripId) as Trip;
+    const trip2 = getStorable(tripId2) as Trip;
+    let next = trip.getDepartureTime();
+    const till = trip2.getDepartureTime();
+    for(let i=next+this.headway;i<till;i+=this.headway) {
+      const route = getStorable(this.route.id) as Route;
+      const newTrip = createStorable<Trip>(TYPES.Trip).init(route, i);
+    }
+    this.update();
+  }
+
   handleTime(event: any): void {
     let value = event.currentTarget.value;
     value = value
@@ -100,9 +129,28 @@ export default class RouteTitle extends Vue {
         parseInt(value.substr(0, value.length - 2), 10) * 60 +
         parseInt(value.substr(-2), 10);
     }
-    //event.currentTarget.value = value;
     this.timeStr = value;
     this.time = value === "" ? undefined : time * 60;
+  }
+
+  handleHeadway(event: any): void {
+    let value = event.currentTarget.value;
+    value = value
+      .split("")
+      .filter((x) => "0" <= x && x <= "9")
+      .join("");
+    if (value.length > 4) {
+      value = value.substr(0, 4);
+    }
+    let time = parseInt(value, 10);
+    if (value.length > 2) {
+      value = value.substr(0, value.length - 2) + ":" + value.substr(-2);
+      time =
+        parseInt(value.substr(0, value.length - 2), 10) * 60 +
+        parseInt(value.substr(-2), 10);
+    }
+    this.headwayStr = value;
+    this.headway = value === "" ? undefined : time * 60;
   }
 
   copy(tripId: string): void {
@@ -180,5 +228,24 @@ export default class RouteTitle extends Vue {
 .blue:hover {
   background-color: #00A;
   cursor: pointer;
+}
+
+.trip-id-divider {
+  display: flex;
+      justify-content: space-between;
+    padding: 0;
+    width: 84px;
+}
+
+.trip-id {
+  width: 40px;
+  padding: 0 3px 0 3px;
+}
+
+.trip-repeat-adder {
+    width: 13px;
+    background-color: #aaccaa;
+    color: #1a7700;
+    cursor: pointer;
 }
 </style>
