@@ -52,11 +52,10 @@ export class BabylonController implements GUISpecificController {
     );
   }
 
-  getFps(): string {
+  getFps(): number {
     return this.camera
       .getEngine()
-      .getFps()
-      .toFixed();
+      .getFps();
   }
 
   saveSpecific(): any {

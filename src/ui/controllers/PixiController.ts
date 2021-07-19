@@ -2,7 +2,7 @@ import { GUISpecificController } from './GUISpecificController';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 
 export class PixiController implements GUISpecificController {
-  constructor() {}
+  constructor() { }
 
   getCamera(): BABYLON.ArcRotateCamera {
     return null;
@@ -25,17 +25,17 @@ export class PixiController implements GUISpecificController {
     };
   }
 
-  modRadius(value: number): void {}
+  modRadius(value: number): void { }
 
-  setFollowCam(coord: Coordinate): void {}
+  setFollowCam(coord: Coordinate): void { }
 
-  getFps(): string {
-    return '-1';
+  getFps(): number {
+    return -1;
   }
 
   saveSpecific(): any {
     return {};
   }
 
-  loadSpecific(obj: any): void {}
+  loadSpecific(obj: any): void { }
 }
