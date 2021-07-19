@@ -1,12 +1,12 @@
 import * as BABYLON from 'babylonjs';
 
-const gridWidth = 300;
-const gridHeight = 300;
+const gridWidth = 5000;
+const gridHeight = 5000;
 
 export class GridDrawer {
   private scene: BABYLON.Scene;
 
-  constructor() {}
+  constructor() { }
 
   setScene(scene: BABYLON.Scene) {
     this.scene = scene;
@@ -27,13 +27,14 @@ export class GridDrawer {
     const HEIGHT = (10 * Math.sqrt(3)) / 2;
     const WIDTH = 10;
 
-    for (let i = -50; i < 50; i++) {
+    /*
+    for (let i = -500; i < 500; i++) {
       const gridVer0 = BABYLON.MeshBuilder.CreateLines(
         'gridVer',
         {
           points: [
-            new BABYLON.Vector3(-50 * WIDTH, 0.01, i * HEIGHT),
-            new BABYLON.Vector3(50 * WIDTH, 0.01, i * HEIGHT)
+            new BABYLON.Vector3(-500 * WIDTH, 0.01, i * HEIGHT),
+            new BABYLON.Vector3(500 * WIDTH, 0.01, i * HEIGHT)
           ]
         },
         this.scene
@@ -45,11 +46,11 @@ export class GridDrawer {
         {
           points: [
             new BABYLON.Vector3(
-              (-50 * WIDTH) / 2 + i * WIDTH,
+              (-500 * WIDTH) / 2 + i * WIDTH,
               0.01,
-              -50 * HEIGHT
+              -500 * HEIGHT
             ),
-            new BABYLON.Vector3((50 * WIDTH) / 2 + i * WIDTH, 0.01, 50 * HEIGHT)
+            new BABYLON.Vector3((500 * WIDTH) / 2 + i * WIDTH, 0.01, 500 * HEIGHT)
           ]
         },
         this.scene
@@ -61,14 +62,14 @@ export class GridDrawer {
         {
           points: [
             new BABYLON.Vector3(
-              (50 * WIDTH) / 2 + i * WIDTH,
+              (500 * WIDTH) / 2 + i * WIDTH,
               0.01,
-              -50 * HEIGHT
+              -500 * HEIGHT
             ),
             new BABYLON.Vector3(
-              (-50 * WIDTH) / 2 + i * WIDTH,
+              (-500 * WIDTH) / 2 + i * WIDTH,
               0.01,
-              50 * HEIGHT
+              500 * HEIGHT
             )
           ]
         },
@@ -76,5 +77,6 @@ export class GridDrawer {
       );
       gridVer2.color = new BABYLON.Color3(0, 0, 0);
     }
+    */
   }
 }

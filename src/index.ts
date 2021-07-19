@@ -216,11 +216,9 @@ if (globalThis.startParam === '2d') {
 
       (window as any).switches = [];
 
-      /*
       const gridDrawer = new GridDrawer();
       gridDrawer.setScene(scene);
       gridDrawer.drawGrid();
-      */
 
       scene.actionManager = new BABYLON.ActionManager(scene);
 
