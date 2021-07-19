@@ -105,9 +105,12 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
   update() {
     //this.renderer.update();
 
-    // const deep = this.persistDeep();
     this.emit('update', this.persistData());
-    // this.emit('info', Object.freeze(deep));
+
+    if (this.isSelected()) {
+      const deep = this.persistDeep();
+      this.emit('info', Object.freeze(deep));
+    }
   }
 
   ///////////////////////////
