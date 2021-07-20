@@ -5,7 +5,7 @@ import { RouteStop } from './RouteStop';
 import { Station } from './Station';
 
 export interface Trip extends BaseStorable {
-  init(route: Route, startTime: number): Trip;
+  init(route: Route, startTime: number, hasGroup?: boolean): Trip;
   getRoute(): Route;
   getStops(): TripStop[];
   redefine(stop: RouteStop, props: OptionalTripStop): void;
@@ -23,4 +23,5 @@ export interface Trip extends BaseStorable {
   getDepartureTime(): number;
   toggleNextReverse(): void;
   getNextReverse(): boolean;
+  getHasGroup(): boolean;
 }

@@ -51,6 +51,9 @@ export const TYPES = {
   TripStop: Symbol.for('TripStop'),
   FactoryOfTripStop: Symbol.for('Factory<TripStop>'),
 
+  TripGroup: Symbol.for('TripGroup'),
+  FactoryOfTripGroup: Symbol.for('Factory<TripGroup>'),
+
   Station: Symbol.for('Station'),
   StationRenderer: Symbol.for('StationRenderer'),
   FactoryOfStation: Symbol.for('Factory<Station>'),

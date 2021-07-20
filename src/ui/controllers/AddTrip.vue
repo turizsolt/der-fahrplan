@@ -20,28 +20,59 @@
     </div>
     <div>
       <div class="trip-list">
-        <div class="trip" :key="trip.id" v-for="trip in filteredTripList">
-          <div class="trip-stop trip-id-header blue" @click="paste(trip.id)">
-              {{trip.prevTrip}}
-          </div>
-          <div class="trip-stop trip-id-header trip-id-divider">
-              <div class="trip-id">{{trip.id}}</div>
-              <div class="trip-repeat-adder" @click="addRepeatedTrips(trip.id, trip.nextId)">+</div>
-          </div>
-          <div class="trip-stop">
-            <div class="trip-stop-time-header trip-stop-arrival">arr</div>
-            <div class="trip-stop-time-header trip-stop-departure">dep</div>
-          </div>
-          <div class="trip-stop" :key="stop.id" v-for="stop in trip.stops">
-            <div class="trip-stop-time trip-stop-arrival">
-              {{ stop.isDepartureStation ? "-" : stop.arrivalTimeString }}
+        <div :class="trip.type === 'Trip' ? 'trip' : 'trip-as-group'" :key="trip.id" v-for="trip in filteredTripList">
+          <div v-if="trip.type === 'Trip'">
+            <div class="trip-stop trip-id-header blue" @click="paste(trip.id)">
+                {{trip.prevTrip}}
             </div>
-            <div class="trip-stop-time trip-stop-departure">
-              {{ stop.isArrivalStation ? "-" : stop.departureTimeString }}
+            <div class="trip-stop trip-id-header trip-id-divider">
+                <div class="trip-id">{{trip.id}}</div>
+                <div class="trip-repeat-adder" @click="addRepeatedTrips(trip.id, trip.nextId)">+</div>
+            </div>
+            <div class="trip-stop">
+              <div class="trip-stop-time-header trip-stop-arrival">arr</div>
+              <div class="trip-stop-time-header trip-stop-departure">dep</div>
+            </div>
+            <div class="trip-stop" :key="stop.id" v-for="stop in trip.stops">
+              <div class="trip-stop-time trip-stop-arrival">
+                {{ stop.isDepartureStation ? "-" : stop.arrivalTimeString }}
+              </div>
+              <div class="trip-stop-time trip-stop-departure">
+                {{ stop.isArrivalStation ? "-" : stop.departureTimeString }}
+              </div>
+            </div>
+            <div class="trip-stop trip-id-header blue" @click="copy(trip.id)">
+                {{trip.nextTrip}}
             </div>
           </div>
-          <div class="trip-stop trip-id-header blue" @click="copy(trip.id)">
-              {{trip.nextTrip}}
+          <div v-if="trip.type === 'TripGroup'" class="trip-group">
+            <div v-if="closedGroups[trip.id]" class="trip-group-headway">
+              <b>{{(trip.headway/60)}}</b><br />mins<br /><br /><span class="expand" @click="expandGroup(trip.id)">[expand]</span>
+            </div>
+            <div class="trip" v-else :key="trip2.id" v-for="trip2 in trip.trips">
+              <div class="trip-stop trip-id-header blue" @click="paste(trip2.id)">
+                  {{trip2.prevTrip}}
+              </div>
+              <div class="trip-stop trip-id-header trip-id-divider">
+                  <div class="trip-id">{{trip2.id}}</div>
+                  <div class="trip-repeat-adder" @click="collapseGroup(trip.id)">-</div>
+              </div>
+              <div class="trip-stop">
+                <div class="trip-stop-time-header trip-stop-arrival">arr</div>
+                <div class="trip-stop-time-header trip-stop-departure">dep</div>
+              </div>
+              <div class="trip-stop" :key="stop.id" v-for="stop in trip2.stops">
+                <div class="trip-stop-time trip-stop-arrival">
+                  {{ stop.isDepartureStation ? "-" : stop.arrivalTimeString }}
+                </div>
+                <div class="trip-stop-time trip-stop-departure">
+                  {{ stop.isArrivalStation ? "-" : stop.departureTimeString }}
+                </div>
+              </div>
+              <div class="trip-stop trip-id-header blue" @click="copy(trip2.id)">
+                  {{trip2.nextTrip}}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -54,6 +85,7 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 import { TYPES } from "../../di/TYPES";
 import { Route } from "../../structs/Scheduling/Route";
 import { Trip } from "../../structs/Scheduling/Trip";
+import { TripGroup } from "../../structs/Scheduling/TripGroup";
 import {
   getStorable,
   getAllOfStorable,
@@ -72,8 +104,13 @@ export default class AddTrip extends Vue {
   headwayStr: string = "";
   headway: number = 0;
   tripList: any[] = [];
+  tripGroupList: any[] = [];
+  closedGroups: Record<string, boolean> = null;
+
   get filteredTripList() {
-    const list = this.tripList.filter((t) => t.routeId === this.route.id).sort((a, b) => a.departureTime - b.departureTime);
+    const list = this.tripList.filter((t) => t.routeId === this.route.id && !t.hasGroup);
+    list.push(...this.tripGroupList.filter((t) => t.trips[0] && t.trips[0].routeId === this.route.id));
+    list.sort((a, b) => a.departureTime - b.departureTime);
     for(let i=1;i<list.length;i++) {
       list[i-1] = {...list[i-1], nextId: list[i].id};
     }
@@ -89,6 +126,29 @@ export default class AddTrip extends Vue {
     this.tripList = getAllOfStorable(TYPES.Trip).map((x) =>
       Object.freeze(x.persistDeep())
     );
+    this.tripGroupList = getAllOfStorable(TYPES.TripGroup).map((x) =>
+      Object.freeze(x.persistDeep())
+    );
+
+    if(!this.closedGroups) {
+      this.closedGroups = {};
+    }
+    
+    for(let group of this.tripGroupList) {
+      if(this.closedGroups[group.id] === undefined) {
+        this.closedGroups[group.id] = true;
+      }
+    }
+  }
+
+  expandGroup(id:string): void {
+    this.closedGroups[id] = false;
+    this.update();
+  }
+
+  collapseGroup(id:string): void {
+    this.closedGroups[id] = true;
+    this.update();
   }
 
   addTrip(): void {
@@ -101,15 +161,23 @@ export default class AddTrip extends Vue {
   addRepeatedTrips(tripId: string, tripId2: string): void {
     if(this.headway < 1) return;
     if(!tripId2) return;
-
+    
     const trip = getStorable(tripId) as Trip;
     const trip2 = getStorable(tripId2) as Trip;
+    if(trip2.getType() !== TYPES.Trip) return;
+
+    if(trip.getHasGroup()) return;
+    if(trip2.getHasGroup()) return;
+
     let next = trip.getDepartureTime();
     const till = trip2.getDepartureTime();
+    const trips:Trip[] = [];
     for(let i=next+this.headway;i<till;i+=this.headway) {
       const route = getStorable(this.route.id) as Route;
-      const newTrip = createStorable<Trip>(TYPES.Trip).init(route, i);
+      const newTrip = createStorable<Trip>(TYPES.Trip).init(route, i, true);
+      trips.push(newTrip);
     }
+    createStorable<TripGroup>(TYPES.TripGroup).init(this.headway, trips);
     this.update();
   }
 
@@ -184,6 +252,11 @@ export default class AddTrip extends Vue {
   margin: 0 5px;
 }
 
+.trip-as-group {
+  display: flex;
+  margin: 0;
+}
+
 .trip-stop {
   display: flex;
   margin-bottom: 10px;
@@ -232,9 +305,9 @@ export default class AddTrip extends Vue {
 
 .trip-id-divider {
   display: flex;
-      justify-content: space-between;
-    padding: 0;
-    width: 84px;
+  justify-content: space-between;
+  padding: 0;
+  width: 84px;
 }
 
 .trip-id {
@@ -243,9 +316,28 @@ export default class AddTrip extends Vue {
 }
 
 .trip-repeat-adder {
-    width: 13px;
-    background-color: #aaccaa;
-    color: #1a7700;
-    cursor: pointer;
+  width: 13px;
+  background-color: #aaccaa;
+  color: #1a7700;
+  cursor: pointer;
 }
+
+.trip-group {
+  display: flex;
+  background-color: #aaccaa;
+  align-self: center;
+  height: calc(100% - 10px);
+  margin-bottom: 10px;
+}
+
+.trip-group-headway {
+  align-self: center;
+  text-align: center;
+  width: 97px;
+}
+
+.expand:hover {
+  cursor: pointer;
+}
+
 </style>

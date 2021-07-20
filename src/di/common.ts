@@ -40,6 +40,8 @@ import { Sensor } from '../modules/Signaling/Sensor';
 import { ActualSensor } from '../modules/Signaling/ActualSensor';
 import { CapacityCap } from '../modules/Signaling/CapacityCap/CapacityCap';
 import { ActualCapacityCap } from '../modules/Signaling/CapacityCap/ActualCapacityCap';
+import { TripGroup } from '../structs/Scheduling/TripGroup';
+import { ActualTripGroup } from '../structs/Scheduling/ActualTripGroup';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
@@ -60,6 +62,7 @@ export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.fm<Route>(T.FactoryOfRoute, T.Route, ActualRoute);
   ioc.fm<RouteStop>(T.FactoryOfRouteStop, T.RouteStop, ActualRouteStop);
   ioc.fm<Trip>(T.FactoryOfTrip, T.Trip, ActualTrip);
+  ioc.fm<TripGroup>(T.FactoryOfTripGroup, T.TripGroup, ActualTripGroup);
   ioc.fm<Signal>(T.FactoryOfSignal, T.Signal, ActualSignal);
   ioc.fm<Sensor>(T.FactoryOfSensor, T.Sensor, ActualSensor);
   ioc.fm<Block>(T.FactoryOfBlock, T.Block, ActualBlock);
