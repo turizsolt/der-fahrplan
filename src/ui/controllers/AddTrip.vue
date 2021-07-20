@@ -65,7 +65,7 @@ import {
 } from "../../structs/Actuals/Store/TripIdClipboard";
 
 @Component
-export default class RouteTitle extends Vue {
+export default class AddTrip extends Vue {
   @Prop() route: any;
   timeStr: string = "";
   time: number = 0;
