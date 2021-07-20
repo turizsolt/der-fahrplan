@@ -42,6 +42,10 @@ export class PlatformBabylonRenderer extends BaseBabylonRenderer
     this.matSel = new BABYLON.StandardMaterial('blue', this.scene);
     this.matSel.diffuseColor = BABYLON.Color3.White();
 
+    this.matNorm.freeze();
+    this.matSel.freeze();
+    this.mesh.freezeWorldMatrix();
+
     this.mesh.material = this.matNorm;
     return this.mesh;
   }

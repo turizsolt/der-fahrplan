@@ -4,8 +4,8 @@ import { Coordinate } from '../Geometry/Coordinate';
 import { Station } from '../Scheduling/Station';
 import { Route } from '../Scheduling/Route';
 import { Color } from '../Color';
-import { Train } from '../Scheduling/Train';
 import { Boardable } from '../../mixins/Boardable';
+import { Train } from '../../modules/Train/Train';
 
 export type Place = Boardable & BaseBrick;
 

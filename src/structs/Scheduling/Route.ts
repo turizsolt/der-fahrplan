@@ -1,5 +1,6 @@
 import { BaseStorable } from '../Interfaces/BaseStorable';
 import { RouteStop } from './RouteStop';
+import { Station } from './Station';
 
 export interface Route extends BaseStorable {
   init(): Route;
@@ -15,4 +16,6 @@ export interface Route extends BaseStorable {
   getReverse(): Route;
   getColor(): string;
   setColor(color: string): void;
+  getFirstStation(): Station;
+  getLastStation(): Station;
 }

@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { WagonRenderer } from '../../src/structs/Renderers/WagonRenderer';
-import { Wagon } from '../../src/structs/Interfaces/Wagon';
+import { WagonData } from '../../src/modules/Train/WagonData';
 
 @injectable()
 export class WagonDummyRenderer implements WagonRenderer {
@@ -9,7 +9,7 @@ export class WagonDummyRenderer implements WagonRenderer {
     return null;
   }
   process(command: string): void {}
-  init(_: Wagon) {}
+  init(_: WagonData) {}
   update() {}
   remove(): void {}
 }

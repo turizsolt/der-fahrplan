@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        globalThis.startParam = '3d';
+    </script>
+    <title>Der Fahrplan</title>
+    <style>
+        html,
+        body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        #canvasBorder {
+            touch-action: none;
+            display: none;
+            z-index: 5;
+        }
+
+        #canvasBorder.stopped {
+            display: block;
+        }
+
+        #canvasBorderLeft {
+            position: fixed;
+            background-color: red;
+            left: 0;
+            width: 5px;
+            top: 0;
+            bottom: 0;
+        }
+
+        #canvasBorderRight {
+            position: fixed;
+            background-color: red;
+            right: 0;
+            width: 5px;
+            top: 0;
+            bottom: 0;
+        }
+
+        #canvasBorderTop {
+            position: fixed;
+            background-color: red;
+            right: 0;
+            left: 0;
+            height: 5px;
+            top: 0;
+        }
+
+        #canvasBorderBottom {
+            position: fixed;
+            background-color: red;
+            right: 0;
+            left: 0;
+            height: 5px;
+            bottom: 0;
+        }
+
+        #button-holder {
+            position: fixed;
+            right: 100px;
+            top: 20px;
+            z-index: 1;
+        }
+
+        #view-holder {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            z-index: 1;
+        }
+
+        button {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            margin: 0;
+        }
+
+        #view-holder button {
+            width: 60px;
+            height: 40px;
+            padding: 0;
+            margin: 0;
+            display: block;
+        }
+
+        .selected {
+            background-color: rebeccapurple;
+        }
+
+
+
+        #big-screen,
+        #big-screen2 {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            bottom: 20px;
+            right: 100px;
+            background-color: #cec;
+
+            border: 2px solid #070;
+            border-radius: 0.5em;
+
+            padding: 10px;
+
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
+        }
+
+        .column {
+            flex-grow: 1;
+        }
+
+        .column-routes {
+            width: 200px;
+            margin-right: 10px;
+        }
+
+        .column-route-stops {
+            width: 280px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .column-add-trips {
+            flex-grow: 1;
+            width: 1px;
+            margin-right: 10px
+        }
+
+        .column-add-stops {
+            width: 160px;
+        }
+
+        /******************************************/
+
+        #info-box {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            bottom: 20px;
+            width: 200px;
+            background-color: #cec;
+
+            border: 2px solid #070;
+            border-radius: 0.5em;
+
+            padding: 10px;
+
+            display: flex;
+            justify-content: space-between;
+            flex-direction: column;
+            z-index: 1;
+        }
+
+        .to-menu {
+            height: 40px;
+            text-align: center;
+        }
+
+        .item-type {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 0px;
+        }
+
+        .item-id {
+            text-align: center;
+            font-style: italic;
+            font-size: 10px;
+            margin-bottom: 20px;
+        }
+
+        .route-select {
+            width: 100%;
+            border: 1px solid #070;
+            border-radius: 0.25em;
+            background-color: #aca;
+        }
+
+        .trip {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .trip-name {
+            background-color: #9a9;
+            border: 1px solid #070;
+            border-radius: 0.25em;
+            padding: 3px 0 3px 3px;
+            min-width: 3em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .trip-destination {
+            padding: 3px;
+            font-weight: bold;
+        }
+
+        .trip-buttons {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .trip-buttons-inner {
+            text-align: right;
+        }
+
+
+        .xbutton {
+            border: 1px solid #a18d6f;
+            border-radius: 0.25em;
+            background-color: khaki;
+            margin: 0.25em;
+            padding: 0.5em;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .xbutton:hover {
+            background-color: #a18d6f;
+        }
+
+        .stop {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            height: 15px;
+        }
+
+        .stop-circle {
+            width: 10px;
+            height: 10px;
+            border: 2px solid #070;
+            border-radius: 50%;
+        }
+
+        .stop-name {
+            margin-left: 5px;
+            margin-top: -2.5px;
+        }
+
+        .stop-after {
+            position: relative;
+            width: 4px;
+            height: 15px;
+            top: 12px;
+            left: -9px;
+        }
+
+        .color {
+            background-color: #070;
+        }
+
+        .nocolor {
+            background-color: none;
+        }
+
+        .route-create-holder {
+            margin-top: 5px;
+        }
+
+        .route-create {
+            border: 1px solid #070;
+            border-radius: 0.25em;
+            background-color: #aca;
+
+            padding-left: 10px;
+            padding-right: 10px;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+        }
+
+        .route-create:hover {
+            background-color: #dfd;
+        }
+
+        .route-details {
+            margin-top: 5px;
+        }
+
+        .route-details-stops {
+            margin-top: 60px;
+        }
+
+        .route-input-name {
+            border-radius: 2px;
+            border: 1px solid #070;
+            padding: 0 3px 0 3px;
+            width: 96px;
+        }
+
+        .column-title {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /******************************************/
+
+        #test-panel {
+            position: fixed;
+            right: 20px;
+            top: 160px;
+            bottom: 20px;
+            width: 200px;
+            background-color: #cec;
+
+            border: 2px solid #070;
+            border-radius: 0.5em;
+
+            padding: 10px;
+
+            display: flex;
+            justify-content: start;
+            flex-direction: column;
+        }
+
+        #test-panel-commands {
+            overflow-y: scroll;
+        }
+
+        .succeded {
+            background-color: #0A0;
+        }
+
+        .failed {
+            background-color: red;
+            color: white;
+        }
+
+        .exception-raised {
+            background-color: purple;
+            color: white;
+        }
+
+        .action {
+            width: 99%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+            padding: 1px;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="view-holder">
+        <button v-for="button in buttons" v-bind:id="button.id" v-on:click="handleClick"
+            v-bind:class="{ selected: selected === button.id }">{{button.text}}</button>
+    </div>
+    <div id="button-holder" v-if="show">
+        <select size="1" v-if="selected === 'CREATE_ENGINE'" v-model="wagon" v-on:click="handleWagonClick">
+            <option value="wagon">Mozdony</option>
+            <option value="mot">Motorvonat</option>
+            <option value="vez">Vezérlőkocsi</option>
+            <option value="utas">Utaskocsi</option>
+        </select>
+        <button v-for="button in buttons" v-bind:id="button.id" v-on:click="handleClick"
+            v-bind:class="{ selected: selected === button.id }">{{button.text}}</button>
+    </div>
+    <div id="info-box">
+        <component v-if="selected" :is="type" :idt="selected.id" :obj="selected"></component>
+        <div v-if="!selected"></div>
+        <div class="to-menu">
+            Time: <span>{{tickCount}}</span> ({{tickSpeed}}x) (fps:{{fps}})<br />
+            Stats: <span>{{passengerArrivedCount}}</span>/{{passengerCount}} avg: {{passengerAverageArriveSpeed}}
+            m/s<br />
+            <a href="index.html">Vissza a menübe</a>
+        </div>
+    </div>
+    <div v-cloak id="big-screen" v-if="show">
+        <trip-planner></trip-planner>
+        <trip-planner></trip-planner>
+    </div>
+    <div v-cloak id="big-screen2" v-if="show">
+        <trip-connector></trip-connector>
+    </div>
+
+    <!--<div v-cloak id="test-panel" v-if="show">
+        <div>
+            Test panel ({{mode}})
+        </div>
+        <div>
+            <button @click="rewind()">Rwnd</button>
+            <button @click="prev()">Prev</button>
+            <button @click="next()">Next</button>
+            <button @click="run()">Run</button>
+        </div>
+        <div id="test-panel-commands">
+            <div v-for="(action, index) in actions" :key="index">
+                <div v-if="action.type === 'tick'" :class="['action', action.result]">
+                    {{action.length}}x tick
+                </div>
+                <div v-else :class="['action', action.result]">
+                    {{action.object}}.{{action.function}}({{action.params.join(", ")}})
+                    <span v-if="action.type==='assertion'"> = {{action.equalsTo}}</span>
+                </div>
+            </div>
+        </div>
+    </div>-->
+    <canvas id="renderCanvas">
+    </canvas>
+    <!-- temp off
+    <div id="renderCanvas"></div>
+    -->
+
+    <div id="canvasBorder" class="stopped">
+        <div id="canvasBorderLeft"></div>
+        <div id="canvasBorderRight"></div>
+        <div id="canvasBorderTop"></div>
+        <div id="canvasBorderBottom"></div>
+    </div>
+    <script>
+
+    </script>
+</body>
+
+</html>

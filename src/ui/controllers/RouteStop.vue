@@ -25,6 +25,14 @@
       </div>
       <div
         v-if="candelete"
+        class="stop-button"
+        :class="stop.isReverseStop?'stop-reverse':'stop-non-reverse'"
+        @click.stop="$emit('reverse')"
+      >
+        R
+      </div>
+      <div
+        v-if="candelete"
         class="stop-button stop-delete"
         @click.stop="$emit('delete')"
       >
@@ -193,4 +201,10 @@ export default class RouteTitle extends Vue {
   font: 400 13.3333px Arial;
   height: 13px;
 }
+
+.stop-reverse {
+  font-weight: bold;
+  color: orange;
+}
+
 </style>

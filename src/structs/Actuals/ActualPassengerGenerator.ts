@@ -11,7 +11,7 @@ export class ActualPassengerGenerator implements PassengerGenerator {
   @inject(TYPES.FactoryOfStore) private StoreFactory: () => Store;
   private store: Store;
 
-  init() {
+  init(): PassengerGenerator {
     this.store = this.StoreFactory();
 
     setTimeout(() => {
@@ -19,6 +19,8 @@ export class ActualPassengerGenerator implements PassengerGenerator {
         this.tick();
       }
     }, 2000);
+
+    return this;
   }
 
   tick() {

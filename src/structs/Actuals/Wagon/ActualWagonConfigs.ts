@@ -1,11 +1,16 @@
 import { WagonConfig } from './WagonConfig';
-import { WagonControlType } from './WagonControl/WagonControlType';
 import { WagonConnectable } from './WagonConnectable';
+import { TrackDirection } from '../../../modules/Track/TrackDirection';
 
 const wagon: WagonConfig = {
   maxSpeed: 3,
-  accelerateBy: 0.25,
-  controlType: WagonControlType.Locomotive,
+  accelerateBy: 0.015625,
+  control: {
+    A: true,
+    B: true
+  },
+  engine: true,
+  appearanceFacing: TrackDirection.AB,
   passengerArrangement: { rows: 0, seats: 0 },
   appearanceId: 'wagon',
   length: 14,
@@ -17,8 +22,13 @@ const wagon: WagonConfig = {
 
 const vez: WagonConfig = {
   maxSpeed: 3,
-  accelerateBy: 0.25,
-  controlType: WagonControlType.ControlCar,
+  accelerateBy: 0.015625,
+  control: {
+    A: true,
+    B: false
+  },
+  engine: false,
+  appearanceFacing: TrackDirection.AB,
   passengerArrangement: { rows: 7, seats: 3 },
   appearanceId: 'vez',
   length: 14,
@@ -30,8 +40,13 @@ const vez: WagonConfig = {
 
 const mot: WagonConfig = {
   maxSpeed: 3,
-  accelerateBy: 0.25,
-  controlType: WagonControlType.Locomotive,
+  accelerateBy: 0.015625,
+  control: {
+    A: true,
+    B: true
+  },
+  engine: true,
+  appearanceFacing: TrackDirection.AB,
   passengerArrangement: { rows: 7, seats: 3 },
   appearanceId: 'mot',
   length: 14,
@@ -43,8 +58,13 @@ const mot: WagonConfig = {
 
 const utas: WagonConfig = {
   maxSpeed: 3,
-  accelerateBy: 0.25,
-  controlType: WagonControlType.Nothing,
+  accelerateBy: 0.015625,
+  control: {
+    A: false,
+    B: false
+  },
+  engine: false,
+  appearanceFacing: TrackDirection.AB,
   passengerArrangement: { rows: 7, seats: 3 },
   appearanceId: 'utas',
   length: 14,

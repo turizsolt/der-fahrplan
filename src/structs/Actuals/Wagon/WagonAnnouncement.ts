@@ -1,26 +1,29 @@
 import { injectable } from 'inversify';
 import { Wagon } from '../../Interfaces/Wagon';
-import { Train } from '../../Scheduling/Train';
-import { TYPES } from '../../../di/TYPES';
 import { Store } from '../../Interfaces/Store';
 import { Platform } from '../../Interfaces/Platform';
 import { Trip } from '../../Scheduling/Trip';
+import { Train } from '../../../modules/Train/Train';
+import { WhichEnd } from '../../Interfaces/WhichEnd';
+
+// todo redo everything
 
 @injectable()
 export class WagonAnnouncement {
   protected trip: Trip;
-  protected train: Train;
 
-  constructor(private parent: Wagon, private store: Store) {
-    this.train = this.store.create<Train>(TYPES.Train).init(this.parent);
-  }
+  constructor(
+    private parent: Wagon,
+    private store: Store,
+    private train: Train
+  ) {}
 
   assignTrip(trip: Trip): void {
-    this.train.assignTrip(trip, [this.parent]);
+    // this.train.assignTrip(trip, [this.parent]);
   }
 
   cancelTrip(): void {
-    this.train.assignTrip(null, [this.parent]);
+    // this.train.assignTrip(null, [this.parent]);
   }
 
   setTrip(trip: Trip) {
@@ -28,10 +31,7 @@ export class WagonAnnouncement {
   }
 
   getTrip(): Trip {
-    const wagonWithTrip = this.train
-      .getWagonsWithSides()
-      .find(x => x.wagon === this.parent);
-    return wagonWithTrip?.trip;
+    return this.trip;
   }
 
   getTrain(): Train {
@@ -39,31 +39,28 @@ export class WagonAnnouncement {
   }
 
   setTrain(train: Train): void {
-    if (train) {
-      this.train = train;
-    } else {
-      this.train = this.store.create<Train>(TYPES.Train).init(this.parent);
-    }
+    this.train = train;
   }
 
   stop(): void {
     // todo use the worm
+    // todo worm is obsolete now, use the markers
     const platformsInvolved: Platform[] = this.platformsBeside();
     platformsInvolved.map(p => this.stoppedAt(p));
   }
 
   platformsBeside(): Platform[] {
     const platformsInvolved: Platform[] = [];
-    const trackA = this.parent.getA().positionOnTrack.getTrack();
+    const trackA = this.parent.getAxlePosition(WhichEnd.A).getTrack();
     platformsInvolved.push(
       ...trackA
         .getPlatformsBeside()
-        .filter(p => this.parent.getA().positionOnTrack.isBeside(p))
+        .filter(p => p.isBesidePoT(this.parent.getAxlePosition(WhichEnd.A)))
     );
-    const trackB = this.parent.getB().positionOnTrack.getTrack();
+    const trackB = this.parent.getAxlePosition(WhichEnd.B).getTrack();
     trackB
       .getPlatformsBeside()
-      .filter(p => this.parent.getB().positionOnTrack.isBeside(p))
+      .filter(p => p.isBesidePoT(this.parent.getAxlePosition(WhichEnd.B)))
       .map((p: Platform) => {
         if (!platformsInvolved.find(x => x === p)) {
           platformsInvolved.push(p);
@@ -88,12 +85,5 @@ export class WagonAnnouncement {
         );
       }
     });
-  }
-
-  persist(): any {
-    return {
-      trip: this.trip && this.trip.getId(),
-      train: this.train.getId()
-    };
   }
 }

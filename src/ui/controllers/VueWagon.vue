@@ -2,7 +2,15 @@
   <div>
     <div class="item-type">🚂 Mozdony</div>
     <div class="item-id">{{ idt }}</div>
-    <div class="item-id">Speed: {{ obj.speed ? obj.speed : "???" }}</div>
+    <div class="item-id">
+      Mode: {{obj.autoMode ? 'AUTO' : 'Manual'}}<br />
+      Shunting: {{obj.shunting ? 'SHUNTING' : 'Normal'}}<br />
+      Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "STOPPED" }}<br />
+      SD: {{ Math.round(obj.stoppingDistance * 10) }}<br />
+      NE: {{ Math.round(obj.nearestEnd * 10) }}<br />
+      NT: {{ Math.round(obj.nearestTrain * 10) }}<br />
+      NS: {{ Math.round(obj.nearestSignal * 10) }} ({{obj.nearestSignalSignal}})
+    </div>
 
     <!-- train -->
     <div class="train">
@@ -38,17 +46,17 @@
     </div>
 
     <div>
-      <div v-if="showTripList && opts && opts.length > 0">
+      <div class="trip-selector" v-if="showTripList && trips && trips.length > 0">
         <div>Útirány kiválasztása...</div>
         <trip-title
           :key="trip.id"
-          v-for="trip in opts"
+          v-for="trip in trips"
           :route="trip.route"
           :trip="trip"
           @click="assignTrip(trip.id)"
         />
       </div>
-      <div v-if="!opts || opts.length === 0">
+      <div v-if="!trips || trips.length === 0">
         <select class="route-select" size="1" disabled>
           <option>Nincs kiválsztható útirány</option>
         </select>
@@ -77,6 +85,19 @@
         isTrip
       >
       </route-stop>
+
+      <div v-if="trip.next">
+        Next trip: <br />
+        <route-stop
+          v-for="(stop, index) in trip.next.stops"
+          :key="stop.id"
+          :route="trip.route"
+          :stop="stop"
+          :index="index"
+          isTrip
+        >
+        </route-stop>
+      </div>
     </div>
   </div>
 </template>
@@ -84,16 +105,17 @@
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { Wagon } from "../../structs/Interfaces/Wagon";
-import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
-import { Train } from "../../structs/Scheduling/Train";
+import { getStorable, getAllOfStorable } from "../../structs/Actuals/Store/StoreForVue";
+import { Train } from "../../modules/Train/Train";
 import { Trip } from "../../structs/Scheduling/Trip";
+import { TYPES } from "../../di/TYPES";
 
 @Component
 export default class VueWagon extends Vue {
   @Prop() idt: string;
   @Prop() obj: any;
-  @Prop() opts: any[];
-
+  
+  trips: any[] = [];
   selectedWagons: Record<string, boolean> = {};
   selectedCount: number = 0;
   showTripList: boolean = false;
@@ -166,6 +188,10 @@ export default class VueWagon extends Vue {
   }
 
   showTrips() {
+    this.trips = getAllOfStorable<Trip>(TYPES.Trip)
+      .map(x => Object.freeze(x.persistDeep()))
+      .sort((a: any, b: any) => a.departureTime - b.departureTime);
+
     this.showTripList = true;
   }
 }
@@ -264,13 +290,13 @@ export default class VueWagon extends Vue {
 }
 
 .pattern-2 {
-  --bg: rgba(255, 255, 255, 0.5);
-
-  background: linear-gradient(135deg, var(--bg) 25%, transparent 25%) -5px 0,
-    linear-gradient(225deg, var(--bg) 25%, transparent 25%) -5px 0,
-    linear-gradient(315deg, var(--bg) 25%, transparent 25%),
-    linear-gradient(45deg, var(--bg) 25%, transparent 25%);
+  --stripe: rgba(255, 255, 255, 0.5);
+  background-image: linear-gradient(45deg, var(--stripe) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--stripe) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--stripe) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--stripe) 75%);
   background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
 }
 
 .pattern-3 {
@@ -286,12 +312,19 @@ export default class VueWagon extends Vue {
 }
 
 .pattern-4 {
-  --stripe: rgba(255, 255, 255, 0.5);
-  background-image: linear-gradient(45deg, var(--stripe) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--stripe) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--stripe) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--stripe) 75%);
+  --bg: rgba(255, 255, 255, 0.5);
+
+  background-image: linear-gradient(135deg, var(--bg) 0%, transparent 50%),
+    linear-gradient(225deg, var(--bg) 0%, transparent 50%),
+    linear-gradient(315deg, var(--bg) 25%, transparent 25%),
+    linear-gradient(45deg, var(--bg) 25%, transparent 25%);
   background-size: 10px 10px;
-  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
 }
+
+.trip-selector {
+  overflow-y: scroll;
+  height: 800px;
+  overflow-x: hidden;
+}
+
 </style>

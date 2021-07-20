@@ -6,7 +6,7 @@ export class BaseBabylonRenderer {
   protected selected: boolean = false;
   protected meshes: BABYLON.AbstractMesh[] = [];
 
-  update() {}
+  update(data?: any) { }
   remove() {
     for (let mesh of this.meshes) {
       mesh.dispose();
@@ -14,5 +14,5 @@ export class BaseBabylonRenderer {
     this.meshes = [];
   }
 
-  process(command: string): void {}
+  process(command: string): void { }
 }

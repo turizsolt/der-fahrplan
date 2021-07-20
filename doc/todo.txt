@@ -1,0 +1,1 @@
+- select a wagon on a multiple wagon train, reverse - the dot will be gray, cause it is not the selected (it should be)

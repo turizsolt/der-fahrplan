@@ -1,14 +1,13 @@
 import { TYPES as T } from './TYPES';
-import { Track } from '../structs/Interfaces/Track';
-import { TrackSwitch } from '../structs/Interfaces/TrackSwitch';
-import { ActualTrack } from '../structs/Actuals/Track/ActualTrack';
-import { ActualTrackSwitch } from '../structs/Actuals/Track/ActualTrackSwitch';
-import { TrackJoint } from '../structs/Interfaces/TrackJoint';
-import { ActualTrackJoint } from '../structs/Actuals/TrackJoint/ActualTrackJoint';
+import { Track } from '../modules/Track/Track';
+import { TrackSwitch } from '../modules/Track/TrackSwitch';
+import { ActualTrack } from '../modules/Track/ActualTrack';
+import { ActualTrackSwitch } from '../modules/Track/ActualTrackSwitch';
+import { TrackJoint } from '../modules/Track/TrackJoint/TrackJoint';
+import { ActualTrackJoint } from '../modules/Track/TrackJoint/ActualTrackJoint';
 import { ActualStore } from '../structs/Actuals/Store/ActualStore';
 import { Platform } from '../structs/Interfaces/Platform';
 import { ActualPlatform } from '../structs/Actuals/ActualPlatform';
-import { TrackJointConnector } from '../structs/Actuals/TrackJoint/TrackJointConnector';
 import { ActualWagon } from '../structs/Actuals/Wagon/ActualWagon';
 import { Wagon } from '../structs/Interfaces/Wagon';
 import { RouteStop } from '../structs/Scheduling/RouteStop';
@@ -23,21 +22,35 @@ import { ActualPassenger } from '../structs/Actuals/ActualPassenger';
 import { PassengerGenerator } from '../structs/Actuals/PassengerGenerator';
 import { ActualPassengerGenerator } from '../structs/Actuals/ActualPassengerGenerator';
 import { DependencyContainer } from './DependencyContainer';
-import { Train } from '../structs/Scheduling/Train';
-import { ActualTrain } from '../structs/Scheduling/ActualTrain';
 import { Trip } from '../structs/Scheduling/Trip';
 import { ActualTrip } from '../structs/Scheduling/ActualTrip';
+import { Train } from '../modules/Train/Train';
+import { ActualTrain } from '../modules/Train/ActualTrain';
+import { Signal } from '../modules/Signaling/Signal';
+import { ActualSignal } from '../modules/Signaling/ActualSignal';
+import { Block } from '../modules/Signaling/Block';
+import { BlockJoint } from '../modules/Signaling/BlockJoint';
+import { PathBlock } from '../modules/Signaling/PathBlock';
+import { Section } from '../modules/Signaling/Section';
+import { ActualBlock } from '../modules/Signaling/ActualBlock';
+import { ActualBlockJoint } from '../modules/Signaling/ActualBlockJoint';
+import { ActualPathBlock } from '../modules/Signaling/ActualPathBlock';
+import { ActualSection } from '../modules/Signaling/ActualSection';
+import { Sensor } from '../modules/Signaling/Sensor';
+import { ActualSensor } from '../modules/Signaling/ActualSensor';
+import { CapacityCap } from '../modules/Signaling/CapacityCap/CapacityCap';
+import { ActualCapacityCap } from '../modules/Signaling/CapacityCap/ActualCapacityCap';
+import { TripGroup } from '../structs/Scheduling/TripGroup';
+import { ActualTripGroup } from '../structs/Scheduling/ActualTripGroup';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
-  ioc.sng<TrackJointConnector>(
-    T.FactoryOfTrackJointConnector,
-    T.TrackJointConnector,
-    TrackJointConnector
+
+  ioc.fm<PassengerGenerator>(
+    T.FactoryOfPassengerGenerator,
+    T.PassengerGenerator,
+    ActualPassengerGenerator
   );
-
-  ioc.map<PassengerGenerator>(T.PassengerGenerator, ActualPassengerGenerator);
-
   ioc.fm<Train>(T.FactoryOfTrain, T.Train, ActualTrain);
   ioc.fm<Wagon>(T.FactoryOfWagon, T.Wagon, ActualWagon);
   ioc.fm<Track>(T.FactoryOfTrack, T.Track, ActualTrack);
@@ -49,4 +62,12 @@ export const addCommonMaps = (ioc: DependencyContainer): void => {
   ioc.fm<Route>(T.FactoryOfRoute, T.Route, ActualRoute);
   ioc.fm<RouteStop>(T.FactoryOfRouteStop, T.RouteStop, ActualRouteStop);
   ioc.fm<Trip>(T.FactoryOfTrip, T.Trip, ActualTrip);
+  ioc.fm<TripGroup>(T.FactoryOfTripGroup, T.TripGroup, ActualTripGroup);
+  ioc.fm<Signal>(T.FactoryOfSignal, T.Signal, ActualSignal);
+  ioc.fm<Sensor>(T.FactoryOfSensor, T.Sensor, ActualSensor);
+  ioc.fm<Block>(T.FactoryOfBlock, T.Block, ActualBlock);
+  ioc.fm<BlockJoint>(T.FactoryOfBlockJoint, T.BlockJoint, ActualBlockJoint);
+  ioc.fm<PathBlock>(T.FactoryOfPathBlock, T.PathBlock, ActualPathBlock);
+  ioc.fm<Section>(T.FactoryOfSection, T.Section, ActualSection);
+  ioc.fm<CapacityCap>(T.FactoryOfCapacityCap, T.CapacityCap, ActualCapacityCap);
 };

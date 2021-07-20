@@ -1,3 +1,5 @@
+import { InputController } from '../../ui/controllers/InputController';
+import { CommandLog } from '../Actuals/Store/Command/CommandLog';
 import { BaseStorable } from './BaseStorable';
 
 export interface Store {
@@ -24,4 +26,11 @@ export interface Store {
 
   addArrivedPassengerStats(stats: { time: number, distance: number }): void;
   getPassengerStats(): any;
+
+  getCommandLog(): CommandLog;
+
+  generateId(): string;
+
+  setInputController(ic: InputController): void;
+  getInputController(): InputController;
 }

@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import { InputController } from './InputController';
+import { GlobalController } from './GlobalController';
 
 export class VueViewbox {
   private vm: any;
 
-  constructor(private inputController: InputController) {
+  constructor(private globalController: GlobalController) {
     const _this = this;
     this.vm = new Vue({
       el: '#view-holder',
@@ -13,8 +13,8 @@ export class VueViewbox {
         buttons: []
       },
       methods: {
-        handleClick: function (event) {
-          _this.inputController.selectView(event.target.id);
+        handleClick: function(event) {
+          _this.globalController.selectView(event.target.id);
         }
       }
     });
