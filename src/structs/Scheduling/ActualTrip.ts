@@ -190,6 +190,10 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return this.xpersistDeep();
   }
 
+  getArrivalTime(): number {
+    return Util.last(this.getStops()).arrivalTime;
+  }
+
   xpersistDeep(level: number = 1): Object {
     return {
       id: this.id,
@@ -198,6 +202,8 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       route: this.route.persistDeep(),
       departureTime: this.departureTime,
       departureTimeString: Util.timeToStr(this.departureTime),
+      arrivalTime: this.getArrivalTime(),
+      arrivalTimeString: Util.timeToStr(this.getArrivalTime()),
       stops: this.getStops(),
       prevTrip: this.prevTrip?.getId(),
       nextTrip: this.nextTrip?.getId(),

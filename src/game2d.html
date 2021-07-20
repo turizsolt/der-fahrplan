@@ -105,7 +105,8 @@
 
 
 
-        #big-screen {
+        #big-screen,
+        #big-screen2 {
             position: fixed;
             left: 20px;
             top: 20px;
@@ -404,6 +405,9 @@
     <div v-cloak id="big-screen" v-if="show">
         <trip-planner></trip-planner>
         <trip-planner></trip-planner>
+    </div>
+    <div v-cloak id="big-screen2" v-if="show">
+        <trip-connector></trip-connector>
     </div>
 
     <!--<div v-cloak id="test-panel" v-if="show">
