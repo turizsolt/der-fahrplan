@@ -21,4 +21,6 @@ export interface Trip extends BaseStorable {
   setPrevTrip(trip: Trip): void;
   xpersistDeep(level?: number): Object;
   getDepartureTime(): number;
+  toggleNextReverse(): void;
+  getNextReverse(): boolean;
 }

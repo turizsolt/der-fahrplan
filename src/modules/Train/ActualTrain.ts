@@ -461,9 +461,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private arrivedToLastStation() {
     const newTrip = this.trips.length > 0 ? this.trips[0].getNextTrip() : null;
     if (newTrip) {
+      this.shouldTurn = this.trips[0].getNextReverse();
       this.assignTrip(null);
       this.assignTrip(newTrip);
-      this.shouldTurn = true;
     }
   }
 

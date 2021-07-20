@@ -18,6 +18,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
   private prevTrip: Trip = null;
   private nextTrip: Trip = null;
+  private nextReverse: boolean = true;
 
   init(route: Route, departureTime: number): Trip {
     super.initStore(TYPES.Trip);
@@ -40,6 +41,14 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
   setPrevTrip(trip: Trip): void {
     this.prevTrip = trip;
+  }
+
+  toggleNextReverse(): void {
+    this.nextReverse = !this.nextReverse;
+  }
+
+  getNextReverse(): boolean {
+    return this.nextReverse;
   }
 
   redefine(stop: RouteStop, props: OptionalTripStop): void {
@@ -207,6 +216,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       stops: this.getStops(),
       prevTrip: this.prevTrip?.getId(),
       nextTrip: this.nextTrip?.getId(),
+      nextReverse: this.nextReverse,
       next: (this.nextTrip && level > 0) ? this.nextTrip.xpersistDeep(level - 1) : null
     };
   }

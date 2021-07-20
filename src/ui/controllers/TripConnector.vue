@@ -3,9 +3,29 @@
     <div>
       Trip Connector
     </div>
-    <div class="xyz" :key="t.trip.id" v-for="t in tripsWithEnd">
-      {{t.trip.id}} - {{t.end}} - {{t.timeStr}} - {{t.trip.route.name}}
-    </div>
+    <table>
+      <tr class="xyz" :key="t.key" v-for="t in tripsWithEnd">
+        <td v-if="!t.Last" colspan="5"></td>
+        <td v-if="t.Last">{{t.Last.trip.id}}</td> 
+        <td v-if="t.Last">{{t.Last.trip.route.detailedName}}</td> 
+        <td v-if="t.Last">{{t.Last.trip.route.name}}</td>  
+        <td v-if="t.Last">{{t.Last.timeStr}}</td>  
+        <td v-if="t.Last" class="blue box" @click="copy(t.Last.trip.id)">{{t.Last.trip.nextTrip}}</td>  
+        
+        <td v-if="!t.Last || !t.Last.trip.nextTrip"></td>
+        <td v-if="t.Last && t.Last.trip.nextTrip" class="box" @click="toggleReverse(t.Last.trip.id)">{{t.Last.trip.nextReverse ? 'R' : '-'}}</td>
+
+        <td v-if="!t.Last || !t.Last.trip.nextTrip"></td>
+        <td v-if="t.Last && t.Last.trip.nextTrip" class="red box" @click="detach(t.Last.trip.id)">detach</td>
+
+        <td v-if="!t.First" colspan="5"></td>
+        <td v-if="t.First" class="blue box" @click="paste(t.First.trip.id)">{{t.First.trip.prevTrip}}</td>  
+        <td v-if="t.First">{{t.First.timeStr}}</td>
+        <td v-if="t.First">{{t.First.trip.route.name}}</td> 
+        <td v-if="t.First">{{t.First.trip.route.detailedName}}</td>
+        <td v-if="t.First">{{t.First.trip.id}}</td>
+      </tr>
+    </table>
   </div>
 </template>
 
@@ -32,7 +52,7 @@ export default class TripConnector extends Vue {
   firstRoutes: string[] = ['1XihqJwLy'];
   tripList: any[] = [];
 
-  get tripsWithEnd(): TripWithEnd[] {
+  get tripsWithEnd(): Record<TripEnd, TripWithEnd>[] {
     const lasts = this.tripList.filter(t => this.lastRoutes.includes(t.route.id));
     const firsts = this.tripList.filter(t => this.firstRoutes.includes(t.route.id));
     const all = [];
@@ -42,7 +62,24 @@ export default class TripConnector extends Vue {
       if(a.time === b.time) return a.end < b.end ? -1 : 1;
       return a.time-b.time;
     });
-    return all;
+    const dual: Record<TripEnd | 'key', TripWithEnd>[] = [];
+    for(let i=0;i<all.length;i++) {
+      if(all[i].end === TripEnd.Last) {
+        if(all[i+1] && all[i+1].end === TripEnd.First 
+          && all[i].trip.nextTrip === all[i+1].trip.id
+          && all[i].trip.id === all[i+1].trip.prevTrip
+        ) {
+          dual.push({Last: all[i], First: all[i+1], key: all[i].id});
+          i++;
+        } else {
+          dual.push({Last: all[i], First: null, key: all[i].id});
+        }
+      } else {
+        dual.push({Last: null, First: all[i], key: all[i].id});
+      }
+    }
+
+    return dual;
   }
 
   update(): void {
@@ -54,6 +91,39 @@ export default class TripConnector extends Vue {
   constructor() {
     super();
     setTimeout(() => this.update(), 0);
+  }
+
+  copy(tripId: string): void {
+      copyTripId(tripId);
+  }
+
+  paste(tripId: string): void {
+      const paste = pasteTripId();
+
+      const prevTrip = getStorable(paste) as Trip;
+      const nextTrip = getStorable(tripId) as Trip;
+
+      prevTrip?.setNextTrip(nextTrip);
+      nextTrip?.setPrevTrip(prevTrip);
+
+      this.update();
+  }
+
+  detach(lastId: string): void {
+      const prevTrip = getStorable(lastId) as Trip;
+      const nextTrip = prevTrip?.getNextTrip();
+
+      prevTrip?.setNextTrip(null);
+      nextTrip?.setPrevTrip(null);
+
+      this.update();
+  }
+
+  toggleReverse(lastId: string): void {
+      const trip = getStorable(lastId) as Trip;
+      trip?.toggleNextReverse();
+
+      this.update();
   }
 }
 </script>
@@ -107,6 +177,19 @@ export default class TripConnector extends Vue {
   text-align: center;
 }
 
+.box {
+  border-radius: 2px;
+  padding: 0 3px 0 3px;
+  width: 78px;
+  font: 400 13.3333px Arial;
+  height: 13px;
+
+  background-color: #070;
+  border: 1px solid #cec;
+  color: #cec;
+  text-align: center;
+}
+
 .blue {
   background-color: #007;
   border: 1px solid #cce;  
@@ -114,6 +197,18 @@ export default class TripConnector extends Vue {
 
 .blue:hover {
   background-color: #00A;
+  cursor: pointer;
+}
+
+.red {
+  background-color: #f00;
+  color: #fff;
+  border: 1px solid #cce;  
+}
+
+.red:hover {
+  background-color: #f00;
+  color: #fff;
   cursor: pointer;
 }
 
