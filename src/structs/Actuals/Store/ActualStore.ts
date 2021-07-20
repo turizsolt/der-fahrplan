@@ -35,6 +35,7 @@ import { SensorRenderer } from '../../Renderers/SensorRenderer';
 import { CapacityCap } from '../../../modules/Signaling/CapacityCap/CapacityCap';
 import { CapacityCapRenderer } from '../../Renderers/CapacityCapRenderer';
 import { InputController } from '../../../ui/controllers/InputController';
+import { TripGroup } from '../../Scheduling/TripGroup';
 
 @injectable()
 export class ActualStore implements Store {
@@ -47,6 +48,7 @@ export class ActualStore implements Store {
   @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
   @inject(TYPES.FactoryOfRouteStop) private RouteStopFactory: () => RouteStop;
   @inject(TYPES.FactoryOfTrip) private TripFactory: () => Trip;
+  @inject(TYPES.FactoryOfTripGroup) private TripGroupFactory: () => TripGroup;
   @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
   @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
   @inject(TYPES.FactoryOfSignal) private SignalFactory: () => Signal;
@@ -99,6 +101,7 @@ export class ActualStore implements Store {
     this.factoryMethods = {
       [TYPES.Route]: this.RouteFactory,
       [TYPES.Trip]: this.TripFactory,
+      [TYPES.TripGroup]: this.TripGroupFactory,
       [TYPES.RouteStop]: this.RouteStopFactory,
       [TYPES.Station]: this.StationFactory,
       [TYPES.Passenger]: this.PassengerFactory,
@@ -122,6 +125,7 @@ export class ActualStore implements Store {
       [TYPES.RouteStop]: 11,
       [TYPES.Route]: 10,
       [TYPES.Trip]: 8,
+      [TYPES.TripGroup]: 7,
       [TYPES.TrackJoint]: 5,
       [TYPES.Track]: 4,
       [TYPES.TrackSwitch]: 3,

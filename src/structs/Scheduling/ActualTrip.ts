@@ -18,11 +18,14 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
   private prevTrip: Trip = null;
   private nextTrip: Trip = null;
+  private nextReverse: boolean = true;
+  private hasGroup: boolean = false;
 
-  init(route: Route, departureTime: number): Trip {
+  init(route: Route, departureTime: number, hasGroup: boolean = false): Trip {
     super.initStore(TYPES.Trip);
     this.route = route;
     this.departureTime = departureTime;
+    this.hasGroup = hasGroup;
 
     const stationsInvolved = this.route.getStops().map((routeStop: RouteStop) => routeStop.getStation());
     stationsInvolved.map((station: Station) => station.addTripToSchedule(this));
@@ -40,6 +43,14 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
   setPrevTrip(trip: Trip): void {
     this.prevTrip = trip;
+  }
+
+  toggleNextReverse(): void {
+    this.nextReverse = !this.nextReverse;
+  }
+
+  getNextReverse(): boolean {
+    return this.nextReverse;
   }
 
   redefine(stop: RouteStop, props: OptionalTripStop): void {
@@ -162,6 +173,10 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return this.route;
   }
 
+  getDepartureTime(): number {
+    return this.departureTime;
+  }
+
   persist(): Object {
     const redefinedProps = {};
     for (let stopId in this.redefinedProps) {
@@ -178,12 +193,22 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       departureTime: this.departureTime,
       prevTrip: this.prevTrip?.getId(),
       nextTrip: this.nextTrip?.getId(),
+      nextReverse: this.nextReverse,
+      hasGroup: this.hasGroup,
       redefinedProps
     };
   }
 
   persistDeep(): Object {
     return this.xpersistDeep();
+  }
+
+  getArrivalTime(): number {
+    return Util.last(this.getStops()).arrivalTime;
+  }
+
+  getHasGroup(): boolean {
+    return this.hasGroup;
   }
 
   xpersistDeep(level: number = 1): Object {
@@ -194,16 +219,20 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       route: this.route.persistDeep(),
       departureTime: this.departureTime,
       departureTimeString: Util.timeToStr(this.departureTime),
+      arrivalTime: this.getArrivalTime(),
+      arrivalTimeString: Util.timeToStr(this.getArrivalTime()),
       stops: this.getStops(),
       prevTrip: this.prevTrip?.getId(),
       nextTrip: this.nextTrip?.getId(),
+      nextReverse: this.nextReverse,
+      hasGroup: this.hasGroup,
       next: (this.nextTrip && level > 0) ? this.nextTrip.xpersistDeep(level - 1) : null
     };
   }
 
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
-    this.init(store.get(obj.route) as Route, obj.departureTime);
+    this.init(store.get(obj.route) as Route, obj.departureTime, obj.hasGroup);
     for (let stopId in obj.redefinedProps) {
       const stop = store.get(stopId) as RouteStop;
       const all = store.getAll();
@@ -225,6 +254,9 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         this.setNextTrip(trip);
         trip.setPrevTrip(this);
       }
+    }
+    if (obj.nextReverse === false) {
+      this.toggleNextReverse();
     }
   }
 }

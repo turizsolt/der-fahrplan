@@ -10,6 +10,7 @@ import { ChainedInputHandler } from './InputHandlers/ChainedInputHandler';
 import { InputController } from './InputController';
 import { InputMode } from './InputHandlers/InputMode';
 import { ToolInputHandler } from './InputHandlers/ToolInputHandler';
+import { VueBigscreen2 } from './VueBigScreen2';
 
 export class GlobalController {
   private viewMode: string = 'terrain';
@@ -17,6 +18,7 @@ export class GlobalController {
   private vueToolbox: VueToolbox;
   private vueViewbox: VueViewbox;
   private vueBigScreen: VueBigscreen;
+  private vueBigScreen2: VueBigscreen2;
   private vueSidebar: VueSidebar;
   private vueTestPanel: VueTestPanel;
   private toolInputHandler: ToolInputHandler;
@@ -32,6 +34,7 @@ export class GlobalController {
   ) {
     this.vueSidebar = new VueSidebar(this.store);
     this.vueBigScreen = new VueBigscreen(this.store);
+    this.vueBigScreen2 = new VueBigscreen2(this.store);
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
 
@@ -55,6 +58,7 @@ export class GlobalController {
 
     this.vueViewbox.addButton({ id: 'terrain', text: 'Terrain' });
     this.vueViewbox.addButton({ id: 'schedule', text: 'Schedule' });
+    this.vueViewbox.addButton({ id: 'connector', text: 'Connect' });
     this.vueViewbox.addButton({ id: 'builder', text: 'Builder' });
     this.vueViewbox.setSelected('terrain');
   }
@@ -81,6 +85,14 @@ export class GlobalController {
     } else {
       this.selectMode(InputMode.CAMERA);
       this.vueBigScreen.setShow(false);
+    }
+
+    if (mode === 'connector') {
+      this.selectMode(InputMode.SELECT);
+      this.vueBigScreen2.setShow(true);
+    } else {
+      this.selectMode(InputMode.CAMERA);
+      this.vueBigScreen2.setShow(false);
     }
 
     if (mode === 'builder') {

@@ -65,6 +65,14 @@ export class ActualLand implements Land {
         .then(() => {
           loadLevel();
         });
+    } else if (levelId === 'line') {
+
+      fetch('line.json')
+        .then(response => response.text())
+        .then(text => levels['line'] = JSON.parse(text))
+        .then(() => {
+          loadLevel();
+        });
     } else {
       loadLevel();
     }

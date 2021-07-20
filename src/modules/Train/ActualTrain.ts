@@ -331,6 +331,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private justPlatformStopped: Platform = null;
   private remainingStopTime: number = 0;
   private shouldTurn: boolean = false;
+  private shouldStop: boolean = false;
   private forgetTime: number = -1;
 
   tick(): void {
@@ -438,6 +439,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   private startStopping(): void {
     this.shouldTurn = false;
+    this.shouldStop = false;
     if (this.justPlatformStopped.getStation()) {
       this.trips.map(t => t.setStationServed(this.justPlatformStopped.getStation()));
     }
@@ -454,6 +456,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     if (thisStop) {
       if (thisStop.isReverseStop()) {
         this.shouldTurn = true;
+        this.shouldStop = false;
       }
     }
   }
@@ -461,9 +464,12 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private arrivedToLastStation() {
     const newTrip = this.trips.length > 0 ? this.trips[0].getNextTrip() : null;
     if (newTrip) {
+      this.shouldTurn = this.trips[0].getNextReverse();
       this.assignTrip(null);
       this.assignTrip(newTrip);
-      this.shouldTurn = true;
+      this.shouldStop = false;
+    } else {
+      this.shouldStop = true;
     }
   }
 
@@ -474,6 +480,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.wagons[0].stop();
     if (this.shouldTurn) {
       this.reverse();
+    }
+    if (this.shouldStop) {
+      this.setAutoMode(false);
     }
     this.forgetTime = 300;
   }
