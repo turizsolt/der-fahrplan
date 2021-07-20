@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="overflow-y">
     <div>
       Trip Connector
     </div>
@@ -34,6 +34,8 @@
       />
       <button style="width: 80px" @click="autoAttach">Auto attach</button>
       <button style="width: 80px" @click="autoReverse">Auto reverse</button>
+      <input type="checkbox" v-model="showUnattachedOnly" @changed="handleShowUnattachedOnly" /> Show unattached only
+      <input type="checkbox" v-model="showAttachedOnly" @changed="handleShowAttachedOnly" /> Show attached only
     </div>
     <hr />
     <table>
@@ -89,6 +91,8 @@ export default class TripConnector extends Vue {
   tripList: any[] = [];
   commonStation: string = null;
   commonStationName: string = '';
+  showUnattachedOnly: boolean = false;
+  showAttachedOnly: boolean = false;
 
   min: number = 0;
   minStr: string = '';
@@ -123,7 +127,7 @@ export default class TripConnector extends Vue {
       }
     }
 
-    return dual;
+    return dual.filter(x => !this.showUnattachedOnly || !(x.First && x.Last)).filter(x => !this.showAttachedOnly || (x.First && x.Last));
   }
 
   update(): void {
@@ -156,6 +160,22 @@ export default class TripConnector extends Vue {
   }
 
   handleFirstRoutesChanged(event): void {
+    this.update();
+  }
+
+  handleShowUnattachedOnly(event): void {
+    if(this.showAttachedOnly && this.showUnattachedOnly) {
+      this.showAttachedOnly = false;
+      this.showUnattachedOnly = false;
+    }
+    this.update();
+  }
+
+  handleShowAttachedOnly(event): void {
+    if(this.showAttachedOnly && this.showUnattachedOnly) {
+      this.showAttachedOnly = false;
+      this.showUnattachedOnly = false;
+    }
     this.update();
   }
 
@@ -394,5 +414,9 @@ export default class TripConnector extends Vue {
     background-color: #aaccaa;
     color: #1a7700;
     cursor: pointer;
+}
+
+.overflow-y{
+  overflow-y: scroll;
 }
 </style>
