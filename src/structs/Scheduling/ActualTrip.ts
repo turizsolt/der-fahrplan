@@ -191,6 +191,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       departureTime: this.departureTime,
       prevTrip: this.prevTrip?.getId(),
       nextTrip: this.nextTrip?.getId(),
+      nextReverse: this.nextReverse,
       redefinedProps
     };
   }
@@ -245,6 +246,9 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         this.setNextTrip(trip);
         trip.setPrevTrip(this);
       }
+    }
+    if (obj.nextReverse === false) {
+      this.toggleNextReverse();
     }
   }
 }

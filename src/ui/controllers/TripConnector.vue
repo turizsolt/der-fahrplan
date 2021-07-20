@@ -3,6 +3,20 @@
     <div>
       Trip Connector
     </div>
+    Last:
+    <select v-model="lastRoutes" multiple @change="handleLastRoutesChanged">
+      <option v-for="route in lastRouteOptions" :value="route.id">{{route.name}} {{route.detailedName}}</option>
+    </select>
+    <br >
+    First:
+    <select v-model="firstRoutes" multiple @change="handleFirstRoutesChanged">
+      <option v-for="route in firstRouteOptions" :value="route.id">{{route.name}} {{route.detailedName}}</option>
+    </select>
+    <br />
+    <button style="width: 80px" @click="clearRoutes">Clear</button>
+    <br />
+    Common station: {{commonStationName}} [{{commonStation}}]
+    <hr />
     <div>
       Min:
       <input
@@ -52,6 +66,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { TYPES } from "../../di/TYPES";
 import { Route } from "../../structs/Scheduling/Route";
+import { Station } from "../../structs/Scheduling/Station";
 import { Trip } from "../../structs/Scheduling/Trip";
 import { TripEnd } from "../../structs/Scheduling/TripEnd";
 import { TripWithEnd } from "../../structs/Scheduling/TripWithEnd";
@@ -67,9 +82,13 @@ import {
 
 @Component
 export default class TripConnector extends Vue {
-  lastRoutes: string[] = ['WNxyhJVS6'];
-  firstRoutes: string[] = ['1XihqJwLy'];
+  lastRoutes: string[] = [];
+  firstRoutes: string[] = [];
+  lastRouteOptions: Readonly<Object>[] = [];
+  firstRouteOptions: Readonly<Object>[] = [];
   tripList: any[] = [];
+  commonStation: string = null;
+  commonStationName: string = '';
 
   min: number = 0;
   minStr: string = '';
@@ -83,7 +102,7 @@ export default class TripConnector extends Vue {
     all.push(...lasts.map(t => ({end: TripEnd.Last, trip: t, time: t.arrivalTime, timeStr: t.arrivalTimeString})));
     all.push(...firsts.map(t => ({end: TripEnd.First, trip: t, time: t.departureTime, timeStr: t.departureTimeString})));
     all.sort((a, b) => {
-      if(a.time === b.time) return a.end < b.end ? -1 : 1;
+      if(a.time === b.time) return a.end > b.end ? -1 : 1;
       return a.time-b.time;
     });
 
@@ -111,6 +130,39 @@ export default class TripConnector extends Vue {
     this.tripList = getAllOfStorable(TYPES.Trip).map((x) =>
       Object.freeze(x.persistDeep())
     );
+    
+    if(this.firstRoutes.length > 0) {
+      const route = getStorable(this.firstRoutes[0]) as Route;
+      this.commonStation = route.getFirstStation()?.getId();
+    } else if(this.lastRoutes.length > 0) {
+      const route = getStorable(this.lastRoutes[0]) as Route;
+      this.commonStation = route.getLastStation()?.getId();
+    } else {
+      this.commonStation = null;
+    }
+    this.commonStationName = (getStorable(this.commonStation) as Station)?.getName();
+
+    this.firstRouteOptions = getAllOfStorable(TYPES.Route).filter((x:Route) => !this.commonStation || x.getFirstStation()?.getId() === this.commonStation).map((x) =>
+      Object.freeze(x.persistDeep())
+    );
+
+    this.lastRouteOptions = getAllOfStorable(TYPES.Route).filter((x:Route) => !this.commonStation || x.getLastStation()?.getId() === this.commonStation).map((x) =>
+      Object.freeze(x.persistDeep())
+    );
+  }
+
+  handleLastRoutesChanged(event): void {
+    this.update();
+  }
+
+  handleFirstRoutesChanged(event): void {
+    this.update();
+  }
+
+  clearRoutes(): void {
+    this.firstRoutes = [];
+    this.lastRoutes = [];
+    this.update();
   }
 
   constructor() {
@@ -202,7 +254,7 @@ export default class TripConnector extends Vue {
     all.push(...lasts.map(t => ({end: TripEnd.Last, trip: t, time: t.arrivalTime, timeStr: t.arrivalTimeString})));
     all.push(...firsts.map(t => ({end: TripEnd.First, trip: t, time: t.departureTime, timeStr: t.departureTimeString})));
     all.sort((a, b) => {
-      if(a.time === b.time) return a.end < b.end ? -1 : 1;
+      if(a.time === b.time) return a.end > b.end ? -1 : 1;
       return a.time-b.time;
     });
 

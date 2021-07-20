@@ -3,6 +3,8 @@ import { Route } from './Route';
 import { RouteStop } from './RouteStop';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
+import { Station } from './Station';
+import { Util } from '../Util';
 
 export class ActualRoute extends ActualBaseStorable implements Route {
   private name: string;
@@ -79,6 +81,14 @@ export class ActualRoute extends ActualBaseStorable implements Route {
       this.stops[index - 1] = tmp1;
       this.stops[index] = tmp0;
     }
+  }
+
+  getFirstStation(): Station {
+    return Util.first(this.stops)?.getStation();
+  }
+
+  getLastStation(): Station {
+    return Util.last(this.stops)?.getStation();
   }
 
   persist(): Object {
