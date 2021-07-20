@@ -5,5 +5,5 @@ export interface TripWithEnd {
     end: TripEnd;
     time: number;
     timeStr: string;
-    trip: Trip;
+    trip: any;
 }

@@ -3,6 +3,25 @@
     <div>
       Trip Connector
     </div>
+    <div>
+      Min:
+      <input
+        style="width: 80px"
+        @keyup.stop="handleMinTime"
+        type="text"
+        v-model="minStr"
+      />
+      Max:
+      <input
+        style="width: 80px"
+        @keyup.stop="handleMaxTime"
+        type="text"
+        v-model="maxStr"
+      />
+      <button style="width: 80px" @click="autoAttach">Auto attach</button>
+      <button style="width: 80px" @click="autoReverse">Auto reverse</button>
+    </div>
+    <hr />
     <table>
       <tr class="xyz" :key="t.key" v-for="t in tripsWithEnd">
         <td v-if="!t.Last" colspan="5"></td>
@@ -52,6 +71,11 @@ export default class TripConnector extends Vue {
   firstRoutes: string[] = ['1XihqJwLy'];
   tripList: any[] = [];
 
+  min: number = 0;
+  minStr: string = '';
+  max: number = 0;
+  maxStr: string = '';
+
   get tripsWithEnd(): Record<TripEnd, TripWithEnd>[] {
     const lasts = this.tripList.filter(t => this.lastRoutes.includes(t.route.id));
     const firsts = this.tripList.filter(t => this.firstRoutes.includes(t.route.id));
@@ -62,6 +86,7 @@ export default class TripConnector extends Vue {
       if(a.time === b.time) return a.end < b.end ? -1 : 1;
       return a.time-b.time;
     });
+
     const dual: Record<TripEnd | 'key', TripWithEnd>[] = [];
     for(let i=0;i<all.length;i++) {
       if(all[i].end === TripEnd.Last) {
@@ -124,6 +149,94 @@ export default class TripConnector extends Vue {
       trip?.toggleNextReverse();
 
       this.update();
+  }
+
+  handleMinTime(event: any): void {
+    let value = event.currentTarget.value;
+    value = value
+      .split("")
+      .filter((x) => "0" <= x && x <= "9")
+      .join("");
+    if (value.length > 4) {
+      value = value.substr(0, 4);
+    }
+    let time = parseInt(value, 10);
+    if (value.length > 2) {
+      value = value.substr(0, value.length - 2) + ":" + value.substr(-2);
+      time =
+        parseInt(value.substr(0, value.length - 2), 10) * 60 +
+        parseInt(value.substr(-2), 10);
+    }
+    this.minStr = value;
+    this.min = value === "" ? undefined : time * 60;
+  }
+
+  handleMaxTime(event: any): void {
+    let value = event.currentTarget.value;
+    value = value
+      .split("")
+      .filter((x) => "0" <= x && x <= "9")
+      .join("");
+    if (value.length > 4) {
+      value = value.substr(0, 4);
+    }
+    let time = parseInt(value, 10);
+    if (value.length > 2) {
+      value = value.substr(0, value.length - 2) + ":" + value.substr(-2);
+      time =
+        parseInt(value.substr(0, value.length - 2), 10) * 60 +
+        parseInt(value.substr(-2), 10);
+    }
+    this.maxStr = value;
+    this.max = value === "" ? undefined : time * 60;
+  }
+
+  autoAttach(): void {
+    const min = this.min || 0;
+    const max = this.max || Number.POSITIVE_INFINITY;
+
+    // todo copied code
+    const lasts = this.tripList.filter(t => this.lastRoutes.includes(t.route.id));
+    const firsts = this.tripList.filter(t => this.firstRoutes.includes(t.route.id));
+    const all = [];
+    all.push(...lasts.map(t => ({end: TripEnd.Last, trip: t, time: t.arrivalTime, timeStr: t.arrivalTimeString})));
+    all.push(...firsts.map(t => ({end: TripEnd.First, trip: t, time: t.departureTime, timeStr: t.departureTimeString})));
+    all.sort((a, b) => {
+      if(a.time === b.time) return a.end < b.end ? -1 : 1;
+      return a.time-b.time;
+    });
+
+    for(let i=0;i<all.length;i++) {
+      if(all[i].end === TripEnd.Last && !all[i].trip.nextTrip) {
+        for(let j=i+1;j<all.length;j++) {
+          if(all[j].time > (all[i].time+max)) break;
+
+          if(all[j].end === TripEnd.First && !all[j].trip.prevTrip && all[j].time >= (all[i].time+min)) {
+            const last = getStorable(all[i].trip.id) as Trip;
+            const first = getStorable(all[j].trip.id) as Trip;
+
+            last?.setNextTrip(first);
+            first?.setPrevTrip(last);
+            break;
+          }
+        }
+      }
+    }
+
+    this.update();
+  }
+
+  autoReverse(): void {
+    const dual = this.tripsWithEnd;
+
+    for(let d of dual) {
+      if(d.Last && d.Last.trip.nextTrip) {
+        const trip = getStorable(d.Last.trip.id) as Trip;
+        trip.toggleNextReverse();
+      }
+    }
+
+    this.update();
   }
 }
 </script>
