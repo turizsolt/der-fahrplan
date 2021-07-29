@@ -7,7 +7,7 @@ import { BaseStorable } from '../../../structs/Interfaces/BaseStorable';
 import { BaseBrick } from '../../../structs/Interfaces/BaseBrick';
 import { Train } from '../../../modules/Train/Train';
 import { GlobalController } from '../GlobalController';
-import { MapCreator } from '../../../modules/Map/MapCreator';
+import { RailMapCreator } from '../../../modules/RailMap/RailMapCreator';
 
 export class GeneralInputHandler extends InputHandler {
   constructor(private store: Store, private globalController: GlobalController) {
@@ -55,7 +55,8 @@ export class GeneralInputHandler extends InputHandler {
     });
 
     this.reg(keyUp('L'), () => {
-      MapCreator.create(this.store);
+      const map = RailMapCreator.create(this.store);
+      console.log(map.getEdges());
     });
 
 

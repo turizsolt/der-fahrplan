@@ -46,7 +46,8 @@ export class ActualDirectedBlock implements DirectedBlock {
     const endBlockEnd = this.getBlock().getEnd(this.getDirection() === TrackDirection.AB ? WhichEnd.B : WhichEnd.A);
     const endJoint = endBlockEnd.getJointEnd().joint;
     const positionOnTrack = startJoint.getPosition();
-    const realStartPositionOnTrack = this.getDirection() === TrackDirection.BA ? positionOnTrack : positionOnTrack.opposition();
+    console.log('HMMM', this.getDirection(), positionOnTrack.getDirectedTrack().getDirection()); // todo itt bugos
+    const realStartPositionOnTrack = this.getDirection() === positionOnTrack.getDirectedTrack().getDirection() ? positionOnTrack : positionOnTrack.opposition(); // todo diff appr.
     const directedTracks: DirectedTrack[] = [];
     let realEndPositionOnTrack: number = null;
     let next = realStartPositionOnTrack.getDirectedTrack();

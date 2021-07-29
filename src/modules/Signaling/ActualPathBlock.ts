@@ -47,6 +47,10 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     return this;
   }
 
+  getName(): string {
+    return this.id;
+  }
+
   getCoord(): Coordinate {
     return this.coord;
   }
