@@ -22,6 +22,16 @@ export class MapCreator {
             // find next PathBlock
             while (true) {
                 if (!start) break;
+
+                // get markers
+                // console.log('track', start.getTrackParts());
+                // console.log('markers', start.getMarkers());
+
+                const markers = start.getMarkers();
+                const filteredMarkers = markers.filter(m => m.marker.type === 'Platform');
+                // console.log('markers', markers, filteredMarkers);
+                console.log('Stations:', filteredMarkers.map(m => m.marker.platform.getStation()?.getName()));
+
                 const nextEnd = start.getBlock().getEnd(start.getDirection() === TrackDirection.AB ? WhichEnd.B : WhichEnd.A);
                 nextOtherEnd = nextEnd.getOtherEnd();
                 if (!nextOtherEnd) break;

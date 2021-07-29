@@ -4,6 +4,7 @@ import { TrackCurve } from './TrackCurve';
 import { TrackDirection } from './TrackDirection';
 import { TrackMarker } from './TrackMarker';
 import { PositionedTrackMarker } from '../PositionedTrackMarker';
+import { TrackPart } from './TrackPart';
 
 export interface DirectedTrack {
   next(): DirectedTrack;
@@ -26,6 +27,7 @@ export interface DirectedTrack {
   addMarkerBothDirections(position: number, marker: TrackMarker): void;
   removeMarkerBothDirections(marker: TrackMarker): void;
   getMarkers(): PositionedTrackMarker[];
+  getMarkersPartially(part: TrackPart): PositionedTrackMarker[];
 
   getHash(): string;
 }

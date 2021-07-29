@@ -5,17 +5,19 @@ import { TrackCurve } from './TrackCurve';
 import { TrackDirection } from './TrackDirection';
 import { TrackMarker } from './TrackMarker';
 import { PositionedTrackMarker } from '../PositionedTrackMarker';
+import { TrackPart } from './TrackPart';
+import { almostBetween } from '../../structs/Geometry/Almost';
 
 export class ActualDirectedTrack implements DirectedTrack {
-    private nextTrack: DirectedTrack = null;
-    private permaNextTracks: DirectedTrack[] = [];
-    private reverseTrack: DirectedTrack = null;
+  private nextTrack: DirectedTrack = null;
+  private permaNextTracks: DirectedTrack[] = [];
+  private reverseTrack: DirectedTrack = null;
 
   constructor(
     private segment: TrackSegment,
     private curve: TrackCurve,
     private trackDirection: TrackDirection
-  ) {}
+  ) { }
 
   next(): DirectedTrack {
     return this.nextTrack;
@@ -86,8 +88,12 @@ export class ActualDirectedTrack implements DirectedTrack {
     return this.markers;
   }
 
+  getMarkersPartially(part: TrackPart): PositionedTrackMarker[] {
+    return this.markers.filter(m => almostBetween(part.startPosition, m.position, part.endPosition));
+  }
+
   getHash(): string {
-      return this.getTrack().getHash(this.getSegment()) + '-' + this.getDirection();
+    return this.getTrack().getHash(this.getSegment()) + '-' + this.getDirection();
   }
 
 }
