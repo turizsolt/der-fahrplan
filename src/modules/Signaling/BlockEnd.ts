@@ -19,5 +19,5 @@ export interface BlockEnd extends Emitable {
   getSignal(): SignalSignal;
   setHidden(): void;
   getHash(): string;
-  getNextBlockEnd(): BlockEnd;
+  getOtherEnd(): BlockEnd;
 }

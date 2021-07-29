@@ -7,6 +7,7 @@ import { BaseStorable } from '../../../structs/Interfaces/BaseStorable';
 import { BaseBrick } from '../../../structs/Interfaces/BaseBrick';
 import { Train } from '../../../modules/Train/Train';
 import { GlobalController } from '../GlobalController';
+import { MapCreator } from '../../../modules/Map/MapCreator';
 
 export class GeneralInputHandler extends InputHandler {
   constructor(private store: Store, private globalController: GlobalController) {
@@ -54,21 +55,7 @@ export class GeneralInputHandler extends InputHandler {
     });
 
     this.reg(keyUp('L'), () => {
-      const download = (content, fileName, contentType) => {
-        var a = document.createElement('a');
-        var file = new Blob([content], { type: contentType });
-        a.href = URL.createObjectURL(file);
-        a.download = fileName;
-        a.click();
-      };
-
-      const data = globalThis.times.map(r => r.join(' ,')).join('\n');
-
-      const fileName = `${new Date().toISOString()}.${(Math.random() *
-        90000) |
-        (0 + 100000)}.csv`;
-
-      download(data, fileName, 'text/csv');
+      MapCreator.create(this.store);
     });
 
 
