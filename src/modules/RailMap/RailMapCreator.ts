@@ -14,12 +14,11 @@ import { RailMapNode } from './RailMapNode';
 export class RailMapCreator {
   static create(store: Store): RailMap {
     const pathBlocks = store.getAllOf(TYPES.PathBlock) as PathBlock[];
+    const stations = (store.getAllOf(TYPES.Station) as Station[]);
 
     const map: RailMap = new ActualRailMap();
-    map.addNodes((store.getAllOf(
-      TYPES.PathBlock
-    ) as PathBlock[]) as RailMapNode[]);
-    map.addNodes((store.getAllOf(TYPES.Station) as Station[]) as RailMapNode[]);
+    map.addNodes(pathBlocks as RailMapNode[]);
+    map.addNodes(stations as RailMapNode[]);
 
     for (let pathBlock of pathBlocks) {
       for (let end of pathBlock.getPathBlockEnds()) {
@@ -68,6 +67,21 @@ export class RailMapCreator {
         }
       }
     }
+
+    let minX = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let minZ = Number.POSITIVE_INFINITY;
+    let maxZ = Number.NEGATIVE_INFINITY;
+
+    for (let node of map.getNodes()) {
+      const coord = node.getCoord();
+      if (coord.x < minX) { minX = coord.x };
+      if (coord.x > maxX) { maxX = coord.x };
+      if (coord.z < minZ) { minZ = coord.z };
+      if (coord.z > maxZ) { maxZ = coord.z };
+    }
+
+    map.setBounds({ minX, minZ, maxX, maxZ });
 
     return map;
   }

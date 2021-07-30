@@ -1,10 +1,12 @@
 import { RailMap } from "./RailMap";
+import { RailMapBounds } from "./RailMapBounds";
 import { RailMapEdge } from "./RailMapEdge";
 import { RailMapNode } from "./RailMapNode";
 
 export class ActualRailMap implements RailMap {
     private nodes: RailMapNode[] = [];
     private edges: Record<string, RailMapEdge> = {};
+    private bounds: RailMapBounds;
 
     addNodes(nodes: RailMapNode[]): void {
         this.nodes.push(...nodes);
@@ -21,6 +23,18 @@ export class ActualRailMap implements RailMap {
 
     getEdges(): Record<string, RailMapEdge> {
         return this.edges;
+    }
+
+    getNodes(): RailMapNode[] {
+        return this.nodes;
+    }
+
+    setBounds(bounds: RailMapBounds): void {
+        this.bounds = bounds;
+    }
+
+    getBounds(): RailMapBounds {
+        return this.bounds
     }
 
     private orderNodes(from: RailMapNode, to: RailMapNode): { from: RailMapNode, to: RailMapNode } {
