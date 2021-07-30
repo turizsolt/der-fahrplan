@@ -54,13 +54,6 @@ export class GeneralInputHandler extends InputHandler {
       download(JSON.stringify(data), fileName, 'application/json');
     });
 
-    this.reg(keyUp('L'), () => {
-      const map = RailMapCreator.create(this.store);
-      console.log(map.getEdges());
-    });
-
-
-
     this.reg(keyUp('D'), () => {
       if (!this.getSelected()) return false;
       (this.getSelected() as BaseBrick)

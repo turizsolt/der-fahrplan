@@ -11,6 +11,7 @@ import { InputController } from './InputController';
 import { InputMode } from './InputHandlers/InputMode';
 import { ToolInputHandler } from './InputHandlers/ToolInputHandler';
 import { VueBigscreen2 } from './VueBigScreen2';
+import { VueBigscreenMap } from './VueBigScreenMap';
 
 export class GlobalController {
   private viewMode: string = 'terrain';
@@ -19,6 +20,7 @@ export class GlobalController {
   private vueViewbox: VueViewbox;
   private vueBigScreen: VueBigscreen;
   private vueBigScreen2: VueBigscreen2;
+  private vueBigScreenMap: VueBigscreenMap;
   private vueSidebar: VueSidebar;
   private vueTestPanel: VueTestPanel;
   private toolInputHandler: ToolInputHandler;
@@ -35,6 +37,7 @@ export class GlobalController {
     this.vueSidebar = new VueSidebar(this.store);
     this.vueBigScreen = new VueBigscreen(this.store);
     this.vueBigScreen2 = new VueBigscreen2(this.store);
+    this.vueBigScreenMap = new VueBigscreenMap(this.store);
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
 
@@ -56,7 +59,8 @@ export class GlobalController {
     this.vueTestPanel = new VueTestPanel(this.store);
     this.store.getCommandLog().setInputController(this);
 
-    this.vueViewbox.addButton({ id: 'terrain', text: 'Terrain' });
+    this.vueViewbox.addButton({ id: 'terrain', text: 'Default' });
+    this.vueViewbox.addButton({ id: 'map', text: 'Map' });
     this.vueViewbox.addButton({ id: 'schedule', text: 'Schedule' });
     this.vueViewbox.addButton({ id: 'connector', text: 'Connect' });
     this.vueViewbox.addButton({ id: 'builder', text: 'Builder' });
@@ -93,6 +97,14 @@ export class GlobalController {
     } else {
       this.selectMode(InputMode.CAMERA);
       this.vueBigScreen2.setShow(false);
+    }
+
+    if (mode === 'map') {
+      this.selectMode(InputMode.SELECT);
+      this.vueBigScreenMap.setShow(true);
+    } else {
+      this.selectMode(InputMode.CAMERA);
+      this.vueBigScreenMap.setShow(false);
     }
 
     if (mode === 'builder') {
