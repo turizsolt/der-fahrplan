@@ -4,4 +4,5 @@ export interface RailMapNode {
     getName(): string;
     getCoord(): Coordinate;
     getId(): string;
+    getType(): Symbol;
 }
