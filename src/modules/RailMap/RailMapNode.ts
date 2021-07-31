@@ -1,3 +1,4 @@
+import { Color } from "../../structs/Color";
 import { Coordinate } from "../../structs/Geometry/Coordinate";
 
 export interface RailMapNode {
@@ -5,4 +6,6 @@ export interface RailMapNode {
     getCoord(): Coordinate;
     getId(): string;
     getType(): symbol;
+    persistShallow(): Object;
+    getColor(): Color;
 }

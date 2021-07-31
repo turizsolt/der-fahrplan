@@ -1,6 +1,7 @@
 import { BaseStorable } from '../Interfaces/BaseStorable';
 import { Station } from './Station';
 import { Platform } from '../Interfaces/Platform';
+import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 
 export interface RouteStop extends BaseStorable {
   init(
@@ -9,8 +10,9 @@ export interface RouteStop extends BaseStorable {
     arrivalTime?: number,
     departureTime?: number
   ): RouteStop;
-  getStationName(): string;
   getStation(): Station;
+  getWaypoint(): RailMapNode;
+  getWaypointName(): string;
   getPlatform(): Platform;
   getArrivalTime(): number;
   getDepartureTime(): number;
@@ -19,4 +21,8 @@ export interface RouteStop extends BaseStorable {
   setDepartureTime(time: number): void;
   toggleReverseStop(): void;
   isReverseStop(): boolean;
+
+  setShouldStop(shouldStop: boolean): void;
+  getShouldStop(): boolean;
+  isStation(): boolean;
 }

@@ -36,12 +36,12 @@ xdescribe('Announcing train trips to stations', () => {
   const tripStopB2 = RouteStopFactory().init(stationB, platformB2);
 
   const route: Route = RouteFactory().init();
-  route.addStop(tripStopA1);
-  route.addStop(tripStopB2);
+  route.addWaypoint(tripStopA1);
+  route.addWaypoint(tripStopB2);
 
   const route2: Route = RouteFactory().init();
-  route2.addStop(tripStopA3);
-  route2.addStop(tripStopB2);
+  route2.addWaypoint(tripStopA3);
+  route2.addWaypoint(tripStopB2);
 
   const passenger = PassengerFactory().init(stationA, stationB);
 

@@ -50,10 +50,10 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     if (this.stops.length === 0) {
       return 'Unknown terminus';
     } else if (this.stops.length === 1) {
-      return this.stops[0].getStationName();
+      return this.stops[0].getWaypointName();
     } else {
       const last = this.stops[this.stops.length - 1];
-      return this.stops[0].getStationName() + '>>' + last.getStationName();
+      return this.stops[0].getWaypointName() + '>>' + last.getWaypointName();
     }
   }
 
@@ -61,25 +61,22 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     this.name = name;
   }
 
-  getStops(): any[] {
+  getStops(): RouteStop[] {
+    return this.stops.filter(s => s.getShouldStop());
+  }
+
+  getWaypoints(): RouteStop[] {
     return this.stops;
   }
 
-  addStop(stop: RouteStop): void {
+  addWaypoint(stop: RouteStop): void {
     this.stops.push(stop);
   }
 
   removeStop(stop: RouteStop): void {
-    this.stops = this.stops.filter(s => s !== stop);
-  }
-
-  swapStopWithPrev(stop: RouteStop): void {
-    const index = this.stops.findIndex(s => s === stop);
-    if (index !== -1 && index > 0) {
-      const tmp0 = this.stops[index - 1];
-      const tmp1 = this.stops[index];
-      this.stops[index - 1] = tmp1;
-      this.stops[index] = tmp0;
+    const foundIndex = this.stops.findIndex(s => s === stop);
+    if (foundIndex === 0 || foundIndex === this.stops.length - 1) {
+      this.stops = this.stops.filter(s => s !== stop);
     }
   }
 
@@ -110,7 +107,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
       name: this.name,
       destination:
         this.stops.length > 0
-          ? this.stops[this.stops.length - 1].getStationName()
+          ? this.stops[this.stops.length - 1].getWaypointName()
           : 'Unknown',
       detailedName: this.getDetailedName(),
       stops: this.stops.map((x, ind) => ({
@@ -129,7 +126,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     this.setName(obj.name);
     for (let stopId of obj.stops) {
       const x = store.get(stopId) as RouteStop;
-      this.addStop(x);
+      this.addWaypoint(x);
     }
     if (obj.reverse && store.get(obj.reverse)) {
       this.setReverse(store.get(obj.reverse) as Route);

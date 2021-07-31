@@ -78,7 +78,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         station: stop.getStation(),
         stationRgbColor: stop.getStation().getColor().getRgbString(),
         platform: stop.getPlatform(),
-        stationName: stop.getStationName(),
+        stationName: stop.getWaypointName(),
         platformNo:
           (this.redefinedProps[stop.getId()]?.platform?.getNo()) ??
           stop.getPlatform()?.getNo(),
@@ -204,7 +204,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   }
 
   getArrivalTime(): number {
-    return Util.last(this.getStops()).arrivalTime;
+    return Util.last(this.getStops())?.arrivalTime;
   }
 
   getHasGroup(): boolean {

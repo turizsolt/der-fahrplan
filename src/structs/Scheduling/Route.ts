@@ -8,9 +8,9 @@ export interface Route extends BaseStorable {
   getDetailedName(): string;
   setName(name: string): void;
   getStops(): RouteStop[];
-  addStop(stop: RouteStop): void;
+  getWaypoints(): RouteStop[];
+  addWaypoint(stop: RouteStop): void;
   removeStop(stop: RouteStop): void;
-  swapStopWithPrev(stop: RouteStop): void;
   remove(): void;
   setReverse(route: Route): void;
   getReverse(): Route;

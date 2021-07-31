@@ -36,9 +36,9 @@ xdescribe('Departing only forward stations', () => {
   const tripStopC3 = RouteStopFactory().init(stationC, platformC3);
 
   const route: Route = RouteFactory().init();
-  route.addStop(tripStopA1);
-  route.addStop(tripStopB2);
-  route.addStop(tripStopC3);
+  route.addWaypoint(tripStopA1);
+  route.addWaypoint(tripStopB2);
+  route.addWaypoint(tripStopC3);
 
   it('only board, when destination is after the current stop', () => {
     const passengerToA = PassengerFactory().init(stationB, stationA);

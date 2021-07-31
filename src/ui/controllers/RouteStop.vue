@@ -17,13 +17,6 @@
     <!-- buttons -->
     <div class="stop-button-holder">
       <div
-        v-if="canmove"
-        class="stop-button stop-move"
-        @click.stop="$emit('move')"
-      >
-        ▲
-      </div>
-      <div
         v-if="candelete"
         class="stop-button"
         :class="stop.isReverseStop?'stop-reverse':'stop-non-reverse'"
