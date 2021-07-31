@@ -16,12 +16,12 @@ const pos = PositionOnTrack.fromTrack(track, 0, TrackDirection.AB);
 describe('Signal', () => {
   it('gets a SignalSignal', () => {
     const signal = store.create<Signal>(TYPES.Signal).init(pos);
-    expect(signal.getSignal()).equals(SignalSignal.Green);
+    expect(signal.getSignal()).equals(SignalSignal.Red);
   });
 
   it('sets and gets a SignalSignal', () => {
     const signal = store.create<Signal>(TYPES.Signal).init(pos);
-    signal.setBlockSignal(SignalSignal.Red);
-    expect(signal.getSignal()).equals(SignalSignal.Red);
+    signal.setBlockSignal(SignalSignal.Green);
+    expect(signal.getSignal()).equals(SignalSignal.Green);
   });
 });
