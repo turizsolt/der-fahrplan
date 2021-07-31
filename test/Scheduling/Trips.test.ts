@@ -69,7 +69,7 @@ describe('Trips', () => {
   it('copies the stops from route', () => {
     const trip = TripFactory().init(route, 0);
 
-    expect(trip.getStops().map(x => x.stationName)).deep.equals([
+    expect(trip.getWaypoints().map(x => x.stationName)).deep.equals([
       'Alpha',
       'Bravo'
     ]);
@@ -79,7 +79,7 @@ describe('Trips', () => {
     const trip = TripFactory().init(route, 0);
     route.addStop(stop2);
 
-    expect(trip.getStops().map(x => x.stationName)).deep.equals([
+    expect(trip.getWaypoints().map(x => x.stationName)).deep.equals([
       'Alpha',
       'Bravo',
       'Charlie'
@@ -91,29 +91,29 @@ describe('Trips', () => {
   it('arrival and departure times read correctly', () => {
     const trip = TripFactory().init(route, 10);
 
-    expect(trip.getStops().map(x => x.arrivalTime)).deep.equals([10, 13]);
-    expect(trip.getStops().map(x => x.departureTime)).deep.equals([10, 14]);
+    expect(trip.getWaypoints().map(x => x.arrivalTime)).deep.equals([10, 13]);
+    expect(trip.getWaypoints().map(x => x.departureTime)).deep.equals([10, 14]);
   });
 
   it('redefined arrival and departure times read correctly', () => {
     const trip = TripFactory().init(route, 10);
     trip.redefine(stop1, { arrivalTime: 15, departureTime: 16 });
 
-    expect(trip.getStops().map(x => x.arrivalTime)).deep.equals([10, 15]);
-    expect(trip.getStops().map(x => x.departureTime)).deep.equals([10, 16]);
+    expect(trip.getWaypoints().map(x => x.arrivalTime)).deep.equals([10, 15]);
+    expect(trip.getWaypoints().map(x => x.departureTime)).deep.equals([10, 16]);
   });
 
   it('platforms read correctly', () => {
     const trip = TripFactory().init(route, 10);
 
-    expect(trip.getStops().map(x => x.platformNo)).deep.equals(['A', 'B']);
+    expect(trip.getWaypoints().map(x => x.platformNo)).deep.equals(['A', 'B']);
   });
 
   it('redefined platform read correctly', () => {
     const trip = TripFactory().init(route, 10);
     trip.redefine(stop1, { platform: platform1C });
 
-    expect(trip.getStops().map(x => x.platformNo)).deep.equals(['A', 'C']);
+    expect(trip.getWaypoints().map(x => x.platformNo)).deep.equals(['A', 'C']);
   });
 
   it('redefined then cleared platform read correctly', () => {
@@ -121,14 +121,14 @@ describe('Trips', () => {
     trip.redefine(stop1, { platform: platform1C });
     trip.undefine(stop1, { platform: undefined });
 
-    expect(trip.getStops().map(x => x.platformNo)).deep.equals(['A', 'B']);
+    expect(trip.getWaypoints().map(x => x.platformNo)).deep.equals(['A', 'B']);
   });
 
   it('cleared not redefined', () => {
     const trip = TripFactory().init(route, 10);
     trip.undefine(stop0, { platform: undefined });
 
-    expect(trip.getStops().map(x => x.platformNo)).deep.equals(['A', 'B']);
+    expect(trip.getWaypoints().map(x => x.platformNo)).deep.equals(['A', 'B']);
   });
 
   it('persist', () => {
@@ -141,8 +141,8 @@ describe('Trips', () => {
     trip2.load(json, store);
 
     expect(trip2.getRoute().getId()).equals(route.getId());
-    expect(trip2.getStops().map(x => x.arrivalTime)).deep.equals([9, 13]);
-    expect(trip2.getStops().map(x => x.departureTime)).deep.equals([10, 14]);
-    expect(trip2.getStops().map(x => x.platformNo)).deep.equals(['A', 'C']);
+    expect(trip2.getWaypoints().map(x => x.arrivalTime)).deep.equals([9, 13]);
+    expect(trip2.getWaypoints().map(x => x.departureTime)).deep.equals([10, 14]);
+    expect(trip2.getWaypoints().map(x => x.platformNo)).deep.equals(['A', 'C']);
   });
 });

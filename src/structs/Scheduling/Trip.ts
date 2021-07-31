@@ -7,7 +7,7 @@ import { Station } from './Station';
 export interface Trip extends BaseStorable {
   init(route: Route, startTime: number, hasGroup?: boolean): Trip;
   getRoute(): Route;
-  getStops(): TripStop[];
+  getWaypoints(): TripStop[];
   redefine(stop: RouteStop, props: OptionalTripStop): void;
   undefine(stop: RouteStop, props: OptionalTripStop): void;
   getStationDepartureTime(station: Station): number;

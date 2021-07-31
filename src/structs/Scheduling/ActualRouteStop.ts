@@ -27,7 +27,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     this.arrivalTime = arrivalTime;
     this.departureTime = departureTime;
     this.reverseStop = false;
-    this.shouldStop = true;
+    this.setShouldStop(true);
     return this;
   }
 
@@ -72,7 +72,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
   }
 
   setShouldStop(shouldStop: boolean): void {
-    this.shouldStop = shouldStop;
+    this.shouldStop = shouldStop && this.isStation();
   }
 
   getShouldStop(): boolean {
@@ -92,7 +92,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       arrivalTime: this.arrivalTime,
       departureTime: this.departureTime,
       isReverseStop: this.reverseStop,
-      shouldStop: this.shouldStop
+      shouldStop: this.getShouldStop()
     };
   }
 
@@ -109,7 +109,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       departureTime: this.departureTime,
       departureTimeString: Util.timeToStr(this.departureTime, true),
       isReverseStop: this.reverseStop,
-      shouldStop: this.shouldStop
+      shouldStop: this.getShouldStop()
     };
   }
 
@@ -124,6 +124,6 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     this.setArrivalTime(obj.arrivalTime);
     this.setDepartureTime(obj.departureTime);
     this.reverseStop = !!obj.isReverseStop;
-    this.shouldStop = obj.shouldStop === undefined ? true : obj.shouldStop;
+    this.setShouldStop(obj.shouldStop === undefined ? true : obj.shouldStop);
   }
 }

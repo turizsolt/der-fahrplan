@@ -2,7 +2,7 @@
   <div id="map-field">
     <div v-for="edge in edges" class="edge" :style="edge.style"></div>  
     <div v-for="node in nodes" class="node-text" :style="{left: node.textLeft, top: node.textTop, display: node.textDisplay}">{{node.getName()}}</div>  
-    <div v-for="node in nodes" class="node" :style="{left: node.left, top: node.top, width: node.size, height: node.size, backgroundColor: node.bgColor}" :title="node.getName()"></div>  
+    <div v-for="node in nodes" @click="$emit('addStop', $event, node.getId())" class="node" :style="{left: node.left, top: node.top, width: node.size, height: node.size, backgroundColor: node.bgColor}" :title="node.getName()"></div>  
   </div>
 </template>
 

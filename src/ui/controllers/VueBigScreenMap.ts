@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { Store } from '../../structs/Interfaces/Store';
+import RoutePlanner from './RoutePlanner.vue';
 import RailMapShower from './RailMapShower.vue';
 
 export class VueBigscreenMap {
@@ -14,6 +15,7 @@ export class VueBigscreenMap {
       methods: {}
     });
 
+    Vue.component('route-planner', RoutePlanner);
     Vue.component('rail-map-shower', RailMapShower);
   }
 
