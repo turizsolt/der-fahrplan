@@ -42,15 +42,6 @@
                 </add-trip>
             </div>
         </div>
-        <div class="column-add-stops" id="route-station-options">
-            <div class="column-title">Add stops</div>
-            <div v-if="selectedRoute">
-                <div v-for="station in stations" :key="station.id">
-                    <button v-on:click="addStop(station)" :style="{backgroundColor: station.rgbColor}">Add</button>
-                    {{station.name}}
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -138,20 +129,6 @@ export default class TripPlanner extends Vue {
           this.load();
         };
 
-        addStop(vStation) {
-          if (this.selectedRoute) {
-            const route = getStorable(this.selectedRoute.id) as Route;
-            const station = getStorable(vStation.id) as Station;
-            const stop = createStorable<RouteStop>(TYPES.RouteStop);
-            stop.init(
-              station,
-              station.getPlatforms().length > 0 && station.getPlatforms()[0]
-            );
-            route.addWaypoint(stop);
-            this.load();
-          }
-        };
-
         nameChange(event) {
           const route = getStorable(this.selectedRoute.id) as Route;
           route.setName(event.target.value);
@@ -169,9 +146,5 @@ export default class TripPlanner extends Vue {
 <style>
 .big-screen-one {
     display: flex;
-}
-.column-add-stops {
-  height: 500px; /* todo arbitrary number */
-  overflow-y: scroll;
 }
 </style>
