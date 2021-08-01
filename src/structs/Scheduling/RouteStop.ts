@@ -5,7 +5,7 @@ import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 
 export interface RouteStop extends BaseStorable {
   init(
-    station: Station,
+    waypoint: RailMapNode,
     platform?: Platform,
     arrivalTime?: number,
     departureTime?: number

@@ -32,11 +32,7 @@ export default class RailMapShower extends Vue {
   }
 
   init() {
-      console.log(this);
       this.map = RailMapCreator.create(getStore());
-
-      console.log(this.map.getEdges());
-      console.log(this.map.getBounds());
 
       this.nodes = this.map.getNodes();
       const gotEdges = this.map.getEdges();
@@ -83,8 +79,6 @@ export default class RailMapShower extends Vue {
           transform: 'rotate('+(-r)+'rad)'
         };
       };
-
-      console.log(this.nodes);
   }
 
   update() {}

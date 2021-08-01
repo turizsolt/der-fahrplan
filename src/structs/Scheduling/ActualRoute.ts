@@ -5,6 +5,7 @@ import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
 import { Station } from './Station';
 import { Util } from '../Util';
+import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 
 export class ActualRoute extends ActualBaseStorable implements Route {
   private name: string;
@@ -86,6 +87,14 @@ export class ActualRoute extends ActualBaseStorable implements Route {
 
   getLastStation(): Station {
     return Util.last(this.stops)?.getStation();
+  }
+
+  getFirstWaypoint(): RailMapNode {
+    return Util.first(this.stops)?.getWaypoint();
+  }
+
+  getLastWaypoint(): RailMapNode {
+    return Util.last(this.stops)?.getWaypoint();
   }
 
   persist(): Object {

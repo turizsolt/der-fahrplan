@@ -45,17 +45,21 @@ import { Route } from "../../structs/Scheduling/Route";
 import { Station } from "../../structs/Scheduling/Station";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { TYPES } from "../../di/TYPES";
-import { getAllOfStorable, getStorable, createStorable } from "../../structs/Actuals/Store/StoreForVue";
-import { get } from "http";
+import { getStore, getAllOfStorable, getStorable, createStorable } from "../../structs/Actuals/Store/StoreForVue";
+import { RailMap } from "../../modules/RailMap/RailMap";
+import { RailMapNode } from "../../modules/RailMap/RailMapNode";
+import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";
 
 @Component
 export default class RoutePlanner extends Vue {
+    private map: RailMap;
     routes: any[] = [];
     selectedRoute: any = null;
     stations: any[] = [];
 
     created() {
-        this.load();
+      this.map = RailMapCreator.create(getStore());
+      this.load();
     }
 
     load() {
@@ -95,7 +99,7 @@ export default class RoutePlanner extends Vue {
           const route = createStorable<Route>(TYPES.Route);
           route.init();
           route.setName(routeFrom.getName());
-          for (let stopFrom of [...routeFrom.getStops()].reverse()) {
+          for (let stopFrom of [...routeFrom.getWaypoints()].reverse()) {
             const stop = createStorable<RouteStop>(TYPES.RouteStop);
             stop.init(stopFrom.getStation(), stopFrom.getPlatform());
             route.addWaypoint(stop);
@@ -124,17 +128,23 @@ export default class RoutePlanner extends Vue {
         };
 
         addStop(evt, stationId) {
-          console.log('station clicked', stationId);
-
           if (this.selectedRoute) {
             const route = getStorable(this.selectedRoute.id) as Route;
             const station = getStorable(stationId) as Station;
-            console.log('station', station);
-            const stop = createStorable<RouteStop>(TYPES.RouteStop);
-            stop.init(
-              station
-            );
-            route.addWaypoint(stop);
+
+            let addingStations:RailMapNode[] = [station];
+            if(route.getLastWaypoint()) {
+              const result = this.map.getShortestPath(route.getLastWaypoint(), station);
+              addingStations = result.slice(1);
+            }
+
+            for(let station of addingStations) {
+              const stop = createStorable<RouteStop>(TYPES.RouteStop);
+              stop.init(
+                station
+              );
+              route.addWaypoint(stop);
+            }
             this.load();
           }
         };
