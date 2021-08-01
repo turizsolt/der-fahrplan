@@ -102,7 +102,8 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         atStation: (ind === index) && (this.atStation === stop.getStation()),
         isArrivalStation: ind === stops.length - 1,
         isDepartureStation: ind === 0,
-        shouldStop: stop.getShouldStop()
+        shouldStop: stop.getShouldStop(),
+        isStation: stop.isStation()
       };
 
       sto.arrivalTimeString = Util.timeToStr(sto.arrivalTime);

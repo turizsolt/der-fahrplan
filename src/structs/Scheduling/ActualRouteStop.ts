@@ -92,7 +92,8 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       arrivalTime: this.arrivalTime,
       departureTime: this.departureTime,
       isReverseStop: this.reverseStop,
-      shouldStop: this.getShouldStop()
+      shouldStop: this.getShouldStop(),
+      isStation: this.isStation()
     };
   }
 
@@ -109,7 +110,8 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
       departureTime: this.departureTime,
       departureTimeString: Util.timeToStr(this.departureTime, true),
       isReverseStop: this.reverseStop,
-      shouldStop: this.getShouldStop()
+      shouldStop: this.getShouldStop(),
+      isStation: this.isStation()
     };
   }
 

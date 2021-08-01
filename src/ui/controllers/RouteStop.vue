@@ -2,14 +2,15 @@
   <div class="stop">
     <div
       class="stop-circle"
-      :style="{ backgroundColor: stop.stationRgbColor }"
+      :style="{ backgroundColor: stop.shouldStop ? stop.stationRgbColor : 'transparent' }"
+      @click.stop="$emit('shouldStop')"
     ></div>
     <div v-if="index !== route.stops.length - 1" class="stop-after color"></div>
     <div
       v-if="index === route.stops.length - 1"
       class="stop-after nocolor"
     ></div>
-    <div class="stop-name" :style="{ color: stop.isServed ? 'grey' : 'black' }">
+    <div class="stop-name" :style="{ color: (stop.isServed || !stop.isStation || !stop.shouldStop) ? 'grey' : 'black', fontStyle: (stop.isStation) ? 'normal' : 'italic' }">
       {{ stop.atStation ? "* " : "" }} {{ stop.stationName }}
       {{ stop.isArrivalStation ? "é." : "" }}
     </div>
@@ -142,6 +143,10 @@ export default class RouteTitle extends Vue {
 <style scoped>
 .stop:hover {
   background-color: #aaccaa;
+}
+
+.stop-circle:hover {
+  cursor: pointer;
 }
 
 .stop-button-holder {

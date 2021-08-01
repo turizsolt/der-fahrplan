@@ -20,6 +20,7 @@ export interface TripStop {
   isDepartureStation: boolean;
   isArrivalStation: boolean;
   shouldStop: boolean;
+  isStation: boolean;
 }
 
 export interface OptionalTripStop {

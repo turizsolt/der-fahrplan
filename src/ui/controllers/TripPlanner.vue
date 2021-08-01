@@ -26,7 +26,7 @@
                     Stops:<br />
                     <route-stop v-for="(stop, index) in selectedRoute.stops" :key="stop.id" :route="selectedRoute"
                         :stop="stop" :index="index" candelete :canmove="index !== 0" @delete="deleteStop(stop)"
-                         @reverse="reverseStop(stop)">
+                         @reverse="reverseStop(stop)" @shouldStop="shouldStop(stop)">
                     </route-stop>
                 </div>
                 <div class="route-details route-create-holder">
@@ -120,6 +120,8 @@ export default class TripPlanner extends Vue {
           const stop = getStorable(vStop.id) as RouteStop;
           const route = getStorable(this.selectedRoute.id) as Route;
           route.removeStop(stop);
+          
+          this.checkFirstAndLastStop();
           this.load();
         };
 
@@ -128,6 +130,32 @@ export default class TripPlanner extends Vue {
           stop.toggleReverseStop();
           this.load();
         };
+
+        shouldStop(vStop) {
+          const stop = getStorable(vStop.id) as RouteStop;
+          stop.setShouldStop(!stop.getShouldStop());
+          
+          this.checkFirstAndLastStop();
+          this.load();
+        }
+
+        checkFirstAndLastStop() {
+          const route = getStorable(this.selectedRoute.id) as Route;
+          const stops = route.getWaypoints();
+          if(stops.length > 0) {
+            const firstStop = stops[0];
+            if(!firstStop.getShouldStop()) {
+              firstStop.setShouldStop(true);
+            }
+
+            if(stops.length > 1) {
+              const lastStop = stops[stops.length-1];
+              if(!lastStop.getShouldStop()) {
+                lastStop.setShouldStop(true);
+              }
+            }
+          }
+        }
 
         nameChange(event) {
           const route = getStorable(this.selectedRoute.id) as Route;
