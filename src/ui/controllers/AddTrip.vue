@@ -61,7 +61,7 @@
                 <div class="trip-stop-time-header trip-stop-arrival">arr</div>
                 <div class="trip-stop-time-header trip-stop-departure">dep</div>
               </div>
-              <div class="trip-stop" :key="stop.id" v-for="stop in trip2.stops">
+              <div class="trip-stop" :key="stop.id" v-for="stop in trip2.waypoints">
                 <div class="trip-stop-time trip-stop-arrival">
                   {{ stop.isDepartureStation ? "-" : stop.arrivalTimeString }}
                 </div>
