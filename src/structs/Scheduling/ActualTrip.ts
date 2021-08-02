@@ -75,7 +75,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   }
 
   getWaypoints(): TripStop[] {
-    const stops = this.route.getStops();
+    const stops = this.route.getWaypoints();
     const index = stops.findIndex((s: RouteStop) => s.getStation() === this.lastStationServed);
     return stops.map((stop, ind) => {
       const sto: TripStop = {
@@ -228,6 +228,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       arrivalTime: this.getArrivalTime(),
       arrivalTimeString: Util.timeToStr(this.getArrivalTime()),
       stops: this.getStops(),
+      waypoints: this.getWaypoints(),
       prevTrip: this.prevTrip?.getId(),
       nextTrip: this.nextTrip?.getId(),
       nextReverse: this.nextReverse,
