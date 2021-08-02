@@ -2,7 +2,7 @@
   <div id="map-field">
     Ide jon minden, Diagram
     <hr />
-    <div v-for="stop in stops">{{stop.position}}</div>
+    <div v-for="stop in sideStops" :key="stop.id" class="side-stop" :title="stop.name" :style="stop.style"></div>
     
     <!--
     <div v-for="edge in edges" class="edge" :style="edge.style"></div>  
@@ -27,7 +27,7 @@ import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";
 export default class RouteDiagram extends Vue {
   private map: RailMap;
   @Prop() route: any;
-  stops: any = [];
+  sideStops: any = [];
 
   constructor() {
     super();
@@ -42,18 +42,42 @@ export default class RouteDiagram extends Vue {
   @Watch('route') 
   init() {
       this.map = RailMapCreator.create(getStore());
-      console.log(this.map.getEdges());
-      const route = getStorable(this.route?.id) as Route;
+      const route = getStorable(this.route && this.route.id) as Route;
 
-      this.stops = [];
+      this.sideStops = [];
       if(route) {
         let position:number = 0;
         let prevStop:RouteStop = null;
+        let maxHeight:number = 0;
+        let pos: number = 0;
+
+        const mapField = document.getElementById('map-field');
+        const h = mapField.clientHeight - 40;
+        
+        for(let stop of route.getWaypoints()) {
+          if(prevStop) {
+            maxHeight += this.map.getDistance(prevStop.getWaypoint(), stop.getWaypoint());
+          }
+          prevStop = stop;
+        }
+        
+        prevStop = null;
         for(let stop of route.getWaypoints()) {
           if(prevStop) {
             position = this.map.getDistance(prevStop.getWaypoint(), stop.getWaypoint());
           }
-          this.stops.push({...stop, position});
+          pos += position;
+          this.sideStops.push({
+              id: stop.getWaypoint().getId(),
+              position,
+              name: stop.getWaypoint().getName(),
+              style: {
+                  left: (20-10)+'px',
+                  top: (20-10+pos/maxHeight*h)+'px',
+                  width: '20px',
+                  height: '20px'
+              }
+          });
           prevStop = stop;
         }
       }
@@ -69,6 +93,13 @@ export default class RouteDiagram extends Vue {
   height: 100%;
   position: relative;
   border: 1px solid red;
+}
+
+.side-stop {
+  border-radius: 50%;
+  border: 1px solid orange;
+  background-color: yellow;
+  position: absolute;
 }
 
 /*
