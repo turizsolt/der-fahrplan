@@ -13,7 +13,7 @@ import { Trip } from "../../structs/Scheduling/Trip";
 import { Route } from "../../structs/Scheduling/Route";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { Station } from "../../structs/Scheduling/Station";
-import { getStore, getStorable } from "../../structs/Actuals/Store/StoreForVue";
+import { getStore, getStorable, getAllOfStorable } from "../../structs/Actuals/Store/StoreForVue";
 import { RailMap } from "../../modules/RailMap/RailMap";
 import { RailMapNode } from "../../modules/RailMap/RailMapNode";
 import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";
@@ -84,20 +84,23 @@ export default class RouteDiagram extends Vue {
           prevStop = stop;
         }
 
-        const tripId = 'Zv2t0vIQc';
         this.stops = [];
-        const trip = getStorable(tripId) as Trip;
-        for(let stop of trip.getWaypoints()) {
-          this.stops.push({
-            id: stop.station.getId()+'-'+stop.arrivalTime,
-            name: stop.arrivalTime+' '+stop.station.getName(),
-            style: {
-              left: (20-2+stop.arrivalTime/(this.maxTime-this.minTime)*w)+'px',
-              top: (20-2+stopHeights[stop.station.getId()])+'px',
-              width: '4px',
-              height: '4px'
-            }
-          });
+        const trips = getAllOfStorable<Trip>(TYPES.Trip);
+        for(let trip of trips) {
+          if(trip.getRoute() !== route) continue;
+
+          for(let stop of trip.getWaypoints()) {
+            this.stops.push({
+              id: stop.station.getId()+'-'+stop.arrivalTime,
+              name: stop.arrivalTime+' '+stop.station.getName(),
+              style: {
+                left: (20-2+stop.arrivalTime/(this.maxTime-this.minTime)*w)+'px',
+                top: (20-2+stopHeights[stop.station.getId()])+'px',
+                width: '4px',
+                height: '4px'
+              }
+            });
+          }
         }
       }
 
