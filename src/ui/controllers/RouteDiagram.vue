@@ -1,5 +1,8 @@
 <template>
   <div id="map-field">
+    <div v-for="line in sideLines" :key="line.id" class="side-line" :style="line.style"></div>  
+    <div v-for="line in stopLines" :key="line.id" class="stop-line" :style="line.style"></div>  
+    
     <div v-for="stop in sideStops" :key="stop.id" class="side-stop" :title="stop.name" :style="stop.style"></div>
     <div v-for="time in sideTimes" :key="time.id" class="side-time" :title="time.name" :style="time.style"></div>
     <div v-for="stop in stops" :key="stop.id" class="stop-plot" :title="stop.name" :style="stop.style"></div>
@@ -22,10 +25,12 @@ import { RailDiagram } from "../../modules/RailDiagram/RailDiagram";
 @Component
 export default class RouteDiagram extends Vue {
   private diagram: RailDiagram;
-  @Prop() route: any;
-  sideStops: any = [];
-  sideTimes: any = [];
-  stops: any = [];
+  @Prop() route: any = null;
+  sideStops: any[] = [];
+  sideTimes: any[] = [];
+  stops: any[] = [];
+  sideLines: any[] = [];
+  stopLines: any[] = [];
   minTime: number = 0;
   maxTime: number = 60*60*24;
 
@@ -64,12 +69,46 @@ export default class RouteDiagram extends Vue {
         ...plot,
         style: plotToStyle(plot)
       }));
+
+      this.sideLines = lines.map(line => {
+        const len = Math.abs(line.from.r-line.to.r)*h;
+        const rotate = 0;
+        return {
+          ...line,
+          style: {
+            left: (20-2+Math.min(line.from.t,line.to.t)*w)+'px',
+            top: (20-2+Math.min(line.from.r,line.to.r)*h)+'px',
+            height: len+'px',
+            width: (line.trackCount*3)+'px',
+            transform: 'rotate('+(-rotate)+'rad)'
+          }
+        };
+      });
        
       const {plots: plots2, lines: lines2} = this.diagram.getPlotsAndLines();
       this.stops = plots2.map(plot => ({
         ...plot,
         style: plotToStyle(plot)
       }));
+
+      this.stopLines = lines2.map(line => {
+        const len = Math.sqrt(
+          Math.pow((line.from.r-line.to.r)*h, 2) +
+          Math.pow((line.from.t-line.to.t)*w, 2)
+        );
+        const rotate = Math.atan2((line.to.t - line.from.t)*w, (line.to.r - line.from.r)*h);
+        const wid = 1;
+        return {
+          ...line,
+          style: {
+            left: (20-wid/2+(line.from.t+line.to.t)/2*w)+'px',
+            top: (20-len/2+(line.from.r+line.to.r)/2*h)+'px',
+            height: len+'px',
+            width: wid+'px',
+            transform: 'rotate('+(-rotate)+'rad)'
+          }
+        };
+      });
     }  
 
     const plots3 = this.diagram.getTimeAxis();
@@ -108,6 +147,12 @@ export default class RouteDiagram extends Vue {
   border-radius: 50%;
   border: 1px solid black;
   background-color: darkgray;
+  position: absolute;
+}
+
+.side-line,
+.stop-line {
+  background-color: black;
   position: absolute;
 }
 

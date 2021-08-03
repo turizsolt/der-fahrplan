@@ -1,8 +1,8 @@
 <template>
   <div id="map-field">
-    <div v-for="edge in edges" class="edge" :style="edge.style"></div>  
-    <div v-for="node in nodes" class="node-text" :style="{left: node.textLeft, top: node.textTop, display: node.textDisplay}">{{node.getName()}}</div>  
-    <div v-for="node in nodes" @click="$emit('addStop', $event, node.getId())" class="node" :style="{left: node.left, top: node.top, width: node.size, height: node.size, backgroundColor: node.bgColor}" :title="node.getName()"></div>  
+    <div :key="edge.id" v-for="edge in edges" class="edge" :style="edge.style"></div>  
+    <div :key="node.id+'-text'" v-for="node in nodes" class="node-text" :style="{left: node.textLeft, top: node.textTop, display: node.textDisplay}">{{node.getName()}}</div>  
+    <div :key="node.id" v-for="node in nodes" @click="$emit('addStop', $event, node.getId())" class="node" :style="{left: node.left, top: node.top, width: node.size, height: node.size, backgroundColor: node.bgColor}" :title="node.getName()"></div>  
   </div>
 </template>
 
@@ -71,6 +71,7 @@ export default class RailMapShower extends Vue {
         const wi = dist(this.edges[i].from.getCoord().distance2d(this.edges[i].to.getCoord()));
         const r = this.edges[i].from.getCoord().whichDir2d(this.edges[i].to.getCoord());
         const e = Math.min(this.edges[i].count, 4);
+        this.edges[i].id = i;
         this.edges[i].style = {
           left: (20+left(coord)-(e*3/2))+'px',
           top: (20+top(coord)-wi/2)+'px',
