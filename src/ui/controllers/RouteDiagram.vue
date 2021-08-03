@@ -17,10 +17,11 @@ import { getStore, getStorable, getAllOfStorable } from "../../structs/Actuals/S
 import { RailMap } from "../../modules/RailMap/RailMap";
 import { RailMapNode } from "../../modules/RailMap/RailMapNode";
 import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";
+import { RailDiagram } from "../../modules/RailDiagram/RailDiagram";
 
 @Component
 export default class RouteDiagram extends Vue {
-  private map: RailMap;
+  private diagram: RailDiagram;
   @Prop() route: any;
   sideStops: any = [];
   sideTimes: any = [];
@@ -32,6 +33,7 @@ export default class RouteDiagram extends Vue {
     super();
     
     this.init = this.init.bind(this);
+    this.diagram = new RailDiagram(getStore());
 
     setTimeout(() => {
       this.init();
@@ -40,89 +42,42 @@ export default class RouteDiagram extends Vue {
 
   @Watch('route') 
   init() {
-      this.map = RailMapCreator.create(getStore());
-      const route = getStorable(this.route && this.route.id) as Route;
+    const route = getStorable(this.route && this.route.id) as Route;
+    this.diagram.setRoute(route);
 
-      const mapField = document.getElementById('map-field');
-      const h = mapField.clientHeight - 40;
-      const w = mapField.clientWidth - 40;
+    const mapField = document.getElementById('map-field');
+    const h = mapField.clientHeight - 40;
+    const w = mapField.clientWidth - 40;
 
-      this.sideStops = [];
-      if(route) {
-        let position:number = 0;
-        let prevStop:RouteStop = null;
-        let maxHeight:number = 0;
-        let pos: number = 0;
+    const plotToStyle = (plot) => ({
+      left: (20-2+plot.t*w)+'px',
+      top: (20-2+plot.r*h)+'px',
+      width: '4px',
+      height: '4px'
+    });
 
-        for(let stop of route.getWaypoints()) {
-          if(prevStop) {
-            maxHeight += this.map.getDistance(prevStop.getWaypoint(), stop.getWaypoint());
-          }
-          prevStop = stop;
-        }
+    this.sideStops = [];
+    this.stops = [];
+    if(route) {
+      const {plots, lines} = this.diagram.getRouteAxis();
+      this.sideStops = plots.map(plot => ({
+        ...plot,
+        style: plotToStyle(plot)
+      }));
+       
+      const {plots: plots2, lines: lines2} = this.diagram.getPlotsAndLines();
+      this.stops = plots2.map(plot => ({
+        ...plot,
+        style: plotToStyle(plot)
+      }));
+    }  
 
-        const stopHeights: Record<string, number> = {};
-        
-        prevStop = null;
-        for(let stop of route.getWaypoints()) {
-          if(prevStop) {
-            position = this.map.getDistance(prevStop.getWaypoint(), stop.getWaypoint());
-          }
-          pos += position;
-          this.sideStops.push({
-              id: stop.getWaypoint().getId(),
-              position,
-              name: stop.getWaypoint().getName(),
-              style: {
-                  left: (20-2)+'px',
-                  top: (20-2+pos/maxHeight*h)+'px',
-                  width: '4px',
-                  height: '4px'
-              }
-          });
-          stopHeights[stop.getWaypoint().getId()] = pos/maxHeight*h;
-          prevStop = stop;
-        }
-
-        this.stops = [];
-        const trips = getAllOfStorable<Trip>(TYPES.Trip);
-        for(let trip of trips) {
-          if(trip.getRoute() !== route) continue;
-
-          for(let stop of trip.getWaypoints()) {
-            this.stops.push({
-              id: stop.station.getId()+'-'+stop.arrivalTime,
-              name: stop.arrivalTime+' '+stop.station.getName(),
-              style: {
-                left: (20-2+stop.arrivalTime/(this.maxTime-this.minTime)*w)+'px',
-                top: (20-2+stopHeights[stop.station.getId()])+'px',
-                width: '4px',
-                height: '4px'
-              }
-            });
-          }
-        }
-      }
-
-
-      this.sideTimes = [];
-      const t = Math.ceil(this.minTime/(60*30))*60*30;
-      const tend = Math.floor(this.maxTime/(60*30))*60*30;
-      for(let i=t;i<=tend;i+=60*30) {
-        this.sideTimes.push({
-          id: i,
-          name: i, // todo Util
-          style: {
-            left: (20-2+i/(this.maxTime-this.minTime)*w)+'px',
-            top: (20+h)+'px',
-            width: '4px',
-            height: '4px'
-          }
-        });
-      }
+    const plots3 = this.diagram.getTimeAxis();
+    this.sideTimes = plots3.map(plot => ({
+      ...plot,
+      style: plotToStyle(plot)
+    }));
   }
-
-  update() {}
 }
 </script>
 

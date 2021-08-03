@@ -12,4 +12,5 @@ export interface RailMap {
     getBounds(): RailMapBounds;
     getShortestPath(from: RailMapNode, to: RailMapNode): RailMapNode[];
     getDistance(from: RailMapNode, to: RailMapNode): number;
+    getTrackCount(from: RailMapNode, to: RailMapNode): number;
 }

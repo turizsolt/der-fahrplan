@@ -56,6 +56,13 @@ export class ActualRailMap implements RailMap {
         return this.edges[hash]?.avgDistance;
     }
 
+    getTrackCount(nodeFrom: RailMapNode, nodeTo: RailMapNode): number {
+        let { from, to } = this.orderNodes(nodeFrom, nodeTo);
+        const hash = this.hashNodes(from, to);
+
+        return this.edges[hash]?.count;
+    }
+
     getShortestPath(from: RailMapNode, to: RailMapNode): RailMapNode[] {
         const queue: RailMapNode[] = [from];
         const comesFrom: Record<string, RailMapNode> = { [from.getId()]: null };
