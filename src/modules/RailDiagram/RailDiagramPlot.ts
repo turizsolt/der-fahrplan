@@ -4,4 +4,5 @@ export interface RailDiagramPlot {
     position: number;
     r: number;
     t: number;
+    meta?: any;
 }

@@ -146,13 +146,19 @@ export class RailDiagram {
                 }
 
                 plots.push({
-                    id: stop.station.getId() + '-' + stop.arrivalTime + '-' + (Math.random() * 1000000 | 0),
+                    id: stop.id,
                     name: Util.timeToString(stop.arrivalTime) + '-' + Util.timeToString(stop.departureTime) + ' ' + stop.station.getName(),
                     position: this.stopHeights[stop.station.getId()],
                     t:
                         ((stop.departureTime || stop.arrivalTime) - this.minTime) /
                         this.diagramWidth,
-                    r: this.stopHeights[stop.station.getId()]
+                    r: this.stopHeights[stop.station.getId()],
+                    meta: {
+                        routeStop: stop.routeStop,
+                        route: stop.route,
+                        tripStop: stop,
+                        trip: stop.trip,
+                    }
                 });
 
                 prevStop = stop;

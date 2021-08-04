@@ -1,11 +1,24 @@
 <template>
-  <div id="map-field">
-    <div v-for="line in sideLines" :key="line.id" class="side-line" :style="line.style"></div>  
-    <div v-for="line in stopLines" :key="line.id" class="stop-line" :style="line.style"></div>  
+  <div>
+    <div>
+      <button @click="move(0, -1)">This-</button>
+      <button @click="move(1, -1)">Before-</button>
+      <button @click="move(2, -1)">After-</button>
+      <button @click="move(3, -1)">All-</button>
+      ----
+      <button @click="move(0, +1)">This+</button>
+      <button @click="move(1, +1)">Before+</button>
+      <button @click="move(2, +1)">After+</button>
+      <button @click="move(3, +1)">All+</button>
+    </div>
+    <div id="map-field">
+      <div v-for="line in sideLines" :key="line.id" class="side-line" :style="line.style"></div>  
+      <div v-for="line in stopLines" :key="line.id" class="stop-line" :style="line.style"></div>  
     
-    <div v-for="stop in sideStops" :key="stop.id" class="side-stop" :title="stop.name" :style="stop.style"></div>
-    <div v-for="time in sideTimes" :key="time.id" class="side-time" :title="time.name" :style="time.style"></div>
-    <div v-for="stop in stops" :key="stop.id" class="stop-plot" :title="stop.name" :style="stop.style"></div>
+      <div v-for="stop in sideStops" :key="stop.id" class="side-stop" :title="stop.name" :style="stop.style"></div>
+      <div v-for="time in sideTimes" :key="time.id" class="side-time" :title="time.name" :style="time.style"></div>
+      <div v-for="stop in stops" :key="stop.id" class="stop-plot" :class="selectedStop && stop.id === selectedStop.id ? 'selected-stop' : ''" :title="stop.name" :style="stop.style" @click.stop="select(stop)"></div>
+    </div>
   </div>
 </template>
 
@@ -13,6 +26,7 @@
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import { TYPES } from "../../di/TYPES";
 import { Trip } from "../../structs/Scheduling/Trip";
+import { TripStop } from "../../structs/Scheduling/TripStop";
 import { Route } from "../../structs/Scheduling/Route";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { Station } from "../../structs/Scheduling/Station";
@@ -33,6 +47,7 @@ export default class RouteDiagram extends Vue {
   stopLines: any[] = [];
   minTime: number = 0;
   maxTime: number = 60*60*24;
+  selectedStop: any = null;
 
   constructor() {
     super();
@@ -117,6 +132,22 @@ export default class RouteDiagram extends Vue {
       style: plotToStyle(plot)
     }));
   }
+
+  select(stop: TripStop):void {
+    this.selectedStop = stop;
+  }
+
+  move(type: number, time: number): void {
+    if(!this.selectedStop) return;
+
+    const route = this.selectedStop.meta.route;
+    const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
+    for(let trip of trips) {
+      trip.setDepartureTime(trip.getDepartureTime()+time*60);
+    }
+
+    this.init();
+  }
 }
 </script>
 
@@ -133,6 +164,11 @@ export default class RouteDiagram extends Vue {
   border: 1px solid darkblue;
   background-color: blue;
   position: absolute;
+}
+
+.stop-plot.selected-stop {
+  border: 1px solid darkred;
+  background-color: red;
 }
 
 .side-stop {

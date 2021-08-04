@@ -79,6 +79,11 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     const index = stops.findIndex((s: RouteStop) => s.getStation() === this.lastStationServed);
     return stops.map((stop, ind) => {
       const sto: TripStop = {
+        trip: this,
+        route: this.route,
+        routeStop: stop,
+        id: stop.getId() + '-' + this.id,
+
         station: stop.getWaypoint(),
         stationRgbColor: stop.getWaypoint().getColor().getRgbString(),
         platform: stop.getPlatform(),
@@ -181,6 +186,10 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
   getDepartureTime(): number {
     return this.departureTime;
+  }
+
+  setDepartureTime(time: number): void {
+    this.departureTime = time;
   }
 
   persist(): Object {
