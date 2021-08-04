@@ -249,8 +249,13 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   }
 
   load(obj: any, store: Store): void {
+    // todo should delete trips, when deleting route
+    // so no dead reference to route here
+    const route = store.get(obj.route) as Route;
+    if (!route) return;
+
     this.presetId(obj.id);
-    this.init(store.get(obj.route) as Route, obj.departureTime, obj.hasGroup);
+    this.init(route, obj.departureTime, obj.hasGroup);
     for (let stopId in obj.redefinedProps) {
       const stop = store.get(stopId) as RouteStop;
       const all = store.getAll();
