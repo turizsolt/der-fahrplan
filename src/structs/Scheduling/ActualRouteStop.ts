@@ -48,6 +48,14 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     return this.platform;
   }
 
+  hasArrivalTime(): boolean {
+    return this.arrivalTime !== undefined;
+  }
+
+  hasDepartureTime(): boolean {
+    return this.departureTime !== undefined;
+  }
+
   getArrivalTime(): number {
     return this.arrivalTime || this.departureTime;
   }

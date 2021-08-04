@@ -1,14 +1,13 @@
 <template>
-  <div>
+  <div style="width:100%;">
     <div>
       <button @click="move(0, -1)">This-</button>
-      <button @click="move(1, -1)">Before-</button>
-      <button @click="move(2, -1)">After-</button>
-      <button @click="move(3, -1)">All-</button>
-      ----
       <button @click="move(0, +1)">This+</button>
+      <button @click="move(1, -1)">Before-</button>
       <button @click="move(1, +1)">Before+</button>
+      <button @click="move(2, -1)">After-</button>
       <button @click="move(2, +1)">After+</button>
+      <button @click="move(3, -1)">All-</button>
       <button @click="move(3, +1)">All+</button>
     </div>
     <div id="map-field">
@@ -141,9 +140,57 @@ export default class RouteDiagram extends Vue {
     if(!this.selectedStop) return;
 
     const route = this.selectedStop.meta.route;
-    const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
-    for(let trip of trips) {
-      trip.setDepartureTime(trip.getDepartureTime()+time*60);
+    const routeStop = this.selectedStop.meta.routeStop;
+
+    if(type === 3) {
+      const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
+      for(let trip of trips) {
+        trip.setDepartureTime(trip.getDepartureTime()+time*60);
+      }
+    } else if(type === 2) {
+      let write = false;
+      for(let stop of route.getWaypoints()) {
+        if(stop === routeStop) {
+          write = true;
+        }
+        if(write) {
+          if(stop.hasDepartureTime()) {
+            stop.setDepartureTime(stop.getDepartureTime()+time*60);
+          }
+          if(stop.hasArrivalTime()) {
+            stop.setArrivalTime(stop.getArrivalTime()+time*60);
+          }
+        }
+      }
+    } else if(type === 1) {
+      const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
+      for(let trip of trips) {
+        trip.setDepartureTime(trip.getDepartureTime()+time*60);
+      }
+
+      let write = false;
+      for(let stop of route.getWaypoints()) {
+        if(write) {
+          if(stop.hasDepartureTime()) {
+            stop.setDepartureTime(stop.getDepartureTime()-time*60);
+          }
+          if(stop.hasArrivalTime()) {
+            stop.setArrivalTime(stop.getArrivalTime()-time*60);
+          }
+        }
+
+        if(stop === routeStop) {
+          write = true;
+        }
+      }
+
+    } else if(type === 0) {
+      if(routeStop.hasDepartureTime()) {
+        routeStop.setDepartureTime(routeStop.getDepartureTime()+time*60);
+      }
+      if(routeStop.hasArrivalTime()) {
+        routeStop.setArrivalTime(routeStop.getArrivalTime()+time*60);
+      }
     }
 
     this.init();
@@ -154,9 +201,10 @@ export default class RouteDiagram extends Vue {
 <style scoped>
 #map-field {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 40px);
   position: relative;
   border: 1px solid red;
+  overflow: hidden;
 }
 
 .stop-plot {

@@ -14,11 +14,14 @@ export interface RouteStop extends BaseStorable {
   getWaypoint(): RailMapNode;
   getWaypointName(): string;
   getPlatform(): Platform;
+
+  hasArrivalTime(): boolean;
+  hasDepartureTime(): boolean;
   getArrivalTime(): number;
   getDepartureTime(): number;
-
   setArrivalTime(time: number): void;
   setDepartureTime(time: number): void;
+
   toggleReverseStop(): void;
   isReverseStop(): boolean;
 
