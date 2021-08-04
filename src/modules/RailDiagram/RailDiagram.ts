@@ -86,6 +86,7 @@ export class RailDiagram {
 
             plots.push({
                 id: stop.getWaypoint().getId(),
+                uniqueId: stop.getWaypoint().getId(),
                 position: pos,
                 name: stop.getWaypoint().getName(),
                 r: pos / this.diagramHeight,
@@ -109,6 +110,7 @@ export class RailDiagram {
         for (let time = timeStart; time <= timeEnd; time += this.timeIntervals) {
             plots.push({
                 id: time.toString(),
+                uniqueId: time.toString(),
                 name: Util.timeToString(time),
                 position: 1,
                 t: (time - this.minTime) / this.diagramWidth,
@@ -145,21 +147,68 @@ export class RailDiagram {
                     });
                 }
 
-                plots.push({
-                    id: stop.id,
-                    name: Util.timeToString(stop.arrivalTime) + '-' + Util.timeToString(stop.departureTime) + ' ' + stop.station.getName(),
-                    position: this.stopHeights[stop.station.getId()],
-                    t:
-                        ((stop.departureTime || stop.arrivalTime) - this.minTime) /
-                        this.diagramWidth,
-                    r: this.stopHeights[stop.station.getId()],
-                    meta: {
-                        routeStop: stop.routeStop,
-                        route: stop.route,
-                        tripStop: stop,
-                        trip: stop.trip,
-                    }
-                });
+                if (stop.hasDepartureTime && stop.hasArrivalTime && stop.departureTime !== stop.arrivalTime) {
+                    plots.push({
+                        id: stop.id,
+                        uniqueId: stop.id + '-arr',
+                        name: Util.timeToString(stop.arrivalTime) + '-' + Util.timeToString(stop.departureTime) + ' ' + stop.station.getName(),
+                        position: this.stopHeights[stop.station.getId()],
+                        t:
+                            ((stop.arrivalTime) - this.minTime) /
+                            this.diagramWidth,
+                        r: this.stopHeights[stop.station.getId()],
+                        meta: {
+                            routeStop: stop.routeStop,
+                            route: stop.route,
+                            tripStop: stop,
+                            trip: stop.trip,
+                        }
+                    });
+                    plots.push({
+                        id: stop.id,
+                        uniqueId: stop.id + '-dep',
+                        name: Util.timeToString(stop.arrivalTime) + '-' + Util.timeToString(stop.departureTime) + ' ' + stop.station.getName(),
+                        position: this.stopHeights[stop.station.getId()],
+                        t:
+                            ((stop.departureTime) - this.minTime) /
+                            this.diagramWidth,
+                        r: this.stopHeights[stop.station.getId()],
+                        meta: {
+                            routeStop: stop.routeStop,
+                            route: stop.route,
+                            tripStop: stop,
+                            trip: stop.trip,
+                        }
+                    });
+                    lines.push({
+                        from: {
+                            r: this.stopHeights[stop.station.getId()],
+                            t: (stop.arrivalTime - this.minTime) / this.diagramWidth
+                        },
+                        to: {
+                            r: this.stopHeights[stop.station.getId()],
+                            t: (stop.departureTime - this.minTime) / this.diagramWidth
+                        },
+                        trackCount: 1
+                    });
+                } else {
+                    plots.push({
+                        id: stop.id,
+                        uniqueId: stop.id,
+                        name: Util.timeToString(stop.arrivalTime) + '-' + Util.timeToString(stop.departureTime) + ' ' + stop.station.getName(),
+                        position: this.stopHeights[stop.station.getId()],
+                        t:
+                            ((stop.departureTime || stop.arrivalTime) - this.minTime) /
+                            this.diagramWidth,
+                        r: this.stopHeights[stop.station.getId()],
+                        meta: {
+                            routeStop: stop.routeStop,
+                            route: stop.route,
+                            tripStop: stop,
+                            trip: stop.trip,
+                        }
+                    });
+                }
 
                 prevStop = stop;
             }

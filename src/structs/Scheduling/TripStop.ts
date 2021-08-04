@@ -10,6 +10,8 @@ export interface TripStop {
   stationRgbColor: string;
   platform: Platform;
   platformNo: string;
+  hasArrivalTime: boolean;
+  hasDepartureTime: boolean;
   arrivalTime: number;
   departureTime: number;
   arrivalTimeString: string;

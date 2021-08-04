@@ -9,6 +9,11 @@
       <button @click="move(2, +1)">After+</button>
       <button @click="move(3, -1)">All-</button>
       <button @click="move(3, +1)">All+</button>
+      ****
+      <button @click="move(4, -1)">Arr-</button>
+      <button @click="move(4, +1)">Arr+</button>
+      <button @click="move(5, -1)">Dep-</button>
+      <button @click="move(5, +1)">Dep+</button>
     </div>
     <div id="map-field">
       <div v-for="line in sideLines" :key="line.id" class="side-line" :style="line.style"></div>  
@@ -16,7 +21,7 @@
     
       <div v-for="stop in sideStops" :key="stop.id" class="side-stop" :title="stop.name" :style="stop.style"></div>
       <div v-for="time in sideTimes" :key="time.id" class="side-time" :title="time.name" :style="time.style"></div>
-      <div v-for="stop in stops" :key="stop.id" class="stop-plot" :class="selectedStop && stop.id === selectedStop.id ? 'selected-stop' : ''" :title="stop.name" :style="stop.style" @click.stop="select(stop)"></div>
+      <div v-for="stop in stops" :key="stop.uniqueId" class="stop-plot" :class="selectedStop && stop.id === selectedStop.id ? 'selected-stop' : ''" :title="stop.name" :style="stop.style" @click.stop="select(stop)"></div>
     </div>
   </div>
 </template>
@@ -183,13 +188,56 @@ export default class RouteDiagram extends Vue {
           write = true;
         }
       }
-
     } else if(type === 0) {
       if(routeStop.hasDepartureTime()) {
         routeStop.setDepartureTime(routeStop.getDepartureTime()+time*60);
       }
       if(routeStop.hasArrivalTime()) {
         routeStop.setArrivalTime(routeStop.getArrivalTime()+time*60);
+      }
+    } else if(type === 4) {
+      const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
+      for(let trip of trips) {
+        trip.setDepartureTime(trip.getDepartureTime()+time*60);
+      }
+
+      let write = false;
+      for(let stop of route.getWaypoints()) {
+        if(write) {
+          if(stop.hasDepartureTime()) {
+            stop.setDepartureTime(stop.getDepartureTime()-time*60);
+          }
+          if(stop.hasArrivalTime()) {
+            stop.setArrivalTime(stop.getArrivalTime()-time*60);
+          }
+        }
+
+        if(stop === routeStop) {
+          stop.setArrivalTime(stop.getArrivalTime() || stop.getDepartureTime());
+          if(stop.hasDepartureTime()) {
+            stop.setDepartureTime(stop.getDepartureTime()-time*60);
+          }
+          write = true;
+        }
+      }
+    } else if(type === 5) {
+      let write = false;
+      for(let stop of route.getWaypoints()) {
+        if(write) {
+          if(stop.hasDepartureTime()) {
+            stop.setDepartureTime(stop.getDepartureTime()+time*60);
+          }
+          if(stop.hasArrivalTime()) {
+            stop.setArrivalTime(stop.getArrivalTime()+time*60);
+          }
+        }
+        if(stop === routeStop) {
+          write = true;
+          stop.setArrivalTime(stop.getArrivalTime() || stop.getDepartureTime());
+          if(stop.hasDepartureTime()) {
+            stop.setDepartureTime(stop.getDepartureTime()+time*60);
+          }
+        }
       }
     }
 
