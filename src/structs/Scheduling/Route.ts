@@ -21,6 +21,7 @@ export interface Route extends BaseStorable {
   getLastStation(): Station;
   getFirstWaypoint(): RailMapNode;
   getLastWaypoint(): RailMapNode;
+  getLastStop(): RouteStop;
   hasCommonEdgeWith(route: Route): boolean;
   getEdges(): { from: RailMapNode; to: RailMapNode }[];
 }

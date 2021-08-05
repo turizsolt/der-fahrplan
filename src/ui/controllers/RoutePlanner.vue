@@ -161,21 +161,35 @@ export default class RoutePlanner extends Vue {
             const station = getStorable(stationId) as Station;
 
             let addingStations:RailMapNode[] = [station];
+            let dist:number[] = [];
             if(route.getLastWaypoint()) {
               const result = this.map.getShortestPath(route.getLastWaypoint(), station);
+              for(let i=1;i<result.length;i++) {
+                dist.push(this.map.getDistance(result[i-1], result[i]));
+              }
               addingStations = result.slice(1);
             }
             const last = addingStations[addingStations.length-1];
 
+            let i = 0;
+            let distSum = 0;
+            const lastTime = route.getLastStop()?.getDepartureTime() || 0;
+
             for(let station of addingStations) {
               const stop = createStorable<RouteStop>(TYPES.RouteStop);
+              distSum += Math.round(dist[i]/55*60)+60;
+              const arrTime = lastTime + distSum;
+              const depTime = lastTime + distSum;
+
               stop.init(
-                station
+                station, null, arrTime, depTime
               );
               if(station !== last) {
                 stop.setShouldStop(false);
               }
               route.addWaypoint(stop);
+
+              i++;
             }
             this.load();
           }

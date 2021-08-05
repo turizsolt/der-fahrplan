@@ -97,26 +97,30 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     return Util.last(this.stops)?.getWaypoint();
   }
 
-  hasCommonEdgeWith(route: Route):boolean {
-      for(let thisEdge of this.getEdges()) {
-          for(let otherEdge of route.getEdges()) {
-            if(thisEdge.from === otherEdge.from && thisEdge.to === otherEdge.to) {
-                return true;
-            }
-            if(thisEdge.from === otherEdge.to && thisEdge.to === otherEdge.from) {
-                return true;
-            }
-          }
-      }
-      return false;    
+  getLastStop(): RouteStop {
+    return Util.last(this.stops);
   }
 
-  getEdges(): {from: RailMapNode, to: RailMapNode}[] {
-    const result:{from: RailMapNode, to: RailMapNode}[] = [];  
-    for(let i=1;i<this.stops.length;i++) {
-        result.push({from: this.stops[i-1].getWaypoint(), to: this.stops[i].getWaypoint()});
+  hasCommonEdgeWith(route: Route): boolean {
+    for (let thisEdge of this.getEdges()) {
+      for (let otherEdge of route.getEdges()) {
+        if (thisEdge.from === otherEdge.from && thisEdge.to === otherEdge.to) {
+          return true;
+        }
+        if (thisEdge.from === otherEdge.to && thisEdge.to === otherEdge.from) {
+          return true;
+        }
       }
-      return result;
+    }
+    return false;
+  }
+
+  getEdges(): { from: RailMapNode, to: RailMapNode }[] {
+    const result: { from: RailMapNode, to: RailMapNode }[] = [];
+    for (let i = 1; i < this.stops.length; i++) {
+      result.push({ from: this.stops[i - 1].getWaypoint(), to: this.stops[i].getWaypoint() });
+    }
+    return result;
   }
 
   persist(): Object {
