@@ -16,15 +16,17 @@ export class ActualRailMap implements RailMap {
         }
     }
 
-    addEdge(nodeFrom: RailMapNode, nodeTo: RailMapNode, count: number = 1): void {
+    addEdge(nodeFrom: RailMapNode, nodeTo: RailMapNode, count: number, distance: number): void {
         let { from, to } = this.orderNodes(nodeFrom, nodeTo);
         const hash = this.hashNodes(from, to);
         if (!this.edges[hash]) {
-            this.edges[hash] = { from, to, count: 0 };
+            this.edges[hash] = { from, to, count: 0, avgDistance: 0, distances: [] };
             this.neighbours[nodeFrom.getId()].push(nodeTo);
             this.neighbours[nodeTo.getId()].push(nodeFrom);
         }
         this.edges[hash].count += count;
+        this.edges[hash].distances.push(distance);
+        this.edges[hash].avgDistance = sum(this.edges[hash].distances) / this.edges[hash].count;
     }
 
     getEdges(): Record<string, RailMapEdge> {
@@ -45,6 +47,20 @@ export class ActualRailMap implements RailMap {
 
     getBounds(): RailMapBounds {
         return this.bounds
+    }
+
+    getDistance(nodeFrom: RailMapNode, nodeTo: RailMapNode): number {
+        let { from, to } = this.orderNodes(nodeFrom, nodeTo);
+        const hash = this.hashNodes(from, to);
+
+        return this.edges[hash]?.avgDistance;
+    }
+
+    getTrackCount(nodeFrom: RailMapNode, nodeTo: RailMapNode): number {
+        let { from, to } = this.orderNodes(nodeFrom, nodeTo);
+        const hash = this.hashNodes(from, to);
+
+        return this.edges[hash]?.count;
     }
 
     getShortestPath(from: RailMapNode, to: RailMapNode): RailMapNode[] {
@@ -85,4 +101,8 @@ export class ActualRailMap implements RailMap {
     private hashNodes(from: RailMapNode, to: RailMapNode): string {
         return from.getId() + '-' + to.getId();
     }
+}
+
+function sum(arr: number[]): number {
+    return arr.reduce((a, b) => a + b, 0);
 }

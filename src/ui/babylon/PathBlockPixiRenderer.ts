@@ -17,7 +17,7 @@ export class PathBlockPixiRenderer extends BasePixiRenderer
     this.circle = new PIXI.Graphics();
     this.circle.lineStyle(0.25, 0x000000);
     this.circle.beginFill(0x800000);
-    this.circle.drawCircle(0, 0, 6);
+    this.circle.drawCircle(0, 0, 3);
     this.circle.endFill();
     this.circle.zIndex = 20;
     this.circle.x = rayPost.coord.x;
@@ -84,5 +84,5 @@ export class PathBlockPixiRenderer extends BasePixiRenderer
     }
   }
 
-  update(data: any) {}
+  update(data: any) { }
 }

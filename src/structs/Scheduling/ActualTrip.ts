@@ -75,10 +75,15 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   }
 
   getWaypoints(): TripStop[] {
-    const stops = this.route.getStops();
+    const stops = this.route.getWaypoints();
     const index = stops.findIndex((s: RouteStop) => s.getStation() === this.lastStationServed);
     return stops.map((stop, ind) => {
       const sto: TripStop = {
+        trip: this,
+        route: this.route,
+        routeStop: stop,
+        id: stop.getId() + '-' + this.id,
+
         station: stop.getWaypoint(),
         stationRgbColor: stop.getWaypoint().getColor().getRgbString(),
         platform: stop.getPlatform(),
@@ -86,6 +91,8 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         platformNo:
           (this.redefinedProps[stop.getId()]?.platform?.getNo()) ??
           stop.getPlatform()?.getNo(),
+        hasArrivalTime: stop.hasArrivalTime() || !!this.redefinedProps[stop.getId()]?.arrivalTime,
+        hasDepartureTime: stop.hasDepartureTime() || !!this.redefinedProps[stop.getId()]?.departureTime,
         arrivalTime:
           (this.redefinedProps[stop.getId()]?.arrivalTime) ??
           this.departureTime + stop.getArrivalTime(),
@@ -183,6 +190,10 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return this.departureTime;
   }
 
+  setDepartureTime(time: number): void {
+    this.departureTime = time;
+  }
+
   persist(): Object {
     const redefinedProps = {};
     for (let stopId in this.redefinedProps) {
@@ -228,6 +239,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
       arrivalTime: this.getArrivalTime(),
       arrivalTimeString: Util.timeToStr(this.getArrivalTime()),
       stops: this.getStops(),
+      waypoints: this.getWaypoints(),
       prevTrip: this.prevTrip?.getId(),
       nextTrip: this.nextTrip?.getId(),
       nextReverse: this.nextReverse,
@@ -237,8 +249,13 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   }
 
   load(obj: any, store: Store): void {
+    // todo should delete trips, when deleting route
+    // so no dead reference to route here
+    const route = store.get(obj.route) as Route;
+    if (!route) return;
+
     this.presetId(obj.id);
-    this.init(store.get(obj.route) as Route, obj.departureTime, obj.hasGroup);
+    this.init(route, obj.departureTime, obj.hasGroup);
     for (let stopId in obj.redefinedProps) {
       const stop = store.get(stopId) as RouteStop;
       const all = store.getAll();

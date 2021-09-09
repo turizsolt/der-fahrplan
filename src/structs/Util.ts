@@ -19,4 +19,10 @@ export class Util {
   public static last<T>(arr: T[]): T {
     return arr?.[arr.length - 1];
   }
+
+  public static timeToString(time: number): string {
+    const hour = Math.floor(time / 3600);
+    const min = Math.floor((time - hour * 3600) / 60);
+    return hour + ':' + (min < 10 ? '0' : '') + min;
+  }
 }

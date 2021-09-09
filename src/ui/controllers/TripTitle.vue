@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="'route-line' + (selected ? ' route-line-selected' : '')"
+    :class="'route-line' + (selected ? ' route-line-selected' : '') + (trip.prevTrip ? ' prev' : '')"
     @click="$emit('click')"
   >
     <div class="route-time">
@@ -159,5 +159,9 @@ export default class TripTitle extends Vue {
   background-color: #aaccaa;
   color: #1a7829;
   cursor: pointer;
+}
+
+.prev {
+  opacity: 0.3;
 }
 </style>

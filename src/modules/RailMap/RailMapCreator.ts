@@ -22,23 +22,36 @@ export class RailMapCreator {
 
     for (let pathBlock of pathBlocks) {
       for (let end of pathBlock.getPathBlockEnds()) {
+        let dist: number = 0;
         let start: DirectedBlock = end.getOtherEnd().getStart();
         let nextOtherEnd: BlockEnd = null;
         let oneAheadEnd: BlockEnd = end;
 
         // find next PathBlock
-        const nodes: RailMapNode[] = [pathBlock];
+        const nodes: { distance: number, node: RailMapNode }[] = [{ node: pathBlock, distance: 0 }];
         while (true) {
           if (!start) break;
 
-          // get markers
-          const markers = start.getMarkers();
-          const filteredMarkers = markers.filter(
-            m => m.marker.type === 'Platform'
-          );
-          nodes.push(
-            ...filteredMarkers.map(m => m.marker.platform.getStation())
-          );
+          for (let trackPart of start.getTrackParts()) {
+            // get markers
+            const markers = trackPart.track.getMarkersPartially(trackPart);
+            const filteredMarkers = markers.filter(
+              m => m.marker.type === 'Platform'
+            );
+
+            if (filteredMarkers.length === 0) {
+              dist += trackPart.endPosition - trackPart.startPosition;
+            } else {
+              let pos = trackPart.startPosition;
+              filteredMarkers.map(m => {
+                dist += m.position - pos;
+                nodes.push({ node: m.marker.platform.getStation(), distance: dist });
+                dist = 0;
+                pos = m.position;
+              });
+              dist += trackPart.endPosition - pos;
+            }
+          }
 
           const nextEnd = start
             .getBlock()
@@ -55,14 +68,14 @@ export class RailMapCreator {
           start = start.next();
         }
         if (nextOtherEnd) {
-          nodes.push((nextOtherEnd as PathBlockEnd).getPathBlock());
+          nodes.push({ node: (nextOtherEnd as PathBlockEnd).getPathBlock(), distance: dist });
           for (let i = 1; i < nodes.length; i++) {
-            map.addEdge(nodes[i - 1], nodes[i], 0.5);
+            map.addEdge(nodes[i - 1].node, nodes[i].node, 0.5, nodes[i].distance / 2);
           }
         } else {
           // todo push a deadend node
           for (let i = 1; i < nodes.length; i++) {
-            map.addEdge(nodes[i - 1], nodes[i]);
+            map.addEdge(nodes[i - 1].node, nodes[i].node, 1, nodes[i].distance);
           }
         }
       }

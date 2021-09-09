@@ -6,6 +6,7 @@ import { TYPES } from '../../di/TYPES';
 import { Platform } from '../Interfaces/Platform';
 import { Util } from '../Util';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
+import { PathBlock } from '../../modules/Signaling/PathBlock';
 
 export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
   private waypoint: RailMapNode;
@@ -45,6 +46,14 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
 
   getPlatform(): Platform {
     return this.platform;
+  }
+
+  hasArrivalTime(): boolean {
+    return this.arrivalTime !== undefined;
+  }
+
+  hasDepartureTime(): boolean {
+    return this.departureTime !== undefined;
   }
 
   getArrivalTime(): number {
@@ -120,7 +129,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
   load(obj: any, store: Store): void {
     this.presetId(obj.id);
     this.init(
-      store.get(obj.station) as Station,
+      store.get(obj.station) as (Station | PathBlock) as RailMapNode,
       obj.platform ? (store.get(obj.platform) as Platform) : undefined
     );
     this.setArrivalTime(obj.arrivalTime);
