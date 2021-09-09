@@ -19,6 +19,7 @@ import { PathRule } from './PathRule';
 import { PathQueue, persistBlockJointEnd, loadBlockJointEnd } from './PathQueue';
 import { BlockJoint } from './BlockJoint';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { Color } from '../../structs/Color';
 
 export interface ActualPathBlock extends Emitable { }
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -45,6 +46,10 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
 
     this.emit('init', this.persist());
     return this;
+  }
+
+  getName(): string {
+    return this.id;
   }
 
   getCoord(): Coordinate {
@@ -230,6 +235,18 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
       coord: { x: this.getCoord().x, y: this.getCoord().y, z: this.getCoord().z },
       key: this.key
     };
+  }
+
+  persistShallow(): Object {
+    return {
+      id: this.id,
+      type: 'PathBlock',
+      name: this.id
+    };
+  }
+
+  getColor(): Color {
+    return new Color(0, 0, 0);
   }
 
   private persistAllowedPath(allowedPath: AllowedPath): any {

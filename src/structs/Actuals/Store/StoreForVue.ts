@@ -24,3 +24,7 @@ export const getAllOfStorable = <T extends BaseStorable>(type: symbol): T[] => {
 export const createStorable = <T>(type: symbol): T => {
   return store.create(type);
 };
+
+export const getStore = (): Store => {
+  return store;
+};

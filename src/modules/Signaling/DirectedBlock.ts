@@ -1,4 +1,6 @@
+import { PositionedTrackMarker } from '../PositionedTrackMarker';
 import { TrackDirection } from '../Track/TrackDirection';
+import { TrackPart } from '../Track/TrackPart';
 import { Block } from './Block';
 
 export interface DirectedBlock {
@@ -10,4 +12,7 @@ export interface DirectedBlock {
 
   getDirection(): TrackDirection;
   getBlock(): Block;
+
+  getTrackParts(): TrackPart[];
+  getMarkers(): PositionedTrackMarker[];
 }

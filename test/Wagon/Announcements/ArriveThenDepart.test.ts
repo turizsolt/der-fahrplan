@@ -36,9 +36,9 @@ xdescribe('Arrive then depart', () => {
   const tripStopC3 = RouteStopFactory().init(stationC, platformC3);
 
   const routeAC: Route = RouteFactory().init();
-  routeAC.addStop(tripStopA1);
-  routeAC.addStop(tripStopB2);
-  routeAC.addStop(tripStopC3);
+  routeAC.addWaypoint(tripStopA1);
+  routeAC.addWaypoint(tripStopB2);
+  routeAC.addWaypoint(tripStopC3);
 
   it('should unboard first, then board', () => {
     const wagon = WagonFactory().init();

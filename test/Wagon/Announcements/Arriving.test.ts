@@ -36,13 +36,13 @@ xdescribe('Announcing departing trains', () => {
   const tripStopC3 = RouteStopFactory().init(stationC, platformC3);
 
   const routeAB: Route = RouteFactory().init();
-  routeAB.addStop(tripStopA1);
-  routeAB.addStop(tripStopB2);
+  routeAB.addWaypoint(tripStopA1);
+  routeAB.addWaypoint(tripStopB2);
 
   const routeAC: Route = RouteFactory().init();
-  routeAC.addStop(tripStopA1);
-  routeAC.addStop(tripStopB2);
-  routeAC.addStop(tripStopC3);
+  routeAC.addWaypoint(tripStopA1);
+  routeAC.addWaypoint(tripStopB2);
+  routeAC.addWaypoint(tripStopC3);
 
   it('train stops where passenger goes to', () => {
     const passenger = PassengerFactory().init(stationA, stationB);

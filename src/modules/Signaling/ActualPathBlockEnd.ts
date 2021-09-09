@@ -9,10 +9,9 @@ import { Train } from '../Train/Train';
 import { Emitable } from '../../mixins/Emitable';
 import { applyMixins } from '../../mixins/ApplyMixins';
 import { SignalSignal } from './SignalSignal';
-import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
-import { TrackDirection } from '../Track/TrackDirection';
+import { otherEnd, WhichEnd } from '../../structs/Interfaces/WhichEnd';
 
-export interface ActualPathBlockEnd extends Emitable {}
+export interface ActualPathBlockEnd extends Emitable { }
 const doApply = () => applyMixins(ActualPathBlockEnd, [Emitable]);
 export class ActualPathBlockEnd implements PathBlockEnd {
   private blockEnd: BlockEnd = null;
@@ -32,31 +31,23 @@ export class ActualPathBlockEnd implements PathBlockEnd {
     this.updateSignal();
   }
 
-  // todo duplicate
-  getNextBlockEnd(): BlockEnd {
-    const nextDB = this.getStart().next();
-    if(!nextDB) return null;
-    const blockEnd = nextDB.getBlock().getEnd(nextDB.getDirection() === TrackDirection.AB ? WhichEnd.A : WhichEnd.B);
-    return blockEnd;
-  }
-
   setGreen() {
     this.signal = SignalSignal.Green;
     this.emit('update', this.persist());
   }
 
   private updateSignal() {
-    if(this.signal !== SignalSignal.Green) return;
+    if (this.signal !== SignalSignal.Green) return;
 
     let newSignal = SignalSignal.Green;
-    if(this.blockEnd) {
-      if(!this.blockEnd.getBlock().isFree()) {
+    if (this.blockEnd) {
+      if (!this.blockEnd.getBlock().isFree()) {
         newSignal = SignalSignal.Red;
       }
     } else {
       newSignal = SignalSignal.Red;
     }
-    
+
     this.signal = newSignal;
     this.emit('update', this.persist());
   }
@@ -66,20 +57,20 @@ export class ActualPathBlockEnd implements PathBlockEnd {
   }
 
   setBlockEnd(blockEnd: BlockEnd): void {
-    if(this.blockEnd) {
+    if (this.blockEnd) {
       this.getBlock().off('update', this.blockSubscribe);
     }
     this.blockEnd = blockEnd;
-    if(this.blockEnd) {
+    if (this.blockEnd) {
       this.getBlock().on('update', this.blockSubscribe);
     }
     this.updateSignal();
   }
 
-  setHidden(): void {}
+  setHidden(): void { }
 
   getPathBlock(): PathBlock {
-      return this.pathBlock;
+    return this.pathBlock;
   }
 
   getStart(): DirectedBlock {
@@ -92,6 +83,10 @@ export class ActualPathBlockEnd implements PathBlockEnd {
 
   getBlock(): Block {
     return this.blockEnd?.getStart().getBlock();
+  }
+
+  getOtherEnd(): BlockEnd {
+    return this.jointEnd.joint.getEnd(otherEnd(this.jointEnd.end));
   }
 
   getJointEnd(): BlockJointEnd {
@@ -114,14 +109,14 @@ export class ActualPathBlockEnd implements PathBlockEnd {
     this.blockEnd?.checkin(train);
   }
 
-  checkout(train: Train): void{
+  checkout(train: Train): void {
     this.pathBlock.checkout(this);
     this.blockEnd?.checkout(train);
   }
 
   getHash(): string {
-    return this.jointEnd.joint.getId()+'-'+this.jointEnd.end+'-Path';
-}
+    return this.jointEnd.joint.getId() + '-' + this.jointEnd.end + '-Path';
+  }
 
   persist(): Object {
     return {
@@ -133,7 +128,7 @@ export class ActualPathBlockEnd implements PathBlockEnd {
   }
 
   getType(): Symbol {
-      return TYPES.PathBlockEnd;
+    return TYPES.PathBlockEnd;
   }
 }
 doApply();

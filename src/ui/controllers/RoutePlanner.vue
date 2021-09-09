@@ -35,13 +35,7 @@
                 </div>
             </div>
         </div>
-        <div class="column-add-trips">
-            <div class="column-title">Add trips</div>
-            <div v-if="selectedRoute">
-                <add-trip :route="selectedRoute">
-                </add-trip>
-            </div>
-        </div>
+        <rail-map-shower @addStop="addStop"></rail-map-shower>
     </div>
 </template>
 
@@ -51,17 +45,21 @@ import { Route } from "../../structs/Scheduling/Route";
 import { Station } from "../../structs/Scheduling/Station";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { TYPES } from "../../di/TYPES";
-import { getAllOfStorable, getStorable, createStorable } from "../../structs/Actuals/Store/StoreForVue";
-import { get } from "http";
+import { getStore, getAllOfStorable, getStorable, createStorable } from "../../structs/Actuals/Store/StoreForVue";
+import { RailMap } from "../../modules/RailMap/RailMap";
+import { RailMapNode } from "../../modules/RailMap/RailMapNode";
+import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";
 
 @Component
-export default class TripPlanner extends Vue {
+export default class RoutePlanner extends Vue {
+    private map: RailMap;
     routes: any[] = [];
     selectedRoute: any = null;
     stations: any[] = [];
 
     created() {
-        this.load();
+      this.map = RailMapCreator.create(getStore());
+      this.load();
     }
 
     load() {
@@ -101,7 +99,7 @@ export default class TripPlanner extends Vue {
           const route = createStorable<Route>(TYPES.Route);
           route.init();
           route.setName(routeFrom.getName());
-          for (let stopFrom of [...routeFrom.getStops()].reverse()) {
+          for (let stopFrom of [...routeFrom.getWaypoints()].reverse()) {
             const stop = createStorable<RouteStop>(TYPES.RouteStop);
             stop.init(stopFrom.getStation(), stopFrom.getPlatform());
             route.addWaypoint(stop);
@@ -120,7 +118,7 @@ export default class TripPlanner extends Vue {
           const stop = getStorable(vStop.id) as RouteStop;
           const route = getStorable(this.selectedRoute.id) as Route;
           route.removeStop(stop);
-          
+
           this.checkFirstAndLastStop();
           this.load();
         };
@@ -134,7 +132,7 @@ export default class TripPlanner extends Vue {
         shouldStop(vStop) {
           const stop = getStorable(vStop.id) as RouteStop;
           stop.setShouldStop(!stop.getShouldStop());
-          
+
           this.checkFirstAndLastStop();
           this.load();
         }
@@ -157,6 +155,32 @@ export default class TripPlanner extends Vue {
           }
         }
 
+        addStop(evt, stationId) {
+          if (this.selectedRoute) {
+            const route = getStorable(this.selectedRoute.id) as Route;
+            const station = getStorable(stationId) as Station;
+
+            let addingStations:RailMapNode[] = [station];
+            if(route.getLastWaypoint()) {
+              const result = this.map.getShortestPath(route.getLastWaypoint(), station);
+              addingStations = result.slice(1);
+            }
+            const last = addingStations[addingStations.length-1];
+
+            for(let station of addingStations) {
+              const stop = createStorable<RouteStop>(TYPES.RouteStop);
+              stop.init(
+                station
+              );
+              if(station !== last) {
+                stop.setShouldStop(false);
+              }
+              route.addWaypoint(stop);
+            }
+            this.load();
+          }
+        };
+
         nameChange(event) {
           const route = getStorable(this.selectedRoute.id) as Route;
           route.setName(event.target.value);
@@ -174,5 +198,22 @@ export default class TripPlanner extends Vue {
 <style>
 .big-screen-one {
     display: flex;
+    height: 100%;
 }
+
+.column-routes {
+  width: 200px;
+  min-width: 200px;
+}
+
+.column-route-stops {
+  width: 280px;
+  min-width: 280px;
+}
+
+.column-add-stops {
+  overflow-y: scroll;
+}
+
+
 </style>

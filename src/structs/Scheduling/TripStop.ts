@@ -1,9 +1,9 @@
-import { Station } from './Station';
 import { Platform } from '../Interfaces/Platform';
+import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 
 export interface TripStop {
   stationName: string;
-  station: Station;
+  station: RailMapNode;
   stationRgbColor: string;
   platform: Platform;
   platformNo: string;
@@ -19,6 +19,8 @@ export interface TripStop {
   atStation: boolean;
   isDepartureStation: boolean;
   isArrivalStation: boolean;
+  shouldStop: boolean;
+  isStation: boolean;
 }
 
 export interface OptionalTripStop {

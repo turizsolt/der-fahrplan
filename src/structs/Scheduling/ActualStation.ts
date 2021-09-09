@@ -270,6 +270,10 @@ export class ActualStation extends ActualBaseBrick implements Station {
     return this.circle;
   }
 
+  getCoord(): Coordinate {
+    return this.circle.a;
+  }
+
   getColor(): Color {
     return this.color;
   }

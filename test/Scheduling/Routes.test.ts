@@ -40,41 +40,18 @@ describe('Routes', () => {
     const station = StationFactory().init(circle);
     station.setName(stationName);
     const stop = RouteStopFactory().init(station);
-    route.addStop(stop);
+    route.addWaypoint(stop);
     expect(route.getStops()).deep.equals([stop]);
-    expect(route.getStops()[0].getStationName()).equals(stationName);
+    expect(route.getStops()[0].getWaypointName()).equals(stationName);
   });
 
   it('adds and removes a stop', () => {
     const route = RouteFactory().init();
     const station = StationFactory().init(circle);
     const stop = RouteStopFactory().init(station);
-    route.addStop(stop);
+    route.addWaypoint(stop);
     route.removeStop(stop);
     expect(route.getStops()).deep.equals([]);
-  });
-
-  it('adds two stops and then swaps them', () => {
-    const route = RouteFactory().init();
-    const station = StationFactory().init(circle);
-    const stop1 = RouteStopFactory().init(station);
-    const stop2 = RouteStopFactory().init(station);
-    route.addStop(stop1);
-    route.addStop(stop2);
-    route.swapStopWithPrev(stop2);
-    expect(route.getStops()).deep.equals([stop2, stop1]);
-  });
-
-  it('adds two stops and then swaps noting, but wrong', () => {
-    const route = RouteFactory().init();
-    const station = StationFactory().init(circle);
-    const stop1 = RouteStopFactory().init(station);
-    const stop2 = RouteStopFactory().init(station);
-    route.addStop(stop1);
-    route.addStop(stop2);
-    route.swapStopWithPrev(stop1);
-    route.swapStopWithPrev(null);
-    expect(route.getStops()).deep.equals([stop1, stop2]);
   });
 
   it('list all the routes', () => {

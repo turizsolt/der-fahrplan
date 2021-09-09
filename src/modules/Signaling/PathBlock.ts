@@ -4,8 +4,9 @@ import { PathBlockEnd } from './PathBlockEnd';
 import { Train } from '../Train/Train';
 import { PathRule } from './PathRule';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { RailMapNode } from '../RailMap/RailMapNode';
 
-export interface PathBlock extends BaseBrick {
+export interface PathBlock extends BaseBrick, RailMapNode {
   init(jointEnds: BlockJointEnd[]): PathBlock;
   allow(
     startPBE: PathBlockEnd,

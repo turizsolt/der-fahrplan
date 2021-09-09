@@ -28,7 +28,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     this.hasGroup = hasGroup;
 
     const stationsInvolved = this.route.getStops().map((routeStop: RouteStop) => routeStop.getStation());
-    stationsInvolved.map((station: Station) => station.addTripToSchedule(this));
+    stationsInvolved.map((station: Station) => station?.addTripToSchedule(this));
     this.updateScheduleOnAllStations(stationsInvolved);
     return this;
   }
@@ -71,14 +71,18 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   }
 
   getStops(): TripStop[] {
+    return this.getWaypoints().filter(s => s.shouldStop);
+  }
+
+  getWaypoints(): TripStop[] {
     const stops = this.route.getStops();
     const index = stops.findIndex((s: RouteStop) => s.getStation() === this.lastStationServed);
     return stops.map((stop, ind) => {
       const sto: TripStop = {
-        station: stop.getStation(),
-        stationRgbColor: stop.getStation().getColor().getRgbString(),
+        station: stop.getWaypoint(),
+        stationRgbColor: stop.getWaypoint().getColor().getRgbString(),
         platform: stop.getPlatform(),
-        stationName: stop.getStationName(),
+        stationName: stop.getWaypointName(),
         platformNo:
           (this.redefinedProps[stop.getId()]?.platform?.getNo()) ??
           stop.getPlatform()?.getNo(),
@@ -97,7 +101,9 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         isServed: (ind <= index),
         atStation: (ind === index) && (this.atStation === stop.getStation()),
         isArrivalStation: ind === stops.length - 1,
-        isDepartureStation: ind === 0
+        isDepartureStation: ind === 0,
+        shouldStop: stop.getShouldStop(),
+        isStation: stop.isStation()
       };
 
       sto.arrivalTimeString = Util.timeToStr(sto.arrivalTime);
@@ -120,14 +126,14 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   }
 
   getStationFollowingStops(station: Station): TripStop[] {
-    const stops = this.getStops();
+    const stops = this.getWaypoints();
     const index = stops.findIndex(s => s.station === station);
     if (index === -1) return [];
     return stops.slice(index + 1);
   }
 
   isStillInFuture(station: Station): boolean {
-    const stops = this.getStops();
+    const stops = this.getWaypoints();
     const indexStation = stops.findIndex(s => s.station === station);
     if (indexStation === -1) return false;
     const indexTrain = stops.findIndex(s => s.station === this.lastStationServed);
@@ -204,7 +210,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
   }
 
   getArrivalTime(): number {
-    return Util.last(this.getStops()).arrivalTime;
+    return Util.last(this.getWaypoints())?.arrivalTime;
   }
 
   getHasGroup(): boolean {

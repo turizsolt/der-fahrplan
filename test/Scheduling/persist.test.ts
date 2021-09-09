@@ -30,8 +30,8 @@ describe('Persisting Route, RouteStop, Station', () => {
     const stop2 = RouteStopFactory().init(station);
     route.setName('B12');
     station.setName('Stadium');
-    route.addStop(stop1);
-    route.addStop(stop2);
+    route.addWaypoint(stop1);
+    route.addWaypoint(stop2);
 
     const json = store.persistAll();
     store.clear();

@@ -8,8 +8,9 @@ import { Trip } from './Trip';
 import { TripInSchedule } from './TripInSchedule';
 import { ShortestPath } from './ShortestPath';
 import { Train } from '../../modules/Train/Train';
+import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 
-export interface Station extends BaseBrick, Boardable {
+export interface Station extends BaseBrick, Boardable, RailMapNode {
   init(circle: Circle): Station;
   initX(): Station;
   getName(): string;

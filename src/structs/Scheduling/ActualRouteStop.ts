@@ -5,35 +5,42 @@ import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
 import { Platform } from '../Interfaces/Platform';
 import { Util } from '../Util';
+import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 
 export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
-  private station: Station;
+  private waypoint: RailMapNode;
   private platform: Platform;
   private arrivalTime: number;
   private departureTime: number;
   private reverseStop: boolean;
+  private shouldStop: boolean;
 
   init(
-    station: Station,
+    waypoint: RailMapNode,
     platform?: Platform,
     arrivalTime?: number,
     departureTime?: number
   ): RouteStop {
     super.initStore(TYPES.RouteStop);
-    this.station = station;
+    this.waypoint = waypoint;
     this.platform = platform;
     this.arrivalTime = arrivalTime;
     this.departureTime = departureTime;
     this.reverseStop = false;
+    this.setShouldStop(true);
     return this;
   }
 
-  getStationName(): string {
-    return this.station.getName();
+  getWaypointName(): string {
+    return this.waypoint.getName();
   }
 
   getStation(): Station {
-    return this.station;
+    return this.waypoint.getType() === TYPES.Station ? (this.waypoint as Station) : null;
+  }
+
+  getWaypoint(): RailMapNode {
+    return this.waypoint;
   }
 
   getPlatform(): Platform {
@@ -64,15 +71,29 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     return this.reverseStop;
   }
 
+  setShouldStop(shouldStop: boolean): void {
+    this.shouldStop = shouldStop && this.isStation();
+  }
+
+  getShouldStop(): boolean {
+    return this.shouldStop;
+  }
+
+  isStation(): boolean {
+    return this.waypoint.getType() === TYPES.Station;
+  }
+
   persist(): Object {
     return {
       id: this.id,
       type: 'RouteStop',
-      station: this.station.getId(),
+      station: this.waypoint.getId(),
       platform: this.platform && this.platform.getId(),
       arrivalTime: this.arrivalTime,
       departureTime: this.departureTime,
-      isReverseStop: this.reverseStop
+      isReverseStop: this.reverseStop,
+      shouldStop: this.getShouldStop(),
+      isStation: this.isStation()
     };
   }
 
@@ -80,15 +101,17 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     return {
       id: this.id,
       type: 'RouteStop',
-      station: this.station.persistShallow(),
-      stationName: this.getStationName(),
-      stationRgbColor: this.station.getColor().getRgbString(),
+      station: this.waypoint.persistShallow(),
+      stationName: this.getWaypointName(),
+      stationRgbColor: this.waypoint.getColor().getRgbString(),
       platform: this.platform && this.platform.getId(),
       arrivalTime: this.arrivalTime,
       arrivalTimeString: Util.timeToStr(this.arrivalTime, true),
       departureTime: this.departureTime,
       departureTimeString: Util.timeToStr(this.departureTime, true),
-      isReverseStop: this.reverseStop
+      isReverseStop: this.reverseStop,
+      shouldStop: this.getShouldStop(),
+      isStation: this.isStation()
     };
   }
 
@@ -103,5 +126,6 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     this.setArrivalTime(obj.arrivalTime);
     this.setDepartureTime(obj.departureTime);
     this.reverseStop = !!obj.isReverseStop;
+    this.setShouldStop(obj.shouldStop === undefined ? true : obj.shouldStop);
   }
 }
