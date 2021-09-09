@@ -7,6 +7,7 @@ import { Trip } from '../../structs/Scheduling/Trip';
 import { Station } from '../../structs/Scheduling/Station';
 import { Platform } from '../../structs/Interfaces/Platform';
 import { WagonConfig } from '../../structs/Actuals/Wagon/WagonConfig';
+import { Store } from '../../structs/Interfaces/Store';
 
 export interface Train extends BaseStorable {
   init(pot: PositionOnTrack, wagons: Wagon[]): Train;
@@ -38,4 +39,6 @@ export interface Train extends BaseStorable {
   moveBoardedPassengers(): void;
 
   createWagonAtEnd(config: WagonConfig): void;
+
+  loadLater(obj: any, store: Store): void;
 }

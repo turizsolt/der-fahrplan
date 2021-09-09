@@ -140,6 +140,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   private alignAxles(): void {
     if (!this.position) return;
+    if (this.wagons.length === 0) return;
 
     const formerStart = Util.first(this.wagons).getAxlePosition(WhichEnd.A);
     const formerEnd = Util.last(this.wagons).getAxlePosition(WhichEnd.B);
@@ -564,17 +565,21 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
 
   load(obj: any, store: Store): void {
+    this.presetId(obj.id);
+    this.init(
+      PositionOnTrack.fromData(obj.position as PositionData, store),
+      []
+    );
+  }
+
+  loadLater(obj: any, store: Store): void {
     const m: Record<string, Trip> = {};
     const wagons: Wagon[] = obj.wagons.map(wagon => {
       const ret: Wagon = store.get(wagon.wagon) as Wagon;
       m[wagon.wagon] = store.get(wagon.trip) as Trip;
       return ret;
     });
-    this.presetId(obj.id);
-    this.init(
-      PositionOnTrack.fromData(obj.position as PositionData, store),
-      wagons
-    );
+    this.addWagons(wagons);
     this.speed.load(obj.speed);
     this.setAutoMode(obj.autoMode);
     this.wagons.map(wagon => {

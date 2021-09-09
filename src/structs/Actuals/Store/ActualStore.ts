@@ -265,8 +265,19 @@ export class ActualStore implements Store {
     });
 
     // to init schedules with a blank nothing
-    this.getAllOf(Symbol.for('Station')).map((station: Station) => {
+    this.getAllOf(TYPES.Station).map((station: Station) => {
       station.addTripToSchedule(null);
+    });
+
+    // to break the dependency loop between 
+    // PathBlock/Train/Trip/Route/RouteStop/PathBlock
+    // at Train
+    arr.map(elem => {
+      const brick: BaseStorable = this.get(elem.id);
+
+      if (brick && brick.getType() === TYPES.Train) {
+        (brick as Train).loadLater(elem, this);
+      }
     });
   }
 
