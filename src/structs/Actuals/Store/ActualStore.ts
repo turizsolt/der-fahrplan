@@ -42,7 +42,7 @@ export class ActualStore implements Store {
   private elements: Record<string, BaseStorable>;
   private typedElements: Record<symbol, BaseStorable[]>;
   private factoryMethods: Record<symbol, () => any>;
-  private renderers: Record<symbol, () => any[]>;
+  private renderers: Record<symbol, (() => any)[]>;
   private typeOrder: Record<symbol, number>;
 
   @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
@@ -212,7 +212,7 @@ export class ActualStore implements Store {
     let id = object.getId();
     this.typedElements[object.getType()] = this.typedElements[
       object.getType()
-    ].filter(x => x.id !== id);
+    ].filter(x => x.getId() !== id);
     delete this.elements[id];
   }
 
@@ -225,7 +225,7 @@ export class ActualStore implements Store {
   }
 
   getAllOf<T extends BaseStorable>(type: symbol): T[] {
-    return this.typedElements[type] || [];
+    return (this.typedElements[type] || []) as T[];
   }
 
   getFiltered(filter: (b: BaseStorable) => boolean): BaseStorable[] {
