@@ -123,7 +123,17 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     }
 
     const switches: TrackSwitch[] = [];
+    const preSwitches: TrackSwitch[] = [];
     if (backFromHere) {
+      // todo remove this hotfix when fixed properly
+      let preNext: DirectedTrack = backFromHere;
+      this.preHandle(preNext, preSwitches);
+      while ((preNext = info[preNext.getHash()])) {
+        this.preHandle(preNext, preSwitches);
+      }
+      if (preSwitches.length > 6) return false;
+      // todo end of hotfix
+
       let next: DirectedTrack = backFromHere;
       this.handle(next, switches);
       while ((next = info[next.getHash()])) {
@@ -217,6 +227,13 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         (track as TrackSwitch).switch();
       }
       (track as TrackSwitch).lock();
+      switches.push(track as TrackSwitch);
+    }
+  }
+
+  private preHandle(dt: DirectedTrack, switches: TrackSwitch[]): void {
+    const track = dt.getTrack();
+    if (track.getType() === TYPES.TrackSwitch) {
       switches.push(track as TrackSwitch);
     }
   }
