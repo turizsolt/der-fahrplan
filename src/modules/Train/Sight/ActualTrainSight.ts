@@ -1,5 +1,6 @@
 import { Station } from "../../../structs/Scheduling/Station";
 import { PositionedTrackMarker } from "../../PositionedTrackMarker";
+import { SignalSignal } from "../../Signaling/SignalSignal";
 import { DirectedTrack } from "../../Track/DirectedTrack";
 import { PositionOnTrack } from "../PositionOnTrack";
 import { Sight } from "./Sight";
@@ -10,7 +11,9 @@ export class ActualTrainSight implements TrainSight {
         const { distance, markers } = this.findMarkers(position, dist);
         return {
             distance,
-            markers: markers.map(m => ({ type: m.marker.type, speed: 0 }))
+            markers: markers
+                .filter(m => ['Train', 'Signal', 'Platform', 'End'].includes(m.marker.type))
+                .map(m => ({ type: m.marker.type, speed: this.determineSpeed(m, nextStation) }))
         };
     }
 
@@ -39,5 +42,18 @@ export class ActualTrainSight implements TrainSight {
         }
 
         return { distance: distance - distanceLeft, markers: positionedTrackMarkers };
+    }
+
+    private determineSpeed(m: PositionedTrackMarker, nextStation: Station): number {
+        switch (m.marker.type) {
+            case 'Signal':
+                return (m.marker.signal.getSignal() === SignalSignal.Red) ? 0 : Number.POSITIVE_INFINITY;
+
+            case 'Platform':
+                return m.marker.platform.getStation() === nextStation ? 0 : Number.POSITIVE_INFINITY;
+
+            default:
+                return 0;
+        }
     }
 }
