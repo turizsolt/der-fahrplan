@@ -56,4 +56,20 @@ describe('TrainSight', () => {
         };
         expect(sight).deep.equals(expectedSight);
     });
+
+    it('Sight to the end', () => {
+        const { track } = createTrackLine(3, 10);
+        const dt0 = track[0].getDirected(TrackDirection.AB);
+        const pos = new PositionOnTrack(dt0, 0);
+
+        const trainSight: TrainSight = new ActualTrainSight();
+        const sight: Sight = trainSight.getSight(pos, 30);
+        const expectedSight: Sight = {
+            distance: 20,
+            markers: [
+                { type: 'End', speed: 0 },
+            ]
+        };
+        expect(sight).deep.equals(expectedSight);
+    });
 });

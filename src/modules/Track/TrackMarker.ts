@@ -6,13 +6,14 @@ import { Platform } from '../../structs/Interfaces/Platform';
 
 export interface TrackMarker {
   type:
-    | 'Train'
-    | 'Signal'
-    | 'BlockJoint'
-    | 'Sensor'
-    | 'Platform'
-    | 'Nothing'
-    | 'Nothing2';
+  | 'Train'
+  | 'Signal'
+  | 'BlockJoint'
+  | 'Sensor'
+  | 'Platform'
+  | 'Nothing'
+  | 'Nothing2'
+  | 'End';
   train?: Train;
   signal?: Signal;
   blockJoint?: BlockJoint;
