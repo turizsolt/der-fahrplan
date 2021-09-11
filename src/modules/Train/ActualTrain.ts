@@ -346,7 +346,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.nearestPlatform = Nearest.platform(nextPosition);
 
     this.nextStation = this.getNextStation();
-    const sightDistance: number = this.speed.getStoppingDistance() + Math.max(this.speed.getSpeed() * 5, 2);
+    const sightDistance: number = this.speed.getStoppingDistance() + Math.max(this.speed.getSpeed() * 5, 3);
     this.sight = this.trainSight.getSight(nextPosition, sightDistance, this.nextStation, this);
 
     if (this.autoMode) {
