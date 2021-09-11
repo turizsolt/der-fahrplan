@@ -27,9 +27,6 @@ export interface Train extends BaseStorable {
   setAutoMode(autoMode: boolean): void;
   getAutoMode(): boolean;
 
-  getNearestEnd(): NearestData;
-  getNearestTrain(): NearestData;
-  getNearestSignal(): NearestData;
   getSight(): Sight;
   getNextStation(): Station;
 

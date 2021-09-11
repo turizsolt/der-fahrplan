@@ -273,25 +273,6 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     return this.autoMode;
   }
 
-  private lastSpeed: number = -1;
-
-  private nearestEnd: NearestData = null;
-  private nearestTrain: NearestData = null;
-  private nearestSignal: NearestData = null;
-  private nearestPlatform: NearestData = null;
-
-  getNearestEnd(): NearestData {
-    return this.nearestEnd;
-  }
-
-  getNearestTrain(): NearestData {
-    return this.nearestTrain;
-  }
-
-  getNearestSignal(): NearestData {
-    return this.nearestSignal;
-  }
-
   assignTrip(trip: Trip, wagons?: Wagon[]): void {
     let addedCount = 0;
     for (let i = 0; i < this.wagons.length; i++) {
@@ -330,6 +311,11 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     }
   }
 
+  private lastSpeed: number = -1;
+
+  private nearestTrain: NearestData = null;
+  private nearestPlatform: NearestData = null;
+
   private nextPlatformToStop: Platform = null;
   private lastPlatformStopped: Platform = null;
   private justPlatformStopped: Platform = null;
@@ -353,42 +339,24 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   tick(): void {
     const nextPosition = this.position.clone();
 
-    this.nearestEnd = Nearest.end(nextPosition);
     this.nearestTrain = Nearest.train(nextPosition);
-    this.nearestSignal = Nearest.signal(nextPosition);
     this.nearestPlatform = Nearest.platform(nextPosition);
 
     this.nextStation = this.getNextStation();
-
-    const sightDistance: number = this.speed.getStoppingDistance() + 5;
+    const sightDistance: number = this.speed.getStoppingDistance() + (this.speed.getSpeed() > 1 ? 5 : 2);
     this.sight = this.trainSight.getSight(nextPosition, sightDistance, this.nextStation, this);
 
     if (this.autoMode) {
-      let pedal = SpeedPedal.Throttle;
-      if (this.nearestSignal.signal) {
-        if (this.nearestSignal.signal.getSignal() === SignalSignal.Red &&
-          (this.speed.getStoppingDistance() + 5) >= this.nearestSignal.distance) {
-          pedal = SpeedPedal.Brake;
+      if (this.sight.markers.some(m => m.speed === 0)) {
+        this.speed.setPedal(SpeedPedal.Brake);
+
+        if (!this.nextPlatformToStop) {
+          this.nextPlatformToStop = this.nearestPlatform.platform;
+          this.remainingStopTime = 30; // todo constant
         }
+      } else {
+        this.speed.setPedal(SpeedPedal.Throttle);
       }
-
-
-      if (this.nearestPlatform.platform
-        && this.nearestPlatform.platform !== this.lastPlatformStopped) {
-        if (
-          ((this.speed.getStoppingDistance() + 5 >= this.nearestPlatform.distance)
-            && this.speed.getSpeed() > 1)
-          || (this.speed.getStoppingDistance() + 2 >= this.nearestPlatform.distance)) {
-
-          pedal = SpeedPedal.Brake;
-
-          if (!this.nextPlatformToStop) {
-            this.nextPlatformToStop = this.nearestPlatform.platform;
-            this.remainingStopTime = 60; // todo constant
-          }
-        }
-      }
-      this.speed.setPedal(pedal);
     }
 
     this.speed.tick();
