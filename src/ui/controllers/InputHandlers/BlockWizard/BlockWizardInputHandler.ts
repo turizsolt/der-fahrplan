@@ -120,7 +120,7 @@ export class BlockWizardInputHandler extends InputHandler {
         : nearestBackward;
 
     const wholeDistance = forward.distance + backward.distance;
-    const signalMinimumDistance = 40;
+    const signalMinimumDistance = 100;
     const signalCount = Math.max(
       1,
       Math.floor(wholeDistance / signalMinimumDistance)
@@ -212,11 +212,11 @@ export class BlockWizardInputHandler extends InputHandler {
       if (pbe.getJointEnd().end === WhichEnd.B) {
         pot.reverse();
       }
-      pot.move(30);
+      pot.move(160);
       pot.reverse();
 
       const nearestData = Nearest.platform(pot.clone());
-      if (nearestData?.distance < 30) {
+      if (nearestData?.distance < 160) {
         this.store.create<Sensor>(TYPES.Sensor).init(nearestData.position, pb, pbe);
       } else {
         this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
