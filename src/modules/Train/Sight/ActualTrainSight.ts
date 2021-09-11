@@ -15,7 +15,7 @@ export class ActualTrainSight implements TrainSight {
             markers: markers
                 .filter(m => ['Train', 'Signal', 'Platform', 'End'].includes(m.marker.type))
                 .filter(m => m.marker.type !== 'Train' || m.marker.train !== train)
-                .map(m => ({ type: m.marker.type, speed: this.determineSpeed(m, nextStation) }))
+                .map(m => ({ type: m.marker.type, speed: this.determineSpeed(m, nextStation), distance: m.position }))
         };
     }
 
@@ -26,21 +26,29 @@ export class ActualTrainSight implements TrainSight {
         let startPosition = position.getPosition();
         let endPosition = Math.min(dt.getLength(), startPosition + distanceLeft);
         distanceLeft = distanceLeft - (endPosition - startPosition);
+        let globalStartPosition = -startPosition;
 
-        do {
-            positionedTrackMarkers.push(...dt.getMarkersPartially({ startPosition, endPosition, track: dt }));
+        positionedTrackMarkers.push(
+            ...dt.getMarkersPartially({ startPosition, endPosition, track: dt })
+                .map(m => ({ ...m, position: m.position + globalStartPosition }))
+        );
 
+        dt = dt.next();
+        while (dt && distanceLeft > 0) {
+            startPosition = 0;
+            endPosition = Math.min(dt.getLength(), distanceLeft);
+            distanceLeft = distanceLeft - (endPosition - startPosition);
+            globalStartPosition = globalStartPosition + dt.getLength();
+
+            positionedTrackMarkers.push(
+                ...dt.getMarkersPartially({ startPosition, endPosition, track: dt })
+                    .map(m => ({ ...m, position: m.position + globalStartPosition }))
+            );
             dt = dt.next();
-            if (dt) {
-                startPosition = 0;
-                endPosition = Math.min(dt.getLength(), distanceLeft);
-                distanceLeft = distanceLeft - (endPosition - startPosition);
-            }
         }
-        while (dt && distanceLeft > 0);
 
         if (distanceLeft > 0) {
-            positionedTrackMarkers.push({ position: null, marker: { type: 'End' } });
+            positionedTrackMarkers.push({ position: distance - distanceLeft, marker: { type: 'End' } });
         }
 
         return { distance: distance - distanceLeft, markers: positionedTrackMarkers };

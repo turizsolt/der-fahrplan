@@ -10,7 +10,7 @@
       <br />
       <div v-if="obj.sight">
         Sight dist: {{obj.sight.distance}}<br />
-        <div v-for="marker in obj.sight.markers">{{marker.speed === 0 ? 'STOP' : 'go'}} {{marker.type}}</div>
+        <div v-for="marker in obj.sight.markers">{{marker.speed === 0 ? 'STOP' : 'go'}} {{marker.distance}} {{marker.type}}</div>
       </div>
     </div>
 

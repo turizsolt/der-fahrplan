@@ -266,6 +266,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
   setAutoMode(autoMode: boolean): void {
     this.autoMode = autoMode;
+    if (!autoMode) {
+      this.speed.setPedal(SpeedPedal.Brake);
+    }
     this.wagons.map(w => w.update());
   }
 
@@ -343,7 +346,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.nearestPlatform = Nearest.platform(nextPosition);
 
     this.nextStation = this.getNextStation();
-    const sightDistance: number = this.speed.getStoppingDistance() + (this.speed.getSpeed() > 1 ? 5 : 2);
+    const sightDistance: number = this.speed.getStoppingDistance() + Math.max(this.speed.getSpeed() * 5, 2);
     this.sight = this.trainSight.getSight(nextPosition, sightDistance, this.nextStation, this);
 
     if (this.autoMode) {

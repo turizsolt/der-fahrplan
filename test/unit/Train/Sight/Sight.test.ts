@@ -54,8 +54,8 @@ describe('TrainSight', () => {
         const expectedSight: Sight = {
             distance: 13,
             markers: [
-                { type: 'Signal', speed: 0 },
-                { type: 'Platform', speed: 0 },
+                { type: 'Signal', distance: 1, speed: 0 },
+                { type: 'Platform', distance: 2, speed: 0 },
             ]
         };
         expect(sight).deep.equals(expectedSight);
@@ -71,7 +71,7 @@ describe('TrainSight', () => {
         const expectedSight: Sight = {
             distance: 20,
             markers: [
-                { type: 'End', speed: 0 },
+                { type: 'End', distance: 20, speed: 0 },
             ]
         };
         expect(sight).deep.equals(expectedSight);
@@ -93,7 +93,7 @@ describe('TrainSight', () => {
         const expectedSight: Sight = {
             distance: 5,
             markers: [
-                { type: 'Platform', speed: Number.POSITIVE_INFINITY },
+                { type: 'Platform', distance: 2, speed: Number.POSITIVE_INFINITY },
             ]
         };
         expect(sight).deep.equals(expectedSight);
@@ -113,7 +113,7 @@ describe('TrainSight', () => {
         const expectedSight: Sight = {
             distance: 5,
             markers: [
-                { type: 'Signal', speed: Number.POSITIVE_INFINITY },
+                { type: 'Signal', distance: 1, speed: Number.POSITIVE_INFINITY },
             ]
         };
         expect(sight).deep.equals(expectedSight);
