@@ -357,6 +357,14 @@ export class ActualTrain extends ActualBaseStorable implements Train {
           this.nextPlatformToStop = this.nearestPlatform.platform;
           this.remainingStopTime = 30; // todo constant
         }
+      } else if (this.speed.getSpeed() === 0 && this.sight?.markers?.[0]?.type === 'Platform' && this.nearestPlatform.platform
+        && this.nearestPlatform.platform !== this.lastPlatformStopped) {
+        this.speed.setPedal(SpeedPedal.Brake);
+
+        if (!this.nextPlatformToStop) {
+          this.nextPlatformToStop = this.nearestPlatform.platform;
+          this.remainingStopTime = 30; // todo constant
+        }
       } else {
         this.speed.setPedal(SpeedPedal.Throttle);
       }
