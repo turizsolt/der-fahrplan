@@ -8,9 +8,9 @@
       Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "STOPPED" }}<br />
       Next: {{obj.nextStationName}}
       <br />
-      <div v-if="obj.sight">
-        Sight dist: {{obj.sight.distance}}<br />
-        <div v-for="marker in obj.sight.markers">{{marker.speed === 0 ? 'STOP' : 'go'}} {{marker.distance}} {{marker.type}}</div>
+      <div v-if="obj.sight" style="height: 8em; overflow: hidden;">
+        Sight dist: {{Math.floor(obj.sight.distance)}}<br />
+        <div v-for="marker in obj.sight.markers">{{marker.speed === 0 ? 'STOP' : 'go'}} {{Math.floor(marker.distance)}} {{marker.type}}</div>
       </div>
     </div>
 
