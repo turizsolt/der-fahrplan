@@ -182,6 +182,14 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     return this.getStationFollowingStops(this.lastStationServed);
   }
 
+  getNextStation(): Station {
+    return Util.first(
+      (this.lastStationServed ? this.getRemainingStops() : this.getStops())
+        .filter(ts => ts.isStation && ts.shouldStop)
+        .map(ts => ts.station as Station)
+    );
+  }
+
   getRoute(): Route {
     return this.route;
   }

@@ -25,4 +25,5 @@ export interface Trip extends BaseStorable {
   toggleNextReverse(): void;
   getNextReverse(): boolean;
   getHasGroup(): boolean;
+  getNextStation(): Station;
 }

@@ -3,16 +3,18 @@ import { PositionedTrackMarker } from "../../PositionedTrackMarker";
 import { SignalSignal } from "../../Signaling/SignalSignal";
 import { DirectedTrack } from "../../Track/DirectedTrack";
 import { PositionOnTrack } from "../PositionOnTrack";
+import { Train } from "../Train";
 import { Sight } from "./Sight";
 import { TrainSight } from "./TrainSight";
 
 export class ActualTrainSight implements TrainSight {
-    getSight(position: PositionOnTrack, dist: number, nextStation?: Station): Sight {
+    getSight(position: PositionOnTrack, dist: number, nextStation?: Station, train?: Train): Sight {
         const { distance, markers } = this.findMarkers(position, dist);
         return {
             distance,
             markers: markers
                 .filter(m => ['Train', 'Signal', 'Platform', 'End'].includes(m.marker.type))
+                .filter(m => m.marker.type !== 'Train' || m.marker.train !== train)
                 .map(m => ({ type: m.marker.type, speed: this.determineSpeed(m, nextStation) }))
         };
     }

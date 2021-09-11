@@ -9,7 +9,14 @@
       SD: {{ Math.round(obj.stoppingDistance * 10) }}<br />
       NE: {{ Math.round(obj.nearestEnd * 10) }}<br />
       NT: {{ Math.round(obj.nearestTrain * 10) }}<br />
-      NS: {{ Math.round(obj.nearestSignal * 10) }} ({{obj.nearestSignalSignal}})
+      NS: {{ Math.round(obj.nearestSignal * 10) }} ({{obj.nearestSignalSignal}})<br />
+      <br />
+      Next: {{obj.nextStationName}}
+      <br />
+      <div v-if="obj.sight">
+        Dist: {{obj.sight.distance}}<br />
+        <div v-for="marker in obj.sight.markers">{{marker.speed === 0 ? 'STOP' : 'go'}} {{marker.type}}</div>
+      </div>
     </div>
 
     <!-- train -->

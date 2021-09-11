@@ -28,6 +28,9 @@ import { Platform } from '../../structs/Interfaces/Platform';
 import { BlockJoint } from '../Signaling/BlockJoint';
 import { WagonConfig } from '../../structs/Actuals/Wagon/WagonConfig';
 import { CapacityCap } from '../Signaling/CapacityCap/CapacityCap';
+import { TrainSight } from './Sight/TrainSight';
+import { ActualTrainSight } from './Sight/ActualTrainSight';
+import { Sight } from './Sight/Sight';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
   private position: PositionOnTrack = null;
@@ -335,6 +338,18 @@ export class ActualTrain extends ActualBaseStorable implements Train {
   private shouldStop: boolean = false;
   private forgetTime: number = -1;
 
+  private trainSight: TrainSight = new ActualTrainSight();
+  private sight: Sight;
+  private nextStation: Station = null;
+
+  getSight(): Sight {
+    return this.sight;
+  }
+
+  getNextStation(): Station {
+    return this.trips?.[0]?.getNextStation();
+  }
+
   tick(): void {
     const nextPosition = this.position.clone();
 
@@ -342,6 +357,11 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     this.nearestTrain = Nearest.train(nextPosition);
     this.nearestSignal = Nearest.signal(nextPosition);
     this.nearestPlatform = Nearest.platform(nextPosition);
+
+    this.nextStation = this.getNextStation();
+
+    const sightDistance: number = this.speed.getStoppingDistance() + 5;
+    this.sight = this.trainSight.getSight(nextPosition, sightDistance, this.nextStation, this);
 
     if (this.autoMode) {
       let pedal = SpeedPedal.Throttle;

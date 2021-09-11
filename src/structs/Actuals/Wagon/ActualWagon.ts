@@ -275,6 +275,8 @@ export class ActualWagon extends ActualBaseBrick implements Wagon {
       nearestTrain: this.getTrain()?.getNearestTrain()?.distance,
       nearestSignal: this.getTrain()?.getNearestSignal()?.distance,
       nearestSignalSignal: this.getTrain()?.getNearestSignal()?.signal?.getSignal(),
+      sight: this.getTrain()?.getSight(),
+      nextStationName: this.getTrain()?.getNextStation()?.getName(),
       autoMode: this.getTrain()?.getAutoMode(),
       shunting: this.getTrain()?.getSpeed()?.isShunting()
     };
