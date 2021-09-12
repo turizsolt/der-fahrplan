@@ -8,6 +8,7 @@ import { Station } from '../../structs/Scheduling/Station';
 import { Platform } from '../../structs/Interfaces/Platform';
 import { WagonConfig } from '../../structs/Actuals/Wagon/WagonConfig';
 import { Store } from '../../structs/Interfaces/Store';
+import { Sight } from './Sight/Sight';
 
 export interface Train extends BaseStorable {
   init(pot: PositionOnTrack, wagons: Wagon[]): Train;
@@ -26,9 +27,8 @@ export interface Train extends BaseStorable {
   setAutoMode(autoMode: boolean): void;
   getAutoMode(): boolean;
 
-  getNearestEnd(): NearestData;
-  getNearestTrain(): NearestData;
-  getNearestSignal(): NearestData;
+  getSight(): Sight;
+  getNextStation(): Station;
 
   assignTrip(trip: Trip, wagons?: Wagon[]): void;
   getTrips(): Trip[];

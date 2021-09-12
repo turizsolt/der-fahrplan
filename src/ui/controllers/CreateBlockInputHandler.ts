@@ -14,13 +14,13 @@ import { createSignals } from './CreateSectionInputHandler';
 export class CreateBlockInputHandler implements InputHandler {
   private jointEnds: BlockJointEnd[] = [];
 
-  constructor(private store: Store) {}
+  constructor(private store: Store) { }
 
-  down(props: InputProps, event: PointerEvent): void {}
+  down(props: InputProps, event: PointerEvent): void { }
 
-  roam(props: InputProps, event: PointerEvent): void {}
+  roam(props: InputProps, event: PointerEvent): void { }
 
-  move(downProps: InputProps, props: InputProps, event: PointerEvent): void {}
+  move(downProps: InputProps, props: InputProps, event: PointerEvent): void { }
 
   click(downProps: InputProps, event: PointerEvent): void {
     let meshId = downProps.mesh.id;
@@ -55,7 +55,7 @@ export class CreateBlockInputHandler implements InputHandler {
               if (pbe.getJointEnd().end === WhichEnd.A) {
                 pot.reverse();
               }
-              pot.move(30);
+              pot.move(160);
               pot.reverse();
 
               this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
@@ -69,7 +69,7 @@ export class CreateBlockInputHandler implements InputHandler {
     }
   }
 
-  up(downProps: InputProps, props: InputProps, event: PointerEvent): void {}
+  up(downProps: InputProps, props: InputProps, event: PointerEvent): void { }
 
-  cancel(): void {}
+  cancel(): void { }
 }
