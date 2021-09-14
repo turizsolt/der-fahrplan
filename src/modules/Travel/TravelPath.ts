@@ -16,3 +16,7 @@ export const persistTravelPathes = (tp: TravelPath[]): TravelPathPersisted[] => 
         changes: t.changes.map(c => ({ time: c.time, route: c.route.getId(), station: c.station.getId() }))
     }));
 }
+
+export const persistReadableTravelPathes = (tp: TravelPath[]): string[] => {
+    return tp.map(t => (t.score.toString() + ': ' + t.changes.map(c => (c.route.getName() + '>' + c.station.getName() + ' (' + c.time.toString() + ')')).join(' ')));
+}

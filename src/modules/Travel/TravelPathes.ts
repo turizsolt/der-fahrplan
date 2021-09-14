@@ -3,6 +3,7 @@ import { Store } from "../../structs/Interfaces/Store";
 import { Route } from "../../structs/Scheduling/Route";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { Station } from "../../structs/Scheduling/Station";
+import { Util } from "../../structs/Util";
 import { TravelPath } from "./TravelPath";
 
 export class TravelPathes {
@@ -23,10 +24,12 @@ export class TravelPathes {
 
         this.findDirect();
         this.orderPathesByScore();
+        this.cutDownTheSlowOnes();
 
         for (let i = 1; i < level; i++) {
             this.findWithTransfer();
             this.orderPathesByScore();
+            this.cutDownTheSlowOnes();
         }
     }
 
@@ -78,6 +81,7 @@ export class TravelPathes {
 
         for (let f of first) {
             for (let s of second) {
+                if (Util.last(f.changes).route === Util.first(s.changes).route) continue; // todo what if skipping a loop on the same line?
                 result.push({ score: f.score + s.score, changes: [...f.changes, ...s.changes] });
             }
         }
@@ -110,11 +114,72 @@ export class TravelPathes {
         for (let from of this.stations) {
             for (let to of this.stations) {
                 this.orderByScore(this.pathes[from.getId()][to.getId()]);
+                this.pathes[from.getId()][to.getId()] = this.skipTheSameSecondTime(this.pathes[from.getId()][to.getId()]);
             }
         }
     }
 
     private orderByScore(tp: TravelPath[]): void {
-        tp.sort((a: TravelPath, b: TravelPath) => a.score - b.score);
+        tp.sort((a: TravelPath, b: TravelPath) => {
+            if (a.score > b.score) return 1;
+            if (a.score < b.score) return -1;
+
+            if (a.changes.length > b.changes.length) return 1;
+            if (a.changes.length < b.changes.length) return -1;
+
+            for (let i = 0; i < a.changes.length; i++) {
+                if (a.changes[i].time > b.changes[i].time) return 1;
+                if (a.changes[i].time < b.changes[i].time) return -1;
+
+                if (a.changes[i].route.getId() > b.changes[i].route.getId()) return 1;
+                if (a.changes[i].route.getId() < b.changes[i].route.getId()) return -1;
+
+                if (a.changes[i].station.getId() > b.changes[i].station.getId()) return 1;
+                if (a.changes[i].station.getId() < b.changes[i].station.getId()) return -1;
+            }
+            return 0;
+        });
+    }
+
+    private skipTheSameSecondTime(tp: TravelPath[]): TravelPath[] {
+        if (tp.length === 0) return [];
+
+        const result: TravelPath[] = [tp[0]];
+
+        let last: TravelPath = tp[0];
+        for (let i = 1; i < tp.length; i++) {
+            if (!this.isSamePath(last, tp[i])) {
+                last = tp[i];
+                result.push(tp[i]);
+            }
+        }
+
+        return result;
+    }
+
+    private isSamePath(a: TravelPath, b: TravelPath): boolean {
+        if (a.score !== b.score) return false;
+        if (a.changes.length !== b.changes.length) return false;
+
+        for (let i = 0; i < a.changes.length; i++) {
+            if (a.changes[i].time !== b.changes[i].time) return false;
+            if (a.changes[i].route !== b.changes[i].route) return false;
+            if (a.changes[i].station !== b.changes[i].station) return false;
+        }
+
+        return true;
+    }
+
+    private cutDownTheSlowOnes(): void {
+        for (let from of this.stations) {
+            for (let to of this.stations) {
+                if (this.pathes[from.getId()][to.getId()].length === 0) continue;
+
+                const targetScore = this.pathes[from.getId()][to.getId()][0].score;
+                const targetChanges = this.pathes[from.getId()][to.getId()][0].changes.length;
+
+                this.pathes[from.getId()][to.getId()] = this.pathes[from.getId()][to.getId()].filter(x => x.score <= (targetScore * 1.5) || x.changes.length < targetChanges);
+            }
+        }
     }
 }

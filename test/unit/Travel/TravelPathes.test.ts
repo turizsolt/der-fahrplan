@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { TYPES } from "../../../src/di/TYPES";
-import { persistTravelPathes, TravelPath, TravelPathPersisted } from "../../../src/modules/Travel/TravelPath";
+import { persistReadableTravelPathes, persistTravelPathes, TravelPath, TravelPathPersisted } from "../../../src/modules/Travel/TravelPath";
 import { TravelPathes } from "../../../src/modules/Travel/TravelPathes";
 import { Circle } from "../../../src/structs/Geometry/Circle";
 import { Coordinate } from "../../../src/structs/Geometry/Coordinate";
@@ -11,8 +11,9 @@ import { getTestStore } from "../../getTestStore";
 
 const store = getTestStore();
 
-const createRoute = (station: Station[], times: number[]): Route => {
+const createRoute = (name: string, station: Station[], times: number[]): Route => {
     const route = store.create<Route>(TYPES.Route).init();
+    route.setName(name);
     for (let i = 0; i < station.length; i++) {
         route.addWaypoint(store.create<RouteStop>(TYPES.RouteStop).init(station[i], null, times[i], times[i]));
     }
@@ -57,21 +58,29 @@ describe('Travel', () => {
         stF = store.create<Station>(TYPES.Station).init(circle);
         stG = store.create<Station>(TYPES.Station).init(circle);
 
-        rAC = createRoute([stA, stC], [0, 5]);
-        rABC = createRoute([stA, stB, stC], [0, 3, 6]);
-        rAF = createRoute([stA, stF], [0, 7]);
-        rADF = createRoute([stA, stD, stF], [0, 4, 8]);
-        rBEG = createRoute([stB, stE, stG], [0, 3, 7]);
-        rDEC = createRoute([stD, stE, stC], [0, 4, 8]);
-        rFG = createRoute([stF, stG], [0, 5]);
+        stA.setName('A');
+        stB.setName('B');
+        stC.setName('C');
+        stD.setName('D');
+        stE.setName('E');
+        stF.setName('F');
+        stG.setName('G');
 
-        rCBA = createRoute([stC, stB, stA], [0, 3, 6]);
-        rCA = createRoute([stC, stA], [0, 5]);
-        rFA = createRoute([stF, stA], [0, 7]);
-        rFDA = createRoute([stF, stD, stA], [0, 4, 8]);
-        rGEB = createRoute([stG, stE, stB], [0, 4, 7]); // note: middle value is different from the top list
-        rCED = createRoute([stC, stE, stD], [0, 4, 8]);
-        rGF = createRoute([stG, stF], [0, 5]);
+        rAC = createRoute('AC', [stA, stC], [0, 5]);
+        rABC = createRoute('ABC', [stA, stB, stC], [0, 3, 6]);
+        rAF = createRoute('AF', [stA, stF], [0, 7]);
+        rADF = createRoute('ADF', [stA, stD, stF], [0, 4, 8]);
+        rBEG = createRoute('BEG', [stB, stE, stG], [0, 3, 7]);
+        rDEC = createRoute('DEC', [stD, stE, stC], [0, 4, 8]);
+        rFG = createRoute('FG', [stF, stG], [0, 5]);
+
+        rCBA = createRoute('CBA', [stC, stB, stA], [0, 3, 6]);
+        rCA = createRoute('CA', [stC, stA], [0, 5]);
+        rFA = createRoute('FA', [stF, stA], [0, 7]);
+        rFDA = createRoute('FDA', [stF, stD, stA], [0, 4, 8]);
+        rGEB = createRoute('GEB', [stG, stE, stB], [0, 4, 7]); // note: middle value is different from the top list
+        rCED = createRoute('CED', [stC, stE, stD], [0, 4, 8]);
+        rGF = createRoute('DF', [stG, stF], [0, 5]);
 
         /****************
          *    /--5--\
@@ -146,6 +155,62 @@ describe('Travel', () => {
                 ]
             }
 
+        ];
+        expect(pathesAG).deep.equals(expectedAG);
+    });
+
+    it('level3: multiple transfer path', () => {
+        const travelPathes: TravelPathes = new TravelPathes(store);
+        travelPathes.find(4);
+
+        const pathesAG: TravelPathPersisted[] = persistTravelPathes(travelPathes.getPathes(stA, stG));
+        const expectedAG: TravelPathPersisted[] = [
+            {
+                score: 10, changes: [
+                    { route: rABC.getId(), station: stB.getId(), time: 3 },
+                    { route: rBEG.getId(), station: stG.getId(), time: 7 }
+                ]
+            },
+            {
+                score: 12, changes: [
+                    { route: rAF.getId(), station: stF.getId(), time: 7 },
+                    { route: rFG.getId(), station: stG.getId(), time: 5 }
+                ]
+            },
+            {
+                score: 12, changes: [
+                    { route: rADF.getId(), station: stD.getId(), time: 4 },
+                    { route: rDEC.getId(), station: stE.getId(), time: 4 },
+                    { route: rBEG.getId(), station: stG.getId(), time: 4 }
+                ]
+            },
+            {
+                score: 13, changes: [
+                    { route: rADF.getId(), station: stF.getId(), time: 8 },
+                    { route: rFG.getId(), station: stG.getId(), time: 5 }
+                ]
+            },
+            {
+                score: 13, changes: [
+                    { route: rAC.getId(), station: stC.getId(), time: 5 },
+                    { route: rCED.getId(), station: stE.getId(), time: 4 },
+                    { route: rBEG.getId(), station: stG.getId(), time: 4 }
+                ]
+            },
+            {
+                score: 14, changes: [
+                    { route: rABC.getId(), station: stC.getId(), time: 6 },
+                    { route: rCED.getId(), station: stE.getId(), time: 4 },
+                    { route: rBEG.getId(), station: stG.getId(), time: 4 }
+                ]
+            },
+            {
+                score: 15, changes: [
+                    { route: rAC.getId(), station: stC.getId(), time: 5 },
+                    { route: rCBA.getId(), station: stB.getId(), time: 3 },
+                    { route: rBEG.getId(), station: stG.getId(), time: 7 }
+                ]
+            }
         ];
         expect(pathesAG).deep.equals(expectedAG);
     });
