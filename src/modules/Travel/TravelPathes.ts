@@ -16,12 +16,18 @@ export class TravelPathes {
         return this.pathes[from.getId()]?.[to.getId()];
     }
 
-    find(): void {
+    find(level: number = 1): void {
         this.initialiseRoutes();
         this.initialiseStations();
         this.initialisePathes();
 
         this.findDirect();
+        this.orderPathesByScore();
+
+        for (let i = 1; i < level; i++) {
+            this.findWithTransfer();
+            this.orderPathesByScore();
+        }
     }
 
     private initialiseRoutes(): void {
@@ -54,5 +60,61 @@ export class TravelPathes {
                 }
             }
         }
+    }
+
+    private copyPathes(): Record<string, Record<string, TravelPath[]>> {
+        const result: Record<string, Record<string, TravelPath[]>> = {};
+        for (let from of this.stations) {
+            result[from.getId()] = {};
+            for (let to of this.stations) {
+                result[from.getId()][to.getId()] = [...this.pathes[from.getId()][to.getId()]];
+            }
+        }
+        return result;
+    }
+
+    private composePathes(first: TravelPath[], second: TravelPath[]): TravelPath[] {
+        const result: TravelPath[] = [];
+
+        for (let f of first) {
+            for (let s of second) {
+                result.push({ score: f.score + s.score, changes: [...f.changes, ...s.changes] });
+            }
+        }
+
+        return result;
+    }
+
+    private findWithTransfer(): void {
+        const prevPathes = this.copyPathes();
+
+        for (let from of this.stations) {
+            for (let to of this.stations) {
+                if (from === to) continue;
+                for (let intermediate of this.stations) {
+                    if (from === intermediate) continue;
+                    if (to === intermediate) continue;
+
+                    const newPathes: TravelPath[] = this.composePathes(
+                        prevPathes[from.getId()][intermediate.getId()],
+                        prevPathes[intermediate.getId()][to.getId()]
+                    );
+
+                    this.pathes[from.getId()][to.getId()].push(...newPathes);
+                }
+            }
+        }
+    }
+
+    private orderPathesByScore(): void {
+        for (let from of this.stations) {
+            for (let to of this.stations) {
+                this.orderByScore(this.pathes[from.getId()][to.getId()]);
+            }
+        }
+    }
+
+    private orderByScore(tp: TravelPath[]): void {
+        tp.sort((a: TravelPath, b: TravelPath) => a.score - b.score);
     }
 }

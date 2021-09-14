@@ -120,4 +120,33 @@ describe('Travel', () => {
         ];
         expect(pathesAC).deep.equals(expectedAC);
     });
+
+    it('level2: transfer path', () => {
+        const travelPathes: TravelPathes = new TravelPathes(store);
+        travelPathes.find(2);
+
+        const pathesAG: TravelPathPersisted[] = persistTravelPathes(travelPathes.getPathes(stA, stG));
+        const expectedAG: TravelPathPersisted[] = [
+            {
+                score: 10, changes: [
+                    { route: rABC.getId(), station: stB.getId(), time: 3 },
+                    { route: rBEG.getId(), station: stG.getId(), time: 7 }
+                ]
+            },
+            {
+                score: 12, changes: [
+                    { route: rAF.getId(), station: stF.getId(), time: 7 },
+                    { route: rFG.getId(), station: stG.getId(), time: 5 }
+                ]
+            },
+            {
+                score: 13, changes: [
+                    { route: rADF.getId(), station: stF.getId(), time: 8 },
+                    { route: rFG.getId(), station: stG.getId(), time: 5 }
+                ]
+            }
+
+        ];
+        expect(pathesAG).deep.equals(expectedAG);
+    });
 });
