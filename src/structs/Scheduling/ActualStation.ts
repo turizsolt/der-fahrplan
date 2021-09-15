@@ -11,7 +11,7 @@ import { inject } from 'inversify';
 import { Color } from '../Color';
 import { NameGenerator } from '../NameGenerator';
 import { Route } from './Route';
-import { Passenger } from '../Interfaces/Passenger';
+import { Passenger } from '../../modules/Passenger/Passenger';
 import { ActualBoardable } from '../../mixins/ActualBoardable';
 import { Trip } from './Trip';
 import { TripInSchedule } from './TripInSchedule';

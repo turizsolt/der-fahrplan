@@ -1,17 +1,17 @@
-import { Platform } from '../Interfaces/Platform';
-import { PassengerRenderer } from '../Renderers/PassengerRenderer';
-import { Coordinate } from '../Geometry/Coordinate';
+import { Platform } from '../../structs/Interfaces/Platform';
+import { PassengerRenderer } from '../../structs/Renderers/PassengerRenderer';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { TYPES } from '../../di/TYPES';
-import { Passenger, Place } from '../Interfaces/Passenger';
-import { ActualBaseBrick } from './ActualBaseBrick';
-import { BaseRenderer } from '../Renderers/BaseRenderer';
+import { Passenger, Place } from './Passenger';
+import { ActualBaseBrick } from '../../structs/Actuals/ActualBaseBrick';
+import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
 import { injectable, inject } from 'inversify';
-import { Station } from '../Scheduling/Station';
-import { Route } from '../Scheduling/Route';
-import { Color } from '../Color';
-import { Store } from '../Interfaces/Store';
-import { RouteStop } from '../Scheduling/RouteStop';
-import { Train } from '../../modules/Train/Train';
+import { Station } from '../../structs/Scheduling/Station';
+import { Route } from '../../structs/Scheduling/Route';
+import { Color } from '../../structs/Color';
+import { Store } from '../../structs/Interfaces/Store';
+import { RouteStop } from '../../structs/Scheduling/RouteStop';
+import { Train } from '../Train/Train';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {

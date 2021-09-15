@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { injectable } from 'inversify';
 import { BasePixiRenderer } from './BasePixiRenderer';
 import { PassengerRenderer } from '../../structs/Renderers/PassengerRenderer';
-import { Passenger } from '../../structs/Interfaces/Passenger';
+import { Passenger } from '../../modules/Passenger/Passenger';
 
 @injectable()
 export class PassengerPixiRenderer extends BasePixiRenderer

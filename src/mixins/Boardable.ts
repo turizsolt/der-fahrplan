@@ -1,8 +1,8 @@
 import { Coordinate } from '../structs/Geometry/Coordinate';
-import { Passenger } from '../structs/Interfaces/Passenger';
+import { Passenger } from '../modules/Passenger/Passenger';
 
 export interface Boardable {
-  board(passenger: Passenger): Coordinate;
-  unboard(passenger: Passenger): void;
-  getBoardedPassengers(): Passenger[];
+    board(passenger: Passenger): Coordinate;
+    unboard(passenger: Passenger): void;
+    getBoardedPassengers(): Passenger[];
 }

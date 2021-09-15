@@ -17,10 +17,10 @@ import { ActualRoute } from '../structs/Scheduling/ActualRoute';
 import { Station } from '../structs/Scheduling/Station';
 import { ActualStation } from '../structs/Scheduling/ActualStation';
 import { Store } from '../structs/Interfaces/Store';
-import { Passenger } from '../structs/Interfaces/Passenger';
-import { ActualPassenger } from '../structs/Actuals/ActualPassenger';
-import { PassengerGenerator } from '../structs/Actuals/PassengerGenerator';
-import { ActualPassengerGenerator } from '../structs/Actuals/ActualPassengerGenerator';
+import { Passenger } from '../modules/Passenger/Passenger';
+import { ActualPassenger } from '../modules/Passenger/ActualPassenger';
+import { PassengerGenerator } from '../modules/Passenger/PassengerGenerator';
+import { ActualPassengerGenerator } from '../modules/Passenger/ActualPassengerGenerator';
 import { DependencyContainer } from './DependencyContainer';
 import { Trip } from '../structs/Scheduling/Trip';
 import { ActualTrip } from '../structs/Scheduling/ActualTrip';
@@ -44,30 +44,30 @@ import { TripGroup } from '../structs/Scheduling/TripGroup';
 import { ActualTripGroup } from '../structs/Scheduling/ActualTripGroup';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
-  ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
+    ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
 
-  ioc.fm<PassengerGenerator>(
-    T.FactoryOfPassengerGenerator,
-    T.PassengerGenerator,
-    ActualPassengerGenerator
-  );
-  ioc.fm<Train>(T.FactoryOfTrain, T.Train, ActualTrain);
-  ioc.fm<Wagon>(T.FactoryOfWagon, T.Wagon, ActualWagon);
-  ioc.fm<Track>(T.FactoryOfTrack, T.Track, ActualTrack);
-  ioc.fm<TrackSwitch>(T.FactoryOfTrackSwitch, T.TrackSwitch, ActualTrackSwitch);
-  ioc.fm<TrackJoint>(T.FactoryOfTrackJoint, T.TrackJoint, ActualTrackJoint);
-  ioc.fm<Station>(T.FactoryOfStation, T.Station, ActualStation);
-  ioc.fm<Platform>(T.FactoryOfPlatform, T.Platform, ActualPlatform);
-  ioc.fm<Passenger>(T.FactoryOfPassenger, T.Passenger, ActualPassenger);
-  ioc.fm<Route>(T.FactoryOfRoute, T.Route, ActualRoute);
-  ioc.fm<RouteStop>(T.FactoryOfRouteStop, T.RouteStop, ActualRouteStop);
-  ioc.fm<Trip>(T.FactoryOfTrip, T.Trip, ActualTrip);
-  ioc.fm<TripGroup>(T.FactoryOfTripGroup, T.TripGroup, ActualTripGroup);
-  ioc.fm<Signal>(T.FactoryOfSignal, T.Signal, ActualSignal);
-  ioc.fm<Sensor>(T.FactoryOfSensor, T.Sensor, ActualSensor);
-  ioc.fm<Block>(T.FactoryOfBlock, T.Block, ActualBlock);
-  ioc.fm<BlockJoint>(T.FactoryOfBlockJoint, T.BlockJoint, ActualBlockJoint);
-  ioc.fm<PathBlock>(T.FactoryOfPathBlock, T.PathBlock, ActualPathBlock);
-  ioc.fm<Section>(T.FactoryOfSection, T.Section, ActualSection);
-  ioc.fm<CapacityCap>(T.FactoryOfCapacityCap, T.CapacityCap, ActualCapacityCap);
+    ioc.fm<PassengerGenerator>(
+        T.FactoryOfPassengerGenerator,
+        T.PassengerGenerator,
+        ActualPassengerGenerator
+    );
+    ioc.fm<Train>(T.FactoryOfTrain, T.Train, ActualTrain);
+    ioc.fm<Wagon>(T.FactoryOfWagon, T.Wagon, ActualWagon);
+    ioc.fm<Track>(T.FactoryOfTrack, T.Track, ActualTrack);
+    ioc.fm<TrackSwitch>(T.FactoryOfTrackSwitch, T.TrackSwitch, ActualTrackSwitch);
+    ioc.fm<TrackJoint>(T.FactoryOfTrackJoint, T.TrackJoint, ActualTrackJoint);
+    ioc.fm<Station>(T.FactoryOfStation, T.Station, ActualStation);
+    ioc.fm<Platform>(T.FactoryOfPlatform, T.Platform, ActualPlatform);
+    ioc.fm<Passenger>(T.FactoryOfPassenger, T.Passenger, ActualPassenger);
+    ioc.fm<Route>(T.FactoryOfRoute, T.Route, ActualRoute);
+    ioc.fm<RouteStop>(T.FactoryOfRouteStop, T.RouteStop, ActualRouteStop);
+    ioc.fm<Trip>(T.FactoryOfTrip, T.Trip, ActualTrip);
+    ioc.fm<TripGroup>(T.FactoryOfTripGroup, T.TripGroup, ActualTripGroup);
+    ioc.fm<Signal>(T.FactoryOfSignal, T.Signal, ActualSignal);
+    ioc.fm<Sensor>(T.FactoryOfSensor, T.Sensor, ActualSensor);
+    ioc.fm<Block>(T.FactoryOfBlock, T.Block, ActualBlock);
+    ioc.fm<BlockJoint>(T.FactoryOfBlockJoint, T.BlockJoint, ActualBlockJoint);
+    ioc.fm<PathBlock>(T.FactoryOfPathBlock, T.PathBlock, ActualPathBlock);
+    ioc.fm<Section>(T.FactoryOfSection, T.Section, ActualSection);
+    ioc.fm<CapacityCap>(T.FactoryOfCapacityCap, T.CapacityCap, ActualCapacityCap);
 };
