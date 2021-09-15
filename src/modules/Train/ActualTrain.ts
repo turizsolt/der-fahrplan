@@ -31,6 +31,7 @@ import { CapacityCap } from '../Signaling/CapacityCap/CapacityCap';
 import { TrainSight } from './Sight/TrainSight';
 import { ActualTrainSight } from './Sight/ActualTrainSight';
 import { Sight } from './Sight/Sight';
+import { ActualTrainStopper } from './ActualTrainStopper';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
     private position: PositionOnTrack = null;
@@ -39,8 +40,12 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     private autoMode: boolean = false;
     private trips: Trip[] = [];
 
+    private stopper: ActualTrainStopper = null;
+
     init(pot: PositionOnTrack, wagons: Wagon[]): Train {
         super.initStore(TYPES.Train);
+
+        this.stopper = new ActualTrainStopper(this, this.store);
 
         this.position = pot;
         this.wagons = wagons;
@@ -317,15 +322,6 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     private lastSpeed: number = -1;
 
     private nearestTrain: NearestData = null;
-    private nearestPlatform: NearestData = null;
-
-    private nextPlatformToStop: Platform = null;
-    private lastPlatformStopped: Platform = null;
-    private justPlatformStopped: Platform = null;
-    private remainingStopTime: number = 0;
-    private shouldTurn: boolean = false;
-    private shouldStop: boolean = false;
-    private forgetTime: number = -1;
 
     private trainSight: TrainSight = new ActualTrainSight();
     private sight: Sight;
@@ -343,7 +339,6 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         const nextPosition = this.position.clone();
 
         this.nearestTrain = Nearest.train(nextPosition);
-        this.nearestPlatform = Nearest.platform(nextPosition);
 
         this.nextStation = this.getNextStation();
         const sightDistance: number = this.speed.getStoppingDistance() + Math.max(this.speed.getSpeed() * 5, 3);
@@ -352,46 +347,25 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         if (this.autoMode) {
             if (this.sight.markers.some(m => m.speed === 0)) {
                 this.speed.setPedal(SpeedPedal.Brake);
-
-                if (!this.nextPlatformToStop) {
-                    this.nextPlatformToStop = this.nearestPlatform.platform;
-                    this.remainingStopTime = 30; // todo constant
-                }
-            } else if (this.speed.getSpeed() === 0 && this.sight?.markers?.[0]?.type === 'Platform' && this.nearestPlatform.platform
-                && this.nearestPlatform.platform !== this.lastPlatformStopped) {
+            } else if (!this.stopper.canDepart()) {
                 this.speed.setPedal(SpeedPedal.Brake);
-
-                if (!this.nextPlatformToStop) {
-                    this.nextPlatformToStop = this.nearestPlatform.platform;
-                    this.remainingStopTime = 30; // todo constant
-                }
-            } else {
+            }
+            else {
                 this.speed.setPedal(SpeedPedal.Throttle);
             }
         }
 
+        // wagon update
         this.speed.tick();
         if (this.speed.getSpeed() === 0 && this.lastSpeed === 0) {
             this.wagons.map(wagon => wagon.update());
         }
         this.lastSpeed = this.speed.getSpeed();
+        // end of wagon update
 
-        if (this.speed.getSpeed() === 0 && this.nextPlatformToStop) {
-            this.remainingStopTime--;
-            if (!this.justPlatformStopped) {
-                this.justPlatformStopped = this.nextPlatformToStop;
-                this.startStopping();
-            }
-            if (this.remainingStopTime < 1 && this.isTimeToGo()) {
-                this.lastPlatformStopped = this.nextPlatformToStop;
-                this.nextPlatformToStop = null;
 
-                this.endStopping();
-                this.justPlatformStopped = null;
-            }
-        }
-
-        if (this.speed.getSpeed() === 0) {
+        if (this.autoMode && this.speed.getSpeed() === 0) {
+            this.stopper.tick(this.sight?.markers?.[0]);
             return;
         }
 
@@ -429,62 +403,6 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         }
 
         this.moveBoardedPassengers();
-    }
-
-    private isTimeToGo(): boolean {
-        if (this.trips.length === 0) return true;
-        const depTime: number = this.trips[0].getStationDepartureTime(this.justPlatformStopped.getStation());
-        return !depTime || depTime <= this.store.getTickCount();
-    }
-
-    private startStopping(): void {
-        this.shouldTurn = false;
-        this.shouldStop = false;
-        if (this.justPlatformStopped.getStation()) {
-            this.trips.map(t => t.setStationServed(this.justPlatformStopped.getStation()));
-        }
-        this.wagons[0].stop();
-
-        // reverse at the end of the trip, and also get the next trip
-        const lastStop = this.trips.length > 0 ? Util.last(this.trips[0].getWaypoints()) : null;
-        if (lastStop && lastStop.station === this.justPlatformStopped.getStation()) {
-            this.arrivedToLastStation();
-        }
-
-        // reverse if needed to
-        const thisStop = this.trips.length > 0 ? this.trips[0].getRoute().getStops().find(x => x.getStation() === this.justPlatformStopped.getStation()) : null;
-        if (thisStop) {
-            if (thisStop.isReverseStop()) {
-                this.shouldTurn = true;
-                this.shouldStop = false;
-            }
-        }
-    }
-
-    private arrivedToLastStation() {
-        const newTrip = this.trips.length > 0 ? this.trips[0].getNextTrip() : null;
-        if (newTrip) {
-            this.shouldTurn = this.trips[0].getNextReverse();
-            this.assignTrip(null);
-            this.assignTrip(newTrip);
-            this.shouldStop = false;
-        } else {
-            this.shouldStop = true;
-        }
-    }
-
-    private endStopping(): void {
-        if (this.justPlatformStopped.getStation()) {
-            this.trips.map(t => t.setAtStation(null));
-        }
-        this.wagons[0].stop();
-        if (this.shouldTurn) {
-            this.reverse();
-        }
-        if (this.shouldStop) {
-            this.setAutoMode(false);
-        }
-        this.forgetTime = 300;
     }
 
     persist(): Object {

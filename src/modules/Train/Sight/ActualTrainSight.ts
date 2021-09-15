@@ -15,7 +15,7 @@ export class ActualTrainSight implements TrainSight {
             markers: markers
                 .filter(m => ['Train', 'Signal', 'Platform', 'End'].includes(m.marker.type))
                 .filter(m => m.marker.type !== 'Train' || m.marker.train !== train)
-                .map(m => ({ type: m.marker.type, speed: this.determineSpeed(m, nextStation), distance: m.position }))
+                .map(m => ({ type: m.marker.type, speed: this.determineSpeed(m, nextStation), distance: m.position, object: m.marker.platform || m.marker.train }))
         };
     }
 
