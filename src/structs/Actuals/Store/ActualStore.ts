@@ -36,6 +36,7 @@ import { CapacityCap } from '../../../modules/Signaling/CapacityCap/CapacityCap'
 import { CapacityCapRenderer } from '../../Renderers/CapacityCapRenderer';
 import { InputController } from '../../../ui/controllers/InputController';
 import { TripGroup } from '../../Scheduling/TripGroup';
+import { TravelPathes } from '../../../modules/Travel/TravelPathes';
 
 @injectable()
 export class ActualStore implements Store {
@@ -44,6 +45,7 @@ export class ActualStore implements Store {
     private factoryMethods: Record<symbol, () => any>;
     private renderers: Record<symbol, (() => any)[]>;
     private typeOrder: Record<symbol, number>;
+    private travelPathes: TravelPathes = new TravelPathes(this);
 
     @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
     @inject(TYPES.FactoryOfRouteStop) private RouteStopFactory: () => RouteStop;
@@ -279,6 +281,8 @@ export class ActualStore implements Store {
                 (brick as Train).loadLater(elem, this);
             }
         });
+
+        this.travelPathes.find(3);
     }
 
     private selected: BaseStorable = null;
@@ -382,5 +386,9 @@ export class ActualStore implements Store {
 
     getInputController(): InputController {
         return this.ic;
+    }
+
+    getTravelPathes(): TravelPathes {
+        return this.travelPathes;
     }
 }

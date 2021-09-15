@@ -30,4 +30,5 @@ export interface Passenger extends BaseBrick {
     updatePos(pos: Coordinate): void;
     getFrom(): Station;
     getTo(): Station;
+    setPlace(place: Place): void;
 }

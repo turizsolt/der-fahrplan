@@ -12,6 +12,7 @@ import { ActualPassengerStatictics } from './ActualPassengerStatistics';
 import { Platform } from '../../structs/Interfaces/Platform';
 import { Train } from '../Train/Train';
 import { Route } from '../../structs/Scheduling/Route';
+import { PassengerRelocator } from './PassengerRelocator';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
@@ -29,6 +30,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
         this.from = from;
         this.stats = new ActualPassengerStatictics(this, this.store);
 
+        PassengerRelocator.insideStation(this.store, this, this.from);
         this.renderer.init(this);
 
         return this;
@@ -72,7 +74,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
         return this.to.getColor();
     }
 
-    private setPlace(place: Place) {
+    setPlace(place: Place): void {
         if (this.place) {
             this.place.unboard(this);
         }
