@@ -39,6 +39,7 @@ import { TripGroup } from '../../Scheduling/TripGroup';
 import { TravelPathes } from '../../../modules/Travel/TravelPathes';
 import { WaitingHall } from '../../../modules/Station/WaitingHall';
 import { WaitingHallRenderer } from '../../Renderers/WaitingHallRenderer';
+import { PlatformGroup } from '../../../modules/Station/PlatformGroup';
 
 @injectable()
 export class ActualStore implements Store {
@@ -74,6 +75,7 @@ export class ActualStore implements Store {
     @inject(TYPES.FactoryOfTrackJointRenderer)
     private TrackJointRendererFactory: () => TrackJointRenderer;
     @inject(TYPES.FactoryOfPlatform) private PlatformFactory: () => Platform;
+    @inject(TYPES.FactoryOfPlatformGroup) private PlatformGroupFactory: () => PlatformGroup;
     @inject(TYPES.FactoryOfWagon) private WagonFactory: () => Wagon;
     @inject(TYPES.FactoryOfWagonRenderer)
     private WagonRendererFactory: () => WagonRenderer;
@@ -117,6 +119,7 @@ export class ActualStore implements Store {
             [TYPES.TrackSwitch]: this.TrackSwitchFactory,
             [TYPES.TrackJoint]: this.TrackJointFactory,
             [TYPES.Platform]: this.PlatformFactory,
+            [TYPES.PlatformGroup]: this.PlatformGroupFactory,
             [TYPES.Train]: this.TrainFactory,
             [TYPES.Wagon]: this.WagonFactory,
             [TYPES.Signal]: this.SignalFactory,
@@ -132,7 +135,8 @@ export class ActualStore implements Store {
             [TYPES.TrackJoint]: 5,
             [TYPES.Track]: 4,
             [TYPES.TrackSwitch]: 3,
-            [TYPES.Platform]: 1,
+            [TYPES.Platform]: 2,
+            [TYPES.PlatformGroup]: 1,
             // skip zero, cos it is falsy
             [TYPES.Wagon]: -1,
             [TYPES.Train]: -2,

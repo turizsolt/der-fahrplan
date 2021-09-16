@@ -4,7 +4,7 @@ import { Station } from './Station';
 import { Store } from '../../structs/Interfaces/Store';
 import { Circle } from '../../structs/Geometry/Circle';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
-import { Platform } from './Platform';
+import { AbstractPlatform } from './AbstractPlatform';
 import { StationRenderer } from '../../structs/Renderers/StationRenderer';
 import { TYPES } from '../../di/TYPES';
 import { inject } from 'inversify';
@@ -22,7 +22,7 @@ const PriorityQueue = require('@darkblue_azurite/priority-queue');
 export class ActualStation extends ActualBaseBrick implements Station {
     private name: string;
     private circle: Circle;
-    private platforms: Platform[];
+    private platforms: AbstractPlatform[];
     private waitingHalls: WaitingHall[];
     private color: Color;
 
@@ -124,13 +124,14 @@ export class ActualStation extends ActualBaseBrick implements Station {
         return this.announcedTrips;
     }
 
-    private platformTo: Record<string, Platform> = {};
+    private platformTo: Record<string, AbstractPlatform> = {};
 
-    getPlatformTo(station: Station): Platform {
+    getPlatformTo(station: Station): AbstractPlatform {
         return this.platformTo[station.getId()];
     }
 
-    announceArrived(train: Train, platform: Platform, trip: Trip) {
+    announceArrived(train: Train, platform: AbstractPlatform, trip: Trip) {
+        /*
         this.callOnPassengers(p => {
             p.listenStationArrivingAnnouncement(
                 this,
@@ -139,6 +140,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
                 trip.getRoute()
             );
         });
+        */
         trip.setStationServed(this);
         //this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
     }
@@ -171,15 +173,15 @@ export class ActualStation extends ActualBaseBrick implements Station {
         return this.boardable.getBoardedPassengers();
     }
 
-    getPlatforms(): Platform[] {
+    getPlatforms(): AbstractPlatform[] {
         return this.platforms;
     }
 
-    addPlatform(platform: Platform): void {
+    addPlatform(platform: AbstractPlatform): void {
         this.platforms.push(platform);
     }
 
-    removePlatform(platform: Platform): void {
+    removePlatform(platform: AbstractPlatform): void {
         this.platforms = this.platforms.filter(p => p !== platform);
     }
 

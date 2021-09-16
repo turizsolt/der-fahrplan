@@ -36,6 +36,9 @@ export const TYPES = {
     PlatformRenderer: Symbol.for('PlatformRenderer'),
     FactoryOfPlatform: Symbol.for('Factory<Platform>'),
 
+    PlatformGroup: Symbol.for('PlatformGroup'),
+    FactoryOfPlatformGroup: Symbol.for('Factory<PlatformGroup>'),
+
     MeshProvider: Symbol.for('MeshProvider'),
     FactoryOfMeshProvider: Symbol.for('Factory<MeshProvider>'),
 
