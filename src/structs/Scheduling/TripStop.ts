@@ -1,14 +1,14 @@
-import { Platform } from '../../modules/Station/Platform';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { Trip } from './Trip';
 import { Route } from './Route';
 import { RouteStop } from './RouteStop';
+import { AbstractPlatform } from '../../modules/Station/AbstractPlatform';
 
 export interface TripStop {
     stationName: string;
     station: RailMapNode;
     stationRgbColor: string;
-    platform: Platform;
+    platform: AbstractPlatform;
     platformNo: string;
     hasArrivalTime: boolean;
     hasDepartureTime: boolean;
@@ -34,7 +34,7 @@ export interface TripStop {
 }
 
 export interface OptionalTripStop {
-    platform?: Platform;
+    platform?: AbstractPlatform;
     arrivalTime?: number;
     departureTime?: number;
     realArrivalTime?: number;

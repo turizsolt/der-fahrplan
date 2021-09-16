@@ -1,19 +1,20 @@
 import { BaseStorable } from '../Interfaces/BaseStorable';
 import { Station } from '../../modules/Station/Station';
-import { Platform } from '../../modules/Station/Platform';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
+import { AbstractPlatform } from '../../modules/Station/AbstractPlatform';
 
 export interface RouteStop extends BaseStorable {
     init(
         waypoint: RailMapNode,
-        platform?: Platform,
+        platform?: AbstractPlatform,
         arrivalTime?: number,
         departureTime?: number
     ): RouteStop;
     getStation(): Station;
     getWaypoint(): RailMapNode;
     getWaypointName(): string;
-    getPlatform(): Platform;
+    getPlatform(): AbstractPlatform;
+    setPlatform(platform: AbstractPlatform): void;
 
     hasArrivalTime(): boolean;
     hasDepartureTime(): boolean;

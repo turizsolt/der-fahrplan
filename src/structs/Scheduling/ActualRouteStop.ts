@@ -3,14 +3,14 @@ import { Station } from '../../modules/Station/Station';
 import { RouteStop } from './RouteStop';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
-import { Platform } from '../../modules/Station/Platform';
 import { Util } from '../Util';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { PathBlock } from '../../modules/Signaling/PathBlock';
+import { AbstractPlatform } from '../../modules/Station/AbstractPlatform';
 
 export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     private waypoint: RailMapNode;
-    private platform: Platform;
+    private platform: AbstractPlatform;
     private arrivalTime: number;
     private departureTime: number;
     private reverseStop: boolean;
@@ -18,7 +18,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
 
     init(
         waypoint: RailMapNode,
-        platform?: Platform,
+        platform?: AbstractPlatform,
         arrivalTime?: number,
         departureTime?: number
     ): RouteStop {
@@ -44,8 +44,12 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
         return this.waypoint;
     }
 
-    getPlatform(): Platform {
+    getPlatform(): AbstractPlatform {
         return this.platform;
+    }
+
+    setPlatform(platform: AbstractPlatform): void {
+        this.platform = platform;
     }
 
     hasArrivalTime(): boolean {
@@ -117,6 +121,8 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
             stationName: this.getWaypointName(),
             stationRgbColor: this.waypoint.getColor().getRgbString(),
             platform: this.platform && this.platform.getId(),
+            platformOptions: this.getStation()?.getPlatforms()
+                .map(p => ({ id: p.getId(), no: p.getNo() })) ?? [],
             arrivalTime: this.arrivalTime,
             arrivalTimeString: Util.timeToStr(this.arrivalTime, true),
             departureTime: this.departureTime,
@@ -133,7 +139,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
         this.presetId(obj.id);
         this.init(
             store.get(obj.station) as (Station | PathBlock) as RailMapNode,
-            obj.platform ? (store.get(obj.platform) as Platform) : undefined
+            obj.platform ? (store.get(obj.platform) as unknown as AbstractPlatform) : undefined
         );
         this.setArrivalTime(obj.arrivalTime);
         this.setDepartureTime(obj.departureTime);

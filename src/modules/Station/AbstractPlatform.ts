@@ -8,4 +8,5 @@ export interface AbstractPlatform extends Boardable {
     getNo(): string;
     setNo(no: string): void;
     getPosition(): Coordinate;
+    getId(): string;
 }

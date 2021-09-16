@@ -35,8 +35,9 @@
     </div>
 
     <!-- platform -->
-    <select v-if="!isTrip" size="1" class="stop-select-platform">
-      <option value="1">?</option>
+    <select v-if="!isTrip" size="1" class="stop-select-platform" :value="stop.platform" @change="changePlatform">
+      <option value="">?</option>
+      <option v-for="option in stop.platformOptions" :value="option.id">{{option.no}}</option>
     </select>
 
     <!-- arrival departure -->
@@ -82,6 +83,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
+import { AbstractPlatform } from "../../modules/Station/AbstractPlatform";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
 
@@ -136,6 +138,12 @@ export default class RouteTitle extends Vue {
     if (column === "departureTime") {
       stop.setDepartureTime(value === "" ? undefined : time * 60);
     }
+  }
+
+  changePlatform(event:any):void {
+    const stop = getStorable(this.stop.id) as RouteStop;
+    const platform = getStorable(event.currentTarget.value) as unknown as AbstractPlatform;
+    stop.setPlatform(platform);
   }
 }
 </script>
