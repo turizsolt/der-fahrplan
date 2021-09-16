@@ -7,8 +7,7 @@ import { CreateStationInputHandlerBabylon } from './CreateStationInputHandlerBab
 import { InputProps } from '../../InputProps';
 import { MouseLeft } from '../Interfaces/InputType';
 import { TYPES } from '../../../../di/TYPES';
-import { Station } from '../../../../modules/Station/Station';
-import { Circle } from '../../../../structs/Geometry/Circle';
+import { WaitingHall } from '../../../../modules/Station/WaitingHall';
 
 export class CreateStationInputHandler extends InputHandler {
     private plugin: CreateStationInputHandlerPlugin;
@@ -80,14 +79,12 @@ export class CreateStationInputHandler extends InputHandler {
                     downProps.snappedJointOnTrack.position === 0 ||
                     downProps.snappedJointOnTrack.position === 1)
             ) {
-                const station = this.store.create<Station>(TYPES.Station);
-                const diam = downProps.snappedPoint.coord.distance2d(
+                const waitingHall = this.store.create<WaitingHall>(TYPES.WaitingHall);
+                const radius = downProps.snappedPoint.coord.distance2d(
                     props.snappedPoint.coord
                 );
-                const pt = downProps.snappedPoint.coord.midpoint(
-                    props.snappedPoint.coord
-                );
-                station.init(new Circle(pt, diam / 2));
+                const pt = downProps.snappedPoint.coord;
+                waitingHall.init(pt, radius);
             }
             this.plugin.up();
 

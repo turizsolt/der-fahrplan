@@ -18,11 +18,13 @@ const doApply = () => applyMixins(ActualWaitingHall, [Emitable]);
 export class ActualWaitingHall extends ActualBaseBrick implements WaitingHall {
     private boardable: ActualBoardable = new ActualBoardable();
     private position: Coordinate;
+    private radius: number;
     private station: Station;
 
-    init(position: Coordinate): WaitingHall {
+    init(position: Coordinate, radius: number): WaitingHall {
         super.initStore(TYPES.WaitingHall);
         this.position = position;
+        this.radius = radius;
 
         this.emit('init', this.persistDeep());
 
@@ -34,7 +36,7 @@ export class ActualWaitingHall extends ActualBaseBrick implements WaitingHall {
     }
 
     getRadius(): number {
-        return 10;
+        return this.radius;
     }
 
     setStation(station: Station): void {
@@ -84,13 +86,20 @@ export class ActualWaitingHall extends ActualBaseBrick implements WaitingHall {
                 x: this.position.x,
                 y: this.position.y,
                 z: this.position.z
-            }
+            },
+            color: {
+                red: this.getColor()?.red,
+                blue: this.getColor()?.blue,
+                green: this.getColor()?.green
+            },
+            radius: this.getRadius(),
+            station: this.station
         }
     }
 
     load(obj: any, store: Store): void {
         this.presetId(obj.id);
-        this.init(new Coordinate(obj.position.x, obj.position.y, obj.position.z));
+        this.init(new Coordinate(obj.position.x, obj.position.y, obj.position.z), obj.radius);
     }
 }
 

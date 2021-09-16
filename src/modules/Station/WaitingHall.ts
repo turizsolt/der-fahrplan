@@ -5,7 +5,7 @@ import { BaseBrick } from "../../structs/Interfaces/BaseBrick";
 import { Station } from "./Station";
 
 export interface WaitingHall extends BaseBrick, Boardable {
-    init(position: Coordinate): WaitingHall;
+    init(position: Coordinate, radius: number): WaitingHall;
     getPosition(): Coordinate;
     getRadius(): number;
     setStation(station: Station): void;

@@ -2,7 +2,6 @@ import * as PIXI from 'pixi.js';
 import { injectable } from 'inversify';
 import { BasePixiRenderer } from './BasePixiRenderer';
 import { WaitingHallRenderer } from '../../structs/Renderers/WaitingHallRenderer';
-import { WaitingHall } from '../../modules/Station/WaitingHall';
 
 @injectable()
 export class WaitingHallPixiRenderer extends BasePixiRenderer
@@ -11,12 +10,10 @@ export class WaitingHallPixiRenderer extends BasePixiRenderer
 
     private inited: boolean = false;
 
-    init(waitingHall: WaitingHall) {
+    init(waitingHall: any) {
         this.rect = new PIXI.Graphics();
         this.rect.interactive = true;
         this.rect.buttonMode = true;
-        this.rect.x = waitingHall.getPosition().x;
-        this.rect.y = waitingHall.getPosition().z;
         this.rect.zIndex = -4;
 
         this.rect.on('pointerdown', (event: PIXI.InteractionEvent) => {
@@ -28,7 +25,7 @@ export class WaitingHallPixiRenderer extends BasePixiRenderer
             event.data.global.y = y;
             globalThis.inputController.down({
                 ...event,
-                meshId: 'clickable-waitingHall-' + waitingHall.getId(),
+                meshId: 'clickable-waitingHall-' + waitingHall.id,
                 button: event.data.button
             });
 
@@ -45,7 +42,7 @@ export class WaitingHallPixiRenderer extends BasePixiRenderer
             event.data.global.y = y;
             globalThis.inputController.up({
                 ...event,
-                meshId: 'clickable-waitingHall-' + waitingHall.getId(),
+                meshId: 'clickable-waitingHall-' + waitingHall.id,
                 button: event.data.button
             });
 
@@ -59,14 +56,16 @@ export class WaitingHallPixiRenderer extends BasePixiRenderer
         this.update(waitingHall);
     }
 
-    update(waitingHall: WaitingHall) {
+    update(waitingHall: any) {
         if (!this.inited) return;
 
-        const color = waitingHall.getColor();
+        const color = waitingHall.color;
         const fillColor =
             color.red * 256 * 256 * 255 + color.green * 256 * 255 + color.blue * 255;
+        this.rect.x = waitingHall.position.x;
+        this.rect.y = waitingHall.position.z;
         this.rect.beginFill(fillColor, 0.3);
-        this.rect.drawCircle(0, 0, waitingHall.getRadius());
+        this.rect.drawCircle(0, 0, waitingHall.radius);
         this.rect.endFill();
     }
 }
