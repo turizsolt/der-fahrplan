@@ -12,6 +12,7 @@ import { BlockWizardInputHandler } from './BlockWizard/BlockWizardInputHandler';
 import { PathInputHandler } from './Path/PathInputHandler';
 import { CapacityCapInputHandler } from './CapacityCap/CapacityCapInputHandler';
 import { AssignStationInputHandler } from './AssignStation/AssignStationInputHandler';
+import { PlatformGroupInputHandler } from './PlatformGroup/PlatformGroupInputHandler';
 
 export class ToolInputHandler extends InputHandler {
     private inputHandler: InputHandler;
@@ -30,6 +31,7 @@ export class ToolInputHandler extends InputHandler {
             [InputMode.CREATE_BLOCK_JOINT]: new BlockJointInputHandler(store),
             [InputMode.BLOCK_WIZARD]: new BlockWizardInputHandler(store),
             [InputMode.ASSIGN_STATION]: new AssignStationInputHandler(store),
+            [InputMode.ADD_PLATFORM_GROUP]: new PlatformGroupInputHandler(store),
             [InputMode.CREATE_PATH]: new PathInputHandler(store),
             [InputMode.CREATE_CAPACITY_CAP]: new CapacityCapInputHandler(store),
         };
@@ -47,6 +49,7 @@ export class ToolInputHandler extends InputHandler {
             [InputMode.CREATE_SECTION]: '+Sect',
             [InputMode.CREATE_PATH]: '+Path',
             [InputMode.ASSIGN_STATION]: 'Stat',
+            [InputMode.ADD_PLATFORM_GROUP]: 'PlGr',
             [InputMode.ALLOW_PATH]: 'Allow',
             [InputMode.BLOCK_WIZARD]: 'BWiz',
             [InputMode.CREATE_CAPACITY_CAP]: 'CCap'
