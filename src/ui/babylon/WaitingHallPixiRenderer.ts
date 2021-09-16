@@ -14,7 +14,7 @@ export class WaitingHallPixiRenderer extends BasePixiRenderer
         this.rect = new PIXI.Graphics();
         this.rect.interactive = true;
         this.rect.buttonMode = true;
-        this.rect.zIndex = -4;
+        this.rect.zIndex = 1;
 
         this.rect.on('pointerdown', (event: PIXI.InteractionEvent) => {
             const x =
@@ -62,9 +62,11 @@ export class WaitingHallPixiRenderer extends BasePixiRenderer
         const color = waitingHall.color;
         const fillColor =
             color.red * 256 * 256 * 255 + color.green * 256 * 255 + color.blue * 255;
+        this.rect.clear();
         this.rect.x = waitingHall.position.x;
         this.rect.y = waitingHall.position.z;
-        this.rect.beginFill(fillColor, 0.3);
+        this.rect.lineStyle(0.5, 0, 1);
+        this.rect.beginFill(fillColor, 1);
         this.rect.drawCircle(0, 0, waitingHall.radius);
         this.rect.endFill();
     }

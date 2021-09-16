@@ -69,6 +69,7 @@ export class PlatformPixiRenderer extends BasePixiRenderer
         const color = this.platform.getColor();
         const fillColor =
             color.red * 256 * 256 * 255 + color.green * 256 * 255 + color.blue * 255;
+        this.rect.lineStyle(0.5, 0, 1);
         this.rect.beginFill(fillColor);
         this.rect.drawRect(
             -this.platform.getWidth() / 2,

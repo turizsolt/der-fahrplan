@@ -95,9 +95,9 @@ export class ActualWaitingHall extends ActualBaseBrick implements WaitingHall {
                 z: this.position.z
             },
             color: {
-                red: this.getColor()?.red,
-                blue: this.getColor()?.blue,
-                green: this.getColor()?.green
+                red: this.getColor()?.red ?? 1,
+                blue: this.getColor()?.blue ?? 1,
+                green: this.getColor()?.green ?? 1
             },
             radius: this.getRadius(),
             station: this.station
