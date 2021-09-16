@@ -1,16 +1,16 @@
 import { InputHandler } from '../InputHandler';
 import { roam, click, drag, move, drop } from '../Interfaces/Helpers';
 import { Store } from '../../../../structs/Interfaces/Store';
-import { CreateStationInputHandlerPlugin } from './CreateStationInputHandlerPlugin';
-import { CreateStationInputHandlerPixi } from './CreateStationInputHandlerPixi';
-import { CreateStationInputHandlerBabylon } from './CreateStationInputHandlerBabylon';
+import { CreateWaitingHallInputHandlerPlugin } from './CreateWaitingHallInputHandlerPlugin';
+import { CreateWaitingHallInputHandlerPixi } from './CreateWaitingHallInputHandlerPixi';
+import { CreateWaitingHallInputHandlerBabylon } from './CreateWaitingHallInputHandlerBabylon';
 import { InputProps } from '../../InputProps';
 import { MouseLeft } from '../Interfaces/InputType';
 import { TYPES } from '../../../../di/TYPES';
 import { WaitingHall } from '../../../../modules/Station/WaitingHall';
 
-export class CreateStationInputHandler extends InputHandler {
-    private plugin: CreateStationInputHandlerPlugin;
+export class CreateWaitingHallInputHandler extends InputHandler {
+    private plugin: CreateWaitingHallInputHandlerPlugin;
     private downProps: InputProps;
 
     constructor(private store: Store) {
@@ -19,8 +19,8 @@ export class CreateStationInputHandler extends InputHandler {
         // todo inject
         this.plugin =
             globalThis.startParam === '2d'
-                ? new CreateStationInputHandlerPixi()
-                : new CreateStationInputHandlerBabylon();
+                ? new CreateWaitingHallInputHandlerPixi()
+                : new CreateWaitingHallInputHandlerBabylon();
         this.plugin.init();
 
         this.reg(drag(MouseLeft), (legacyEvent: PointerEvent) => {
