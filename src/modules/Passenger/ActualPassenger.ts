@@ -18,8 +18,9 @@ import { PassengerRelocator } from './PassengerRelocator';
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
     private to: Station;
     private from: Station;
-    private nextStation: Station;
+    private next: Station;
     private stats: ActualPassengerStatictics;
+    private waitingFor: Route;
 
     private place: Place;
     private pos: Coordinate = Coordinate.Origo();
@@ -34,6 +35,14 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
         this.renderer.init(this);
 
         return this;
+    }
+
+    getWaitingFor(): Route {
+        return this.waitingFor;
+    }
+
+    setWaitingFor(route: Route): void {
+        this.waitingFor = route;
     }
 
     listenStationAnnouncement(station: Station): void { }
@@ -62,6 +71,14 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
         return this.to;
     }
 
+    getNext(): Station {
+        return this.next;
+    }
+
+    setNext(next: Station) {
+        this.next = next;
+    }
+
     getPlace(): Place {
         return this.place;
     }
@@ -81,8 +98,12 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
         this.place = place;
         if (this.place) {
             this.pos = this.place.board(this);
-            this.renderer.update();
         }
+        this.renderer.update();
+    }
+
+    justArrived(): void {
+        this.stats.setStatsOnArrival();
     }
 
     updatePos(pos: Coordinate): void {
@@ -122,7 +143,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
 
             fromName: this.from.getName(),
             toName: this.to.getName(),
-            nextName: this.nextStation && this.nextStation.getName(),
+            nextName: this.next && this.next.getName(),
         };
     }
 

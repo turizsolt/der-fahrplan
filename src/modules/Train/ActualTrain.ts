@@ -439,7 +439,10 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
     // boarding and announcements
 
+    // todo
     stoppedAt(station: Station, platform: Platform) {
+        return;
+
         if (this.speed.getSpeed() > 0) return;
 
         this.getTrips().map(trip => {

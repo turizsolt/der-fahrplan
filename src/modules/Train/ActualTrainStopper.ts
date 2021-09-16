@@ -1,6 +1,8 @@
 import { Platform } from "../../structs/Interfaces/Platform";
 import { Store } from "../../structs/Interfaces/Store";
 import { Util } from "../../structs/Util";
+import { Passenger } from "../Passenger/Passenger";
+import { PassengerRelocator } from "../Passenger/PassengerRelocator";
 import { SightMarker } from "./Sight/SightMarker";
 import { Train } from "./Train";
 
@@ -26,6 +28,7 @@ export class ActualTrainStopper {
         if (this.stoppedAt && !this.ready) {
             console.log('stopping', this.minimumStayingTime);
             this.minimumStayingTime--;
+            this.stopping();
             if (this.minimumStayingTime < 0 && this.isTimeToGo()) {
                 this.ready = true;
             }
@@ -40,6 +43,42 @@ export class ActualTrainStopper {
 
     canDepart(): boolean {
         return this.ready;
+    }
+
+    private stopping(): void {
+        const trainers: Passenger[] = this.train.getWagons()
+            .map(w => w.getBoardedPassengers()).flat();
+        console.log('train passengers', trainers.length, trainers);
+
+        // todo leszallas
+
+        const offboarders: Passenger[] = this.train.getWagons()
+            .map(w => w.getBoardedPassengers()).flat()
+            .filter(p => p.getNext() === this.stoppedAt.getStation());
+        console.log('offboarding passengers', offboarders.length, offboarders);
+
+        offboarders.map(b => {
+            if (b.getTo() === this.stoppedAt.getStation()) {
+                b.setPlace(null);
+                b.justArrived();
+            } else {
+                PassengerRelocator.insideStation(this.store, b, this.stoppedAt.getStation());
+            }
+        });
+
+        // todo felszallas
+
+        const onboarders: Passenger[] = this.stoppedAt.getStation()
+            .getBoardedPassengers()
+            .filter(p => p.getWaitingFor() === this.train.getTrips()[0].getRoute());
+        console.log('onboarding passengers', onboarders.length, onboarders);
+
+        onboarders.map(b => {
+            const wagon = this.train.getFreeWagon();
+            if (wagon) {
+                b.setPlace(wagon);
+            }
+        });
     }
 
     private isTimeToGo(): boolean {

@@ -19,7 +19,7 @@ export class PassengerPixiRenderer extends BasePixiRenderer
         this.rect.buttonMode = true;
         this.rect.x = passenger.getPosition().x;
         this.rect.y = passenger.getPosition().z;
-        this.rect.zIndex = 10;
+        this.rect.zIndex = 20;
 
         this.rect.on('pointerdown', (event: PIXI.InteractionEvent) => {
             const x =
@@ -68,8 +68,14 @@ export class PassengerPixiRenderer extends BasePixiRenderer
         const color = this.passenger.getColor();
         const fillColor =
             color.red * 256 * 256 * 255 + color.green * 256 * 255 + color.blue * 255;
-        this.rect.beginFill(fillColor);
-        this.rect.drawCircle(0, 0, 2);
-        this.rect.endFill();
+        this.rect.clear();
+        if (this.passenger.getPlace()) {
+            this.rect.lineStyle(0.2, 0, 1);
+            this.rect.beginFill(fillColor);
+            this.rect.drawCircle(0, 0, 1);
+            this.rect.x = this.passenger.getPosition().x;
+            this.rect.y = this.passenger.getPosition().z;
+            this.rect.endFill();
+        }
     }
 }

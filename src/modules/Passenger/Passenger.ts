@@ -31,4 +31,9 @@ export interface Passenger extends BaseBrick {
     getFrom(): Station;
     getTo(): Station;
     setPlace(place: Place): void;
+    getWaitingFor(): Route;
+    setWaitingFor(route: Route): void;
+    getNext(): Station;
+    setNext(next: Station);
+    justArrived(): void;
 }
