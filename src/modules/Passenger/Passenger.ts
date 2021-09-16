@@ -1,7 +1,7 @@
-import { Platform } from '../../structs/Interfaces/Platform';
+import { Platform } from '../Station/Platform';
 import { BaseBrick } from '../../structs/Interfaces/BaseBrick';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
-import { Station } from '../../structs/Scheduling/Station';
+import { Station } from '../Station/Station';
 import { Route } from '../../structs/Scheduling/Route';
 import { Color } from '../../structs/Color';
 import { Boardable } from '../../mixins/Boardable';

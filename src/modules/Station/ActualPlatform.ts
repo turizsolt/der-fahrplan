@@ -1,21 +1,21 @@
-import { Passenger } from '../../modules/Passenger/Passenger';
-import { Side } from '../Interfaces/Side';
-import { TrackBase } from '../../modules/Track/TrackBase';
-import { Coordinate } from '../Geometry/Coordinate';
-import { Platform } from '../Interfaces/Platform';
-import { Color } from '../Color';
+import { Passenger } from '../Passenger/Passenger';
+import { Side } from '../../structs/Interfaces/Side';
+import { TrackBase } from '../Track/TrackBase';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { Platform } from './Platform';
+import { Color } from '../../structs/Color';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../di/TYPES';
-import { PlatformRenderer } from '../Renderers/PlatformRenderer';
-import { BaseRenderer } from '../Renderers/BaseRenderer';
-import { Store } from '../Interfaces/Store';
-import { LineSegmentChain } from '../Geometry/LineSegmentChain';
-import { Station } from '../Scheduling/Station';
-import { Left, Right } from '../Geometry/Directions';
+import { PlatformRenderer } from '../../structs/Renderers/PlatformRenderer';
+import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
+import { Store } from '../../structs/Interfaces/Store';
+import { LineSegmentChain } from '../../structs/Geometry/LineSegmentChain';
+import { Station } from './Station';
+import { Left, Right } from '../../structs/Geometry/Directions';
 import { ActualBoardable } from '../../mixins/ActualBoardable';
-import { ActualBaseBrick } from './ActualBaseBrick';
-import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
-import { TrackDirection } from '../../modules/Track/TrackDirection';
+import { ActualBaseBrick } from '../../structs/Actuals/ActualBaseBrick';
+import { PositionOnTrack } from '../Train/PositionOnTrack';
+import { TrackDirection } from '../Track/TrackDirection';
 
 @injectable()
 export class ActualPlatform extends ActualBaseBrick implements Platform {
@@ -223,7 +223,7 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
         this.store
             .getFiltered(x => x.constructor.name === 'ActualStation')
             .forEach(st => {
-                const station = st as Station;
+                const station = st as unknown as Station;
                 if (this.isPartOfStation(station)) {
                     station.addPlatform(this);
                 }

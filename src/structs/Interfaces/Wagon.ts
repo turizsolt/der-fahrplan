@@ -1,6 +1,6 @@
 import { Ray } from '../Geometry/Ray';
 import { WhichEnd } from '../Interfaces/WhichEnd';
-import { Platform } from './Platform';
+import { Platform } from '../../modules/Station/Platform';
 import { BaseBrick } from './BaseBrick';
 import { Passenger } from '../../modules/Passenger/Passenger';
 import { Boardable } from '../../mixins/Boardable';

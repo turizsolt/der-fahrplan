@@ -3,7 +3,7 @@ import { PassengerGenerator } from './PassengerGenerator';
 import { injectable, inject } from 'inversify';
 import { Store } from '../../structs/Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
-import { Station } from '../../structs/Scheduling/Station';
+import { Station } from '../Station/Station';
 import { _TypeStore } from 'babylonjs';
 
 @injectable()

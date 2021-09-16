@@ -3,7 +3,7 @@ import { Route } from './Route';
 import { RouteStop } from './RouteStop';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
-import { Station } from './Station';
+import { Station } from '../../modules/Station/Station';
 import { Util } from '../Util';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 

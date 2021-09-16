@@ -1,4 +1,4 @@
-import { Station } from "../../../structs/Scheduling/Station";
+import { Station } from "../../../modules/Station/Station";
 import { PositionOnTrack } from "../PositionOnTrack";
 import { Train } from "../Train";
 import { Sight } from "./Sight";

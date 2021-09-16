@@ -10,9 +10,9 @@ import { Sight } from "../../../../src/modules/Train/Sight/Sight";
 import { TrainSight } from "../../../../src/modules/Train/Sight/TrainSight";
 import { Circle } from "../../../../src/structs/Geometry/Circle";
 import { Coordinate } from "../../../../src/structs/Geometry/Coordinate";
-import { Platform } from "../../../../src/structs/Interfaces/Platform";
+import { Platform } from "../../../../src/modules/Station/Platform";
 import { Side } from "../../../../src/structs/Interfaces/Side";
-import { Station } from "../../../../src/structs/Scheduling/Station";
+import { Station } from "../../../../src/modules/Station/Station";
 import { getTestStore } from "../../../getTestStore";
 import { createTrack, createTrackLine } from "../../Track/util";
 

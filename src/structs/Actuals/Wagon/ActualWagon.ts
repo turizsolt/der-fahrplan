@@ -6,7 +6,7 @@ import { Ray } from '../../Geometry/Ray';
 import { TYPES } from '../../../di/TYPES';
 import { WagonRenderer } from '../../Renderers/WagonRenderer';
 import { Store } from '../../Interfaces/Store';
-import { Platform } from '../../Interfaces/Platform';
+import { Platform } from '../../../modules/Station/Platform';
 import { Passenger } from '../../../modules/Passenger/Passenger';
 import { Coordinate } from '../../Geometry/Coordinate';
 import { applyMixins } from '../../../mixins/ApplyMixins';

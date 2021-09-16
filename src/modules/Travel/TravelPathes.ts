@@ -2,7 +2,7 @@ import { TYPES } from "../../di/TYPES";
 import { Store } from "../../structs/Interfaces/Store";
 import { Route } from "../../structs/Scheduling/Route";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
-import { Station } from "../../structs/Scheduling/Station";
+import { Station } from "../Station/Station";
 import { Util } from "../../structs/Util";
 import { TravelPath } from "./TravelPath";
 

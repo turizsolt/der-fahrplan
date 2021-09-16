@@ -1,5 +1,5 @@
 import { Route } from "../../structs/Scheduling/Route";
-import { Station } from "../../structs/Scheduling/Station";
+import { Station } from "../Station/Station";
 
 export interface RouteToStation {
     route: Route;

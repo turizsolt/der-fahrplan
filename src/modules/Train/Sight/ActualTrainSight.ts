@@ -1,4 +1,4 @@
-import { Station } from "../../../structs/Scheduling/Station";
+import { Station } from "../../../modules/Station/Station";
 import { PositionedTrackMarker } from "../../PositionedTrackMarker";
 import { SignalSignal } from "../../Signaling/SignalSignal";
 import { DirectedTrack } from "../../Track/DirectedTrack";

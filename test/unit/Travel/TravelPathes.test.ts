@@ -6,7 +6,7 @@ import { Circle } from "../../../src/structs/Geometry/Circle";
 import { Coordinate } from "../../../src/structs/Geometry/Coordinate";
 import { Route } from "../../../src/structs/Scheduling/Route";
 import { RouteStop } from "../../../src/structs/Scheduling/RouteStop";
-import { Station } from "../../../src/structs/Scheduling/Station";
+import { Station } from "../../../src/modules/Station/Station";
 import { getTestStore } from "../../getTestStore";
 
 const store = getTestStore();

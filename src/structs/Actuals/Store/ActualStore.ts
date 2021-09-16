@@ -1,12 +1,12 @@
 import { injectable, inject } from 'inversify';
 import * as shortid from 'shortid';
 import { BaseStorable } from '../../Interfaces/BaseStorable';
-import { Platform } from '../../Interfaces/Platform';
+import { Platform } from '../../../modules/Station/Platform';
 import { TYPES } from '../../../di/TYPES';
 import { Track } from '../../../modules/Track/Track';
 import { TrackSwitch } from '../../../modules/Track/TrackSwitch';
 import { TrackJoint } from '../../../modules/Track/TrackJoint/TrackJoint';
-import { Station } from '../../Scheduling/Station';
+import { Station } from '../../../modules/Station/Station';
 import { RouteStop } from '../../Scheduling/RouteStop';
 import { Route } from '../../Scheduling/Route';
 import { Store } from '../../Interfaces/Store';

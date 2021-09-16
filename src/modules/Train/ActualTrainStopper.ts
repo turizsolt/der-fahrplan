@@ -1,4 +1,4 @@
-import { Platform } from "../../structs/Interfaces/Platform";
+import { Platform } from "../Station/Platform";
 import { Store } from "../../structs/Interfaces/Store";
 import { Util } from "../../structs/Util";
 import { Passenger } from "../Passenger/Passenger";

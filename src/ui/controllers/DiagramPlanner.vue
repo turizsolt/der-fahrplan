@@ -42,7 +42,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import { Route } from "../../structs/Scheduling/Route";
-import { Station } from "../../structs/Scheduling/Station";
+import { Station } from "../../modules/Station/Station";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { TYPES } from "../../di/TYPES";
 import { getStore, getAllOfStorable, getStorable, createStorable } from "../../structs/Actuals/Store/StoreForVue";

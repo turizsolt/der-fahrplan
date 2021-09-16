@@ -1,22 +1,22 @@
-import { ActualBaseBrick } from '../Actuals/ActualBaseBrick';
-import { BaseRenderer } from '../Renderers/BaseRenderer';
+import { ActualBaseBrick } from '../../structs/Actuals/ActualBaseBrick';
+import { BaseRenderer } from '../../structs/Renderers/BaseRenderer';
 import { Station } from './Station';
-import { Store } from '../Interfaces/Store';
-import { Circle } from '../Geometry/Circle';
-import { Coordinate } from '../Geometry/Coordinate';
-import { Platform } from '../Interfaces/Platform';
-import { StationRenderer } from '../Renderers/StationRenderer';
+import { Store } from '../../structs/Interfaces/Store';
+import { Circle } from '../../structs/Geometry/Circle';
+import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { Platform } from './Platform';
+import { StationRenderer } from '../../structs/Renderers/StationRenderer';
 import { TYPES } from '../../di/TYPES';
 import { inject } from 'inversify';
-import { Color } from '../Color';
-import { NameGenerator } from '../NameGenerator';
-import { Route } from './Route';
-import { Passenger } from '../../modules/Passenger/Passenger';
+import { Color } from '../../structs/Color';
+import { NameGenerator } from '../../structs/NameGenerator';
+import { Route } from '../../structs/Scheduling/Route';
+import { Passenger } from '../Passenger/Passenger';
 import { ActualBoardable } from '../../mixins/ActualBoardable';
-import { Trip } from './Trip';
-import { TripInSchedule } from './TripInSchedule';
-import { Util } from '../Util';
-import { Train } from '../../modules/Train/Train';
+import { Trip } from '../../structs/Scheduling/Trip';
+import { TripInSchedule } from '../../structs/Scheduling/TripInSchedule';
+import { Util } from '../../structs/Util';
+import { Train } from '../Train/Train';
 const PriorityQueue = require('@darkblue_azurite/priority-queue');
 
 export class ActualStation extends ActualBaseBrick implements Station {

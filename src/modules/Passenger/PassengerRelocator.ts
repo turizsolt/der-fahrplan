@@ -1,6 +1,6 @@
 import { Passenger } from "./Passenger";
 import { Store } from "../../structs/Interfaces/Store";
-import { Station } from "../../structs/Scheduling/Station";
+import { Station } from "../Station/Station";
 import { TravelPath } from "../Travel/TravelPath";
 import { Route } from "../../structs/Scheduling/Route";
 

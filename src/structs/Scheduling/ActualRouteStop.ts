@@ -1,9 +1,9 @@
 import { ActualBaseStorable } from '../Actuals/ActualStorable';
-import { Station } from './Station';
+import { Station } from '../../modules/Station/Station';
 import { RouteStop } from './RouteStop';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
-import { Platform } from '../Interfaces/Platform';
+import { Platform } from '../../modules/Station/Platform';
 import { Util } from '../Util';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { PathBlock } from '../../modules/Signaling/PathBlock';

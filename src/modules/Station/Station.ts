@@ -1,11 +1,11 @@
-import { Circle } from '../Geometry/Circle';
-import { Platform } from '../Interfaces/Platform';
-import { Color } from '../Color';
-import { Route } from './Route';
-import { BaseBrick } from '../Interfaces/BaseBrick';
+import { Circle } from '../../structs/Geometry/Circle';
+import { Platform } from './Platform';
+import { Color } from '../../structs/Color';
+import { Route } from '../../structs/Scheduling/Route';
+import { BaseBrick } from '../../structs/Interfaces/BaseBrick';
 import { Boardable } from '../../mixins/Boardable';
-import { Trip } from './Trip';
-import { TripInSchedule } from './TripInSchedule';
+import { Trip } from '../../structs/Scheduling/Trip';
+import { TripInSchedule } from '../../structs/Scheduling/TripInSchedule';
 import { Train } from '../../modules/Train/Train';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 

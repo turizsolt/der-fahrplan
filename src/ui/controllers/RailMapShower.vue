@@ -10,7 +10,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { TYPES } from "../../di/TYPES";
 import { Route } from "../../structs/Scheduling/Route";
-import { Station } from "../../structs/Scheduling/Station";
+import { Station } from "../../modules/Station/Station";
 import { getStore } from "../../structs/Actuals/Store/StoreForVue";
 import { RailMap } from "../../modules/RailMap/RailMap";
 import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";

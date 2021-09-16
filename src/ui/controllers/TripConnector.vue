@@ -68,7 +68,7 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { TYPES } from "../../di/TYPES";
 import { Route } from "../../structs/Scheduling/Route";
-import { Station } from "../../structs/Scheduling/Station";
+import { Station } from "../../modules/Station/Station";
 import { Trip } from "../../structs/Scheduling/Trip";
 import { TripEnd } from "../../structs/Scheduling/TripEnd";
 import { TripWithEnd } from "../../structs/Scheduling/TripWithEnd";
