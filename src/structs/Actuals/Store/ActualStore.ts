@@ -37,6 +37,8 @@ import { CapacityCapRenderer } from '../../Renderers/CapacityCapRenderer';
 import { InputController } from '../../../ui/controllers/InputController';
 import { TripGroup } from '../../Scheduling/TripGroup';
 import { TravelPathes } from '../../../modules/Travel/TravelPathes';
+import { WaitingHall } from '../../../modules/Station/WaitingHall';
+import { WaitingHallRenderer } from '../../Renderers/WaitingHallRenderer';
 
 @injectable()
 export class ActualStore implements Store {
@@ -52,6 +54,7 @@ export class ActualStore implements Store {
     @inject(TYPES.FactoryOfTrip) private TripFactory: () => Trip;
     @inject(TYPES.FactoryOfTripGroup) private TripGroupFactory: () => TripGroup;
     @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
+    @inject(TYPES.FactoryOfWaitingHall) private WaitingHallFactory: () => WaitingHall;
     @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
     @inject(TYPES.FactoryOfSignal) private SignalFactory: () => Signal;
     @inject(TYPES.FactoryOfSensor) private SensorFactory: () => Sensor;
@@ -78,6 +81,8 @@ export class ActualStore implements Store {
     private SignalRendererFactory: () => SignalRenderer;
     @inject(TYPES.FactoryOfSensorRenderer)
     private SensorRendererFactory: () => SensorRenderer;
+    @inject(TYPES.FactoryOfWaitingHallRenderer)
+    private WaitingHallRendererFactory: () => WaitingHallRenderer;
 
     @inject(TYPES.FactoryOfBlockRenderer)
     private BlockRendererFactory: () => BlockRenderer;
@@ -106,6 +111,7 @@ export class ActualStore implements Store {
             [TYPES.TripGroup]: this.TripGroupFactory,
             [TYPES.RouteStop]: this.RouteStopFactory,
             [TYPES.Station]: this.StationFactory,
+            [TYPES.WaitingHall]: this.WaitingHallFactory,
             [TYPES.Passenger]: this.PassengerFactory,
             [TYPES.Track]: this.TrackFactory,
             [TYPES.TrackSwitch]: this.TrackSwitchFactory,
@@ -133,6 +139,7 @@ export class ActualStore implements Store {
             [TYPES.BlockJoint]: -3,
             [TYPES.Block]: -4,
             [TYPES.PathBlock]: -5,
+            [TYPES.WaitingHall]: -5.5,
             [TYPES.Station]: -6,
             [TYPES.RouteStop]: -7,
             [TYPES.Route]: -8,
@@ -150,6 +157,7 @@ export class ActualStore implements Store {
             [TYPES.Wagon]: [this.WagonRendererFactory],
             [TYPES.Signal]: [this.SignalRendererFactory],
             [TYPES.Sensor]: [this.SensorRendererFactory],
+            [TYPES.WaitingHall]: [this.WaitingHallRendererFactory],
             [TYPES.Block]: [this.BlockRendererFactory],
             [TYPES.BlockJoint]: [this.BlockJointRendererFactory],
             [TYPES.PathBlock]: [this.PathBlockRendererFactory],

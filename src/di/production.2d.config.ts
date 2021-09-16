@@ -33,6 +33,8 @@ import { PathBlockPixiRenderer } from '../ui/babylon/PathBlockPixiRenderer';
 import { CapacityCapRenderer } from '../structs/Renderers/CapacityCapRenderer';
 import { CapacityCapPixiRenderer } from '../ui/babylon/CapacityCapPixiRenderer';
 import { PassengerPixiRenderer } from '../ui/babylon/PassengerPixiRenderer';
+import { WaitingHallRenderer } from '../structs/Renderers/WaitingHallRenderer';
+import { WaitingHallPixiRenderer } from '../ui/babylon/WaitingHallPixiRenderer';
 
 export const productionContainer2d = new Container();
 const ioc = new DependencyContainer(productionContainer2d);
@@ -63,6 +65,11 @@ ioc.fm<SensorRenderer>(
     T.FactoryOfSensorRenderer,
     T.SensorRenderer,
     SensorDummyRenderer
+);
+ioc.fm<WaitingHallRenderer>(
+    T.FactoryOfWaitingHallRenderer,
+    T.WaitingHallRenderer,
+    WaitingHallPixiRenderer
 );
 ioc.fm<BlockRenderer>(
     T.FactoryOfBlockRenderer,

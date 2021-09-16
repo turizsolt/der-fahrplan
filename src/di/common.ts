@@ -42,6 +42,8 @@ import { CapacityCap } from '../modules/Signaling/CapacityCap/CapacityCap';
 import { ActualCapacityCap } from '../modules/Signaling/CapacityCap/ActualCapacityCap';
 import { TripGroup } from '../structs/Scheduling/TripGroup';
 import { ActualTripGroup } from '../structs/Scheduling/ActualTripGroup';
+import { WaitingHall } from '../modules/Station/WaitingHall';
+import { ActualWaitingHall } from '../modules/Station/ActualWaitingHall';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
     ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
@@ -58,6 +60,7 @@ export const addCommonMaps = (ioc: DependencyContainer): void => {
     ioc.fm<TrackJoint>(T.FactoryOfTrackJoint, T.TrackJoint, ActualTrackJoint);
     ioc.fm<Station>(T.FactoryOfStation, T.Station, ActualStation);
     ioc.fm<Platform>(T.FactoryOfPlatform, T.Platform, ActualPlatform);
+    ioc.fm<WaitingHall>(T.FactoryOfWaitingHall, T.WaitingHall, ActualWaitingHall);
     ioc.fm<Passenger>(T.FactoryOfPassenger, T.Passenger, ActualPassenger);
     ioc.fm<Route>(T.FactoryOfRoute, T.Route, ActualRoute);
     ioc.fm<RouteStop>(T.FactoryOfRouteStop, T.RouteStop, ActualRouteStop);
