@@ -11,6 +11,7 @@ export class PassengerRelocator {
         const scheduledDepartures = station.getScheduledTrips();
         passenger.setPlace(station);
         for (let i = 0; i < scheduledDepartures.length; i++) {
+            if (scheduledDepartures[i].departureTime < store.getTickCount()) continue;
             const index = routes.findIndex(x => x === scheduledDepartures[i].trip.getRoute());
             if (index !== -1) {
                 console.log('will go to ' + passenger.getTo().getName() + ' with', scheduledDepartures[i]);
