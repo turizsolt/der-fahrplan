@@ -11,6 +11,7 @@ import { BlockJointInputHandler } from './BlockJoint/BlockJointInputHandler';
 import { BlockWizardInputHandler } from './BlockWizard/BlockWizardInputHandler';
 import { PathInputHandler } from './Path/PathInputHandler';
 import { CapacityCapInputHandler } from './CapacityCap/CapacityCapInputHandler';
+import { AssignStationInputHandler } from './AssignStation/AssignStationInputHandler';
 
 export class ToolInputHandler extends InputHandler {
     private inputHandler: InputHandler;
@@ -28,6 +29,7 @@ export class ToolInputHandler extends InputHandler {
             [InputMode.CREATE_WAITING_HALL]: new CreateWaitingHallInputHandler(store),
             [InputMode.CREATE_BLOCK_JOINT]: new BlockJointInputHandler(store),
             [InputMode.BLOCK_WIZARD]: new BlockWizardInputHandler(store),
+            [InputMode.ASSIGN_STATION]: new AssignStationInputHandler(store),
             [InputMode.CREATE_PATH]: new PathInputHandler(store),
             [InputMode.CREATE_CAPACITY_CAP]: new CapacityCapInputHandler(store),
         };
@@ -44,6 +46,7 @@ export class ToolInputHandler extends InputHandler {
             [InputMode.CREATE_BLOCK]: '+Blck',
             [InputMode.CREATE_SECTION]: '+Sect',
             [InputMode.CREATE_PATH]: '+Path',
+            [InputMode.ASSIGN_STATION]: 'Stat',
             [InputMode.ALLOW_PATH]: 'Allow',
             [InputMode.BLOCK_WIZARD]: 'BWiz',
             [InputMode.CREATE_CAPACITY_CAP]: 'CCap'

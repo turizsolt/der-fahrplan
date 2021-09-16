@@ -15,14 +15,15 @@ import { Passenger } from '../Passenger/Passenger';
 import { ActualBoardable } from '../../mixins/ActualBoardable';
 import { Trip } from '../../structs/Scheduling/Trip';
 import { TripInSchedule } from '../../structs/Scheduling/TripInSchedule';
-import { Util } from '../../structs/Util';
 import { Train } from '../Train/Train';
+import { WaitingHall } from './WaitingHall';
 const PriorityQueue = require('@darkblue_azurite/priority-queue');
 
 export class ActualStation extends ActualBaseBrick implements Station {
     private name: string;
     private circle: Circle;
     private platforms: Platform[];
+    private waitingHalls: WaitingHall[];
     private color: Color;
 
     private removed: boolean = false;
@@ -60,16 +61,8 @@ export class ActualStation extends ActualBaseBrick implements Station {
         this.circle = circle;
         this.name = NameGenerator.next();
         this.platforms = [];
+        this.waitingHalls = [];
         this.color = Color.CreateRandom();
-        this.store
-            .getFiltered(x => x.constructor.name === 'ActualPlatform')
-            .forEach(pl => {
-                const platform = pl as Platform;
-                if (platform.isPartOfStation(this)) {
-                    this.addPlatform(platform);
-                }
-            });
-
         this.renderer.init(this);
 
         return this;
@@ -80,6 +73,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
         this.circle = null;
         this.name = NameGenerator.next();
         this.platforms = [];
+        this.waitingHalls = [];
         this.color = Color.CreateRandom();
         this.renderer.init(this);
         return this;
@@ -182,15 +176,23 @@ export class ActualStation extends ActualBaseBrick implements Station {
     }
 
     addPlatform(platform: Platform): void {
-        if (!platform.getStation()) {
-            this.platforms.push(platform);
-            platform.setStation(this);
-        }
+        this.platforms.push(platform);
     }
 
     removePlatform(platform: Platform): void {
-        platform.setStation(null);
         this.platforms = this.platforms.filter(p => p !== platform);
+    }
+
+    getWaitingHalls(): WaitingHall[] {
+        return this.waitingHalls;
+    }
+
+    addWaitingHall(waitingHall: WaitingHall): void {
+        this.waitingHalls.push(waitingHall);
+    }
+
+    removeWaitingHall(waitingHall: WaitingHall): void {
+        this.waitingHalls = this.waitingHalls.filter(w => w !== waitingHall);
     }
 
     getCircle(): Circle {

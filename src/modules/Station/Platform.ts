@@ -7,8 +7,9 @@ import { Station } from '../../modules/Station/Station';
 import { BaseBrick } from '../../structs/Interfaces/BaseBrick';
 import { Boardable } from '../../mixins/Boardable';
 import { PositionOnTrack } from '../Train/PositionOnTrack';
+import { AbstractPlatform } from './AbstractPlatform';
 
-export interface Platform extends BaseBrick, Boardable {
+export interface Platform extends BaseBrick, Boardable, AbstractPlatform {
     isBeside(position: number): boolean;
     isBesidePoT(pot: PositionOnTrack): boolean;
 
@@ -16,8 +17,6 @@ export interface Platform extends BaseBrick, Boardable {
 
     getLineSegmentChain(): LineSegmentChain;
     isPartOfStation(station: Station): boolean;
-    setStation(station: Station): void;
-    getStation(): Station;
 
     getWidth(): number;
     getLength(): number;

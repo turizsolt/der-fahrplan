@@ -126,6 +126,12 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
     }
 
     setStation(station: Station): void {
+        if (station) {
+            station.addPlatform(this);
+        } else {
+            // todo put pax away
+            this.station.removePlatform(this);
+        }
         this.station = station;
         this.renderer.update();
     }
@@ -219,15 +225,6 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
         /////////////
 
         this.renderer.init(this);
-
-        this.store
-            .getFiltered(x => x.constructor.name === 'ActualStation')
-            .forEach(st => {
-                const station = st as unknown as Station;
-                if (this.isPartOfStation(station)) {
-                    station.addPlatform(this);
-                }
-            });
         this.no = '';
 
         return this;

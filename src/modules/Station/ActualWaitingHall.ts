@@ -40,7 +40,14 @@ export class ActualWaitingHall extends ActualBaseBrick implements WaitingHall {
     }
 
     setStation(station: Station): void {
+        if (station) {
+            station.addWaitingHall(this);
+        } else {
+            // todo put pax away
+            this.station.removeWaitingHall(this);
+        }
         this.station = station;
+        this.emit('update', this.persistDeep());
     }
 
     getStation(): Station {

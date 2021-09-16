@@ -8,6 +8,7 @@ import { Trip } from '../../structs/Scheduling/Trip';
 import { TripInSchedule } from '../../structs/Scheduling/TripInSchedule';
 import { Train } from '../../modules/Train/Train';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
+import { WaitingHall } from './WaitingHall';
 
 export interface Station extends BaseBrick, Boardable, RailMapNode {
     init(circle: Circle): Station;
@@ -23,6 +24,10 @@ export interface Station extends BaseBrick, Boardable, RailMapNode {
     removePlatform(platform: Platform): void;
     remove(): boolean;
     isRemoved(): boolean;
+
+    getWaitingHalls(): WaitingHall[];
+    addWaitingHall(waitingHall: WaitingHall): void;
+    removeWaitingHall(waitingHall: WaitingHall): void;
 
     announceArrived(train: Train, platform: Platform, trip: Trip);
     announce(trip: Route);
