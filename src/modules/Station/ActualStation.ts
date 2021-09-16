@@ -25,6 +25,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
     private platforms: AbstractPlatform[];
     private waitingHalls: WaitingHall[];
     private color: Color;
+    private noCounter: number;
 
     private removed: boolean = false;
     @inject(TYPES.StationRenderer) private renderer: StationRenderer;
@@ -63,6 +64,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
         this.platforms = [];
         this.waitingHalls = [];
         this.color = Color.CreateRandom();
+        this.noCounter = 0;
         this.renderer.init(this);
 
         return this;
@@ -75,6 +77,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
         this.platforms = [];
         this.waitingHalls = [];
         this.color = Color.CreateRandom();
+        this.noCounter = 0;
         this.renderer.init(this);
         return this;
     }
@@ -179,6 +182,9 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
     addPlatform(platform: AbstractPlatform): void {
         this.platforms.push(platform);
+        if (!platform.getNo()) {
+            platform.setNo((++this.noCounter).toString());
+        }
     }
 
     removePlatform(platform: AbstractPlatform): void {
@@ -199,6 +205,10 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
     getCircle(): Circle {
         return this.circle;
+    }
+
+    setCircle(circle: Circle): void {
+        this.circle = circle;
     }
 
     getCoord(): Coordinate {
@@ -243,7 +253,8 @@ export class ActualStation extends ActualBaseBrick implements Station {
                 r: this.circle.r
             },
             type: 'Station',
-            name: this.name
+            name: this.name,
+            noCounter: this.noCounter
         };
     }
 
@@ -276,5 +287,6 @@ export class ActualStation extends ActualBaseBrick implements Station {
             )
         );
         this.setName(obj.name);
+        this.noCounter = obj.noCounter ?? 0;
     }
 }

@@ -19,6 +19,7 @@ export interface Station extends BaseBrick, Boardable, RailMapNode {
     getPlatformTo(station: Station): AbstractPlatform;
     getPlatforms(): AbstractPlatform[];
     getCircle(): Circle;
+    setCircle(circle: Circle): void;
     getColor(): Color;
     addPlatform(platform: AbstractPlatform): void;
     removePlatform(platform: AbstractPlatform): void;

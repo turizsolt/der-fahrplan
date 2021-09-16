@@ -242,6 +242,10 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
         return this.no;
     }
 
+    setNo(no: string): void {
+        this.no = no;
+    }
+
     isBeside(position: number): boolean {
         return this.start <= position && position <= this.end;
     }
@@ -273,12 +277,14 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
         return {
             id: this.getId(),
             type: 'Platform',
+            no: this.no,
 
             track: this.track.getId(),
             start: this.startPerc,
             end: this.endPerc,
             side: this.side,
-            width: this.width
+            width: this.width,
+            station: this.station?.getId()
         };
     }
 
@@ -291,5 +297,9 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
             obj.side,
             obj.width
         );
+        this.no = obj.no;
+        if (obj.station) {
+            this.setStation(store.get(obj.station) as Station);
+        }
     }
 }

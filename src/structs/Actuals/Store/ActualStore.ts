@@ -132,23 +132,29 @@ export class ActualStore implements Store {
         };
         // higher number (12) loads first
         this.typeOrder = {
-            [TYPES.TrackJoint]: 5,
-            [TYPES.Track]: 4,
-            [TYPES.TrackSwitch]: 3,
-            [TYPES.Platform]: 2,
-            [TYPES.PlatformGroup]: 1,
+            [TYPES.TrackJoint]: 22,
+            [TYPES.Track]: 21,
+            [TYPES.TrackSwitch]: 20,
+
+
+
             // skip zero, cos it is falsy
             [TYPES.Wagon]: -1,
             [TYPES.Train]: -2,
             [TYPES.BlockJoint]: -3,
             [TYPES.Block]: -4,
             [TYPES.PathBlock]: -5,
-            [TYPES.WaitingHall]: -5.5,
+
             [TYPES.Station]: -6,
+            [TYPES.Platform]: -6.1,
+            [TYPES.PlatformGroup]: -6.2,
+            [TYPES.WaitingHall]: -6.3,
+
             [TYPES.RouteStop]: -7,
             [TYPES.Route]: -8,
             [TYPES.Trip]: -9,
             [TYPES.TripGroup]: -10,
+
             [TYPES.Passenger]: -11,
             [TYPES.Sensor]: -14,
             [TYPES.Section]: -15,

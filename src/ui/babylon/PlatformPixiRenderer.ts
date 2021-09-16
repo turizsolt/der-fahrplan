@@ -3,11 +3,13 @@ import { injectable } from 'inversify';
 import { BasePixiRenderer } from './BasePixiRenderer';
 import { PlatformRenderer } from '../../structs/Renderers/PlatformRenderer';
 import { Platform } from '../../modules/Station/Platform';
+import { ITextStyle } from 'pixi.js';
 
 @injectable()
 export class PlatformPixiRenderer extends BasePixiRenderer
     implements PlatformRenderer {
     private rect: PIXI.Graphics;
+    private text: PIXI.Text;
     private platform: Platform;
 
     private inited: boolean = false;
@@ -58,6 +60,22 @@ export class PlatformPixiRenderer extends BasePixiRenderer
 
         globalThis.stage.addChild(this.rect);
 
+        const settings: Partial<ITextStyle> = {
+            fontFamily: 'Arial',
+            fontSize: 5,
+            fill: 0x000000,
+            align: 'center'
+        };
+
+        this.text = new PIXI.Text(platform.getNo(), settings);
+        this.text.x = platform.getPosition().x;
+        this.text.y = platform.getPosition().z;
+        this.text.zIndex = 30;
+        this.text.resolution = 10;
+        this.text.anchor.x = 0.5;
+        this.text.anchor.y = 0.5;
+        globalThis.stage.addChild(this.text);
+
         this.inited = true;
         this.update();
     }
@@ -78,5 +96,7 @@ export class PlatformPixiRenderer extends BasePixiRenderer
             this.platform.getLength()
         );
         this.rect.endFill();
+
+        this.text.text = this.platform.getNo();
     }
 }

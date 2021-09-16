@@ -31,6 +31,13 @@ export class ActualWaitingHall extends ActualBaseBrick implements WaitingHall {
         return this;
     }
 
+    getNo(): string {
+        return 'WH';
+    }
+
+    setNo(no: string): void { }
+
+
     getPosition(): Coordinate {
         return this.position;
     }
@@ -100,13 +107,16 @@ export class ActualWaitingHall extends ActualBaseBrick implements WaitingHall {
                 green: this.getColor()?.green ?? 1
             },
             radius: this.getRadius(),
-            station: this.station
+            station: this.station?.getId()
         }
     }
 
     load(obj: any, store: Store): void {
         this.presetId(obj.id);
         this.init(new Coordinate(obj.position.x, obj.position.y, obj.position.z), obj.radius);
+        if (obj.station) {
+            this.setStation(store.get(obj.station) as Station);
+        }
     }
 }
 

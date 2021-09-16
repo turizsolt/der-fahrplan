@@ -19,15 +19,23 @@ export class ActualPlatformGroup extends ActualBaseBrick implements PlatformGrou
     init(platforms: Platform[]): PlatformGroup {
         this.initStore(TYPES.PlatformGroup);
         this.platforms = platforms;
-        this.no = '';
+        this.no = this.platforms.map(p => p.getNo()).join('-');
 
         this.platforms[0]?.getStation().addPlatform(this);
 
         return this;
     }
 
+    getPosition(): Coordinate {
+        return this.platforms[0]?.getPosition();
+    }
+
     getNo(): string {
         return this.no;
+    }
+
+    setNo(no: string): void {
+        this.no = no;
     }
 
     board(passenger: Passenger): Coordinate {

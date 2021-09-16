@@ -49,13 +49,17 @@ export class AssignStationInputHandler extends InputHandler {
                 // no platform connected to station, connect all          // todo
                 const station = store.create<Station>(TYPES.Station).init(new Circle(new Coordinate(0, 0, 0), 0));
                 this.abstractPlatforms.map(p => p.setStation(station));
+                station.setCircle(new Circle(this.abstractPlatforms[0].getPosition(), 0));
             } else if (this.abstractPlatforms?.[0].getStation()) {
                 if (this.abstractPlatforms.every(p => p.getStation())) {
                     // remove these from station
+                    const station = this.abstractPlatforms?.[0].getStation();
+                    station.setCircle(new Circle(this.abstractPlatforms[0].getPosition(), 0));
                     this.abstractPlatforms.map(p => p.setStation(null));
                 } else {
                     // add the non-station ones to the 0th
                     const station = this.abstractPlatforms?.[0].getStation();
+                    station.setCircle(new Circle(this.abstractPlatforms[0].getPosition(), 0));
                     this.abstractPlatforms.filter(p => !p.getStation()).map(p => p.setStation(station));
                 }
             }
