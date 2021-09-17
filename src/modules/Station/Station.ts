@@ -9,6 +9,7 @@ import { Train } from '../../modules/Train/Train';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { WaitingHall } from './WaitingHall';
 import { AbstractPlatform } from './AbstractPlatform';
+import { Platform } from './Platform';
 
 export interface Station extends BaseBrick, Boardable, RailMapNode {
     init(circle: Circle): Station;
@@ -33,6 +34,7 @@ export interface Station extends BaseBrick, Boardable, RailMapNode {
     announceArrived(train: Train, platform: AbstractPlatform, trip: Trip);
     announce(trip: Route);
     deannounce(trip: Route);
+    updateArrivingPlatform(platform: AbstractPlatform, trip: Trip): void;
 
     addTripToSchedule(trip: Trip);
     getScheduledTrips(): TripInSchedule[];

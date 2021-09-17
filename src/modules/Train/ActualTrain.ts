@@ -32,6 +32,7 @@ import { TrainSight } from './Sight/TrainSight';
 import { ActualTrainSight } from './Sight/ActualTrainSight';
 import { Sight } from './Sight/Sight';
 import { ActualTrainStopper } from './ActualTrainStopper';
+import { AbstractPlatform } from '../Station/AbstractPlatform';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
     private position: PositionOnTrack = null;
@@ -326,6 +327,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
     private trainSight: TrainSight = new ActualTrainSight();
     private sight: Sight;
     private nextStation: Station = null;
+    private nextPlatform: AbstractPlatform = null;
 
     getSight(): Sight {
         return this.sight;
@@ -339,6 +341,13 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         const nextPosition = this.position.clone();
 
         this.nearestTrain = Nearest.train(nextPosition);
+        const pl = this.trainSight.findNextPlatform(nextPosition, this.getId());
+        if (pl && pl !== this.nextPlatform) {
+            this.nextPlatform = pl;
+            if (this.getTrips()[0]) pl?.getStation().updateArrivingPlatform(pl, this.getTrips()[0]);
+        } else if (!pl && this.nextPlatform) {
+            this.nextPlatform = null;
+        }
 
         this.nextStation = this.getNextStation();
         const sightDistance: number = this.speed.getStoppingDistance() + Math.max(this.speed.getSpeed() * 5, 3);

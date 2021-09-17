@@ -53,6 +53,17 @@ export class ActualStation extends ActualBaseBrick implements Station {
         });
     }
 
+    updateArrivingPlatform(platform: AbstractPlatform, trip: Trip): void {
+        console.log('updateArrivingPlatform');
+
+        const stop = trip.getRoute().getStops().find(s => s.getStation() === this);
+        if (stop && stop.getPlatform() !== platform) {
+            trip.redefine(stop, { platform });
+            // todo update in scheduled
+            // const schedTrip = this.scheduledTrips.find(t => t.trip === trip);
+        }
+    }
+
     // end of neu
 
     private boardable: ActualBoardable = new ActualBoardable();

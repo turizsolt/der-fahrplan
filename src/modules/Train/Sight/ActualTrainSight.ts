@@ -1,7 +1,10 @@
+import { TYPES } from "../../../di/TYPES";
 import { Station } from "../../../modules/Station/Station";
 import { PositionedTrackMarker } from "../../PositionedTrackMarker";
 import { SignalSignal } from "../../Signaling/SignalSignal";
+import { AbstractPlatform } from "../../Station/AbstractPlatform";
 import { DirectedTrack } from "../../Track/DirectedTrack";
+import { TrackSwitch } from "../../Track/TrackSwitch";
 import { PositionOnTrack } from "../PositionOnTrack";
 import { Train } from "../Train";
 import { Sight } from "./Sight";
@@ -65,5 +68,43 @@ export class ActualTrainSight implements TrainSight {
             default:
                 return 0;
         }
+    }
+
+    findNextPlatform(position: PositionOnTrack, trainId: string): AbstractPlatform {
+        const positionedTrackMarkers: PositionedTrackMarker[] = [];
+        let dt: DirectedTrack = position.getDirectedTrack();
+        let startPosition = position.getPosition();
+        let endPosition = dt.getLength();
+        let globalStartPosition = -startPosition;
+
+        if (dt.getTrack().getType() === TYPES.TrackSwitch && ((dt.getTrack()) as TrackSwitch).getLockedTrain() !== trainId) {
+            return null;
+        }
+
+        for (let m of dt.getMarkersPartially({ startPosition, endPosition, track: dt })) {
+            if (m.marker.type === 'Platform') {
+                return m.marker.platform;
+            }
+        }
+
+        dt = dt.next();
+        while (dt) {
+            startPosition = 0;
+            endPosition = dt.getLength();
+            globalStartPosition = globalStartPosition + dt.getLength();
+
+            if (dt.getTrack().getType() === TYPES.TrackSwitch && ((dt.getTrack()) as TrackSwitch).getLockedTrain() !== trainId) {
+                return null;
+            }
+
+            for (let m of dt.getMarkersPartially({ startPosition, endPosition, track: dt })) {
+                if (m.marker.type === 'Platform') {
+                    return m.marker.platform;
+                }
+            }
+            dt = dt.next();
+        }
+
+        return null;
     }
 }
