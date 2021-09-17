@@ -42,7 +42,6 @@ addCommonMaps(ioc);
 ioc.map<Land>(T.Land, ActualLand);
 ioc.map<TrackRenderer>(T.TrackRenderer, TrackPixiRenderer);
 ioc.map<TrackSwitchRenderer>(T.TrackSwitchRenderer, TrackSwitchPixiRenderer);
-ioc.map<StationRenderer>(T.StationRenderer, StationPixiRenderer);
 ioc.map<PlatformRenderer>(T.PlatformRenderer, PlatformPixiRenderer);
 ioc.map<PassengerRenderer>(T.PassengerRenderer, PassengerPixiRenderer);
 
@@ -95,5 +94,10 @@ ioc.fm<CapacityCapRenderer>(
     T.FactoryOfCapacityCapRenderer,
     T.CapacityCapRenderer,
     CapacityCapPixiRenderer
+);
+ioc.fm<StationRenderer>(
+    T.FactoryOfStationRenderer,
+    T.StationRenderer,
+    StationPixiRenderer
 );
 

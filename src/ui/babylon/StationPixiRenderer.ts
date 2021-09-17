@@ -1,8 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { injectable } from 'inversify';
 import { BasePixiRenderer } from './BasePixiRenderer';
-import { PlatformRenderer } from '../../structs/Renderers/PlatformRenderer';
-import { Platform } from '../../modules/Station/Platform';
 import { StationRenderer } from '../../structs/Renderers/StationRenderer';
 import { Station } from '../../modules/Station/Station';
 

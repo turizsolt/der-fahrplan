@@ -5,9 +5,8 @@ import { Store } from '../../structs/Interfaces/Store';
 import { Circle } from '../../structs/Geometry/Circle';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { AbstractPlatform } from './AbstractPlatform';
-import { StationRenderer } from '../../structs/Renderers/StationRenderer';
 import { TYPES } from '../../di/TYPES';
-import { inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { Color } from '../../structs/Color';
 import { NameGenerator } from '../../structs/NameGenerator';
 import { Route } from '../../structs/Scheduling/Route';
@@ -17,8 +16,13 @@ import { Trip } from '../../structs/Scheduling/Trip';
 import { TripInSchedule } from '../../structs/Scheduling/TripInSchedule';
 import { Train } from '../Train/Train';
 import { WaitingHall } from './WaitingHall';
+import { applyMixins } from '../../mixins/ApplyMixins';
+import { Emitable } from '../../mixins/Emitable';
 const PriorityQueue = require('@darkblue_azurite/priority-queue');
 
+export interface ActualStation extends Emitable { }
+const doApply = () => applyMixins(ActualStation, [Emitable]);
+@injectable()
 export class ActualStation extends ActualBaseBrick implements Station {
     private name: string;
     private circle: Circle;
@@ -28,7 +32,6 @@ export class ActualStation extends ActualBaseBrick implements Station {
     private noCounter: number;
 
     private removed: boolean = false;
-    @inject(TYPES.StationRenderer) private renderer: StationRenderer;
 
     private announcedTrips: Route[] = [];
 
@@ -59,8 +62,10 @@ export class ActualStation extends ActualBaseBrick implements Station {
         const stop = trip.getRoute().getStops().find(s => s.getStation() === this);
         if (stop && stop.getPlatform() !== platform) {
             trip.redefine(stop, { platform });
-            // todo update in scheduled
+            // todo update in scheduled - maybe not needed at all
             // const schedTrip = this.scheduledTrips.find(t => t.trip === trip);
+
+            this.update();
         }
     }
 
@@ -76,7 +81,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
         this.waitingHalls = [];
         this.color = Color.CreateRandom();
         this.noCounter = 0;
-        this.renderer.init(this);
+        this.emit('init', this);
 
         return this;
     }
@@ -89,7 +94,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
         this.waitingHalls = [];
         this.color = Color.CreateRandom();
         this.noCounter = 0;
-        this.renderer.init(this);
+        this.emit('init', this);
         return this;
     }
 
@@ -239,14 +244,14 @@ export class ActualStation extends ActualBaseBrick implements Station {
     }
 
     getRenderer(): BaseRenderer {
-        return this.renderer;
+        return null;
     }
 
     remove(): boolean {
         this.store.unregister(this);
         this.removed = true;
         this.platforms.map(platform => this.removePlatform(platform));
-        this.renderer.update();
+        this.emit('update', this.persistDeep());
         return true;
     }
 
@@ -289,6 +294,25 @@ export class ActualStation extends ActualBaseBrick implements Station {
         };
     }
 
+    select(): void {
+        super.select();
+        this.update();
+    }
+
+    deselect(): void {
+        super.deselect();
+        this.update();
+    }
+
+    update() {
+        this.emit('update', this);
+
+        if (this.isSelected()) {
+            const deep = this.persistDeep();
+            this.emit('info', Object.freeze(deep));
+        }
+    }
+
     load(obj: any, store: Store): void {
         this.presetId(obj.id);
         this.init(
@@ -301,3 +325,4 @@ export class ActualStation extends ActualBaseBrick implements Station {
         this.noCounter = obj.noCounter ?? 0;
     }
 }
+doApply();

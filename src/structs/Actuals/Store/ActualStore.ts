@@ -40,6 +40,7 @@ import { TravelPathes } from '../../../modules/Travel/TravelPathes';
 import { WaitingHall } from '../../../modules/Station/WaitingHall';
 import { WaitingHallRenderer } from '../../Renderers/WaitingHallRenderer';
 import { PlatformGroup } from '../../../modules/Station/PlatformGroup';
+import { StationRenderer } from '../../Renderers/StationRenderer';
 
 @injectable()
 export class ActualStore implements Store {
@@ -95,6 +96,7 @@ export class ActualStore implements Store {
     @inject(TYPES.FactoryOfSectionRenderer)
     private SectionRendererFactory: () => SectionRenderer;
     @inject(TYPES.FactoryOfCapacityCapRenderer) private CapacityCapRendererFactory: () => CapacityCapRenderer;
+    @inject(TYPES.FactoryOfStationRenderer) private StationRendererFactory: () => StationRenderer;
 
     @inject(TYPES.FactoryOfPassengerGenerator)
     private PassengerGeneratorFactory: () => PassengerGenerator;
@@ -172,7 +174,8 @@ export class ActualStore implements Store {
             [TYPES.BlockJoint]: [this.BlockJointRendererFactory],
             [TYPES.PathBlock]: [this.PathBlockRendererFactory],
             [TYPES.Section]: [this.SectionRendererFactory],
-            [TYPES.CapacityCap]: [this.CapacityCapRendererFactory]
+            [TYPES.CapacityCap]: [this.CapacityCapRendererFactory],
+            [TYPES.Station]: [this.StationRendererFactory]
         };
 
         shortid.characters(

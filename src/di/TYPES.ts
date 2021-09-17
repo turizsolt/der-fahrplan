@@ -60,6 +60,7 @@ export const TYPES = {
     Station: Symbol.for('Station'),
     StationRenderer: Symbol.for('StationRenderer'),
     FactoryOfStation: Symbol.for('Factory<Station>'),
+    FactoryOfStationRenderer: Symbol.for('Factory<StationRenderer>'),
 
     WaitingHall: Symbol.for('WaitingHall'),
     WaitingHallRenderer: Symbol.for('WaitingHallRenderer'),

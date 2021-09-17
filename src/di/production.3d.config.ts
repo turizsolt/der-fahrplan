@@ -44,7 +44,6 @@ ioc.map<Land>(T.Land, ActualLand);
 ioc.sng<MeshProvider>(T.FactoryOfMeshProvider, T.MeshProvider, MeshProvider);
 ioc.map<TrackRenderer>(T.TrackRenderer, TrackBabylonRenderer);
 ioc.map<TrackSwitchRenderer>(T.TrackSwitchRenderer, TrackSwitchBabylonRenderer);
-ioc.map<StationRenderer>(T.StationRenderer, StationBabylonRenderer);
 ioc.map<PlatformRenderer>(T.PlatformRenderer, PlatformBabylonRenderer);
 ioc.map<PassengerRenderer>(T.PassengerRenderer, PassengerBabylonRenderer);
 
@@ -97,4 +96,9 @@ ioc.fm<CapacityCapRenderer>(
     T.FactoryOfCapacityCapRenderer,
     T.CapacityCapRenderer,
     CapacityCapDummyRenderer
+);
+ioc.fm<StationRenderer>(
+    T.FactoryOfStationRenderer,
+    T.StationRenderer,
+    StationBabylonRenderer
 );
