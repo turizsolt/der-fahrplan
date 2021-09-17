@@ -14,7 +14,7 @@ export class TravelPathes {
     constructor(private store: Store) { }
 
     getPathes(from: Station, to: Station): TravelPath[] {
-        return this.pathes[from.getId()]?.[to.getId()];
+        return this.pathes[from.getId()]?.[to.getId()] ?? [];
     }
 
     find(level: number = 1): void {
