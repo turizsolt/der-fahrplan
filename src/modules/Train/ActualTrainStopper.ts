@@ -21,12 +21,10 @@ export class ActualTrainStopper {
             this.stoppedAt = marker.object as Platform;
             this.ready = false;
             this.minimumStayingTime = 30;
-            console.log('stopped at', marker.object.getId());
             this.startStopping();
         }
 
         if (this.stoppedAt && !this.ready) {
-            console.log('stopping', this.minimumStayingTime);
             this.minimumStayingTime--;
             this.stopping();
             if (this.minimumStayingTime < 0 && this.isTimeToGo()) {
@@ -35,7 +33,6 @@ export class ActualTrainStopper {
         }
 
         if (this.stoppedAt && this.ready) {
-            console.log('ready');
             this.endStopping();
             this.stoppedAt = null;
         }
@@ -46,16 +43,14 @@ export class ActualTrainStopper {
     }
 
     private stopping(): void {
-        const trainers: Passenger[] = this.train.getWagons()
-            .map(w => w.getBoardedPassengers()).flat();
-        console.log('train passengers', trainers.length, trainers);
+        // const trainers: Passenger[] = this.train.getWagons()
+        //     .map(w => w.getBoardedPassengers()).flat();
 
         // todo leszallas
 
         const offboarders: Passenger[] = this.train.getWagons()
             .map(w => w.getBoardedPassengers()).flat()
             .filter(p => p.getNext() === this.stoppedAt.getStation());
-        console.log('offboarding passengers', offboarders.length, offboarders);
 
         offboarders.map(b => {
             if (b.getTo() === this.stoppedAt.getStation()) {
@@ -68,10 +63,9 @@ export class ActualTrainStopper {
 
         // todo felszallas
 
-        const onboarders: Passenger[] = this.stoppedAt.getStation()
+        const onboarders: Passenger[] = this.stoppedAt //.getStation()
             .getBoardedPassengers()
             .filter(p => p.getWaitingFor() === this.train.getTrips()[0].getRoute());
-        console.log('onboarding passengers', onboarders.length, onboarders);
 
         onboarders.map(b => {
             const wagon = this.train.getFreeWagon();

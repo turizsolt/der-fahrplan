@@ -99,17 +99,10 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
             .getBezier()
             .getPoint(this.endPerc);
 
-        //console.log('p1', p1);
-        //console.log('p2', p2);
-
         const chain = this.track.getCurve().getLineSegmentChain();
-
         const chain2 = chain.getChainFromPoint(chain.project(p1).coord);
-        const chain3 = chain2.getChainToPoint(chain2.project(p2).coord);
+        const chain3 = chain2.getChainToPoint(chain.project(p2).coord);
 
-        // console.log('pch1', chain.getRays().map(x => x.coord));
-        // console.log('pch2', chain2.getRays().map(x => x.coord));
-        // console.log('pch3', chain3.getRays().map(x => x.coord));
         return chain3;
     }
 
