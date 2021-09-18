@@ -119,6 +119,7 @@ export class ActualTrainStopper {
 
     private endStopping(): void {
         if (this.stoppedAt.getStation()) {
+            this.stoppedAt.getStation().setTripAsGone(this.train.getTrips()[0]);
             this.train.getTrips().map(t => t.setAtStation(null));
         }
         this.train.getWagons()[0].stop();

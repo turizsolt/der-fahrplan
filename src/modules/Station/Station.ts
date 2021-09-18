@@ -38,4 +38,6 @@ export interface Station extends BaseBrick, Boardable, RailMapNode {
 
     addTripToSchedule(trip: Trip);
     getScheduledTrips(): TripInSchedule[];
+
+    setTripAsGone(trip: Trip): void;
 }

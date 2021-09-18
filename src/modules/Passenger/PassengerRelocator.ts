@@ -3,6 +3,7 @@ import { Store } from "../../structs/Interfaces/Store";
 import { Station } from "../Station/Station";
 import { TravelPath } from "../Travel/TravelPath";
 import { Route } from "../../structs/Scheduling/Route";
+import { AbstractPlatform } from "../Station/AbstractPlatform";
 
 export class PassengerRelocator {
     static insideStation(store: Store, passenger: Passenger, station: Station): void {
@@ -12,14 +13,17 @@ export class PassengerRelocator {
         const platforms = station.getPlatforms();
         const scheduledDepartures = station.getScheduledTrips();
         for (let i = 0; i < scheduledDepartures.length; i++) {
-            if (scheduledDepartures[i].departureTime < store.getTickCount()) continue;
+            if (scheduledDepartures[i].gone) continue;
             const index = routes.findIndex(x => x === scheduledDepartures[i].trip.getRoute());
             if (index !== -1) {
-                const route = scheduledDepartures[i].trip.getRoute();
+                const trip = scheduledDepartures[i].trip;
+                const route = trip.getRoute();
                 passenger.setWaitingFor(route);
                 passenger.setNext(pathes[index].changes[0].station);
 
-                const platform = route.getStops().find(s => s.getStation() === station)?.getPlatform();
+                const stop = trip.getWaypoints().find(s => s.isStation && s.station === station);
+                const platform = stop?.platform;
+
                 if (platform) {
                     passenger.setPlace(platform);
                 } else {
@@ -45,5 +49,9 @@ export class PassengerRelocator {
             passenger.setPlace(station);
         }
 
+    }
+
+    static changedPlatform(store: Store, passenger: Passenger, newPlatform: AbstractPlatform): void {
+        passenger.setPlace(newPlatform);
     }
 }

@@ -18,6 +18,7 @@ import { Train } from '../Train/Train';
 import { WaitingHall } from './WaitingHall';
 import { applyMixins } from '../../mixins/ApplyMixins';
 import { Emitable } from '../../mixins/Emitable';
+import { PassengerRelocator } from '../Passenger/PassengerRelocator';
 const PriorityQueue = require('@darkblue_azurite/priority-queue');
 
 export interface ActualStation extends Emitable { }
@@ -46,7 +47,8 @@ export class ActualStation extends ActualBaseBrick implements Station {
             const departureTime = trip.getStationDepartureTime(this);
             this.scheduledTrips.push({
                 trip,
-                departureTime
+                departureTime,
+                gone: false
             });
             this.scheduledTrips.sort((a, b) => a.departureTime - b.departureTime);
         }
@@ -56,14 +58,25 @@ export class ActualStation extends ActualBaseBrick implements Station {
         });
     }
 
-    updateArrivingPlatform(platform: AbstractPlatform, trip: Trip): void {
-        console.log('updateArrivingPlatform');
+    setTripAsGone(trip: Trip): void {
+        const scheduledTrip = this.scheduledTrips.find(x => x.trip === trip);
+        if (scheduledTrip) {
+            scheduledTrip.gone = true;
+        }
+        this.update();
+    }
 
+
+    updateArrivingPlatform(platform: AbstractPlatform, trip: Trip): void {
         const stop = trip.getRoute().getStops().find(s => s.getStation() === this);
         if (stop && stop.getPlatform() !== platform) {
+            const pax = stop.getPlatform()
+                ? stop.getPlatform().getBoardedPassengers()
+                : this.getWaitingHalls().map(wh => wh.getBoardedPassengers()).flat();
+
             trip.redefine(stop, { platform });
-            // todo update in scheduled - maybe not needed at all
-            // const schedTrip = this.scheduledTrips.find(t => t.trip === trip);
+            pax.map(p =>
+                PassengerRelocator.changedPlatform(this.store, p, platform));
 
             this.update();
         }
@@ -281,7 +294,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
             name: this.name,
             rgbColor: this.color.getRgbString(),
             schedule: this.scheduledTrips.map((tripIS: TripInSchedule) =>
-                tripIS.trip.persistDeep()
+                ({ ...tripIS.trip.persistDeep(), gone: tripIS.gone })
             )
         };
     }
