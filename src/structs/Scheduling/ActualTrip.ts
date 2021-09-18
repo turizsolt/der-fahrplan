@@ -86,8 +86,9 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
                 station: stop.getWaypoint(),
                 stationRgbColor: stop.getWaypoint().getColor().getRgbString(),
-                platform: stop.getPlatform(),
                 stationName: stop.getWaypointName(),
+                platform: (this.redefinedProps[stop.getId()]?.platform) ??
+                    stop.getPlatform(),
                 platformNo:
                     (this.redefinedProps[stop.getId()]?.platform?.getNo()) ??
                     stop.getPlatform()?.getNo(),
