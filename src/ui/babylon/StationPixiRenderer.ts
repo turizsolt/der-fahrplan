@@ -65,6 +65,7 @@ export class StationPixiRenderer extends BasePixiRenderer
         const color = station.getColor();
         const fillColor =
             color.red * 256 * 256 * 255 + color.green * 256 * 255 + color.blue * 255;
+        this.rect.clear();
         this.rect.beginFill(fillColor, 0.3);
         this.rect.drawCircle(0, 0, 50);
         this.rect.endFill();

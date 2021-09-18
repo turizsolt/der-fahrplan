@@ -4,7 +4,7 @@
     @click="$emit('click')"
   >
     <div v-if="station" class="route-platform">
-      {{ stationPlatform }}
+      {{trip.gone?'G':''}}{{ stationPlatform }}
     </div>
     <div class="route-time">
       {{ stationTimeString ? stationTimeString : trip.departureTimeString }}
