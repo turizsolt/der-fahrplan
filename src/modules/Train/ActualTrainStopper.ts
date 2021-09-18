@@ -120,6 +120,10 @@ export class ActualTrainStopper {
             this.train.assignTrip(null);
             this.train.assignTrip(newTrip);
             this.shouldStop = false;
+
+            if (this.stoppedAt.getStation()) {
+                this.train.getTrips().map(t => t.setStationServed(this.stoppedAt.getStation()));
+            }
         } else {
             this.shouldStop = true;
         }
@@ -127,6 +131,7 @@ export class ActualTrainStopper {
 
     private endStopping(): void {
         if (this.stoppedAt.getStation()) {
+            this.train.getTrips().map(t => t.setStationServed(this.stoppedAt.getStation()));
             this.stoppedAt.getStation().setTripAsGone(this.train.getTrips()[0]);
             this.train.getTrips().map(t => t.setAtStation(null));
         }

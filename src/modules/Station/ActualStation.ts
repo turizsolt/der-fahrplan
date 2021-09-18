@@ -173,7 +173,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
             );
         });
         */
-        trip.setStationServed(this);
+        // trip.setStationServed(this);
         //this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
     }
 
