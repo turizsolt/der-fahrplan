@@ -337,6 +337,10 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         return this.trips?.[0]?.getNextStation();
     }
 
+    resetNextPlatform(): void {
+        this.nextPlatform = null;
+    }
+
     tick(): void {
         const nextPosition = this.position.clone();
 

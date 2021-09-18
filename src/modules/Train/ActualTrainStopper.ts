@@ -5,6 +5,7 @@ import { Passenger } from "../Passenger/Passenger";
 import { PassengerRelocator } from "../Passenger/PassengerRelocator";
 import { SightMarker } from "./Sight/SightMarker";
 import { Train } from "./Train";
+import { Station } from "../Station/Station";
 
 export class ActualTrainStopper {
     private stoppedAt: Platform = null;
@@ -106,6 +107,13 @@ export class ActualTrainStopper {
     }
 
     private arrivedToLastStation() {
+        const station: Station = this.stoppedAt?.getStation();
+        if (station) {
+            station.setTripAsGone(this.train.getTrips()[0]);
+        }
+
+        this.train.resetNextPlatform();
+
         const newTrip = this.train.getTrips().length > 0 ? this.train.getTrips()[0].getNextTrip() : null;
         if (newTrip) {
             this.shouldTurn = this.train.getTrips()[0].getNextReverse();

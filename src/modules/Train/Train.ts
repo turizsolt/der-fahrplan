@@ -36,6 +36,7 @@ export interface Train extends BaseStorable {
     stoppedAt(station: Station, platform: Platform): void;
     getFreeWagon(): Wagon;
     moveBoardedPassengers(): void;
+    resetNextPlatform(): void;
 
     createWagonAtEnd(config: WagonConfig): void;
 
