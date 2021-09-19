@@ -131,7 +131,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
             while ((preNext = info[preNext.getHash()])) {
                 this.preHandle(preNext, preSwitches);
             }
-            if (preSwitches.length > 6) return false;
+            if (preSwitches.length > 10) return false;
             // todo end of hotfix
 
             let next: DirectedTrack = backFromHere;
