@@ -16,7 +16,6 @@ import { BlockJointRenderer } from '../structs/Renderers/BlockJointRenderer';
 import { PathBlockRenderer } from '../structs/Renderers/PathBlockRenderer';
 import { SectionRenderer } from '../structs/Renderers/SectionRenderer';
 import { SensorRenderer } from '../structs/Renderers/SensorRenderer';
-import { SensorDummyRenderer } from '../../test/dummies/SensorDummyRenderer';
 import { TrackPixiRenderer } from '../ui/babylon/TrackPixiRenderer';
 import { ActualLand } from '../structs/Actuals/ActualLand';
 import { Land } from '../structs/Interfaces/Land';
@@ -35,6 +34,7 @@ import { CapacityCapPixiRenderer } from '../ui/babylon/CapacityCapPixiRenderer';
 import { PassengerPixiRenderer } from '../ui/babylon/PassengerPixiRenderer';
 import { WaitingHallRenderer } from '../structs/Renderers/WaitingHallRenderer';
 import { WaitingHallPixiRenderer } from '../ui/babylon/WaitingHallPixiRenderer';
+import { SensorPixiRenderer } from '../ui/babylon/SensorPixiRenderer';
 
 export const productionContainer2d = new Container();
 const ioc = new DependencyContainer(productionContainer2d);
@@ -63,7 +63,7 @@ ioc.fm<SignalRenderer>(
 ioc.fm<SensorRenderer>(
     T.FactoryOfSensorRenderer,
     T.SensorRenderer,
-    SensorDummyRenderer
+    SensorPixiRenderer
 );
 ioc.fm<WaitingHallRenderer>(
     T.FactoryOfWaitingHallRenderer,
