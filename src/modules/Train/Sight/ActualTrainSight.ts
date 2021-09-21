@@ -107,4 +107,34 @@ export class ActualTrainSight implements TrainSight {
 
         return null;
     }
+
+    distanceWithoutSwitchprivate(position: PositionOnTrack, distance: number): number {
+        let distanceLeft = distance;
+
+        let dt: DirectedTrack = position.getDirectedTrack();
+        if (dt.getTrack().getType() === TYPES.TrackSwitch) {
+            return distance - distanceLeft;
+        }
+
+        let startPosition = position.getPosition();
+        let endPosition = Math.min(dt.getLength(), startPosition + distanceLeft);
+        distanceLeft = distanceLeft - (endPosition - startPosition);
+        let globalStartPosition = -startPosition;
+
+        dt = dt.next();
+        while (dt && distanceLeft > 0) {
+            if (dt.getTrack().getType() === TYPES.TrackSwitch) {
+                return distance - distanceLeft;
+            }
+
+            startPosition = 0;
+            endPosition = Math.min(dt.getLength(), distanceLeft);
+            distanceLeft = distanceLeft - (endPosition - startPosition);
+            globalStartPosition = globalStartPosition + dt.getLength();
+
+            dt = dt.next();
+        }
+
+        return distance - distanceLeft;
+    }
 }

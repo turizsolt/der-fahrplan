@@ -214,19 +214,37 @@ export class BlockWizardInputHandler extends InputHandler {
             if (pbe.getJointEnd().end === WhichEnd.B) {
                 pot.reverse();
             }
+
+            const sight = new ActualTrainSight();
+            const distance: number = sight.distanceWithoutSwitchprivate(pot, 160);
+
+            // console.log('dist', distance);
+
+            pot.move(distance);
+            pot.reverse();
+
+            const nearestData = Nearest.platform(pot.clone());
+            if (nearestData?.distance < distance) {
+                this.store.create<Sensor>(TYPES.Sensor).init(nearestData.position, pb, pbe);
+
+            } else {
+                this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
+            }
+            /*
             pot.move(160);
             pot.reverse();
 
             const sight = new ActualTrainSight();
             const nearestPlatformList = sight.getSight(pot, 160, null, null).markers
                 .filter(m => m.type === 'Platform');;
-
+            
             if (nearestPlatformList.length > 0) {
                 pot.move(Util.last(nearestPlatformList).distance);
                 this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
             } else {
                 this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
             }
+            */
         });
 
         // create signals
