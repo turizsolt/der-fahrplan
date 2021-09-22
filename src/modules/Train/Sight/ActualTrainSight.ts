@@ -1,6 +1,7 @@
 import { TYPES } from "../../../di/TYPES";
 import { Station } from "../../../modules/Station/Station";
 import { PositionedTrackMarker } from "../../PositionedTrackMarker";
+import { BlockJoint } from "../../Signaling/BlockJoint";
 import { SignalSignal } from "../../Signaling/SignalSignal";
 import { AbstractPlatform } from "../../Station/AbstractPlatform";
 import { DirectedTrack } from "../../Track/DirectedTrack";
@@ -101,6 +102,44 @@ export class ActualTrainSight implements TrainSight {
             for (let m of dt.getMarkersPartially({ startPosition, endPosition, track: dt })) {
                 if (m.marker.type === 'Platform') {
                     return { platform: m.marker.platform, position: new PositionOnTrack(dt, m.position), distance: globalStartPosition + m.position };
+                }
+            }
+            dt = dt.next();
+        }
+
+        return null;
+    }
+
+    findNextBlockJoint(position: PositionOnTrack, trainId: string): { blockJoint: BlockJoint, position: PositionOnTrack, distance: number } {
+        const positionedTrackMarkers: PositionedTrackMarker[] = [];
+        let dt: DirectedTrack = position.getDirectedTrack();
+        let startPosition = position.getPosition();
+        let endPosition = dt.getLength();
+        let globalStartPosition = -startPosition;
+
+        if (dt.getTrack().getType() === TYPES.TrackSwitch && ((dt.getTrack()) as TrackSwitch).getLockedTrain() !== trainId) {
+            return null;
+        }
+
+        for (let m of dt.getMarkersPartially({ startPosition, endPosition, track: dt })) {
+            if (m.marker.type === 'BlockJoint') {
+                return { blockJoint: m.marker.blockJoint, position: new PositionOnTrack(dt, m.position), distance: globalStartPosition + m.position };
+            }
+        }
+
+        dt = dt.next();
+        while (dt) {
+            startPosition = 0;
+            endPosition = dt.getLength();
+            globalStartPosition = globalStartPosition + dt.getLength();
+
+            if (dt.getTrack().getType() === TYPES.TrackSwitch && ((dt.getTrack()) as TrackSwitch).getLockedTrain() !== trainId) {
+                return null;
+            }
+
+            for (let m of dt.getMarkersPartially({ startPosition, endPosition, track: dt })) {
+                if (m.marker.type === 'BlockJoint') {
+                    return { blockJoint: m.marker.blockJoint, position: new PositionOnTrack(dt, m.position), distance: globalStartPosition + m.position };
                 }
             }
             dt = dt.next();

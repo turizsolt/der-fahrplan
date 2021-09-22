@@ -15,9 +15,12 @@ import { TrackDirection } from '../../../../modules/Track/TrackDirection';
 import { PositionOnTrack } from '../../../../modules/Train/PositionOnTrack';
 import { PositionData } from '../../../../modules/Train/PositionData';
 import { SpeedPedal } from '../../../../modules/Train/SpeedPedal';
+import { ActualTrainSight } from '../../../../modules/Train/Sight/ActualTrainSight';
+import { TrainSight } from '../../../../modules/Train/Sight/TrainSight';
+import { convertTo } from '../../../../modules/Train/ActualTrain';
 
 export class CommandProcessor {
-  constructor(private store: Store, private logStore: CommandLog) {}
+  constructor(private store: Store, private logStore: CommandLog) { }
 
   createTrackJoint(
     id: string,
@@ -139,14 +142,21 @@ export class CommandProcessor {
     wagon.init(wagonConfig, train);
 
     const track = this.store.get(trackId) as Track;
-    train.init(
-      PositionOnTrack.fromTrack(
-        track,
-        position * track.getLength(),
-        direction === 1 ? TrackDirection.AB : TrackDirection.BA
-      ),
-      [wagon]
+    const pot = PositionOnTrack.fromTrack(
+      track,
+      position * track.getLength(),
+      direction === 1 ? TrackDirection.AB : TrackDirection.BA
     );
+    train.init(pot, [wagon]);
+
+    // checking in into the nearest blockJoint's block
+    const oppot = pot.opposition();
+    const sight: TrainSight = new ActualTrainSight();
+    const bjx = sight.findNextBlockJoint(oppot, null);
+    if (bjx) {
+      const blockJointEnd = bjx.blockJoint.getEnd(convertTo(bjx.blockJoint, bjx.position));
+      blockJointEnd.checkin(train);
+    }
 
     return wagon;
   }
