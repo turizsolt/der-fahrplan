@@ -10,13 +10,13 @@ import { PathBlockEnd } from '../../modules/Signaling/PathBlockEnd';
 export class AllowPathInputHandler implements InputHandler {
   private jointEnds: BlockJointEnd[] = [];
 
-  constructor(private store: Store) {}
+  constructor(private store: Store) { }
 
-  down(props: InputProps, event: PointerEvent): void {}
+  down(props: InputProps, event: PointerEvent): void { }
 
-  roam(props: InputProps, event: PointerEvent): void {}
+  roam(props: InputProps, event: PointerEvent): void { }
 
-  move(downProps: InputProps, props: InputProps, event: PointerEvent): void {}
+  move(downProps: InputProps, props: InputProps, event: PointerEvent): void { }
 
   click(downProps: InputProps, event: PointerEvent): void {
     let meshId = downProps.mesh.id;
@@ -47,7 +47,7 @@ export class AllowPathInputHandler implements InputHandler {
               (blockEnd0 as PathBlockEnd).getPathBlock() ===
               (blockEnd1 as PathBlockEnd).getPathBlock()
             ) {
-              (blockEnd1 as PathBlockEnd).getPathBlock().allow(blockEnd0 as PathBlockEnd, blockEnd1 as PathBlockEnd, null);
+              (blockEnd1 as PathBlockEnd).getPathBlock().allow(blockEnd0 as PathBlockEnd, blockEnd1 as PathBlockEnd, null, null);
             }
           }
 
@@ -57,7 +57,7 @@ export class AllowPathInputHandler implements InputHandler {
     }
   }
 
-  up(downProps: InputProps, props: InputProps, event: PointerEvent): void {}
+  up(downProps: InputProps, props: InputProps, event: PointerEvent): void { }
 
-  cancel(): void {}
+  cancel(): void { }
 }

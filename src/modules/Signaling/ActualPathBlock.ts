@@ -20,6 +20,7 @@ import { PathQueue, persistBlockJointEnd, loadBlockJointEnd } from './PathQueue'
 import { BlockJoint } from './BlockJoint';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { Color } from '../../structs/Color';
+import { PathRequest } from './PathRequest';
 
 export interface ActualPathBlock extends Emitable { }
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -63,6 +64,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     allow(
         startPathBlockEnd: PathBlockEnd,
         endPathBlockEnd: PathBlockEnd,
+        request: PathRequest,
         train: Train,
         count: number = 1
     ): boolean {
@@ -150,7 +152,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
                 endPathBlockEnd,
                 switches,
                 block,
-                count
+                count,
+                request
             };
 
             this.allowBlock(allowedPath);
@@ -213,6 +216,9 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     }
 
     requestPath(pathBlockEnd: PathBlockEnd, train: Train): void {
+        if (this.allowedPathes.some(ap => ap.request.train === train)) return;
+        if (this.queue.getQueue().some(rq => rq.train === train)) return;
+
         this.queue.push(pathBlockEnd, train);
     }
 
@@ -273,6 +279,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
             switches: allowedPath.switches.map(sw => sw.getId()),
             startPathBlockEnd: allowedPath.startPathBlockEnd.persist(),
             endPathBlockEnd: allowedPath.endPathBlockEnd.persist(),
+            request: persistRequest(allowedPath.request)
         };
     }
 
@@ -283,6 +290,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
             switches: obj.switches.map(sw => store.get(sw) as TrackSwitch),
             startPathBlockEnd: loadPathBlockEnd(obj.startPathBlockEnd, store),
             endPathBlockEnd: loadPathBlockEnd(obj.endPathBlockEnd, store),
+            request: loadRequest(obj.request, store)
         };
     }
 
@@ -301,4 +309,20 @@ doApply();
 export const loadPathBlockEnd = (obj: any, store: Store): PathBlockEnd => {
     const joint = store.get(obj.joint) as BlockJoint;
     return joint.getEnd(obj.end) as PathBlockEnd;
+};
+
+const persistRequest = (request: PathRequest): any => {
+    return {
+        from: request.from.persist(),
+        toOptions: request.toOptions.map(t => t.persist()),
+        train: request.train.getId()
+    }
+};
+
+const loadRequest = (obj: any, store: Store): PathRequest => {
+    return {
+        from: loadPathBlockEnd(obj.from, store),
+        toOptions: obj.toOptions.map(t => loadBlockJointEnd(t, store)),
+        train: store.get(obj.train) as Train
+    }
 };

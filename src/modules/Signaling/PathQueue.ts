@@ -12,7 +12,7 @@ export class PathQueue {
   private rules: PathRule[] = [];
   private queue: PathRequest[] = [];
 
-  constructor(private pathBlock: PathBlock) {}
+  constructor(private pathBlock: PathBlock) { }
 
   push(pathBlockEnd: PathBlockEnd, train: Train) {
     const found = this.rules.find(
@@ -20,10 +20,10 @@ export class PathQueue {
         r.from === pathBlockEnd &&
         (!r.filter ||
           r.filter ===
-            train
-              ?.getTrips()[0]
-              ?.getRoute()
-              ?.getName())
+          train
+            ?.getTrips()[0]
+            ?.getRoute()
+            ?.getName())
     );
     if (found) {
       this.queue.push({
@@ -34,6 +34,10 @@ export class PathQueue {
     }
   }
 
+  getQueue(): PathRequest[] {
+    return this.queue;
+  }
+
   evaluate() {
     const toEval = [...this.queue];
     this.queue = [];
@@ -41,7 +45,7 @@ export class PathQueue {
     for (let next of toEval) {
       let succ = false;
       for (let to of next.toOptions) {
-        if (this.pathBlock.allow(next.from, to, next.train)) {
+        if (this.pathBlock.allow(next.from, to, next, next.train)) {
           succ = true;
           break;
         }
