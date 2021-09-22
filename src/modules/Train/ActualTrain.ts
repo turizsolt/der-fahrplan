@@ -345,7 +345,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
         const nextPosition = this.position.clone();
 
         this.nearestTrain = Nearest.train(nextPosition);
-        const pl = this.trainSight.findNextPlatform(nextPosition, this.getId());
+        const pl = this.trainSight.findNextPlatform(nextPosition, this.getId())?.platform;
         if (pl && pl !== this.nextPlatform) {
             this.nextPlatform = pl;
             if (this.getTrips()[0]) pl?.getStation().updateArrivingPlatform(pl, this.getTrips()[0]);

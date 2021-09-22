@@ -6,6 +6,6 @@ import { Sight } from "./Sight";
 
 export interface TrainSight {
     getSight(position: PositionOnTrack, distance: number, nextStation?: Station, train?: Train): Sight;
-    findNextPlatform(position: PositionOnTrack, trainId: string): AbstractPlatform;
+    findNextPlatform(position: PositionOnTrack, trainId: string): { platform: AbstractPlatform, position: PositionOnTrack, distance: number };
     distanceWithoutSwitchprivate(position: PositionOnTrack, distance: number): number;
 }

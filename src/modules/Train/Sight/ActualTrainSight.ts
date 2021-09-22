@@ -71,7 +71,7 @@ export class ActualTrainSight implements TrainSight {
         }
     }
 
-    findNextPlatform(position: PositionOnTrack, trainId: string): AbstractPlatform {
+    findNextPlatform(position: PositionOnTrack, trainId: string): { platform: AbstractPlatform, position: PositionOnTrack, distance: number } {
         const positionedTrackMarkers: PositionedTrackMarker[] = [];
         let dt: DirectedTrack = position.getDirectedTrack();
         let startPosition = position.getPosition();
@@ -84,7 +84,7 @@ export class ActualTrainSight implements TrainSight {
 
         for (let m of dt.getMarkersPartially({ startPosition, endPosition, track: dt })) {
             if (m.marker.type === 'Platform') {
-                return m.marker.platform;
+                return { platform: m.marker.platform, position: new PositionOnTrack(dt, m.position), distance: globalStartPosition + m.position };
             }
         }
 
@@ -100,7 +100,7 @@ export class ActualTrainSight implements TrainSight {
 
             for (let m of dt.getMarkersPartially({ startPosition, endPosition, track: dt })) {
                 if (m.marker.type === 'Platform') {
-                    return m.marker.platform;
+                    return { platform: m.marker.platform, position: new PositionOnTrack(dt, m.position), distance: globalStartPosition + m.position };
                 }
             }
             dt = dt.next();
