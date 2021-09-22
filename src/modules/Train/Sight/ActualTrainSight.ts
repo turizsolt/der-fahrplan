@@ -50,9 +50,10 @@ export class ActualTrainSight implements TrainSight {
             dt = dt.next();
         }
 
-        if (distanceLeft > 0) {
-            positionedTrackMarkers.push({ position: distance - distanceLeft, marker: { type: 'End' } });
-        }
+        // todo
+        // if (distanceLeft > 0) {
+        //     positionedTrackMarkers.push({ position: distance - distanceLeft, marker: { type: 'End' } });
+        // }
 
         return { distance: distance - distanceLeft, markers: positionedTrackMarkers };
     }
