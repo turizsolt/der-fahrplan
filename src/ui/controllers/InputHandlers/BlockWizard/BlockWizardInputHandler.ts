@@ -216,7 +216,7 @@ export class BlockWizardInputHandler extends InputHandler {
             }
 
             const sight = new ActualTrainSight();
-            const distance: number = sight.distanceWithoutSwitchprivate(pot, 160);
+            const distance: number = sight.distanceWithoutSwitchprivate(pot, 160) - 1;
 
             // console.log('dist', distance);
 
