@@ -81,9 +81,11 @@ export class GeneralInputHandler extends InputHandler {
         .process('lock');
     });
 
-    this.reg(keyUp('S'), () => {
+    this.reg(keyUp('I'), () => {
 
       if (!this.getSelected()) return false;
+      if (this.getSelected().getType() !== TYPES.TrackSwitch) return false;
+
       this.store
         .getCommandLog()
         .addAction(
