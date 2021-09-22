@@ -11,7 +11,7 @@ import { PathBlockEnd } from './PathBlockEnd';
 import { Train } from '../Train/Train';
 import { loadPathBlockEnd } from './ActualPathBlock';
 
-export interface ActualSensor extends Emitable {}
+export interface ActualSensor extends Emitable { }
 const doApply = () => applyMixins(ActualSensor, [Emitable]);
 export class ActualSensor extends ActualBaseBrick implements Sensor {
   private position: PositionOnTrack;
@@ -23,7 +23,7 @@ export class ActualSensor extends ActualBaseBrick implements Sensor {
     pathBlock: PathBlock,
     pathBlockEnd: PathBlockEnd
   ): Sensor {
-    this.initStore(TYPES.Signal);
+    this.initStore(TYPES.Sensor);
 
     this.position = position;
     this.pathBlock = pathBlock;
@@ -35,6 +35,24 @@ export class ActualSensor extends ActualBaseBrick implements Sensor {
 
     this.emit('init', this.persist());
     return this;
+  }
+
+  getPosition(): PositionOnTrack {
+    return this.position;
+  }
+
+  setPosition(position: PositionOnTrack): void {
+    this.position
+      .getDirectedTrack()
+      .removeMarker({ type: 'Sensor', sensor: this });
+
+    this.position = position;
+
+    this.position
+      .getDirectedTrack()
+      .addMarker(this.position.getPosition(), { type: 'Sensor', sensor: this });
+
+    this.emit('update', this.persist());
   }
 
   checkin(train: Train): void {
