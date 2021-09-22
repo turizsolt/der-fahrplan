@@ -62,8 +62,8 @@ export class SensorPixiRenderer extends BasePixiRenderer
         if (!this.inited) return;
 
         this.rect.clear();
-        this.rect.beginFill(255 * 256 * 256, 1);
-        this.rect.drawCircle(0, 0, 5);
+        this.rect.beginFill(255 * 256 * 256 + 255 * 256 + 255, 1);
+        this.rect.drawCircle(0, 0, 1);
         this.rect.endFill();
     }
 }
