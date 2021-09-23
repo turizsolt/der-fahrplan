@@ -7,53 +7,53 @@ import { Right } from '../../src/structs/Geometry/Directions';
 chai.use(chaiAlmost(0.00001));
 
 describe('Line segment projects point', () => {
-  it('not on the line', () => {
-    const seg = LineSegment.fromTwoPoints(
-      new Coordinate(0, 0, 0),
-      new Coordinate(0, 0, 20)
-    );
+    it('not on the line', () => {
+        const seg = LineSegment.fromTwoPoints(
+            new Coordinate(0, 0, 0),
+            new Coordinate(0, 0, 20)
+        );
 
-    const point = new Coordinate(10, 0, 10);
-    const projected: Ray = seg.project(point);
+        const point = new Coordinate(10, 0, 10);
+        const projected: Ray = seg.project(point);
 
-    expect(projected).deep.equals(new Ray(new Coordinate(0, 0, 10), 0));
-  });
+        expect(projected.persist()).deep.equals((new Ray(new Coordinate(0, 0, 10), 0)).persist());
+    });
 
-  it('on the line', () => {
-    const seg = LineSegment.fromTwoPoints(
-      new Coordinate(0, 0, 0),
-      new Coordinate(0, 0, 20)
-    );
+    it('on the line', () => {
+        const seg = LineSegment.fromTwoPoints(
+            new Coordinate(0, 0, 0),
+            new Coordinate(0, 0, 20)
+        );
 
-    const point = new Coordinate(0, 0, 10);
-    const projected: Ray = seg.project(point);
+        const point = new Coordinate(0, 0, 10);
+        const projected: Ray = seg.project(point);
 
-    expect(projected).deep.equals(new Ray(new Coordinate(0, 0, 10), 0));
-  });
+        expect(projected.persist()).deep.equals((new Ray(new Coordinate(0, 0, 10), 0)).persist());
+    });
 
-  it('diagonal line', () => {
-    const seg = LineSegment.fromTwoPoints(
-      new Coordinate(0, 0, 0),
-      new Coordinate(20, 0, 20)
-    );
+    it('diagonal line', () => {
+        const seg = LineSegment.fromTwoPoints(
+            new Coordinate(0, 0, 0),
+            new Coordinate(20, 0, 20)
+        );
 
-    const point = new Coordinate(20, 0, 0);
-    const projected: Ray = seg.project(point);
+        const point = new Coordinate(20, 0, 0);
+        const projected: Ray = seg.project(point);
 
-    expect(projected).deep.almost(
-      new Ray(new Coordinate(10, 0, 10), Right / 2)
-    );
-  });
+        expect(projected.persist()).deep.almost(
+            (new Ray(new Coordinate(10, 0, 10), Right / 2)).persist()
+        );
+    });
 
-  it('somewhere else', () => {
-    const seg = LineSegment.fromTwoPoints(
-      new Coordinate(0, 0, 0),
-      new Coordinate(0, 0, 20)
-    );
+    it('somewhere else', () => {
+        const seg = LineSegment.fromTwoPoints(
+            new Coordinate(0, 0, 0),
+            new Coordinate(0, 0, 20)
+        );
 
-    const point = new Coordinate(0, 0, 50);
-    const projected: Ray = seg.project(point);
+        const point = new Coordinate(0, 0, 50);
+        const projected: Ray = seg.project(point);
 
-    expect(projected).deep.equals(null);
-  });
+        expect(projected).deep.equals(null);
+    });
 });

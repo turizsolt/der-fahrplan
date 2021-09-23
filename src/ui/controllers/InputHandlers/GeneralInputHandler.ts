@@ -8,6 +8,8 @@ import { BaseBrick } from '../../../structs/Interfaces/BaseBrick';
 import { Train } from '../../../modules/Train/Train';
 import { GlobalController } from '../GlobalController';
 import { RailMapCreator } from '../../../modules/RailMap/RailMapCreator';
+import { TYPES } from '../../../di/TYPES';
+import { Sensor } from '../../../modules/Signaling/Sensor';
 
 export class GeneralInputHandler extends InputHandler {
   constructor(private store: Store, private globalController: GlobalController) {
@@ -54,6 +56,24 @@ export class GeneralInputHandler extends InputHandler {
       download(JSON.stringify(data), fileName, 'application/json');
     });
 
+    this.reg(keyUp('O'), () => {
+      console.log('correcting sensors');
+      let n = 0;
+      const sensors: Sensor[] = this.store.getAllOf<Sensor>(TYPES.Sensor);
+      sensors.map(s => {
+        const pos = s.getPosition();
+
+        if (pos.getTrack().getType() === TYPES.Track) return;
+
+        const newPos = pos.clone();
+        newPos.move(1);
+
+        s.setPosition(newPos);
+        n++;
+      });
+      console.log(n, ' corrected');
+    });
+
     this.reg(keyUp('D'), () => {
       if (!this.getSelected()) return false;
       (this.getSelected() as BaseBrick)
@@ -61,9 +81,11 @@ export class GeneralInputHandler extends InputHandler {
         .process('lock');
     });
 
-    this.reg(keyUp('S'), () => {
+    this.reg(keyUp('I'), () => {
 
       if (!this.getSelected()) return false;
+      if (this.getSelected().getType() !== TYPES.TrackSwitch) return false;
+
       this.store
         .getCommandLog()
         .addAction(

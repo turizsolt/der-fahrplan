@@ -108,7 +108,7 @@ export class TrainInputHandler extends InputHandler {
       }
     });
 
-    this.reg(keyUp('A'), () => {
+    this.reg(keyUp('U'), () => {
       if (!this.getSelected()) return false;
       if (this.getSelected().getType() === TYPES.Wagon) {
         const wagon = this.getSelected() as Wagon;

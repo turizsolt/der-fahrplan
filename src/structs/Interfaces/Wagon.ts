@@ -1,8 +1,8 @@
 import { Ray } from '../Geometry/Ray';
 import { WhichEnd } from '../Interfaces/WhichEnd';
-import { Platform } from './Platform';
+import { Platform } from '../../modules/Station/Platform';
 import { BaseBrick } from './BaseBrick';
-import { Passenger } from './Passenger';
+import { Passenger } from '../../modules/Passenger/Passenger';
 import { Boardable } from '../../mixins/Boardable';
 import { WagonConfig } from '../Actuals/Wagon/WagonConfig';
 import { PassengerArrangement } from '../../mixins/BoardableWagon';
@@ -14,44 +14,44 @@ import { Train } from '../../modules/Train/Train';
 import { TrackDirection } from '../../modules/Track/TrackDirection';
 
 export interface Wagon extends Boardable, BaseBrick, Emitable {
-  init(config?: WagonConfig, train?: Train): Wagon;
-  update(): void;
-  getRay(): Ray;
+    init(config?: WagonConfig, train?: Train): Wagon;
+    update(): void;
+    getRay(): Ray;
 
-  setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack): void;
-  getAxlePosition(whichEnd: WhichEnd): PositionOnTrack;
-  axleReverse(): void;
-  getFacing(): TrackDirection;
+    setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack): void;
+    getAxlePosition(whichEnd: WhichEnd): PositionOnTrack;
+    axleReverse(): void;
+    getFacing(): TrackDirection;
 
-  getPassengerArrangement(): PassengerArrangement;
-  getPassengerCount(): number;
-  getAppearanceId(): string;
-  getConnectable(A: WhichEnd): WagonConnectable;
+    getPassengerArrangement(): PassengerArrangement;
+    getPassengerCount(): number;
+    getAppearanceId(): string;
+    getConnectable(A: WhichEnd): WagonConnectable;
 
-  getCenterRay(): Ray;
+    getCenterRay(): Ray;
 
-  stop(): void;
+    stop(): void;
 
-  getLength(): number;
-  swapEnds(): void;
+    getLength(): number;
+    swapEnds(): void;
 
-  assignTrip(trip: Trip): void;
-  setTrip(trip: Trip): void;
-  cancelTrip(): void;
-  getTrip(): Trip;
+    assignTrip(trip: Trip): void;
+    setTrip(trip: Trip): void;
+    cancelTrip(): void;
+    getTrip(): Trip;
 
-  stoppedAt(platform: Platform): void;
-  hasFreeSeat(): boolean;
-  setSeatCount(count: number, columns?: number);
-  moveBoardedPassengers(): void;
+    stoppedAt(platform: Platform): void;
+    hasFreeSeat(): boolean;
+    setSeatCount(count: number, columns?: number);
+    moveBoardedPassengers(): void;
 
-  getTrain(): Train;
-  setTrain(train: Train): void;
+    getTrain(): Train;
+    setTrain(train: Train): void;
 
-  getBoardedPassengers(): Passenger[];
+    getBoardedPassengers(): Passenger[];
 
-  platformsBeside(): Platform[];
+    platformsBeside(): Platform[];
 
-  hasControl(whichEnd: WhichEnd): boolean;
-  hasEngine(): boolean;
+    hasControl(whichEnd: WhichEnd): boolean;
+    hasEngine(): boolean;
 }

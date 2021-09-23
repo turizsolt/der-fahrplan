@@ -1,8 +1,11 @@
 <template>
   <div
-    :class="'route-line' + (selected ? ' route-line-selected' : '') + (trip.prevTrip ? ' prev' : '')"
+    :class="'route-line' + (selected ? ' route-line-selected' : '') + (trip.prevTrip && !station ? ' prev' : '')"
     @click="$emit('click')"
   >
+    <div v-if="station" class="route-platform">
+      {{trip.gone?'G':''}}{{ stationPlatform }}
+    </div>
     <div class="route-time">
       {{ stationTimeString ? stationTimeString : trip.departureTimeString }}
     </div>
@@ -47,12 +50,14 @@ export default class TripTitle extends Vue {
   @Prop() station?: any;
   @Prop() candelete?: boolean;
   stationTimeString: string = "";
+  stationPlatform: string = "?";
 
   @Watch("station", { immediate: true }) watchStationAndUpdateTime() {
     if (this.station) {
       for (let stop of this.trip.stops) {
         if (stop.station.id === this.station.id) {
           this.stationTimeString = stop.departureTimeString;
+          this.stationPlatform = stop.platformNo ?? '?';
           break;
         }
       }
@@ -98,7 +103,8 @@ export default class TripTitle extends Vue {
 }
 
 .route-sign,
-.route-time {
+.route-time,
+.route-platform {
   width: 2em;
   text-align: center;
   white-space: nowrap;

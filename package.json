@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack",
     "start": "webpack-dev-server --open",
-    "test:this": "ts-mocha --require mocha-steps --slow 5 test/unit/Train/Sight/Sight.test.ts",
+    "test:this": "ts-mocha --require mocha-steps --slow 5 test/Geometry/LineSegmentChain.test.ts",
     "test:only": "ts-mocha --require mocha-steps --slow 5 test/unit/**/*.test.{ts,tsx}",
     "test": "nyc ts-mocha --require mocha-steps test/unit/**/*.test.{ts,tsx}",
     "posttest": "nyc report --reporter=json && nyc report --reporter=html"

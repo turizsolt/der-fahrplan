@@ -12,4 +12,7 @@ export interface Sensor extends BaseBrick {
   ): Sensor;
 
   checkin(train: Train): void;
+
+  getPosition(): PositionOnTrack;
+  setPosition(position: PositionOnTrack): void;
 }

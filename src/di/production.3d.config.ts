@@ -34,6 +34,8 @@ import { SensorRenderer } from '../structs/Renderers/SensorRenderer';
 import { SensorBabylonRenderer } from '../ui/babylon/SensorBabylonRenderer';
 import { CapacityCapDummyRenderer } from '../../test/dummies/CapacityCapDummyRenderer';
 import { CapacityCapRenderer } from '../structs/Renderers/CapacityCapRenderer';
+import { WaitingHallRenderer } from '../structs/Renderers/WaitingHallRenderer';
+import { WaitingHallBabylonRenderer } from '../ui/babylon/WaitingHallBabylonRenderer';
 
 export const productionContainer3d = new Container();
 const ioc = new DependencyContainer(productionContainer3d);
@@ -42,52 +44,61 @@ ioc.map<Land>(T.Land, ActualLand);
 ioc.sng<MeshProvider>(T.FactoryOfMeshProvider, T.MeshProvider, MeshProvider);
 ioc.map<TrackRenderer>(T.TrackRenderer, TrackBabylonRenderer);
 ioc.map<TrackSwitchRenderer>(T.TrackSwitchRenderer, TrackSwitchBabylonRenderer);
-ioc.map<StationRenderer>(T.StationRenderer, StationBabylonRenderer);
 ioc.map<PlatformRenderer>(T.PlatformRenderer, PlatformBabylonRenderer);
 ioc.map<PassengerRenderer>(T.PassengerRenderer, PassengerBabylonRenderer);
 
 ioc.fm<TrackJointRenderer>(
-  T.FactoryOfTrackJointRenderer,
-  T.TrackJointRenderer,
-  TrackJointBabylonRenderer
+    T.FactoryOfTrackJointRenderer,
+    T.TrackJointRenderer,
+    TrackJointBabylonRenderer
 );
 ioc.fm<WagonRenderer>(
-  T.FactoryOfWagonRenderer,
-  T.WagonRenderer,
-  WagonBabylonRenderer
+    T.FactoryOfWagonRenderer,
+    T.WagonRenderer,
+    WagonBabylonRenderer
 );
 ioc.fm<SignalRenderer>(
-  T.FactoryOfSignalRenderer,
-  T.SignalRenderer,
-  SignalBabylonRenderer
+    T.FactoryOfSignalRenderer,
+    T.SignalRenderer,
+    SignalBabylonRenderer
 );
 ioc.fm<SensorRenderer>(
-  T.FactoryOfSensorRenderer,
-  T.SensorRenderer,
-  SensorBabylonRenderer
+    T.FactoryOfSensorRenderer,
+    T.SensorRenderer,
+    SensorBabylonRenderer
+);
+ioc.fm<WaitingHallRenderer>(
+    T.FactoryOfWaitingHallRenderer,
+    T.WaitingHallRenderer,
+    WaitingHallBabylonRenderer
 );
 ioc.fm<BlockRenderer>(
-  T.FactoryOfBlockRenderer,
-  T.BlockRenderer,
-  BlockBabylonRenderer
+    T.FactoryOfBlockRenderer,
+    T.BlockRenderer,
+    BlockBabylonRenderer
 );
 ioc.fm<BlockJointRenderer>(
-  T.FactoryOfBlockJointRenderer,
-  T.BlockJointRenderer,
-  BlockJointBabylonRenderer
+    T.FactoryOfBlockJointRenderer,
+    T.BlockJointRenderer,
+    BlockJointBabylonRenderer
 );
 ioc.fm<PathBlockRenderer>(
-  T.FactoryOfPathBlockRenderer,
-  T.PathBlockRenderer,
-  PathBlockBabylonRenderer
+    T.FactoryOfPathBlockRenderer,
+    T.PathBlockRenderer,
+    PathBlockBabylonRenderer
 );
 ioc.fm<SectionRenderer>(
-  T.FactoryOfSectionRenderer,
-  T.SectionRenderer,
-  SectionBabylonRenderer
+    T.FactoryOfSectionRenderer,
+    T.SectionRenderer,
+    SectionBabylonRenderer
 );
 ioc.fm<CapacityCapRenderer>(
-  T.FactoryOfCapacityCapRenderer,
-  T.CapacityCapRenderer,
-  CapacityCapDummyRenderer
+    T.FactoryOfCapacityCapRenderer,
+    T.CapacityCapRenderer,
+    CapacityCapDummyRenderer
+);
+ioc.fm<StationRenderer>(
+    T.FactoryOfStationRenderer,
+    T.StationRenderer,
+    StationBabylonRenderer
 );

@@ -10,9 +10,9 @@ import { Sight } from "../../../../src/modules/Train/Sight/Sight";
 import { TrainSight } from "../../../../src/modules/Train/Sight/TrainSight";
 import { Circle } from "../../../../src/structs/Geometry/Circle";
 import { Coordinate } from "../../../../src/structs/Geometry/Coordinate";
-import { Platform } from "../../../../src/structs/Interfaces/Platform";
+import { Platform } from "../../../../src/modules/Station/Platform";
 import { Side } from "../../../../src/structs/Interfaces/Side";
-import { Station } from "../../../../src/structs/Scheduling/Station";
+import { Station } from "../../../../src/modules/Station/Station";
 import { getTestStore } from "../../../getTestStore";
 import { createTrack, createTrackLine } from "../../Track/util";
 
@@ -54,8 +54,8 @@ describe('TrainSight', () => {
         const expectedSight: Sight = {
             distance: 13,
             markers: [
-                { type: 'Signal', distance: 1, speed: 0 },
-                { type: 'Platform', distance: 2, speed: 0 },
+                { type: 'Signal', distance: 1, speed: 0, object: undefined },
+                { type: 'Platform', distance: 2, speed: 0, object: platform },
             ]
         };
         expect(sight).deep.equals(expectedSight);
@@ -71,7 +71,7 @@ describe('TrainSight', () => {
         const expectedSight: Sight = {
             distance: 20,
             markers: [
-                { type: 'End', distance: 20, speed: 0 },
+                { type: 'End', distance: 20, speed: 0, object: undefined },
             ]
         };
         expect(sight).deep.equals(expectedSight);
@@ -93,7 +93,7 @@ describe('TrainSight', () => {
         const expectedSight: Sight = {
             distance: 5,
             markers: [
-                { type: 'Platform', distance: 2, speed: Number.POSITIVE_INFINITY },
+                { type: 'Platform', distance: 2, speed: Number.POSITIVE_INFINITY, object: platform },
             ]
         };
         expect(sight).deep.equals(expectedSight);
@@ -113,7 +113,7 @@ describe('TrainSight', () => {
         const expectedSight: Sight = {
             distance: 5,
             markers: [
-                { type: 'Signal', distance: 1, speed: Number.POSITIVE_INFINITY },
+                { type: 'Signal', distance: 1, speed: Number.POSITIVE_INFINITY, object: undefined },
             ]
         };
         expect(sight).deep.equals(expectedSight);

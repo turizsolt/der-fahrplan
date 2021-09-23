@@ -33,7 +33,7 @@ import { Trip } from "../../structs/Scheduling/Trip";
 import { TripStop } from "../../structs/Scheduling/TripStop";
 import { Route } from "../../structs/Scheduling/Route";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
-import { Station } from "../../structs/Scheduling/Station";
+import { Station } from "../../modules/Station/Station";
 import { getStore, getStorable, getAllOfStorable } from "../../structs/Actuals/Store/StoreForVue";
 import { RailMap } from "../../modules/RailMap/RailMap";
 import { RailMapNode } from "../../modules/RailMap/RailMapNode";

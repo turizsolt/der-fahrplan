@@ -1,7 +1,11 @@
-import { Station } from "../../../structs/Scheduling/Station";
+import { TYPES } from "../../../di/TYPES";
+import { Station } from "../../../modules/Station/Station";
 import { PositionedTrackMarker } from "../../PositionedTrackMarker";
+import { BlockJoint } from "../../Signaling/BlockJoint";
 import { SignalSignal } from "../../Signaling/SignalSignal";
+import { AbstractPlatform } from "../../Station/AbstractPlatform";
 import { DirectedTrack } from "../../Track/DirectedTrack";
+import { TrackSwitch } from "../../Track/TrackSwitch";
 import { PositionOnTrack } from "../PositionOnTrack";
 import { Train } from "../Train";
 import { Sight } from "./Sight";
@@ -15,7 +19,7 @@ export class ActualTrainSight implements TrainSight {
             markers: markers
                 .filter(m => ['Train', 'Signal', 'Platform', 'End'].includes(m.marker.type))
                 .filter(m => m.marker.type !== 'Train' || m.marker.train !== train)
-                .map(m => ({ type: m.marker.type, speed: this.determineSpeed(m, nextStation), distance: m.position }))
+                .map(m => ({ type: m.marker.type, speed: this.determineSpeed(m, nextStation), distance: m.position, object: m.marker.platform || m.marker.train }))
         };
     }
 
@@ -47,9 +51,10 @@ export class ActualTrainSight implements TrainSight {
             dt = dt.next();
         }
 
-        if (distanceLeft > 0) {
-            positionedTrackMarkers.push({ position: distance - distanceLeft, marker: { type: 'End' } });
-        }
+        // todo
+        // if (distanceLeft > 0) {
+        //     positionedTrackMarkers.push({ position: distance - distanceLeft, marker: { type: 'End' } });
+        // }
 
         return { distance: distance - distanceLeft, markers: positionedTrackMarkers };
     }
@@ -65,5 +70,111 @@ export class ActualTrainSight implements TrainSight {
             default:
                 return 0;
         }
+    }
+
+    findNextPlatform(position: PositionOnTrack, trainId: string): { platform: AbstractPlatform, position: PositionOnTrack, distance: number } {
+        const positionedTrackMarkers: PositionedTrackMarker[] = [];
+        let dt: DirectedTrack = position.getDirectedTrack();
+        let startPosition = position.getPosition();
+        let endPosition = dt.getLength();
+        let globalStartPosition = -startPosition;
+
+        if (dt.getTrack().getType() === TYPES.TrackSwitch && ((dt.getTrack()) as TrackSwitch).getLockedTrain() !== trainId) {
+            return null;
+        }
+
+        for (let m of dt.getMarkersPartially({ startPosition, endPosition, track: dt })) {
+            if (m.marker.type === 'Platform') {
+                return { platform: m.marker.platform, position: new PositionOnTrack(dt, m.position), distance: globalStartPosition + m.position };
+            }
+        }
+
+        dt = dt.next();
+        while (dt) {
+            startPosition = 0;
+            endPosition = dt.getLength();
+            globalStartPosition = globalStartPosition + dt.getLength();
+
+            if (dt.getTrack().getType() === TYPES.TrackSwitch && ((dt.getTrack()) as TrackSwitch).getLockedTrain() !== trainId) {
+                return null;
+            }
+
+            for (let m of dt.getMarkersPartially({ startPosition, endPosition, track: dt })) {
+                if (m.marker.type === 'Platform') {
+                    return { platform: m.marker.platform, position: new PositionOnTrack(dt, m.position), distance: globalStartPosition + m.position };
+                }
+            }
+            dt = dt.next();
+        }
+
+        return null;
+    }
+
+    findNextBlockJoint(position: PositionOnTrack, trainId: string): { blockJoint: BlockJoint, position: PositionOnTrack, distance: number } {
+        const positionedTrackMarkers: PositionedTrackMarker[] = [];
+        let dt: DirectedTrack = position.getDirectedTrack();
+        let startPosition = position.getPosition();
+        let endPosition = dt.getLength();
+        let globalStartPosition = -startPosition;
+
+        if (dt.getTrack().getType() === TYPES.TrackSwitch && ((dt.getTrack()) as TrackSwitch).getLockedTrain() !== trainId) {
+            return null;
+        }
+
+        for (let m of dt.getMarkersPartially({ startPosition, endPosition, track: dt })) {
+            if (m.marker.type === 'BlockJoint') {
+                return { blockJoint: m.marker.blockJoint, position: new PositionOnTrack(dt, m.position), distance: globalStartPosition + m.position };
+            }
+        }
+
+        dt = dt.next();
+        while (dt) {
+            startPosition = 0;
+            endPosition = dt.getLength();
+            globalStartPosition = globalStartPosition + dt.getLength();
+
+            if (dt.getTrack().getType() === TYPES.TrackSwitch && ((dt.getTrack()) as TrackSwitch).getLockedTrain() !== trainId) {
+                return null;
+            }
+
+            for (let m of dt.getMarkersPartially({ startPosition, endPosition, track: dt })) {
+                if (m.marker.type === 'BlockJoint') {
+                    return { blockJoint: m.marker.blockJoint, position: new PositionOnTrack(dt, m.position), distance: globalStartPosition + m.position };
+                }
+            }
+            dt = dt.next();
+        }
+
+        return null;
+    }
+
+    distanceWithoutSwitchprivate(position: PositionOnTrack, distance: number): number {
+        let distanceLeft = distance;
+
+        let dt: DirectedTrack = position.getDirectedTrack();
+        if (dt.getTrack().getType() === TYPES.TrackSwitch) {
+            return distance - distanceLeft;
+        }
+
+        let startPosition = position.getPosition();
+        let endPosition = Math.min(dt.getLength(), startPosition + distanceLeft);
+        distanceLeft = distanceLeft - (endPosition - startPosition);
+        let globalStartPosition = -startPosition;
+
+        dt = dt.next();
+        while (dt && distanceLeft > 0) {
+            if (dt.getTrack().getType() === TYPES.TrackSwitch) {
+                return distance - distanceLeft;
+            }
+
+            startPosition = 0;
+            endPosition = Math.min(dt.getLength(), distanceLeft);
+            distanceLeft = distanceLeft - (endPosition - startPosition);
+            globalStartPosition = globalStartPosition + dt.getLength();
+
+            dt = dt.next();
+        }
+
+        return distance - distanceLeft;
     }
 }

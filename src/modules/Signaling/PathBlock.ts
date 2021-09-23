@@ -5,12 +5,14 @@ import { Train } from '../Train/Train';
 import { PathRule } from './PathRule';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { RailMapNode } from '../RailMap/RailMapNode';
+import { PathRequest } from './PathRequest';
 
 export interface PathBlock extends BaseBrick, RailMapNode {
   init(jointEnds: BlockJointEnd[]): PathBlock;
   allow(
     startPBE: PathBlockEnd,
     endPBE: PathBlockEnd,
+    request: PathRequest,
     train: Train,
     count?: number
   ): boolean;
