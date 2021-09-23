@@ -6,9 +6,9 @@
   "scripts": {
     "build": "webpack",
     "start": "webpack-dev-server --open",
-    "test:this": "ts-mocha --require mocha-steps --slow 5 test/Wagon/Announcements/AssignTrip.test.ts",
-    "test:only": "ts-mocha --require mocha-steps --slow 5 test/**/*.test.{ts,tsx}",
-    "test": "nyc ts-mocha --require mocha-steps test/**/*.test.{ts,tsx}",
+    "test:this": "ts-mocha --require mocha-steps --slow 5 test/Geometry/LineSegmentChain.test.ts",
+    "test:only": "ts-mocha --require mocha-steps --slow 5 test/unit/**/*.test.{ts,tsx}",
+    "test": "nyc ts-mocha --require mocha-steps test/unit/**/*.test.{ts,tsx}",
     "posttest": "nyc report --reporter=json && nyc report --reporter=html"
   },
   "keywords": [],
@@ -54,6 +54,7 @@
     "inversify": "^5.0.1",
     "lodash": "^4.17.19",
     "oimo": "^1.0.9",
+    "pixi.js": "^6.0.4",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.2",
     "shortid": "^2.2.15",

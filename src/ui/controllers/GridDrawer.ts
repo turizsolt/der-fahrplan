@@ -1,12 +1,12 @@
 import * as BABYLON from 'babylonjs';
 
-const gridWidth = 300;
-const gridHeight = 300;
+const gridWidth = 5000;
+const gridHeight = 5000;
 
 export class GridDrawer {
   private scene: BABYLON.Scene;
 
-  constructor() {}
+  constructor() { }
 
   setScene(scene: BABYLON.Scene) {
     this.scene = scene;
@@ -23,32 +23,60 @@ export class GridDrawer {
     mat.diffuseColor = new BABYLON.Color3(0.5, 1, 0.5);
     ground.material = mat;
 
-    for (let i = -gridWidth / 2; i <= gridWidth / 2; i += 10) {
-      const gridVer = BABYLON.MeshBuilder.CreateLines(
+    // draw the grid
+    const HEIGHT = (10 * Math.sqrt(3)) / 2;
+    const WIDTH = 10;
+
+    /*
+    for (let i = -500; i < 500; i++) {
+      const gridVer0 = BABYLON.MeshBuilder.CreateLines(
         'gridVer',
         {
           points: [
-            new BABYLON.Vector3(i, 0.01, -gridHeight / 2),
-            new BABYLON.Vector3(i, 0.01, gridHeight / 2)
+            new BABYLON.Vector3(-500 * WIDTH, 0.01, i * HEIGHT),
+            new BABYLON.Vector3(500 * WIDTH, 0.01, i * HEIGHT)
           ]
         },
         this.scene
       );
-      gridVer.color = new BABYLON.Color3(0, 0, 0);
-    }
+      gridVer0.color = new BABYLON.Color3(0, 0, 0);
 
-    for (let i = -gridHeight / 2; i <= gridHeight / 2; i += 10) {
-      const gridHor = BABYLON.MeshBuilder.CreateLines(
-        'gridHor',
+      const gridVer1 = BABYLON.MeshBuilder.CreateLines(
+        'gridVer',
         {
           points: [
-            new BABYLON.Vector3(-gridWidth / 2, 0.01, i),
-            new BABYLON.Vector3(gridWidth / 2, 0.01, i)
+            new BABYLON.Vector3(
+              (-500 * WIDTH) / 2 + i * WIDTH,
+              0.01,
+              -500 * HEIGHT
+            ),
+            new BABYLON.Vector3((500 * WIDTH) / 2 + i * WIDTH, 0.01, 500 * HEIGHT)
           ]
         },
         this.scene
       );
-      gridHor.color = new BABYLON.Color3(0, 0, 0);
+      gridVer1.color = new BABYLON.Color3(0, 0, 0);
+
+      const gridVer2 = BABYLON.MeshBuilder.CreateLines(
+        'gridVer',
+        {
+          points: [
+            new BABYLON.Vector3(
+              (500 * WIDTH) / 2 + i * WIDTH,
+              0.01,
+              -500 * HEIGHT
+            ),
+            new BABYLON.Vector3(
+              (-500 * WIDTH) / 2 + i * WIDTH,
+              0.01,
+              500 * HEIGHT
+            )
+          ]
+        },
+        this.scene
+      );
+      gridVer2.color = new BABYLON.Color3(0, 0, 0);
     }
+    */
   }
 }

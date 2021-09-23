@@ -17,13 +17,15 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: 'src/game.html',
-      filename: 'game.html'
+      template: 'src/game3d.html',
+      filename: 'game3d.html'
+    }),
+    new HtmlWebpackPlugin({
+      template: 'src/game2d.html',
+      filename: 'game2d.html'
     }),
     new CopyWebpackPlugin([{ from: 'src/assets', to: 'assets' }]),
-    new CopyWebpackPlugin([
-      { from: 'src/html/*.*', to: '.', flatten: true }
-    ]),
+    new CopyWebpackPlugin([{ from: 'src/html/*.*', to: '.', flatten: true }]),
     new VueLoaderPlugin()
   ],
   devtool: 'inline-source-map',

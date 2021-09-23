@@ -1,9 +1,9 @@
 import { Ray } from './Ray';
 import { Coordinate } from './Coordinate';
-import { TrackBase } from '../Interfaces/TrackBase';
-import { TrackJoint } from '../Interfaces/TrackJoint';
-import { ActualTrack } from '../Actuals/Track/ActualTrack';
-import { TrackSwitch } from '../Interfaces/TrackSwitch';
+import { TrackBase } from '../../modules/Track/TrackBase';
+import { TrackJoint } from '../../modules/Track/TrackJoint/TrackJoint';
+import { ActualTrack } from '../../modules/Track/ActualTrack';
+import { TrackSwitch } from '../../modules/Track/TrackSwitch';
 
 export function snapXZ(p: Ray): Ray {
   return new Ray(new Coordinate(snap(p.coord.x), 0, snap(p.coord.z)), p.dirXZ);
@@ -15,6 +15,26 @@ function snap(p) {
   return p;
 }
 
+export function snapHexaXZ(p: Ray): Ray {
+  const a = snapHexaHeight(p.coord.z) / HEIGHT;
+  const par = a % 2 === 0 ? 0 : WIDTH / 2;
+  return new Ray(
+    new Coordinate(snapHexaWidth(p.coord.x, par), 0, snapHexaHeight(p.coord.z)),
+    p.dirXZ
+  );
+}
+
+const HEIGHT = (10 * Math.sqrt(3)) / 2;
+const WIDTH = 10;
+
+function snapHexaHeight(p) {
+  return Math.round(p / HEIGHT) * HEIGHT;
+}
+
+function snapHexaWidth(p, par) {
+  return Math.round((p - par) / WIDTH) * WIDTH + par;
+}
+
 export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
   let distance = Infinity;
   let track = null;
@@ -24,7 +44,7 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
   for (let thisTrack of trackList) {
     if (thisTrack.constructor.name === ActualTrack.name) {
       const linePoints = thisTrack
-        .getSegment()
+        .getCurve()
         .getBezier()
         .getLineSegmentChain()
         .getPoints();
@@ -39,7 +59,7 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
       }
     } else {
       const linePoints = (thisTrack as TrackSwitch)
-        .getSegmentE()
+        .getSegmentLeft()
         .getBezier()
         .getLineSegmentChain()
         .getPoints();
@@ -55,7 +75,7 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
       }
 
       const linePoints2 = (thisTrack as TrackSwitch)
-        .getSegmentF()
+        .getSegmentRight()
         .getBezier()
         .getLineSegmentChain()
         .getPoints();
@@ -83,7 +103,7 @@ export function snapPositionOnTrack(p: Ray, trackList: TrackBase[]) {
 }
 
 export function snapJoint(p: Ray, jointList: TrackJoint[]) {
-  const snapped = snapXZ(p);
+  const snapped = snapHexaXZ(p);
 
   for (let joint of jointList) {
     if (joint.getPosition().equalsTo(snapped.coord)) return joint;

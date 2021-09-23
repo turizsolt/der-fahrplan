@@ -2,14 +2,15 @@
   <div class="stop">
     <div
       class="stop-circle"
-      :style="{ backgroundColor: stop.stationRgbColor }"
+      :style="{ backgroundColor: stop.shouldStop ? stop.stationRgbColor : 'transparent' }"
+      @click.stop="$emit('shouldStop')"
     ></div>
     <div v-if="index !== route.stops.length - 1" class="stop-after color"></div>
     <div
       v-if="index === route.stops.length - 1"
       class="stop-after nocolor"
     ></div>
-    <div class="stop-name" :style="{ color: stop.isServed ? 'grey' : 'black' }">
+    <div class="stop-name" :style="{ color: (stop.isServed || !stop.isStation || !stop.shouldStop) ? 'grey' : 'black', fontStyle: (stop.isStation) ? 'normal' : 'italic' }">
       {{ stop.atStation ? "* " : "" }} {{ stop.stationName }}
       {{ stop.isArrivalStation ? "é." : "" }}
     </div>
@@ -17,11 +18,12 @@
     <!-- buttons -->
     <div class="stop-button-holder">
       <div
-        v-if="canmove"
-        class="stop-button stop-move"
-        @click.stop="$emit('move')"
+        v-if="candelete"
+        class="stop-button"
+        :class="stop.isReverseStop?'stop-reverse':'stop-non-reverse'"
+        @click.stop="$emit('reverse')"
       >
-        ▲
+        R
       </div>
       <div
         v-if="candelete"
@@ -33,8 +35,9 @@
     </div>
 
     <!-- platform -->
-    <select v-if="!isTrip" size="1" class="stop-select-platform">
-      <option value="1">?</option>
+    <select v-if="!isTrip" size="1" class="stop-select-platform" :value="stop.platform" @change="changePlatform">
+      <option value="">?</option>
+      <option v-for="option in stop.platformOptions" :value="option.id">{{option.no}}</option>
     </select>
 
     <!-- arrival departure -->
@@ -80,6 +83,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
+import { AbstractPlatform } from "../../modules/Station/AbstractPlatform";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
 
@@ -135,12 +139,22 @@ export default class RouteTitle extends Vue {
       stop.setDepartureTime(value === "" ? undefined : time * 60);
     }
   }
+
+  changePlatform(event:any):void {
+    const stop = getStorable(this.stop.id) as RouteStop;
+    const platform = getStorable(event.currentTarget.value) as unknown as AbstractPlatform;
+    stop.setPlatform(platform);
+  }
 }
 </script>
 
 <style scoped>
 .stop:hover {
   background-color: #aaccaa;
+}
+
+.stop-circle:hover {
+  cursor: pointer;
 }
 
 .stop-button-holder {
@@ -193,4 +207,10 @@ export default class RouteTitle extends Vue {
   font: 400 13.3333px Arial;
   height: 13px;
 }
+
+.stop-reverse {
+  font-weight: bold;
+  color: orange;
+}
+
 </style>

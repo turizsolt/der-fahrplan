@@ -1,99 +1,89 @@
 import { injectable } from 'inversify';
 import { Wagon } from '../../Interfaces/Wagon';
-import { Train } from '../../Scheduling/Train';
-import { TYPES } from '../../../di/TYPES';
 import { Store } from '../../Interfaces/Store';
-import { Platform } from '../../Interfaces/Platform';
+import { Platform } from '../../../modules/Station/Platform';
 import { Trip } from '../../Scheduling/Trip';
+import { Train } from '../../../modules/Train/Train';
+import { WhichEnd } from '../../Interfaces/WhichEnd';
+
+// todo redo everything
 
 @injectable()
 export class WagonAnnouncement {
-  protected trip: Trip;
-  protected train: Train;
+    protected trip: Trip;
 
-  constructor(private parent: Wagon, private store: Store) {
-    this.train = this.store.create<Train>(TYPES.Train).init(this.parent);
-  }
+    constructor(
+        private parent: Wagon,
+        private store: Store,
+        private train: Train
+    ) { }
 
-  assignTrip(trip: Trip): void {
-    this.train.assignTrip(trip, [this.parent]);
-  }
-
-  cancelTrip(): void {
-    this.train.assignTrip(null, [this.parent]);
-  }
-
-  setTrip(trip: Trip) {
-    this.trip = trip;
-  }
-
-  getTrip(): Trip {
-    const wagonWithTrip = this.train
-      .getWagonsWithSides()
-      .find(x => x.wagon === this.parent);
-    return wagonWithTrip?.trip;
-  }
-
-  getTrain(): Train {
-    return this.train;
-  }
-
-  setTrain(train: Train): void {
-    if (train) {
-      this.train = train;
-    } else {
-      this.train = this.store.create<Train>(TYPES.Train).init(this.parent);
+    assignTrip(trip: Trip): void {
+        // this.train.assignTrip(trip, [this.parent]);
     }
-  }
 
-  stop(): void {
-    // todo use the worm
-    const platformsInvolved: Platform[] = this.platformsBeside();
-    platformsInvolved.map(p => this.stoppedAt(p));
-  }
+    cancelTrip(): void {
+        // this.train.assignTrip(null, [this.parent]);
+    }
 
-  platformsBeside(): Platform[] {
-    const platformsInvolved: Platform[] = [];
-    const trackA = this.parent.getA().positionOnTrack.getTrack();
-    platformsInvolved.push(
-      ...trackA
-        .getPlatformsBeside()
-        .filter(p => this.parent.getA().positionOnTrack.isBeside(p))
-    );
-    const trackB = this.parent.getB().positionOnTrack.getTrack();
-    trackB
-      .getPlatformsBeside()
-      .filter(p => this.parent.getB().positionOnTrack.isBeside(p))
-      .map((p: Platform) => {
-        if (!platformsInvolved.find(x => x === p)) {
-          platformsInvolved.push(p);
-        }
-      });
-    return platformsInvolved;
-  }
+    setTrip(trip: Trip) {
+        this.trip = trip;
+    }
 
-  stoppedAt(platform: Platform): void {
-    this.train.stoppedAt(platform.getStation(), platform);
-  }
+    getTrip(): Trip {
+        return this.trip;
+    }
 
-  announceStoppedAt(platform: Platform): void {
-    const station = platform.getStation();
-    this.parent.getBoardedPassengers().map(p => {
-      if (p) {
-        p.listenWagonStoppedAtAnnouncement(
-          station,
-          platform,
-          this.train,
-          this.trip.getRoute()
+    getTrain(): Train {
+        return this.train;
+    }
+
+    setTrain(train: Train): void {
+        this.train = train;
+    }
+
+    stop(): void {
+        // todo use the worm
+        // todo worm is obsolete now, use the markers
+        const platformsInvolved: Platform[] = this.platformsBeside();
+        platformsInvolved.map(p => this.stoppedAt(p));
+    }
+
+    platformsBeside(): Platform[] {
+        const platformsInvolved: Platform[] = [];
+        const trackA = this.parent.getAxlePosition(WhichEnd.A).getTrack();
+        platformsInvolved.push(
+            ...trackA
+                .getPlatformsBeside()
+                .filter(p => p.isBesidePoT(this.parent.getAxlePosition(WhichEnd.A)))
         );
-      }
-    });
-  }
+        const trackB = this.parent.getAxlePosition(WhichEnd.B).getTrack();
+        trackB
+            .getPlatformsBeside()
+            .filter(p => p.isBesidePoT(this.parent.getAxlePosition(WhichEnd.B)))
+            .map((p: Platform) => {
+                if (!platformsInvolved.find(x => x === p)) {
+                    platformsInvolved.push(p);
+                }
+            });
+        return platformsInvolved;
+    }
 
-  persist(): any {
-    return {
-      trip: this.trip && this.trip.getId(),
-      train: this.train.getId()
-    };
-  }
+    stoppedAt(platform: Platform): void {
+        this.train.stoppedAt(platform.getStation(), platform);
+    }
+
+    announceStoppedAt(platform: Platform): void {
+        const station = platform.getStation();
+        this.parent.getBoardedPassengers().map(p => {
+            if (p) {
+                p.listenWagonStoppedAtAnnouncement(
+                    station,
+                    platform,
+                    this.train,
+                    this.trip.getRoute()
+                );
+            }
+        });
+    }
 }

@@ -1,98 +1,57 @@
-import { WagonEnd } from '../Actuals/Wagon/WagonEnd';
 import { Ray } from '../Geometry/Ray';
-import { Track } from './Track';
-import { PositionOnTrack } from '../Actuals/Track/PositionOnTrack';
 import { WhichEnd } from '../Interfaces/WhichEnd';
-import { Platform } from './Platform';
-import { Updatable } from '../../mixins/Updatable';
+import { Platform } from '../../modules/Station/Platform';
 import { BaseBrick } from './BaseBrick';
-import { Train } from '../Scheduling/Train';
-import { TrackWorm } from '../Actuals/Track/TrackWorm';
-import { Passenger } from './Passenger';
+import { Passenger } from '../../modules/Passenger/Passenger';
 import { Boardable } from '../../mixins/Boardable';
 import { WagonConfig } from '../Actuals/Wagon/WagonConfig';
-import { WagonControlType } from '../Actuals/Wagon/WagonControl/WagonControlType';
 import { PassengerArrangement } from '../../mixins/BoardableWagon';
 import { WagonConnectable } from '../Actuals/Wagon/WagonConnectable';
-import { WagonMovingState } from '../Actuals/Wagon/WagonMovingState';
 import { Trip } from '../Scheduling/Trip';
+import { PositionOnTrack } from '../../modules/Train/PositionOnTrack';
+import { Emitable } from '../../mixins/Emitable';
+import { Train } from '../../modules/Train/Train';
+import { TrackDirection } from '../../modules/Track/TrackDirection';
 
-export interface Wagon extends Boardable, BaseBrick, Updatable {
-  init(config?: WagonConfig): Wagon;
-  update(): void;
-  getA(): WagonEnd;
-  getB(): WagonEnd;
-  getEnd(whichEnd: WhichEnd): WagonEnd;
-  getRay(): Ray;
-  remove(): boolean;
-  isRemoved(): boolean;
-  isAFree(): boolean;
-  isBFree(): boolean;
-  isOneFree(): boolean;
-  onStocked(): void;
-  getSelectedSide(): WhichEnd | null;
-  swapSelectedSide(): void;
-  accelerate(): void;
-  break(): void;
-  getLastWagon(whichEnd: WhichEnd): Wagon;
+export interface Wagon extends Boardable, BaseBrick, Emitable {
+    init(config?: WagonConfig, train?: Train): Wagon;
+    update(): void;
+    getRay(): Ray;
 
-  getMaxSpeed(): number;
-  getAccelerateBy(): number;
-  getControlType(): WagonControlType;
-  getPassengerArrangement(): PassengerArrangement;
-  getPassengerCount(): number;
-  getAppearanceId(): string;
-  getConnectable(A: WhichEnd): WagonConnectable;
+    setAxlePosition(whichEnd: WhichEnd, pot: PositionOnTrack): void;
+    getAxlePosition(whichEnd: WhichEnd): PositionOnTrack;
+    axleReverse(): void;
+    getFacing(): TrackDirection;
 
-  getWorm(): TrackWorm;
-  getCenterRay(): Ray;
+    getPassengerArrangement(): PassengerArrangement;
+    getPassengerCount(): number;
+    getAppearanceId(): string;
+    getConnectable(A: WhichEnd): WagonConnectable;
 
-  putOnTrack(track: Track, position?: number, direction?: number): void;
-  moveTowardsWagon(whichEnd: WhichEnd, distance: number): void;
-  moveTowardsWagonB(distance: number): void;
-  moveTowardsWagonA(distance: number): void;
-  stop(): void;
+    getCenterRay(): Ray;
 
-  getLength(): number;
-  getNearestWagon(end: WhichEnd): NearestWagon;
-  swapEnds(): void;
-  pullToPos(pot: PositionOnTrack, dir: number): void;
+    stop(): void;
 
-  assignTrip(trip: Trip): void;
-  setTrip(trip: Trip): void;
-  cancelTrip(): void;
-  getTrip(): Trip;
+    getLength(): number;
+    swapEnds(): void;
 
-  stoppedAt(platform: Platform): void;
-  hasFreeSeat(): boolean;
-  setSeatCount(count: number, columns?: number);
-  moveBoardedPassengers(): void;
+    assignTrip(trip: Trip): void;
+    setTrip(trip: Trip): void;
+    cancelTrip(): void;
+    getTrip(): Trip;
 
-  getTrain(): Train;
-  setTrain(train: Train): void;
+    stoppedAt(platform: Platform): void;
+    hasFreeSeat(): boolean;
+    setSeatCount(count: number, columns?: number);
+    moveBoardedPassengers(): void;
 
-  getBoardedPassengers(): Passenger[];
-  detach(): void;
-  tick(): void;
-  getSpeed(): number;
+    getTrain(): Train;
+    setTrain(train: Train): void;
 
-  shuntForward(): void;
-  shuntBackward(): void;
+    getBoardedPassengers(): Passenger[];
 
-  setControlingWagon(wagon: Wagon): void;
-  getControlingWagon(): Wagon;
-  clearControlingWagon(): void;
-  canThisWagonControl(): boolean;
+    platformsBeside(): Platform[];
 
-  disconnect(whichEnd: WhichEnd): void;
-  getMovingState(): WagonMovingState;
-  halt(): void;
-
-  platformsBeside(): Platform[];
-}
-
-export interface NearestWagon {
-  distance: number;
-  wagon: Wagon;
-  end: WagonEnd;
+    hasControl(whichEnd: WhichEnd): boolean;
+    hasEngine(): boolean;
 }
