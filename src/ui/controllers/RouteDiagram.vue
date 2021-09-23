@@ -14,6 +14,13 @@
       <button @click="move(4, +1)">Arr+</button>
       <button @click="move(5, -1)">Dep-</button>
       <button @click="move(5, +1)">Dep+</button>
+      time
+      <button @click="time(0, -1)">Start-</button>
+      <button @click="time(0, +1)">Start+</button>
+      <button @click="time(1, -1)">End-</button>
+      <button @click="time(1, +1)">End+</button>
+      {{minTimeStr}}
+      {{maxTimeStr}}
     </div>
     <div id="map-field">
       <div v-for="line in sideLines" :key="line.id" class="side-line" :style="line.style"></div>  
@@ -39,6 +46,7 @@ import { RailMap } from "../../modules/RailMap/RailMap";
 import { RailMapNode } from "../../modules/RailMap/RailMapNode";
 import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";
 import { RailDiagram } from "../../modules/RailDiagram/RailDiagram";
+import { Util } from "../../structs/Util";
 
 @Component
 export default class RouteDiagram extends Vue {
@@ -51,6 +59,8 @@ export default class RouteDiagram extends Vue {
   stopLines: any[] = [];
   minTime: number = 0;
   maxTime: number = 60*60*24;
+  minTimeStr: string = '0:00';
+  maxTimeStr: string = '24:00';
   selectedStop: any = null;
 
   constructor() {
@@ -135,10 +145,28 @@ export default class RouteDiagram extends Vue {
       ...plot,
       style: plotToStyle(plot)
     }));
+    
+    const timeBounds = this.diagram.getTimeBounds();
+    this.minTime = timeBounds.minTime;
+    this.maxTime = timeBounds.maxTime;
+
+    this.minTimeStr = Util.timeToString(this.minTime);
+    this.maxTimeStr = Util.timeToString(this.maxTime);
   }
 
   select(stop: TripStop):void {
     this.selectedStop = stop;
+  }
+
+  time(type: number, time: number): void {
+    const timeBounds = this.diagram.getTimeBounds();
+    if(type === 0) {
+      timeBounds.minTime += time*1800;
+    } else if(type === 1) {
+      timeBounds.maxTime += time*1800;
+    }
+    this.diagram.setTimeBounds(timeBounds.minTime, timeBounds.maxTime);
+    this.init();
   }
 
   move(type: number, time: number): void {

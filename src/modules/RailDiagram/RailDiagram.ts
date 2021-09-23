@@ -33,6 +33,19 @@ export class RailDiagram {
         this.update();
     }
 
+    setTimeBounds(minTime: number, maxTime: number): void {
+        this.minTime = minTime;
+        this.maxTime = maxTime;
+        this.update();
+    }
+
+    getTimeBounds(): { minTime: number, maxTime: number } {
+        return {
+            minTime: this.minTime,
+            maxTime: this.maxTime
+        }
+    }
+
     update(): void {
         if (this.route) {
             this.updateDiagramHeight();
