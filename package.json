@@ -52,7 +52,7 @@
     "cannon": "^0.6.2",
     "earcut": "^2.1.5",
     "inversify": "^5.0.1",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "oimo": "^1.0.9",
     "pixi.js": "^6.0.4",
     "reflect-metadata": "^0.1.13",
