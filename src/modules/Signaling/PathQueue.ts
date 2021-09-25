@@ -42,14 +42,21 @@ export class PathQueue {
     const toEval = [...this.queue];
     this.queue = [];
 
+    const dict: Record<string, boolean> = {};
+
     for (let next of toEval) {
       let succ = false;
-      for (let to of next.toOptions) {
-        if (this.pathBlock.allow(next.from, to, next, next.train)) {
-          succ = true;
-          break;
+
+      if (!dict[next.from.getHash()]) {
+        for (let to of next.toOptions) {
+          if (this.pathBlock.allow(next.from, to, next, next.train)) {
+            succ = true;
+            dict[next.from.getHash()] = true;
+            break;
+          }
         }
       }
+      dict[next.from.getHash()] = true;
 
       if (!succ) {
         this.queue.push(next);
