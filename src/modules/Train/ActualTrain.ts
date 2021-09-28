@@ -378,7 +378,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
 
         if (this.autoMode && this.speed.getSpeed() === 0) {
-            this.stopper.tick(this.sight?.markers?.[0]);
+            this.stopper.tick(this.sight?.markers.filter(m => m.type === 'Platform')?.[0]);
             return;
         }
 
