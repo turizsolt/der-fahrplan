@@ -11,23 +11,40 @@ import { PixiClick } from './PixiClick';
 export class PathBlockPixiRenderer extends BasePixiRenderer
   implements PathBlockRenderer {
   private circle: PIXI.Graphics;
-  private texts: PIXI.Text[];
+  private texts: PIXI.Text[] = [];
+  private inited: boolean = false;
 
   init(data: any): void {
-    const rayPost = new Ray(data.coord, 0);
-
     this.circle = new PIXI.Graphics();
     this.circle.lineStyle(0.25, 0x000000);
-    this.circle.beginFill(0x800000);
+    this.circle.beginFill(data.light ? 0x008080 : 0x800000);
     this.circle.drawCircle(0, 0, 3);
     this.circle.endFill();
     this.circle.zIndex = 20;
+
+    const rayPost = new Ray(data.coord, 0);
     this.circle.x = rayPost.coord.x;
     this.circle.y = rayPost.coord.z;
 
     PixiClick(this.circle, 'pathBlock', data.id);
 
     globalThis.stage.addChild(this.circle);
+
+    this.inited = true;
+    this.update(data);
+  }
+
+  update(data: any) {
+    if (!this.inited) return;
+
+    const rayPost = new Ray(data.coord, 0);
+    this.circle.x = rayPost.coord.x;
+    this.circle.y = rayPost.coord.z;
+
+    this.circle.clear();
+    this.circle.beginFill(data.light ? 0x008080 : 0x800000);
+    this.circle.drawCircle(0, 0, 3);
+    this.circle.endFill();
 
     const settings: Partial<ITextStyle> = {
       fontFamily: 'Arial',
@@ -36,6 +53,9 @@ export class PathBlockPixiRenderer extends BasePixiRenderer
       align: 'center'
     };
 
+    this.texts.map((t: PIXI.Text) => {
+      t.renderable = false;
+    });
     this.texts = [];
     for (let i = 0; i < data.jointEnds.length; i++) {
       let text = new PIXI.Text(i.toString(), settings);
@@ -53,8 +73,6 @@ export class PathBlockPixiRenderer extends BasePixiRenderer
       globalThis.stage.addChild(text);
     }
   }
-
-  update(data: any) { }
 
   remove() {
     this.circle.clear();

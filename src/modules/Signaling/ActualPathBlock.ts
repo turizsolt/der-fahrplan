@@ -30,6 +30,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     private queue: PathQueue;
     private coord: Coordinate;
     private key: Record<string, number> = {};
+    private light: boolean = false;
 
     init(jointEnds: BlockJointEnd[]): PathBlock {
         this.initStore(TYPES.PathBlock);
@@ -37,16 +38,46 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         this.queue = new PathQueue(this);
 
         this.pathBlockEnds = jointEnds.map(je => new ActualPathBlockEnd(je, this));
-        this.coord = jointEnds.map(je => je.joint.getPosition().getRay().coord).reduce((a, b) => new Coordinate(a.x + b.x, a.y + b.y, a.z + b.z), new Coordinate(0, 0, 0));
-        const n = jointEnds.length;
-        this.coord = new Coordinate(this.coord.x / n, this.coord.y / n, this.coord.z / n);
 
         for (let i = 0; i < this.pathBlockEnds.length; i++) {
             this.key[this.pathBlockEnds[i].getJointEnd().joint.getId() + '-' + this.pathBlockEnds[i].getJointEnd().end] = i;
         }
 
+        this.coord = jointEnds.map(je => je.joint.getPosition().getRay().coord).reduce((a, b) => new Coordinate(a.x + b.x, a.y + b.y, a.z + b.z), new Coordinate(0, 0, 0));
+        const n = jointEnds.length;
+        this.coord = new Coordinate(this.coord.x / n, this.coord.y / n, this.coord.z / n);
+
         this.emit('init', this.persist());
         return this;
+    }
+
+    update(jointEnds: BlockJointEnd[]): void {
+
+        this.pathBlockEnds = jointEnds.map(je => new ActualPathBlockEnd(je, this));
+
+        this.key = {};
+        for (let i = 0; i < this.pathBlockEnds.length; i++) {
+            this.key[this.pathBlockEnds[i].getJointEnd().joint.getId() + '-' + this.pathBlockEnds[i].getJointEnd().end] = i;
+        }
+
+        this.coord = jointEnds.map(je => je.joint.getPosition().getRay().coord).reduce((a, b) => new Coordinate(a.x + b.x, a.y + b.y, a.z + b.z), new Coordinate(0, 0, 0));
+        const n = jointEnds.length;
+        this.coord = new Coordinate(this.coord.x / n, this.coord.y / n, this.coord.z / n);
+
+        this.queue.updateRules(this.pathBlockEnds);
+
+        this.emit('update', this.persist());
+    }
+
+    empty(): void {
+        if (this.allowedPathes.length > 0) return;
+
+        this.pathBlockEnds.map(pbe => pbe.pathDisconnect());
+        this.pathBlockEnds = [];
+
+        this.key = {};
+
+        this.emit('update', this.persist());
     }
 
     remove() {
@@ -55,6 +86,11 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         this.pathBlockEnds.map(pbe => pbe.pathDisconnect());
         this.emit('remove', this.id);
         super.remove();
+    }
+
+    highlight(light: boolean): void {
+        this.light = light;
+        this.emit('update', this.persist());
     }
 
     getName(): string {
@@ -264,7 +300,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
             queue: this.queue.persist(),
             allowedPathes: this.allowedPathes.map(this.persistAllowedPath),
             coord: { x: this.getCoord().x, y: this.getCoord().y, z: this.getCoord().z },
-            key: this.key
+            key: this.key,
+            light: this.light
         };
     }
 

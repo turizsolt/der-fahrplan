@@ -76,6 +76,25 @@ export class PathQueue {
     this.rules[index].filter = filter;
   }
 
+  updateRules(jointEnds: PathBlockEnd[]): void {
+    const newRules: PathRule[] = [];
+    for (let rule of this.rules) {
+      if (jointEnds.some(je => je.getHash() === rule.from.getHash())) {
+        const toOptions: PathBlockEnd[] = [];
+        for (let to of rule.toOptions) {
+          if (jointEnds.some(je => je.getHash() === to.getHash())) {
+            toOptions.push(to);
+          }
+        }
+        if (toOptions.length > 0) {
+          newRules.push({ from: rule.from, toOptions, filter: rule.filter });
+        }
+      }
+    }
+
+    this.rules = newRules;
+  }
+
   persist(): Object {
     return {
       rules: this.rules.map(r => ({

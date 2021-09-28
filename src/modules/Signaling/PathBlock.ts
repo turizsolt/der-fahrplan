@@ -9,6 +9,8 @@ import { PathRequest } from './PathRequest';
 
 export interface PathBlock extends BaseBrick, RailMapNode {
   init(jointEnds: BlockJointEnd[]): PathBlock;
+  update(jointEnds: BlockJointEnd[]): void;
+  empty(): void;
   allow(
     startPBE: PathBlockEnd,
     endPBE: PathBlockEnd,
@@ -24,4 +26,5 @@ export interface PathBlock extends BaseBrick, RailMapNode {
   getPathBlockEnds(): PathBlockEnd[];
   tick(): void;
   getCoord(): Coordinate;
+  highlight(light: boolean): void;
 }

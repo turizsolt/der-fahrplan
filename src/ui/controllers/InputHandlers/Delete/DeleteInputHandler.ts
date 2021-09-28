@@ -6,8 +6,9 @@ import { CommandLog } from '../../../../structs/Actuals/Store/Command/CommandLog
 import { MeshInfo } from '../../MeshInfo';
 import { BaseBrick } from '../../../../structs/Interfaces/BaseBrick';
 import { TYPES } from '../../../../di/TYPES';
-import { MouseLeft } from '../Interfaces/InputType';
+import { MouseLeft, MouseRight } from '../Interfaces/InputType';
 import { BaseStorable } from '../../../../structs/Interfaces/BaseStorable';
+import { PathBlock } from '../../../../modules/Signaling/PathBlock';
 
 // @injectable()
 export class DeleteInputHandler extends InputHandler {
@@ -28,12 +29,28 @@ export class DeleteInputHandler extends InputHandler {
 
             toDelete.remove();
         });
+
+        this.reg(click(MouseRight), (legacyEvent: PointerEvent) => {
+            const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
+            const toDelete = this.acceptedToEmpty(legacyProps);
+            if (!toDelete) return false;
+
+            (toDelete as PathBlock).empty();
+        });
     }
 
     private acceptedToDelete(legacyProps: InputProps): BaseStorable {
         const meshInfo = this.getMeshInfo(legacyProps?.mesh?.id);
         if (!meshInfo || !meshInfo.storedBrick) return null;
         if (![TYPES.Block, TYPES.BlockJoint, TYPES.Section, TYPES.Signal, TYPES.CapacityCap, TYPES.Sensor, TYPES.PathBlock].includes(meshInfo.type)) return null;
+
+        return this.store.get(meshInfo.id);
+    }
+
+    private acceptedToEmpty(legacyProps: InputProps): BaseStorable {
+        const meshInfo = this.getMeshInfo(legacyProps?.mesh?.id);
+        if (!meshInfo || !meshInfo.storedBrick) return null;
+        if (![TYPES.PathBlock].includes(meshInfo.type)) return null;
 
         return this.store.get(meshInfo.id);
     }
