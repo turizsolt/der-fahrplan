@@ -97,7 +97,7 @@ describe('Travel', () => {
         travelPathes.find();
         const stFake: Station = { getId: () => undefined } as Station;
         const pathes: TravelPath[] = travelPathes.getPathes(stFake, stFake);
-        expect(pathes).equals(undefined);
+        expect(pathes).deep.equals([]);
     });
 
     it('level1: no direct pathes', () => {
