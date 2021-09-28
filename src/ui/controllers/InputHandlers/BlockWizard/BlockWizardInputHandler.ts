@@ -122,7 +122,7 @@ export class BlockWizardInputHandler extends InputHandler {
                 : nearestBackward;
 
         const wholeDistance = forward.distance + backward.distance;
-        const signalMinimumDistance = 100;
+        const signalMinimumDistance = globalThis.signalDistance || 100;
         const signalCount = Math.max(
             1,
             Math.floor(wholeDistance / signalMinimumDistance)
