@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import { injectable } from 'inversify';
 import { BasePixiRenderer } from './BasePixiRenderer';
 import { BlockJointRenderer } from '../../structs/Renderers/BlockJointRenderer';
+import { PixiClick } from './PixiClick';
 
 @injectable()
 export class BlockJointPixiRenderer extends BasePixiRenderer
@@ -11,8 +12,6 @@ export class BlockJointPixiRenderer extends BasePixiRenderer
 
   init(data: any) {
     this.rectangle = new PIXI.Graphics();
-    this.rectangle.interactive = true;
-    this.rectangle.buttonMode = true;
     this.rectangle.beginFill(0xa8a632);
     this.rectangle.drawCircle(0, -3, 3);
     this.rectangle.endFill();
@@ -22,38 +21,7 @@ export class BlockJointPixiRenderer extends BasePixiRenderer
     this.rectangle.rotation = -data.ray.dirXZ;
     this.rectangle.zIndex = 10;
 
-    this.rectangle.on('pointerdown', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.down({
-        ...event,
-        meshId: 'clickable-blockjoint-' + data.id + '-jointA',
-        button: event.data.button
-      });
-
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
-
-    this.rectangle.on('pointerup', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.up({
-        ...event,
-        meshId: 'clickable-blockjoint-' + data.id + '-jointA',
-        button: event.data.button
-      });
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
+    PixiClick(this.rectangle, 'blockjoint', data.id, 'jointA');
 
     ///////////////////////
 
@@ -69,39 +37,7 @@ export class BlockJointPixiRenderer extends BasePixiRenderer
     this.rectangle2.rotation = -data.ray.dirXZ;
     this.rectangle2.zIndex = 10;
 
-    this.rectangle2.on('pointerdown', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.down({
-        ...event,
-        meshId: 'clickable-blockjoint-' + data.id + '-jointB',
-        button: event.data.button
-      });
-
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
-
-    this.rectangle2.on('pointerup', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.up({
-        ...event,
-        meshId: 'clickable-blockjoint-' + data.id + '-jointB',
-        button: event.data.button
-      });
-
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
+    PixiClick(this.rectangle2, 'blockjoint', data.id, 'jointB');
 
     globalThis.stage.addChild(this.rectangle);
     globalThis.stage.addChild(this.rectangle2);
@@ -110,6 +46,9 @@ export class BlockJointPixiRenderer extends BasePixiRenderer
   update() { }
 
   remove() {
+    this.rectangle.clear();
     this.rectangle.renderable = false;
+    this.rectangle2.clear();
+    this.rectangle2.renderable = false;
   }
 }

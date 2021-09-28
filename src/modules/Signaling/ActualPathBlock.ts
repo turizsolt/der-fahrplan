@@ -49,6 +49,14 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         return this;
     }
 
+    remove() {
+        if (this.allowedPathes.length > 0) return;
+
+        this.pathBlockEnds.map(pbe => pbe.pathDisconnect());
+        this.emit('remove', this.id);
+        super.remove();
+    }
+
     getName(): string {
         return this.id;
     }

@@ -101,6 +101,10 @@ export class ActualPathBlockEnd implements PathBlockEnd {
     this.jointEnd.joint.setOneEnd(this.jointEnd.end, this.blockEnd);
   }
 
+  pathDisconnect(): void {
+    this.jointEnd.joint.removeEnd(this);
+  }
+
   disconnect(): void {
     this.jointEnd.joint.removeEnd(this.blockEnd);
   }

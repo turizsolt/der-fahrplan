@@ -44,6 +44,14 @@ export class ActualCapacityCap extends ActualBaseBrick implements CapacityCap {
         return this;
     }
 
+    remove() {
+        this.signal = SignalSignal.Green;
+        this.getJointEnds().map(je => je.joint.removeCapacityCap(this));
+        this.emit('update', this.persist());
+        this.emit('remove', this.id);
+        super.remove();
+    }
+
     getJointEnds(): BlockJointEnd[] {
         return this.jointEnds;
     }

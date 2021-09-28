@@ -48,6 +48,20 @@ export class ActualBlockJoint extends ActualBaseBrick implements BlockJoint {
     return this;
   }
 
+  remove() {
+    if (this.getEnd(WhichEnd.A)) return;
+    if (this.getEnd(WhichEnd.B)) return;
+    if (this.getSectionEnd(WhichEnd.A)) return;
+    if (this.getSectionEnd(WhichEnd.B)) return;
+    if (this.getCapacityCap(WhichEnd.A)) return;
+    if (this.getCapacityCap(WhichEnd.B)) return;
+
+    this.position.removeMarker({ type: 'BlockJoint', blockJoint: this });
+    this.opposition.removeMarker({ type: 'BlockJoint', blockJoint: this });
+    this.emit('remove', this.id);
+    super.remove();
+  }
+
   setOneEnd(jointEnd: WhichEnd, blockEnd: BlockEnd): void {
     this.ends[jointEnd] = blockEnd;
     if (this.ends.A && this.ends.B) {

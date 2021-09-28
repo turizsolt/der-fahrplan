@@ -52,6 +52,14 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
     return this;
   }
 
+  remove() {
+    this.blockEnd?.off('update', this.blockSubscribe);
+    this.sectionEnd?.off('update', this.sectionSubscribe);
+    this.capacityCap?.off('update', this.capacitySubscribe);
+    this.emit('remove', this.id);
+    super.remove();
+  }
+
   addSectionEmitter(sectionEnd: SectionEnd): void {
     this.sectionSubscribe = (data: any) => {
       this.setSectionSignal(data.signal);
@@ -159,13 +167,6 @@ export class ActualSignal extends ActualBaseBrick implements Signal {
     }
     this.init(PositionOnTrack.fromData(obj.positionOnTrack, store), blockEnd, sectionEnd, obj.signal, capacityCap);
     if (obj.hidden) { this.setHidden(); }
-  }
-
-  remove() {
-    super.remove();
-    this.blockEnd?.off('update', this.blockSubscribe);
-    this.sectionEnd?.off('update', this.sectionSubscribe);
-    this.capacityCap?.off('update', this.capacitySubscribe);
   }
 }
 doApply();

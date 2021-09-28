@@ -9,7 +9,7 @@ import { Store } from '../../structs/Interfaces/Store';
 import { TrackMarker } from '../Track/TrackMarker';
 
 export class PositionOnTrack {
-  constructor(private directedTrack: DirectedTrack, private position: number) {}
+  constructor(private directedTrack: DirectedTrack, private position: number) { }
 
   static fromTrack(
     track: TrackBase,
@@ -31,6 +31,10 @@ export class PositionOnTrack {
 
   addMarker(marker: TrackMarker): void {
     this.directedTrack.addMarker(this.position, marker);
+  }
+
+  removeMarker(marker: TrackMarker): void {
+    this.directedTrack.removeMarker(marker);
   }
 
   getRay(): Ray {

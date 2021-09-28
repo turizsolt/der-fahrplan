@@ -197,7 +197,7 @@ export class ActualStore implements Store {
                 // todo prettify
                 ((created as any) as Emitable).on('init', data => g.init(data));
                 ((created as any) as Emitable).on('update', data => g.update(data));
-                ((created as any) as Emitable).on('remove', data => g.remove(data));
+                ((created as any) as Emitable).on('remove', id => g.remove(id));
                 ((created as any) as Emitable).on('remove', id =>
                     this.unregister(this.get(id))
                 );

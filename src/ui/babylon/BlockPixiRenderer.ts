@@ -3,11 +3,13 @@ import { injectable } from 'inversify';
 import { BasePixiRenderer } from './BasePixiRenderer';
 import { BlockRenderer } from '../../structs/Renderers/BlockRenderer';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
+import { PixiClick } from './PixiClick';
 
 @injectable()
 export class BlockPixiRenderer extends BasePixiRenderer
   implements BlockRenderer {
   private line: PIXI.Graphics;
+  private circle: PIXI.Graphics;
   private coords: Coordinate[];
 
   init(data: any): void {
@@ -21,7 +23,27 @@ export class BlockPixiRenderer extends BasePixiRenderer
     }
     this.line.zIndex = 8;
 
+    let coord: Coordinate = null;
+    if (this.coords.length % 2 == 1) {
+      const i = (this.coords.length - 1) / 2;
+      coord = this.coords[i];
+    } else {
+      const i = this.coords.length / 2;
+      coord = this.coords[i - 1].midpoint(this.coords[1]);
+    }
+
+    this.circle = new PIXI.Graphics();
+    this.circle.lineStyle(0.25, 0x000000, 0.5);
+    this.circle.beginFill(0x00ff00);
+    this.circle.drawCircle(0, 0, 2);
+    this.circle.endFill();
+    this.circle.zIndex = 9;
+    this.circle.x = coord.x;
+    this.circle.y = coord.z;
+    PixiClick(this.circle, 'block', data.id);
+
     globalThis.stage.addChild(this.line);
+    globalThis.stage.addChild(this.circle);
   }
 
   update(data: any) {
@@ -36,5 +58,7 @@ export class BlockPixiRenderer extends BasePixiRenderer
   remove() {
     this.line.clear();
     this.line.renderable = false;
+    this.circle.clear();
+    this.circle.renderable = false;
   }
 }

@@ -57,7 +57,12 @@ export class ActualBlock extends ActualBaseBrick implements Block {
   }
 
   remove(): void {
+    this.checkedTrains = [];
+    this.getEnd(WhichEnd.A).disconnect();
+    this.getEnd(WhichEnd.B).disconnect();
+    this.emit('update', this.id);
     this.emit('remove', this.id);
+    super.remove();
   }
 
   private findCoords(start: PositionOnTrack, end: PositionOnTrack, fx) {

@@ -29,12 +29,16 @@ export class ActualSensor extends ActualBaseBrick implements Sensor {
     this.pathBlock = pathBlock;
     this.pathBlockEnd = pathBlockEnd;
 
-    this.position
-      .getDirectedTrack()
-      .addMarker(this.position.getPosition(), { type: 'Sensor', sensor: this });
+    this.position.addMarker({ type: 'Sensor', sensor: this });
 
     this.emit('init', this.persist());
     return this;
+  }
+
+  remove() {
+    this.position.removeMarker({ type: 'Sensor', sensor: this });
+    this.emit('remove', this.id);
+    super.remove();
   }
 
   getPosition(): PositionOnTrack {
@@ -56,7 +60,7 @@ export class ActualSensor extends ActualBaseBrick implements Sensor {
   }
 
   checkin(train: Train): void {
-    this.pathBlock.requestPath(this.pathBlockEnd, train);
+    this.pathBlock?.requestPath(this.pathBlockEnd, train);
   }
 
   getRenderer(): BaseRenderer {
@@ -68,7 +72,7 @@ export class ActualSensor extends ActualBaseBrick implements Sensor {
       id: this.id,
       type: 'Sensor',
       positionOnTrack: this.position.persist(),
-      pathBlock: this.pathBlock.getId(),
+      pathBlock: this.pathBlock?.getId(),
       pathBlockEnd: this.pathBlockEnd.persist(),
 
       ray: this.position.getRay().persist() // visuals
