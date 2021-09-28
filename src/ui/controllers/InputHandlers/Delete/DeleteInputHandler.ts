@@ -35,7 +35,11 @@ export class DeleteInputHandler extends InputHandler {
             const toDelete = this.acceptedToEmpty(legacyProps);
             if (!toDelete) return false;
 
-            (toDelete as PathBlock).empty();
+            if (toDelete.getType() === TYPES.PathBlock) {
+                (toDelete as PathBlock).empty();
+            } else {
+                toDelete.remove();
+            }
         });
     }
 
@@ -50,7 +54,7 @@ export class DeleteInputHandler extends InputHandler {
     private acceptedToEmpty(legacyProps: InputProps): BaseStorable {
         const meshInfo = this.getMeshInfo(legacyProps?.mesh?.id);
         if (!meshInfo || !meshInfo.storedBrick) return null;
-        if (![TYPES.PathBlock].includes(meshInfo.type)) return null;
+        if (![TYPES.PathBlock, TYPES.Track, TYPES.TrackSwitch].includes(meshInfo.type)) return null;
 
         return this.store.get(meshInfo.id);
     }

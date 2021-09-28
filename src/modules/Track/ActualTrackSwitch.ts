@@ -133,6 +133,8 @@ export class ActualTrackSwitch extends ActualTrackBase implements TrackSwitch {
     }
 
     remove(): boolean {
+        if (this.isLocked()) return false;
+
         const removable = super.remove();
         if (removable) {
             this.activeSegment.disconnect();

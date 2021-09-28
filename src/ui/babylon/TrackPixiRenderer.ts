@@ -4,11 +4,13 @@ import { injectable } from 'inversify';
 import { Track } from '../../modules/Track/Track';
 import { BasePixiRenderer } from './BasePixiRenderer';
 import { Left, Right } from '../../structs/Geometry/Directions';
+import { PixiClick } from './PixiClick';
 
 @injectable()
 export class TrackPixiRenderer extends BasePixiRenderer
   implements TrackRenderer {
   private track: Track;
+  private line: PIXI.Graphics;
 
   init(track: Track): void {
     this.track = track;
@@ -23,51 +25,23 @@ export class TrackPixiRenderer extends BasePixiRenderer
     coords.push(...rays2.map(r => new PIXI.Point(r.coord.x, r.coord.z)));
     const polygon = new PIXI.Polygon(coords);
 
-    const line = new PIXI.Graphics();
-    line.hitArea = polygon;
-    line.interactive = true;
-    line.buttonMode = true;
-    line.beginFill(0xa6bdac);
-    line.drawPolygon(polygon);
-    line.endFill();
-    line.zIndex = 0;
+    this.line = new PIXI.Graphics();
+    this.line.hitArea = polygon;
+    this.line.beginFill(0xa6bdac);
+    this.line.drawPolygon(polygon);
+    this.line.endFill();
+    this.line.zIndex = 0;
 
-    line.on('pointerdown', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.down({
-        ...event,
-        meshId: 'clickable-track-' + track.getId(),
-        button: event.data.button
-      });
+    PixiClick(this.line, 'track', track.getId());
 
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
-
-    line.on('pointerup', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.up({
-        ...event,
-        meshId: 'clickable-track-' + track.getId(),
-        button: event.data.button
-      });
-
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
-
-    globalThis.stage.addChild(line);
+    globalThis.stage.addChild(this.line);
   }
 
-  update() {}
+  update() { }
+
+  remove() {
+    console.log('tr pixi rem');
+    this.line.clear();
+    this.line.renderable = false;
+  }
 }
