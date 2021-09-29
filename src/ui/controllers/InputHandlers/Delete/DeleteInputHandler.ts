@@ -46,7 +46,10 @@ export class DeleteInputHandler extends InputHandler {
     private acceptedToDelete(legacyProps: InputProps): BaseStorable {
         const meshInfo = this.getMeshInfo(legacyProps?.mesh?.id);
         if (!meshInfo || !meshInfo.storedBrick) return null;
-        if (![TYPES.Block, TYPES.BlockJoint, TYPES.Section, TYPES.Signal, TYPES.CapacityCap, TYPES.Sensor, TYPES.PathBlock].includes(meshInfo.type)) return null;
+        if (![
+            TYPES.Block, TYPES.BlockJoint, TYPES.Section, TYPES.Signal,
+            TYPES.CapacityCap, TYPES.Sensor, TYPES.PathBlock,
+            TYPES.Platform, TYPES.WaitingHall, TYPES.TrackJoint].includes(meshInfo.type)) return null;
 
         return this.store.get(meshInfo.id);
     }

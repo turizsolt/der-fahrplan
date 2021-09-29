@@ -31,6 +31,15 @@ export class ActualWaitingHall extends ActualBaseBrick implements WaitingHall {
         return this;
     }
 
+    remove(): boolean {
+        if (this.station) {
+            this.station.removeWaitingHall(this);
+            this.station = null;
+        }
+        this.emit('remove', this.id);
+        return true;
+    }
+
     getNo(): string {
         return 'WH';
     }
