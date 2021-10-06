@@ -47,7 +47,9 @@
           </div>
           <div v-if="trip.type === 'TripGroup'" class="trip-group">
             <div v-if="closedGroups[trip.id]" class="trip-group-headway">
-              <b>{{(trip.headway/60)}}</b><br />mins<br /><br /><span class="expand" @click="expandGroup(trip.id)">[expand]</span>
+              <b>{{(Math.floor(trip.headway/60))}}</b>{{fraction(trip.headway%60)}}<br />
+              mins<br /><br />
+              <span class="expand" @click="expandGroup(trip.id)">[expand]</span>
             </div>
             <div class="trip" v-else :key="trip2.id" v-for="trip2 in trip.trips">
               <div class="trip-stop trip-id-header blue" @click="paste(trip2.id)">
@@ -208,6 +210,20 @@ export default class AddTrip extends Vue {
       nextTrip?.setPrevTrip(prevTrip);
 
       this.update();
+  }
+
+  gcd(a, b) {
+    if (!b) {
+      return a;
+    }
+
+    return this.gcd(b, a % b);
+  }
+
+  fraction(x:number) {
+      if(x === 0) return '';
+      const gcd = this.gcd(x, 60);
+      return ' '+(x/gcd)+'/'+(60/gcd);
   }
 }
 </script>
