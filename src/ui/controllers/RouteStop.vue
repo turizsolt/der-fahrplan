@@ -86,6 +86,7 @@ import { Vue, Component, Prop } from "vue-property-decorator";
 import { AbstractPlatform } from "../../modules/Station/AbstractPlatform";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
+import { handleTimeText } from "./HandleTime";
 
 @Component
 export default class RouteTitle extends Vue {
@@ -114,29 +115,15 @@ export default class RouteTitle extends Vue {
   }
 
   handleTime(column: string, event: any): void {
-    let value = event.currentTarget.value;
-    value = value
-      .split("")
-      .filter((x) => "0" <= x && x <= "9")
-      .join("");
-    if (value.length > 4) {
-      value = value.substr(0, 4);
-    }
-    let time = parseInt(value, 10);
-    if (value.length > 2) {
-      value = value.substr(0, value.length - 2) + ":" + value.substr(-2);
-      time =
-        parseInt(value.substr(0, value.length - 2), 10) * 60 +
-        parseInt(value.substr(-2), 10);
-    }
-    event.currentTarget.value = value;
+    const {time, timeStr} = handleTimeText(event);
+    event.currentTarget.value = timeStr;
 
     const stop = getStorable(this.stop.id) as RouteStop;
     if (column === "arrivalTime") {
-      stop.setArrivalTime(value === "" ? undefined : time * 60);
+      stop.setArrivalTime(time);
     }
     if (column === "departureTime") {
-      stop.setDepartureTime(value === "" ? undefined : time * 60);
+      stop.setDepartureTime(time);
     }
   }
 
