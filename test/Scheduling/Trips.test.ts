@@ -52,7 +52,7 @@ describe('Trips', () => {
 
         platform1B = PlatformFactory().initX(station1, 'B');
         platform1C = PlatformFactory().initX(station1, 'C');
-        stop1 = RouteStopFactory().init(station1, platform1B, 3, 4);
+        stop1 = RouteStopFactory().init(station1, platform1B, route, 3, 4);
 
         stop2 = RouteStopFactory().init(station2, null);
 

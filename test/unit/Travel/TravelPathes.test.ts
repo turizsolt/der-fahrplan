@@ -15,7 +15,7 @@ const createRoute = (name: string, station: Station[], times: number[]): Route =
     const route = store.create<Route>(TYPES.Route).init();
     route.setName(name);
     for (let i = 0; i < station.length; i++) {
-        route.addWaypoint(store.create<RouteStop>(TYPES.RouteStop).init(station[i], null, times[i], times[i]));
+        route.addWaypoint(store.create<RouteStop>(TYPES.RouteStop).init(station[i], null, route, times[i], times[i]));
     }
     return route;
 }

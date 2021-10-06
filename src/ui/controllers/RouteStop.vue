@@ -11,8 +11,9 @@
       class="stop-after nocolor"
     ></div>
     <div class="stop-name" :style="{ color: (stop.isServed || !stop.isStation || !stop.shouldStop) ? 'grey' : 'black', fontStyle: (stop.isStation) ? 'normal' : 'italic' }">
-      {{ stop.atStation ? "* " : "" }} {{ stop.stationName }}
+      {{ stop.atStation ? "* " : "" }} {{ stop.stationName.substring(0, 4) }}
       {{ stop.isArrivalStation ? "é." : "" }}
+      <span @click="addTime()">+</span>/<span @click="removeTime()">-</span>
     </div>
 
     <!-- buttons -->
@@ -131,6 +132,16 @@ export default class RouteTitle extends Vue {
     const stop = getStorable(this.stop.id) as RouteStop;
     const platform = getStorable(event.currentTarget.value) as unknown as AbstractPlatform;
     stop.setPlatform(platform);
+  }
+
+  addTime(): void {
+    const stop = getStorable(this.stop.id) as RouteStop;
+    stop.setExtraTimeToStation(stop.getExtraTimeToStation()+60);
+  }
+
+  removeTime(): void {
+    const stop = getStorable(this.stop.id) as RouteStop;
+    stop.setExtraTimeToStation(stop.getExtraTimeToStation()-60);
   }
 }
 </script>

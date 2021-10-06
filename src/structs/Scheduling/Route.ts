@@ -24,4 +24,6 @@ export interface Route extends BaseStorable {
     getLastStop(): RouteStop;
     hasCommonEdgeWith(route: Route): boolean;
     getEdges(): { from: RailMapNode; to: RailMapNode }[];
+
+    update(): void;
 }

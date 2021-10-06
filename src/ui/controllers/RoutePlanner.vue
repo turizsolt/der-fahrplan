@@ -182,7 +182,7 @@ export default class RoutePlanner extends Vue {
               const depTime = lastTime + distSum;
 
               stop.init(
-                station, null, arrTime, depTime
+                station, null, route, arrTime, depTime
               );
               if(station !== last) {
                 stop.setShouldStop(false);

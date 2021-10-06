@@ -125,6 +125,26 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         return result;
     }
 
+    update(): void {
+        let time = 0;
+        let first = true;
+        for(let waypoint of this.getWaypoints()) {
+            if(first) {
+                waypoint.setArrivalTime(undefined);
+                waypoint.setDepartureTime(0);
+                first = false;
+            } else {
+                time += waypoint.getTimeToStation() + waypoint.getExtraTimeToStation();
+                console.log(time);
+                waypoint.setArrivalTime(time);
+                time += waypoint.getTimeAtStation() + waypoint.getExtraTimeAtStation();
+                console.log(time);
+                waypoint.setDepartureTime(time);
+            }
+        }
+        Util.last(this.getWaypoints())?.setDepartureTime(undefined);
+    }
+
     persist(): Object {
         return {
             id: this.id,
@@ -163,6 +183,9 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         this.setName(obj.name);
         for (let stopId of obj.stops) {
             const x = store.get(stopId) as RouteStop;
+            if(x.getType() === TYPES.RouteStop) {
+                x.setRoute(this);
+            }
             this.addWaypoint(x);
         }
         if (obj.reverse && store.get(obj.reverse)) {

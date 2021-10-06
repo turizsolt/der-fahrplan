@@ -7,8 +7,10 @@ import { Util } from '../Util';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { PathBlock } from '../../modules/Signaling/PathBlock';
 import { AbstractPlatform } from '../../modules/Station/AbstractPlatform';
+import { Route } from './Route';
 
 export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
+    private route: Route;
     private waypoint: RailMapNode;
     private platform: AbstractPlatform;
     private arrivalTime: number;
@@ -16,13 +18,18 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     private reverseStop: boolean;
     private shouldStop: boolean;
 
+    private extraTimeToStation: number = 0;
+    private extraTimeAtStation: number = 0;
+
     init(
         waypoint: RailMapNode,
         platform?: AbstractPlatform,
+        route?: Route,
         arrivalTime?: number,
         departureTime?: number
     ): RouteStop {
         super.initStore(TYPES.RouteStop);
+        this.route = route;
         this.waypoint = waypoint;
         this.platform = platform;
         this.arrivalTime = arrivalTime;
@@ -30,6 +37,36 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
         this.reverseStop = false;
         this.setShouldStop(true);
         return this;
+    }
+
+    setRoute(route: Route): void {
+        this.route = route;
+    }
+
+    getExtraTimeToStation(): number {
+        return this.extraTimeToStation;
+    }
+
+    getExtraTimeAtStation(): number {
+        return this.extraTimeAtStation;
+    }
+
+    setExtraTimeToStation(time: number): void {
+        this.extraTimeToStation = time;
+        this.route?.update();
+    }
+
+    setExtraTimeAtStation(time: number): void {
+        this.extraTimeAtStation = time;
+        this.route?.update();
+    }
+
+    getTimeToStation(): number {
+        return 180;
+    }
+
+    getTimeAtStation(): number {
+        return 30;
     }
 
     getWaypointName(): string {
