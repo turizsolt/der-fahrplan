@@ -2,6 +2,7 @@ import Vue from 'vue';
 import { Store } from '../../structs/Interfaces/Store';
 import AddTrip from './AddTrip.vue';
 import TripPlanner from './TripPlanner.vue';
+import ScheduleGrid from './ScheduleGrid.vue';
 
 export class VueBigscreen {
   private vmBigScreen: any;
@@ -16,6 +17,7 @@ export class VueBigscreen {
     });
 
     Vue.component('add-trip', AddTrip);
+    Vue.component('schedule-grid', ScheduleGrid);
     Vue.component('trip-planner', TripPlanner);
   }
 

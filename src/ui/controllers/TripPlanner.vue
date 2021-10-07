@@ -1,5 +1,10 @@
 <template>
-  <div class="big-screen-one">
+  <div>
+    <schedule-grid>
+    </schedule-grid>
+    <hr />
+        
+    <div class="big-screen-one">
         <div class="column-routes" id="route-list">
             <div class="column-title">Route list</div>
             <route-title :key="route.id" v-for="route in routes" :route="route"
@@ -43,6 +48,7 @@
             </div>
         </div>
     </div>
+  </div>
 </template>
 
 <script lang="ts">
