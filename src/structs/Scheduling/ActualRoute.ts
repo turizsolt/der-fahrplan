@@ -194,5 +194,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         if (obj.color) {
             this.setColor(obj.color);
         }
+
+        this.update();
     }
 }

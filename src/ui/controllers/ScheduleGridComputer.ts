@@ -10,7 +10,7 @@ export class ScheduleGridComputer {
     static getByRoute(route: Route):any {
         const stops = route.getWaypoints().map(s => 
             ({
-                name: s.getStation()?.getName(), 
+                name: s.getWaypoint()?.getName(), 
                 time: s.getTimeToStation(),
                 extraTime: s.getExtraTimeToStation(),
                 stopId: s.getId()
