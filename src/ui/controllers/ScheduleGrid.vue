@@ -7,7 +7,8 @@
                 {{ route.detailedName }}
             </option>
         </select>
-        <div id="sg-schedule-grid" :style="'grid-template-rows: repeat('+(2 * rowCount)+', 10px);'">
+        <div id="sg-schedule-grid" :style="'grid-template-rows: repeat('+(rowCount)+', 10px);'">
+            <div class="header0" style="grid-column: span 3; grid-row: span 6;">Header</div>
             <div class="header0 half" v-if="rowCount > 0"></div>
             <div class="header0 cell right time-cell" v-for="time in times">
                 <div class="time">
@@ -19,6 +20,7 @@
                 </div>
             </div>
             <div class="header0 half" v-if="rowCount > 0"></div>
+            <div class="header0" style="grid-column: span 3; grid-row: span 4;">Footer</div>
 
             <div class="header1 half" v-if="rowCount > 0"></div>
             <div class="header1 cell right time-cell" v-for="time in times">
@@ -43,6 +45,32 @@
                         @keyup.stop="handleTime"
                         type="text"
                     />
+                </div>
+                <div v-else-if="time.sign" class="cell center" style="display: flex;">
+                    <!--
+                    ⤵ <input type="checkbox" /> ⓧ<br />
+                    -->
+                    <route-sign :name="time.sign.name" :color="time.sign.color" />
+                </div>
+                <div v-else-if="time.prev" class="cell-double center">
+                    <template v-if="time.hasPrev">
+                        <route-sign :name="time.prev.name" :color="time.prev.color" />
+                        <div class="prev-time">{{time.prev.timeStr}}</div>
+                        <div class="prev-arrow">▼</div>
+                    </template>
+                    <template v-else>
+                        ?
+                    </template>
+                </div>
+                <div v-else-if="time.next" class="cell-double center">
+                    <template v-if="time.hasNext">
+                        <div class="next-arrow">▼</div>
+                        <div class="next-time">{{time.next.timeStr}}</div>
+                        <route-sign :name="time.next.name" :color="time.next.color" />
+                    </template>
+                    <template v-else>
+                        ?
+                    </template>
                 </div>
                 <div v-else class="cell right">{{time.timeStr}}</div>
             </template>
@@ -244,6 +272,24 @@ export default class ScheduleGrid extends Vue {
 
 .header2 {
     left: 80px;
+}
+
+.prev-time, .next-time {
+    text-align: right;
+}
+
+.prev-arrow, .next-arrow {
+    font-size: 8px;
+    text-align: right;
+    padding-right: 1.8em;
+}
+
+.prev-arrow {
+    margin-top: -4px;
+}
+
+.next-arrow {
+    margin-bottom: -4px;
 }
 
 </style>

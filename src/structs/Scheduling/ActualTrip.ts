@@ -41,6 +41,10 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         return this.nextTrip;
     }
 
+    getPrevTrip(): Trip {
+        return this.prevTrip;
+    }
+
     setPrevTrip(trip: Trip): void {
         this.prevTrip = trip;
     }
@@ -200,6 +204,14 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
     setDepartureTime(time: number): void {
         this.departureTime = time;
+    }
+
+    getDepartureTimeStr(): string {
+        return Util.timeToString(this.departureTime);
+    }
+
+    getArrivalTimeStr(): string {
+        return Util.timeToString(this.getArrivalTime());
     }
 
     persist(): Object {

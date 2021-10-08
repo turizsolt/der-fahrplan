@@ -3,6 +3,7 @@ import { Store } from '../../structs/Interfaces/Store';
 import AddTrip from './AddTrip.vue';
 import TripPlanner from './TripPlanner.vue';
 import ScheduleGrid from './ScheduleGrid.vue';
+import RouteSign from './RouteSign.vue';
 
 export class VueBigscreen {
   private vmBigScreen: any;
@@ -17,6 +18,7 @@ export class VueBigscreen {
     });
 
     Vue.component('add-trip', AddTrip);
+    Vue.component('route-sign', RouteSign);
     Vue.component('schedule-grid', ScheduleGrid);
     Vue.component('trip-planner', TripPlanner);
   }
