@@ -135,10 +135,8 @@ export class ActualRoute extends ActualBaseStorable implements Route {
                 first = false;
             } else {
                 time += waypoint.getTimeToStation() + waypoint.getExtraTimeToStation();
-                console.log(time);
                 waypoint.setArrivalTime(time);
                 time += waypoint.getTimeAtStation() + waypoint.getExtraTimeAtStation();
-                console.log(time);
                 waypoint.setDepartureTime(time);
             }
         }

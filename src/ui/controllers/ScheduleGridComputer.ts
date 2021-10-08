@@ -7,7 +7,7 @@ import { Trip } from "../../structs/Scheduling/Trip";
 const store = getStore();
 
 export class ScheduleGridComputer {
-    static getByRoute(route: Route):any {
+    static getByRoute(route: Route, adderTripId: string):any {
         const stops = route.getWaypoints().map(s => 
             ({
                 name: s.getWaypoint()?.getName(), 
@@ -17,7 +17,7 @@ export class ScheduleGridComputer {
             })
         );
         const times = stops.slice(1);
-        const rowCount = stops.length * 2 + 10;
+        const rowCount = stops.length * 2 + 12;
 
         const trips = store.getAllOf<Trip>(TYPES.Trip)
             .filter(t => t.getRoute() === route);
@@ -25,6 +25,10 @@ export class ScheduleGridComputer {
 
         const timetable = [];
         for(let trip of trips) { // .filter(w => w.isStation)
+            if(trip.getId() === adderTripId) {
+                timetable.push({adder: true});
+            }
+
             const prev = trip.getPrevTrip();
             const next = trip.getNextTrip();
             timetable.push({hasPrev: !!prev, prev: !prev ? {} : {
@@ -32,6 +36,7 @@ export class ScheduleGridComputer {
                 color: prev.getRoute().getColor(), 
                 timeStr: prev.getArrivalTimeStr()
             }});
+            timetable.push({actions: {tripId: trip.getId()}});
             timetable.push({sign: {name: route.getName(), color: route.getColor()}});
             timetable.push(...trip.getWaypoints().map(w => ({timeStr: w.departureTime ? w.departureTimeString : w.arrivalTimeString})));
             timetable.push({hasNext: !!next, next: !next ? {} : {

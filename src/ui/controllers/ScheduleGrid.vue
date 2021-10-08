@@ -8,7 +8,7 @@
             </option>
         </select>
         <div id="sg-schedule-grid" :style="'grid-template-rows: repeat('+(rowCount)+', 10px);'">
-            <div class="header0" style="grid-column: span 3; grid-row: span 6;">Header</div>
+            <div class="header0" style="grid-column: span 3; grid-row: span 8;">Header</div>
             <div class="header0 half" v-if="rowCount > 0"></div>
             <div class="header0 cell right time-cell" v-for="time in times">
                 <div class="time">
@@ -37,7 +37,7 @@
             <div class="left header2" :class="stop.size === 2 ? 'cell-double' : 'cell'" v-for="stop in stops">{{stop.name}}</div>
             
             <template v-for="time in timetable">
-                <div v-if="time.inter" class="column center">
+                <div v-if="time.inter || time.adder" class="column center">
                     Inter
                     <input
                         id="sg-adder"
@@ -46,10 +46,12 @@
                         type="text"
                     />
                 </div>
-                <div v-else-if="time.sign" class="cell center" style="display: flex;">
-                    <!--
-                    ⤵ <input type="checkbox" /> ⓧ<br />
-                    -->
+                <div v-else-if="time.actions" class="cell center" style="display: flex;">
+                    <div class="adder-insert" @click="handleShowAdder(time.actions.tripId)">⤵</div>
+                    <input class="select-trip" type="checkbox" />
+                    <!--ⓧ-->
+                </div>
+                <div v-else-if="time.sign" class="cell center">
                     <route-sign :name="time.sign.name" :color="time.sign.color" />
                 </div>
                 <div v-else-if="time.prev" class="cell-double center">
@@ -100,6 +102,8 @@ export default class ScheduleGrid extends Vue {
     timetable:any[] = [];
     rowCount:number = 0;
 
+    adder:string = null;
+
     created() {
         this.load();
     }
@@ -130,7 +134,7 @@ export default class ScheduleGrid extends Vue {
             this.selectedRoute = route.persistDeep();
 
             if(route) {
-                const {stops, times, rowCount, timetable} = ScheduleGridComputer.getByRoute(route);
+                const {stops, times, rowCount, timetable} = ScheduleGridComputer.getByRoute(route, this.adder);
                 this.stops = stops;
                 this.times = times;
                 this.rowCount = rowCount;
@@ -180,6 +184,15 @@ export default class ScheduleGrid extends Vue {
     handleExtraTimePlus(stopId:string): void {
         const stop = getStorable(stopId) as RouteStop;
         stop.setExtraTimeToStation(stop.getExtraTimeToStation()+30);
+        this.update();
+    }
+
+    handleShowAdder(tripId: string): void {
+        if(tripId === this.adder) {
+            this.adder = null;
+        } else {
+            this.adder = tripId;
+        }
         this.update();
     }
 }
@@ -292,4 +305,11 @@ export default class ScheduleGrid extends Vue {
     margin-bottom: -4px;
 }
 
+.select-trip {
+     margin-left: 22px;
+}
+
+.adder-insert:hover {
+    cursor: pointer;
+}
 </style>
