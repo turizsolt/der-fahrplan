@@ -19,7 +19,15 @@
             <div class="left header2" :class="stop.size === 2 ? 'cell-double' : 'cell'" v-for="stop in stops">{{stop.name}}</div>
             
             <template v-for="time in timetable">
-                <div v-if="time.inter" class="column center">Inter</div>
+                <div v-if="time.inter" class="column center">
+                    Inter
+                    <input
+                        id="sg-adder"
+                        style="width: 100%"
+                        @keyup.stop="handleTime"
+                        type="text"
+                    />
+                </div>
                 <div v-else class="cell right">{{time.timeStr}}</div>
             </template>
         </div>
@@ -29,11 +37,13 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import { Route } from "../../structs/Scheduling/Route";
+import { Trip } from "../../structs/Scheduling/Trip";
 import { Station } from "../../modules/Station/Station";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { TYPES } from "../../di/TYPES";
 import { getAllOfStorable, getStorable, createStorable } from "../../structs/Actuals/Store/StoreForVue";
 import { ScheduleGridComputer } from "./ScheduleGridComputer";
+import { handleTimeText } from "./HandleTime";
 
 @Component
 export default class ScheduleGrid extends Vue {
@@ -86,6 +96,26 @@ export default class ScheduleGrid extends Vue {
             }
         } else {
             this.reset();
+        }
+    }
+
+    handleTime(event: any): void {
+        const {time, timeStr} = handleTimeText(event);
+        
+        if(event.keyCode === 13) {
+            const route = getStorable(this.selectedRouteId) as Route;
+            const trip = createStorable<Trip>(TYPES.Trip).init(route, time);
+            event.currentTarget.value = '';
+            this.update();
+
+            setTimeout(() => {
+                const sg = document.getElementById('sg-schedule-grid');
+                sg.scrollTo({ top: 0, left: sg.scrollWidth, behavior: "smooth" });
+                const target = document.getElementById('sg-adder');
+                target.focus();
+            },0);
+        } else {
+            event.currentTarget.value = timeStr;
         }
     }
 }
