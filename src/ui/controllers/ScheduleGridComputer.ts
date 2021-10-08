@@ -24,9 +24,13 @@ export class ScheduleGridComputer {
         trips.sort((a,b) => a.getDepartureTime() - b.getDepartureTime());
 
         const timetable = [];
+        let lastTrip:Trip = null;
         for(let trip of trips) { // .filter(w => w.isStation)
             if(trip.getId() === adderTripId) {
-                timetable.push({adder: true});
+                timetable.push({adder: {
+                    prevTime: lastTrip?.getDepartureTime(),
+                    nextTime: trip?.getDepartureTime()
+                }});
             }
 
             const prev = trip.getPrevTrip();
@@ -44,8 +48,10 @@ export class ScheduleGridComputer {
                 color: next.getRoute().getColor(), 
                 timeStr: next.getDepartureTimeStr()
             }});
+
+            lastTrip = trip;
         }
-        timetable.push({inter: true});
+        timetable.push({inter: {prevTime: lastTrip?.getDepartureTime()}});
         
         return {stops, times, rowCount, timetable};
     }

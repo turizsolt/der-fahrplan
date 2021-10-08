@@ -37,12 +37,35 @@
             <div class="left header2" :class="stop.size === 2 ? 'cell-double' : 'cell'" v-for="stop in stops">{{stop.name}}</div>
             
             <template v-for="time in timetable">
-                <div v-if="time.inter || time.adder" class="column center">
-                    Inter
+                <div v-if="time.inter" class="column center">
+                    Headway
                     <input
-                        id="sg-adder"
+                        id="sg-inter-headway"
                         style="width: 100%"
-                        @keyup.stop="handleTime"
+                        @keyup.stop="handleInterHeadway(time.inter.prevTime,$event)"
+                        type="text"
+                    />
+                    Add new
+                    <input
+                        id="sg-inter-time"
+                        style="width: 100%"
+                        @keyup.stop="handleInterTime(time.inter.prevTime,$event)"
+                        type="text"
+                    />
+                </div>
+                <div v-else-if="time.adder" class="column center">
+                    Headway
+                    <input
+                        id="sg-adder-headway"
+                        style="width: 100%"
+                        @keyup.stop="handleAdderHeadway(time.adder.prevTime,time.adder.nextTime,$event)"
+                        type="text"
+                    />
+                    Add new
+                    <input
+                        id="sg-adder-time"
+                        style="width: 100%"
+                        @keyup.stop="handleAdderTime"
                         type="text"
                     />
                 </div>
@@ -147,21 +170,91 @@ export default class ScheduleGrid extends Vue {
         }
     }
 
-    handleTime(event: any): void {
+    setFocus(gridId: string, focusId:string): void {
+        setTimeout(() => {
+            if(gridId) {
+                const sg = document.getElementById(gridId);
+                sg.scrollTo({ top: 0, left: sg.scrollWidth, behavior: "smooth" });
+            }
+            const target = document.getElementById(focusId);
+            target.focus();
+        },0);
+    }
+
+    createTrip(time: number): void {
+        const route = getStorable(this.selectedRouteId) as Route;
+        const trip = createStorable<Trip>(TYPES.Trip).init(route, time);
+    }
+
+    createTrips(timeFrom: number, timeTo: number, headway: number): void {
+        const route = getStorable(this.selectedRouteId) as Route;
+        for(let i=timeFrom+headway;i<timeTo;i+=headway) {
+            const trip = createStorable<Trip>(TYPES.Trip).init(route, i);
+        }
+    }
+
+    handleInterTime(prevTime: number, event: any): void {
         const {time, timeStr} = handleTimeText(event);
         
         if(event.keyCode === 13) {
-            const route = getStorable(this.selectedRouteId) as Route;
-            const trip = createStorable<Trip>(TYPES.Trip).init(route, time);
+            const headwayStr = (document.getElementById('sg-inter-headway') as HTMLInputElement).value;
+            const headway = handleTimeText({currentTarget: {value: headwayStr}}).time;
+            
+            this.createTrips(prevTime, time, headway);
+            this.createTrip(time);
             event.currentTarget.value = '';
             this.update();
 
-            setTimeout(() => {
-                const sg = document.getElementById('sg-schedule-grid');
-                sg.scrollTo({ top: 0, left: sg.scrollWidth, behavior: "smooth" });
-                const target = document.getElementById('sg-adder');
-                target.focus();
-            },0);
+            this.setFocus('sg-schedule-grid', 'sg-inter-time');
+        } else {
+            event.currentTarget.value = timeStr;
+        }
+    }
+
+    handleInterHeadway(prevTime: number, event: any): void {
+        const {time, timeStr} = handleTimeText(event);
+        
+        if(event.keyCode === 13) {
+            const tStr = (document.getElementById('sg-inter-time') as HTMLInputElement).value;
+            if(tStr) {
+            const t = handleTimeText({currentTarget: {value: tStr}}).time;
+            
+            this.createTrips(prevTime, t, time);
+            this.createTrip(t);
+            event.currentTarget.value = '';
+            this.update();
+
+            this.setFocus('sg-schedule-grid', 'sg-inter-time');
+            } else {
+                event.currentTarget.value = timeStr;
+            }
+        } else {
+            event.currentTarget.value = timeStr;
+        }
+    }
+
+    handleAdderTime(event: any): void {
+        const {time, timeStr} = handleTimeText(event);
+        
+        if(event.keyCode === 13) {
+            this.createTrip(time);
+            event.currentTarget.value = '';
+
+            this.adder = null;
+            this.update();
+        } else {
+            event.currentTarget.value = timeStr;
+        }
+    }
+
+    handleAdderHeadway(prevTime:number, nextTime: number, event: any): void {
+        const {time, timeStr} = handleTimeText(event);
+
+        if(event.keyCode === 13) {
+            this.createTrips(prevTime, nextTime, time);
+            
+            this.adder = null;
+            this.update();
         } else {
             event.currentTarget.value = timeStr;
         }
