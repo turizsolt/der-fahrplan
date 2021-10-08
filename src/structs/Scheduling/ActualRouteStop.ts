@@ -62,7 +62,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
     }
 
     getTimeToStation(): number {
-        return 180;
+        return 0;
     }
 
     getTimeAtStation(): number {

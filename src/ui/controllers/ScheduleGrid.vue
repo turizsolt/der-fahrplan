@@ -9,11 +9,27 @@
         </select>
         <div id="sg-schedule-grid" :style="'grid-template-rows: repeat('+(2 * rowCount)+', 10px);'">
             <div class="header0 half" v-if="rowCount > 0"></div>
-            <div class="header0 cell right" v-for="time in times">{{time.time}}</div>
+            <div class="header0 cell right time-cell" v-for="time in times">
+                <div class="time">
+                    {{time.extraTime}}
+                </div>
+                <div class="plus-minus">
+                    <div @click="handleExtraTimePlus(time.stopId)">+</div>
+                    <div @click="handleExtraTimeMinus(time.stopId)">-</div>
+                </div>
+            </div>
             <div class="header0 half" v-if="rowCount > 0"></div>
 
             <div class="header1 half" v-if="rowCount > 0"></div>
-            <div class="header1 cell right" v-for="time in times">{{time.time}}</div>
+            <div class="header1 cell right time-cell" v-for="time in times">
+                <div class="time">
+                    {{time.time}}
+                </div>
+                <div class="plus-minus">
+                    <div @click="handleTimePlus(time.stopId)">+</div>
+                    <div @click="handleTimeMinus(time.stopId)">-</div>
+                </div>
+            </div>
             <div class="header1 half" v-if="rowCount > 0"></div>
 
             <div class="left header2" :class="stop.size === 2 ? 'cell-double' : 'cell'" v-for="stop in stops">{{stop.name}}</div>
@@ -118,6 +134,26 @@ export default class ScheduleGrid extends Vue {
             event.currentTarget.value = timeStr;
         }
     }
+
+    handleTimeMinus(stopId:string): void {
+        console.log('t-', stopId);
+    }
+
+    handleTimePlus(stopId:string): void {
+        console.log('t+', stopId);
+    }
+
+    handleExtraTimeMinus(stopId:string): void {
+        const stop = getStorable(stopId) as RouteStop;
+        stop.setExtraTimeToStation(stop.getExtraTimeToStation()-30);
+        this.update();
+    }
+
+    handleExtraTimePlus(stopId:string): void {
+        const stop = getStorable(stopId) as RouteStop;
+        stop.setExtraTimeToStation(stop.getExtraTimeToStation()+30);
+        this.update();
+    }
 }
 </script>
 
@@ -134,10 +170,39 @@ export default class ScheduleGrid extends Vue {
     overflow: scroll hidden;
 }
 
-#sg-schedule-grid div {
+#sg-schedule-grid > div {
     align-items: center;
     display: grid;
     height: 100%;
+}
+
+.time-cell {
+    grid-template-columns: 30px 10px;
+    grid-template-rows: 100%;
+}
+
+.time {
+    width: 40px;
+}
+
+.plus-minus {
+    position: relative;
+    top: 0px;
+    left: -30px;
+    width: 40px;
+    display: flex;
+}
+
+.plus-minus div {
+    width: 20px;
+    text-align: center;
+    opacity: 0.3;
+}
+
+.plus-minus div:hover {
+    background-color: #aca;
+    opacity: 0.8;
+    cursor: pointer;
 }
 
 .left {

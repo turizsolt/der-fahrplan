@@ -8,10 +8,12 @@ const store = getStore();
 
 export class ScheduleGridComputer {
     static getByRoute(route: Route):any {
-        const stops = route.getStops().map(s => 
+        const stops = route.getWaypoints().map(s => 
             ({
                 name: s.getStation()?.getName(), 
-                time: s.getDepartureTime()
+                time: s.getTimeToStation(),
+                extraTime: s.getExtraTimeToStation(),
+                stopId: s.getId()
             })
         );
         const times = stops.slice(1);
@@ -22,8 +24,8 @@ export class ScheduleGridComputer {
         trips.sort((a,b) => a.getDepartureTime() - b.getDepartureTime());
 
         const timetable = [];
-        for(let trip of trips) {
-            timetable.push(...trip.getWaypoints().filter(w => w.isStation).map(w => ({timeStr: w.departureTimeString})));
+        for(let trip of trips) { // .filter(w => w.isStation)
+            timetable.push(...trip.getWaypoints().map(w => ({timeStr: w.departureTime ? w.departureTimeString : w.arrivalTimeString})));
         }
         timetable.push({inter: true});
 
