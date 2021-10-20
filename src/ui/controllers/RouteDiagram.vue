@@ -27,6 +27,7 @@
       <div v-for="line in stopLines" :key="line.id" class="stop-line" :style="line.style"></div>  
     
       <div v-for="stop in sideStops" :key="stop.id" class="side-stop" :title="stop.name" :style="stop.style"></div>
+      <div v-for="stopLine in sideStopLines" :key="stopLine.id" class="side-stop-line" :style="stopLine.style"></div>
       <div v-for="time in sideTimes" :key="time.id" class="side-time" :title="time.name" :style="time.style"></div>
       <div v-for="stop in stops" :key="stop.uniqueId" class="stop-plot" :class="selectedStop && stop.id === selectedStop.id ? 'selected-stop' : ''" :title="stop.name" :style="stop.style" @click.stop="select(stop)"></div>
     </div>
@@ -48,11 +49,14 @@ import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";
 import { RailDiagram } from "../../modules/RailDiagram/RailDiagram";
 import { Util } from "../../structs/Util";
 
+const GAP = 30;
+
 @Component
 export default class RouteDiagram extends Vue {
   private diagram: RailDiagram;
   @Prop() route: any = null;
   sideStops: any[] = [];
+  sideStopLines: any[] = [];
   sideTimes: any[] = [];
   stops: any[] = [];
   sideLines: any[] = [];
@@ -91,12 +95,18 @@ export default class RouteDiagram extends Vue {
     });
 
     this.sideStops = [];
+    this.sideStopLines = [];
     this.stops = [];
     if(route) {
       const {plots, lines} = this.diagram.getRouteAxis();
       this.sideStops = plots.map(plot => ({
         ...plot,
         style: plotToStyle(plot)
+      }));
+      this.sideStopLines = plots.filter(p => p.meta?.hasLine).map(plot => ({
+        ...plot,
+        id: plot.id+'-line',
+        style: {... plotToStyle(plot), top: (20-0.5+plot.r*h)+'px', width: w+'px', height: '1px' }
       }));
 
       this.sideLines = lines.map(line => {
@@ -178,7 +188,7 @@ export default class RouteDiagram extends Vue {
     if(type === 3) {
       const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
       for(let trip of trips) {
-        trip.setDepartureTime(trip.getDepartureTime()+time*60);
+        trip.setDepartureTime(trip.getDepartureTime()+time*GAP);
       }
     } else if(type === 2) {
       let write = false;
@@ -188,27 +198,27 @@ export default class RouteDiagram extends Vue {
         }
         if(write) {
           if(stop.hasDepartureTime()) {
-            stop.setDepartureTime(stop.getDepartureTime()+time*60);
+            stop.setDepartureTime(stop.getDepartureTime()+time*GAP);
           }
           if(stop.hasArrivalTime()) {
-            stop.setArrivalTime(stop.getArrivalTime()+time*60);
+            stop.setArrivalTime(stop.getArrivalTime()+time*GAP);
           }
         }
       }
     } else if(type === 1) {
       const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
       for(let trip of trips) {
-        trip.setDepartureTime(trip.getDepartureTime()+time*60);
+        trip.setDepartureTime(trip.getDepartureTime()+time*GAP);
       }
 
       let write = false;
       for(let stop of route.getWaypoints()) {
         if(write) {
           if(stop.hasDepartureTime()) {
-            stop.setDepartureTime(stop.getDepartureTime()-time*60);
+            stop.setDepartureTime(stop.getDepartureTime()-time*GAP);
           }
           if(stop.hasArrivalTime()) {
-            stop.setArrivalTime(stop.getArrivalTime()-time*60);
+            stop.setArrivalTime(stop.getArrivalTime()-time*GAP);
           }
         }
 
@@ -218,32 +228,32 @@ export default class RouteDiagram extends Vue {
       }
     } else if(type === 0) {
       if(routeStop.hasDepartureTime()) {
-        routeStop.setDepartureTime(routeStop.getDepartureTime()+time*60);
+        routeStop.setDepartureTime(routeStop.getDepartureTime()+time*GAP);
       }
       if(routeStop.hasArrivalTime()) {
-        routeStop.setArrivalTime(routeStop.getArrivalTime()+time*60);
+        routeStop.setArrivalTime(routeStop.getArrivalTime()+time*GAP);
       }
     } else if(type === 4) {
       const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
       for(let trip of trips) {
-        trip.setDepartureTime(trip.getDepartureTime()+time*60);
+        trip.setDepartureTime(trip.getDepartureTime()+time*GAP);
       }
 
       let write = false;
       for(let stop of route.getWaypoints()) {
         if(write) {
           if(stop.hasDepartureTime()) {
-            stop.setDepartureTime(stop.getDepartureTime()-time*60);
+            stop.setDepartureTime(stop.getDepartureTime()-time*GAP);
           }
           if(stop.hasArrivalTime()) {
-            stop.setArrivalTime(stop.getArrivalTime()-time*60);
+            stop.setArrivalTime(stop.getArrivalTime()-time*GAP);
           }
         }
 
         if(stop === routeStop) {
           stop.setArrivalTime(stop.getArrivalTime() || stop.getDepartureTime());
           if(stop.hasDepartureTime()) {
-            stop.setDepartureTime(stop.getDepartureTime()-time*60);
+            stop.setDepartureTime(stop.getDepartureTime()-time*GAP);
           }
           write = true;
         }
@@ -253,17 +263,17 @@ export default class RouteDiagram extends Vue {
       for(let stop of route.getWaypoints()) {
         if(write) {
           if(stop.hasDepartureTime()) {
-            stop.setDepartureTime(stop.getDepartureTime()+time*60);
+            stop.setDepartureTime(stop.getDepartureTime()+time*GAP);
           }
           if(stop.hasArrivalTime()) {
-            stop.setArrivalTime(stop.getArrivalTime()+time*60);
+            stop.setArrivalTime(stop.getArrivalTime()+time*GAP);
           }
         }
         if(stop === routeStop) {
           write = true;
           stop.setArrivalTime(stop.getArrivalTime() || stop.getDepartureTime());
           if(stop.hasDepartureTime()) {
-            stop.setDepartureTime(stop.getDepartureTime()+time*60);
+            stop.setDepartureTime(stop.getDepartureTime()+time*GAP);
           }
         }
       }
@@ -302,7 +312,6 @@ export default class RouteDiagram extends Vue {
   position: absolute;
 }
 
-
 .side-time {
   border-radius: 50%;
   border: 1px solid black;
@@ -310,6 +319,7 @@ export default class RouteDiagram extends Vue {
   position: absolute;
 }
 
+.side-stop-line,
 .side-line,
 .stop-line {
   background-color: black;

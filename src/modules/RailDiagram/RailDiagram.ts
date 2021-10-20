@@ -103,7 +103,10 @@ export class RailDiagram {
                 position: pos,
                 name: stop.getWaypoint().getName(),
                 r: pos / this.diagramHeight,
-                t: 0
+                t: 0,
+                meta: {
+                    hasLine: stop.getWaypoint().getType() === TYPES.Station
+                }
             });
 
             this.stopHeights[stop.getWaypoint().getId()] = pos / this.diagramHeight;
@@ -143,7 +146,7 @@ export class RailDiagram {
             if (!routesToPlot.includes(trip.getRoute())) continue;
 
             let prevStop: TripStop = null;
-            for (let stop of trip.getWaypoints()) {
+            for (let stop of trip.getWaypoints().filter(w => w.shouldStop)) {
                 if (this.stopHeights[stop.station.getId()] === undefined) continue;
 
                 if (prevStop) {
