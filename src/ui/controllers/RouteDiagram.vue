@@ -190,6 +190,29 @@ export default class RouteDiagram extends Vue {
       for(let trip of trips) {
         trip.setDepartureTime(trip.getDepartureTime()+time*GAP);
       }
+    } else if(type === 4) {
+      const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
+      for(let trip of trips) {
+        trip.setDepartureTime(trip.getDepartureTime()+time*GAP);
+      }
+      for(let stop of route.getWaypoints()) {
+        if(stop === routeStop) {
+          stop.setExtraTimeAtStation(stop.getExtraTimeAtStation()-time*GAP);
+        } 
+      }
+    } else if(type === 5) {
+      for(let stop of route.getWaypoints()) {
+        if(stop === routeStop) {
+          stop.setExtraTimeAtStation(stop.getExtraTimeAtStation()+time*GAP);
+        } 
+      }
+    }
+    /*
+    if(type === 3) {
+      const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
+      for(let trip of trips) {
+        trip.setDepartureTime(trip.getDepartureTime()+time*GAP);
+      }
     } else if(type === 2) {
       let write = false;
       for(let stop of route.getWaypoints()) {
@@ -278,6 +301,7 @@ export default class RouteDiagram extends Vue {
         }
       }
     }
+    */
 
     this.init();
   }
