@@ -107,12 +107,12 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
 
     setArrivalTime(time: number): void {
         this.arrivalTime = time;
-        this.store.getTravelPathes().find(3);
+        // this.store.getTravelPathes().find(3);
     }
 
     setDepartureTime(time: number): void {
         this.departureTime = time;
-        this.store.getTravelPathes().find(3);
+        // this.store.getTravelPathes().find(3);
     }
 
     toggleReverseStop(): void {
@@ -125,7 +125,7 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
 
     setShouldStop(shouldStop: boolean): void {
         this.shouldStop = shouldStop && this.isStation();
-        this.store.getTravelPathes().find(3);
+        // this.store.getTravelPathes().find(3);
     }
 
     getShouldStop(): boolean {

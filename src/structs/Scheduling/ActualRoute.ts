@@ -72,7 +72,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
 
     addWaypoint(stop: RouteStop): void {
         this.stops.push(stop);
-        this.store.getTravelPathes().find(3);
+        // this.store.getTravelPathes().find(3);
     }
 
     removeStop(stop: RouteStop): void {
@@ -80,7 +80,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         if (foundIndex === 0 || foundIndex === this.stops.length - 1) {
             this.stops = this.stops.filter(s => s !== stop);
         }
-        this.store.getTravelPathes().find(3);
+        // this.store.getTravelPathes().find(3);
     }
 
     getFirstStation(): Station {
@@ -128,8 +128,8 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     update(): void {
         let time = 0;
         let first = true;
-        for(let waypoint of this.getWaypoints()) {
-            if(first) {
+        for (let waypoint of this.getWaypoints()) {
+            if (first) {
                 waypoint.setArrivalTime(undefined);
                 waypoint.setDepartureTime(0);
                 first = false;
@@ -181,7 +181,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         this.setName(obj.name);
         for (let stopId of obj.stops) {
             const x = store.get(stopId) as RouteStop;
-            if(x.getType() === TYPES.RouteStop) {
+            if (x.getType() === TYPES.RouteStop) {
                 x.setRoute(this);
             }
             this.addWaypoint(x);
