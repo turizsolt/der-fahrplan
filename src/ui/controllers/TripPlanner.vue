@@ -64,8 +64,7 @@ import { get } from "http";
 export default class TripPlanner extends Vue {
     routes: any[] = [];
     selectedRoute: any = null;
-    stations: any[] = [];
-
+    
     created() {
         this.load();
     }
@@ -73,13 +72,6 @@ export default class TripPlanner extends Vue {
     load() {
           this.routes = getAllOfStorable<Route>(TYPES.Route)
             .map(x => x.persistDeep());
-          this.stations = getAllOfStorable<Station>(TYPES.Station)
-            .map(x => Object.freeze(x.persistDeep()));
-            this.stations.sort((a, b) => {
-              if(a.name < b.name) return -1;
-              if(a.name > b.name) return 1;
-              return 0;
-            });
           if (this.selectedRoute) {
             this.selectedRoute = (getStorable(
               this.selectedRoute.id

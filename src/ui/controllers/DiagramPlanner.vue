@@ -55,8 +55,7 @@ export default class DiagramPlanner extends Vue {
     private map: RailMap;
     routes: any[] = [];
     selectedRoute: any = null;
-    stations: any[] = [];
-
+    
     created() {
       this.map = RailMapCreator.create(getStore());
       this.load();
@@ -65,13 +64,6 @@ export default class DiagramPlanner extends Vue {
     load() {
           this.routes = getAllOfStorable<Route>(TYPES.Route)
             .map(x => x.persistDeep());
-          this.stations = getAllOfStorable<Station>(TYPES.Station)
-            .map(x => Object.freeze(x.persistDeep()));
-            this.stations.sort((a, b) => {
-              if(a.name < b.name) return -1;
-              if(a.name > b.name) return 1;
-              return 0;
-            });
           if (this.selectedRoute) {
             this.selectedRoute = (getStorable(
               this.selectedRoute.id
