@@ -1,13 +1,18 @@
+import { Coordinate } from "../../structs/Geometry/Coordinate";
+import { Ray } from "../../structs/Geometry/Ray";
+import { Route } from "../../structs/Scheduling/Route";
 import { RailMap } from "./RailMap";
 import { RailMapBounds } from "./RailMapBounds";
 import { RailMapEdge } from "./RailMapEdge";
 import { RailMapNode } from "./RailMapNode";
+import { RailMapRoute } from "./RailMapRoute";
 
 export class ActualRailMap implements RailMap {
     private nodes: RailMapNode[] = [];
     private edges: Record<string, RailMapEdge> = {};
     private bounds: RailMapBounds;
     private neighbours: Record<string, RailMapNode[]> = {};
+    private routes: RailMapRoute[] = [];
 
     addNodes(nodes: RailMapNode[]): void {
         this.nodes.push(...nodes);
@@ -20,7 +25,7 @@ export class ActualRailMap implements RailMap {
         let { from, to } = this.orderNodes(nodeFrom, nodeTo);
         const hash = this.hashNodes(from, to);
         if (!this.edges[hash]) {
-            this.edges[hash] = { from, to, count: 0, avgDistance: 0, distances: [] };
+            this.edges[hash] = { from, to, count: 0, avgDistance: 0, distances: [], routeCount: 0 };
             this.neighbours[nodeFrom.getId()].push(nodeTo);
             this.neighbours[nodeTo.getId()].push(nodeFrom);
         }
@@ -29,12 +34,39 @@ export class ActualRailMap implements RailMap {
         this.edges[hash].avgDistance = sum(this.edges[hash].distances) / this.edges[hash].count;
     }
 
+    addRoute(route: Route): void {
+        const mapRoute: RailMapRoute = [];
+        const waypoints = route.getWaypoints();
+        for (let i = 1; i < waypoints.length; i++) {
+            const { from, to } = this.orderNodes(waypoints[i - 1].getWaypoint(), waypoints[i].getWaypoint());
+            const hash = this.hashNodes(from, to);
+            const routeCount = this.edges[hash].routeCount++;
+
+            const fromCoord: Coordinate = from.getCoord();
+            const toCoord: Coordinate = to.getCoord();
+            const fromDir: number = fromCoord.whichDir2d(toCoord);
+            const toDir: number = toCoord.whichDir2d(fromCoord);
+
+            mapRoute.push({
+                from: new Ray(fromCoord, fromDir),
+                to: new Ray(toCoord, toDir),
+                no: routeCount,
+                color: route.getColor()
+            });
+        }
+        this.routes.push(mapRoute);
+    }
+
     getEdges(): Record<string, RailMapEdge> {
         return this.edges;
     }
 
     getNodes(): RailMapNode[] {
         return this.nodes;
+    }
+
+    getRoutes(): RailMapRoute[] {
+        return this.routes;
     }
 
     getNeighboursOf(node: RailMapNode): RailMapNode[] {

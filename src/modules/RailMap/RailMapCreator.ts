@@ -10,11 +10,13 @@ import { TrackDirection } from '../Track/TrackDirection';
 import { ActualRailMap } from './ActualRailMap';
 import { RailMap } from './RailMap';
 import { RailMapNode } from './RailMapNode';
+import { Route } from '../../structs/Scheduling/Route';
 
 export class RailMapCreator {
     static create(store: Store): RailMap {
         const pathBlocks = store.getAllOf(TYPES.PathBlock) as PathBlock[];
         const stations = (store.getAllOf(TYPES.Station) as Station[]);
+        const routes = (store.getAllOf(TYPES.Route) as Route[]);
 
         const map: RailMap = new ActualRailMap();
         map.addNodes(pathBlocks as RailMapNode[]);
@@ -79,6 +81,10 @@ export class RailMapCreator {
                     }
                 }
             }
+        }
+
+        for (let route of routes) {
+            map.addRoute(route);
         }
 
         let minX = Number.POSITIVE_INFINITY;
