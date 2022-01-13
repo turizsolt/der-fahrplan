@@ -1,42 +1,71 @@
 <template>
   <div class="big-screen-one">
-        <div class="column-routes" id="route-list">
-            <div class="column-title">Route list</div>
-            <route-title :key="route.id" v-for="route in routes" :route="route"
-                :selected="selectedRoute && selectedRoute.id === route.id" candelete @click="selectRoute(route)"
-                @delete="removeRoute(route)"></route-title>
-            <div class="route-create-holder">
-                <span class="route-create" v-on:click="createRoute()">Create route</span>
-            </div>
-        </div>
-        <div class="column-route-stops" id="route-details">
-            <div class="column-title">Edit route</div>
-            <div v-if="selectedRoute">
-                <div class="route-details">
-                    Name:
-                    <input class="route-input-name" type="text" v-model="selectedRoute.name"
-                        @keyup.stop="nameChange" /><br />
-                </div>
-                <div class="route-details">
-                    Color:
-                    <input class="route-input-name" type="text" v-model="selectedRoute.color"
-                        @keyup.stop="colorChange" /><br />
-                </div>
-                <div class="route-details-stops">
-                    Stops:<br />
-                    <route-stop v-for="(stop, index) in selectedRoute.stops" :key="stop.id" :route="selectedRoute"
-                        :stop="stop" :index="index" candelete :canmove="index !== 0" @delete="deleteStop(stop)"
-                         @reverse="reverseStop(stop)" @shouldStop="shouldStop(stop)">
-                    </route-stop>
-                </div>
-                <div class="route-details route-create-holder">
-                    <span class="route-create" v-on:click="createReverseRoute(selectedRoute)">Create reverse
-                        route</span>
-                </div>
-            </div>
-        </div>
-        <rail-map-shower @addStop="addStop"></rail-map-shower>
+    <div class="column-routes" id="route-list">
+      <div class="column-title">Route list</div>
+      <route-title
+        :key="route.id"
+        v-for="route in routes"
+        :route="route"
+        :selected="selectedRoute && selectedRoute.id === route.id"
+        candelete
+        @click="selectRoute(route)"
+        @delete="removeRoute(route)"
+      ></route-title>
+      <div class="route-create-holder">
+        <span class="route-create" v-on:click="createRoute()"
+          >Create route</span
+        >
+      </div>
     </div>
+    <div class="column-route-stops" id="route-details">
+      <div class="column-title">Edit route</div>
+      <div v-if="selectedRoute">
+        <div class="route-details">
+          Name:
+          <input
+            class="route-input-name"
+            type="text"
+            v-model="selectedRoute.name"
+            @keyup.stop="nameChange"
+          /><br />
+        </div>
+        <div class="route-details">
+          Color:
+          <input
+            class="route-input-name"
+            type="text"
+            v-model="selectedRoute.color"
+            @keyup.stop="colorChange"
+          /><br />
+        </div>
+        <div class="route-details-stops">
+          Stops:<br />
+          <route-stop
+            v-for="(stop, index) in selectedRoute.stops"
+            :key="stop.id"
+            :route="selectedRoute"
+            :stop="stop"
+            :index="index"
+            candelete
+            :canmove="index !== 0"
+            @delete="deleteStop(stop)"
+            @reverse="reverseStop(stop)"
+            @shouldStop="shouldStop(stop)"
+          >
+          </route-stop>
+        </div>
+        <div class="route-details route-create-holder">
+          <span
+            class="route-create"
+            v-on:click="createReverseRoute(selectedRoute)"
+            >Create reverse route</span
+          >
+        </div>
+      </div>
+    </div>
+    <div id="pixi-map-container"></div>
+    <!--<rail-map-shower @addStop="addStop"></rail-map-shower>-->
+  </div>
 </template>
 
 <script lang="ts">
@@ -45,166 +74,173 @@ import { Route } from "../../structs/Scheduling/Route";
 import { Station } from "../../modules/Station/Station";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { TYPES } from "../../di/TYPES";
-import { getStore, getAllOfStorable, getStorable, createStorable } from "../../structs/Actuals/Store/StoreForVue";
+import {
+  getStore,
+  getAllOfStorable,
+  getStorable,
+  createStorable,
+} from "../../structs/Actuals/Store/StoreForVue";
 import { RailMap } from "../../modules/RailMap/RailMap";
 import { RailMapNode } from "../../modules/RailMap/RailMapNode";
 import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";
 
 @Component
 export default class RoutePlanner extends Vue {
-    private map: RailMap;
-    routes: any[] = [];
-    selectedRoute: any = null;
-    
-    created() {
-      this.map = RailMapCreator.create(getStore());
+  private map: RailMap;
+  routes: any[] = [];
+  selectedRoute: any = null;
+
+  created() {
+    this.map = RailMapCreator.create(getStore());
+    this.load();
+  }
+
+  load() {
+    this.routes = getAllOfStorable<Route>(TYPES.Route).map((x) =>
+      x.persistDeep()
+    );
+    if (this.selectedRoute) {
+      this.selectedRoute = (
+        getStorable(this.selectedRoute.id) as Route
+      ).persistDeep();
+    }
+  }
+
+  removeRoute(vRoute) {
+    const route = getStorable(vRoute.id) as Route;
+    route.remove();
+    this.selectedRoute = null;
+    this.load();
+  }
+
+  createRoute() {
+    const route = createStorable<Route>(TYPES.Route);
+    route.init();
+    this.load();
+    const routeData = this.routes.find((x) => x.id === route.getId());
+    this.selectRoute(routeData);
+  }
+
+  createReverseRoute(vRouteFrom) {
+    const routeFrom = getStorable(vRouteFrom.id) as Route;
+    const route = createStorable<Route>(TYPES.Route);
+    route.init();
+    route.setName(routeFrom.getName());
+    for (let stopFrom of [...routeFrom.getWaypoints()].reverse()) {
+      const stop = createStorable<RouteStop>(TYPES.RouteStop);
+      stop.init(stopFrom.getStation(), stopFrom.getPlatform());
+      route.addWaypoint(stop);
+    }
+    this.load();
+    const routeData = this.routes.find((x) => x.id === route.getId());
+    this.selectRoute(routeData);
+  }
+
+  selectRoute(route) {
+    this.selectedRoute = route;
+    this.load();
+  }
+
+  deleteStop(vStop) {
+    const stop = getStorable(vStop.id) as RouteStop;
+    const route = getStorable(this.selectedRoute.id) as Route;
+    route.removeStop(stop);
+
+    this.checkFirstAndLastStop();
+    this.load();
+  }
+
+  reverseStop(vStop) {
+    const stop = getStorable(vStop.id) as RouteStop;
+    stop.toggleReverseStop();
+    this.load();
+  }
+
+  shouldStop(vStop) {
+    const stop = getStorable(vStop.id) as RouteStop;
+    stop.setShouldStop(!stop.getShouldStop());
+
+    this.checkFirstAndLastStop();
+    this.load();
+  }
+
+  checkFirstAndLastStop() {
+    const route = getStorable(this.selectedRoute.id) as Route;
+    const stops = route.getWaypoints();
+    if (stops.length > 0) {
+      const firstStop = stops[0];
+      if (!firstStop.getShouldStop()) {
+        firstStop.setShouldStop(true);
+      }
+
+      if (stops.length > 1) {
+        const lastStop = stops[stops.length - 1];
+        if (!lastStop.getShouldStop()) {
+          lastStop.setShouldStop(true);
+        }
+      }
+    }
+  }
+
+  addStop(evt, stationId) {
+    if (this.selectedRoute) {
+      const route = getStorable(this.selectedRoute.id) as Route;
+      const station = getStorable(stationId) as Station;
+
+      let addingStations: RailMapNode[] = [station];
+      let dist: number[] = [];
+      if (route.getLastWaypoint()) {
+        const result = this.map.getShortestPath(
+          route.getLastWaypoint(),
+          station
+        );
+        for (let i = 1; i < result.length; i++) {
+          dist.push(this.map.getDistance(result[i - 1], result[i]));
+        }
+        addingStations = result.slice(1);
+      }
+      const last = addingStations[addingStations.length - 1];
+
+      let i = 0;
+      let distSum = 0;
+      const lastTime = route.getLastStop()?.getDepartureTime() || 0;
+
+      for (let station of addingStations) {
+        const stop = createStorable<RouteStop>(TYPES.RouteStop);
+        distSum += Math.round((dist[i] / 55) * 60) + 60;
+        const arrTime = lastTime + distSum;
+        const depTime = lastTime + distSum;
+
+        stop.init(station, null, route, arrTime, depTime);
+        if (station !== last) {
+          stop.setShouldStop(false);
+        }
+        route.addWaypoint(stop);
+
+        i++;
+      }
       this.load();
     }
+  }
 
-    load() {
-          this.routes = getAllOfStorable<Route>(TYPES.Route)
-            .map(x => x.persistDeep());
-          if (this.selectedRoute) {
-            this.selectedRoute = (getStorable(
-              this.selectedRoute.id
-            ) as Route).persistDeep()
-          }
-        };
+  nameChange(event) {
+    const route = getStorable(this.selectedRoute.id) as Route;
+    route.setName(event.target.value);
+    this.load();
+  }
 
-        removeRoute(vRoute) {
-          const route = getStorable(vRoute.id) as Route;
-          route.remove();
-          this.selectedRoute = null;
-          this.load();
-        };
-
-        createRoute() {
-          const route = createStorable<Route>(TYPES.Route);
-          route.init();
-          this.load();
-          const routeData = this.routes.find(x => x.id === route.getId());
-          this.selectRoute(routeData);
-        };
-
-        createReverseRoute(vRouteFrom) {
-          const routeFrom = getStorable(vRouteFrom.id) as Route;
-          const route = createStorable<Route>(TYPES.Route);
-          route.init();
-          route.setName(routeFrom.getName());
-          for (let stopFrom of [...routeFrom.getWaypoints()].reverse()) {
-            const stop = createStorable<RouteStop>(TYPES.RouteStop);
-            stop.init(stopFrom.getStation(), stopFrom.getPlatform());
-            route.addWaypoint(stop);
-          }
-          this.load();
-          const routeData = this.routes.find(x => x.id === route.getId());
-          this.selectRoute(routeData);
-        };
-
-        selectRoute(route) {
-          this.selectedRoute = route;
-          this.load();
-        };
-
-        deleteStop(vStop) {
-          const stop = getStorable(vStop.id) as RouteStop;
-          const route = getStorable(this.selectedRoute.id) as Route;
-          route.removeStop(stop);
-
-          this.checkFirstAndLastStop();
-          this.load();
-        };
-
-        reverseStop(vStop) {
-          const stop = getStorable(vStop.id) as RouteStop;
-          stop.toggleReverseStop();
-          this.load();
-        };
-
-        shouldStop(vStop) {
-          const stop = getStorable(vStop.id) as RouteStop;
-          stop.setShouldStop(!stop.getShouldStop());
-
-          this.checkFirstAndLastStop();
-          this.load();
-        }
-
-        checkFirstAndLastStop() {
-          const route = getStorable(this.selectedRoute.id) as Route;
-          const stops = route.getWaypoints();
-          if(stops.length > 0) {
-            const firstStop = stops[0];
-            if(!firstStop.getShouldStop()) {
-              firstStop.setShouldStop(true);
-            }
-
-            if(stops.length > 1) {
-              const lastStop = stops[stops.length-1];
-              if(!lastStop.getShouldStop()) {
-                lastStop.setShouldStop(true);
-              }
-            }
-          }
-        }
-
-        addStop(evt, stationId) {
-          if (this.selectedRoute) {
-            const route = getStorable(this.selectedRoute.id) as Route;
-            const station = getStorable(stationId) as Station;
-
-            let addingStations:RailMapNode[] = [station];
-            let dist:number[] = [];
-            if(route.getLastWaypoint()) {
-              const result = this.map.getShortestPath(route.getLastWaypoint(), station);
-              for(let i=1;i<result.length;i++) {
-                dist.push(this.map.getDistance(result[i-1], result[i]));
-              }
-              addingStations = result.slice(1);
-            }
-            const last = addingStations[addingStations.length-1];
-
-            let i = 0;
-            let distSum = 0;
-            const lastTime = route.getLastStop()?.getDepartureTime() || 0;
-
-            for(let station of addingStations) {
-              const stop = createStorable<RouteStop>(TYPES.RouteStop);
-              distSum += Math.round(dist[i]/55*60)+60;
-              const arrTime = lastTime + distSum;
-              const depTime = lastTime + distSum;
-
-              stop.init(
-                station, null, route, arrTime, depTime
-              );
-              if(station !== last) {
-                stop.setShouldStop(false);
-              }
-              route.addWaypoint(stop);
-
-              i++;
-            }
-            this.load();
-          }
-        };
-
-        nameChange(event) {
-          const route = getStorable(this.selectedRoute.id) as Route;
-          route.setName(event.target.value);
-          this.load();
-        };
-
-        colorChange(event) {
-          const route = getStorable(this.selectedRoute.id) as Route;
-          route.setColor(event.target.value);
-          this.load();
-        };
+  colorChange(event) {
+    const route = getStorable(this.selectedRoute.id) as Route;
+    route.setColor(event.target.value);
+    this.load();
+  }
 }
 </script>
 
 <style>
 .big-screen-one {
-    display: flex;
-    height: 100%;
+  display: flex;
+  height: 100%;
 }
 
 .column-routes {
@@ -221,5 +257,10 @@ export default class RoutePlanner extends Vue {
   overflow-y: scroll;
 }
 
-
+#pixi-map-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border: 1px solid red;
+}
 </style>

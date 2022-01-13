@@ -17,6 +17,24 @@ const productionContainer =
     ? productionContainer2d
     : productionContainer3d;
 
+setTimeout(() => {
+  const app2 = new PIXI.Application({ width: 5120, height: 5120 });
+  const container = document.getElementById('pixi-map-container');
+  container.appendChild(app2.view);
+  app2.renderer.backgroundColor = 0xcceecc;
+  app2.renderer.view.style.position = 'absolute';
+  app2.renderer.view.style.display = 'block';
+  app2.renderer.resize(container.clientWidth - 1, container.clientHeight - 1);
+  app2.renderer.view.style.zIndex = '0';
+  app2.view.id = 'renderCanvasMap';
+
+  app2.stage.scale.x = 3;
+  app2.stage.scale.y = 3;
+
+  globalThis.stageMap = app2.stage;
+  globalThis.rendererMap = app2.renderer;
+}, 0);
+
 if (globalThis.startParam === '2d') {
   // init PIXI
   const app = new PIXI.Application({ width: 5120, height: 5120 });

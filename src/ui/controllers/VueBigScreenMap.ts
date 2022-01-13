@@ -23,10 +23,13 @@ export class VueBigscreenMap {
   }
 
   toggleShow() {
-    this.vmBigScreen.show = !this.vmBigScreen.show;
+    this.setShow(!this.vmBigScreen.show);
   }
 
   setShow(show: boolean) {
     this.vmBigScreen.show = show;
+    if (this.vmBigScreen.show) {
+      // todo invoke that this screen is showing
+    }
   }
 }
