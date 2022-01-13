@@ -7,16 +7,19 @@ export class VueBigscreenMap {
   private vmBigScreen: any;
 
   constructor(private store: Store) {
+    Vue.component('route-planner', RoutePlanner);
+    Vue.component('rail-map-shower', RailMapShower);
+
     this.vmBigScreen = new Vue({
       el: '#big-screen-map',
       data: {
         show: false
       },
-      methods: {}
+      methods: {},
+      computed: {
+        style: function () { return this.show ? 'visibility: visible;' : 'visibility: hidden;'; }
+      }
     });
-
-    Vue.component('route-planner', RoutePlanner);
-    Vue.component('rail-map-shower', RailMapShower);
   }
 
   toggleShow() {
