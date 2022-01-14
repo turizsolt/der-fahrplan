@@ -12,8 +12,10 @@ import { ActualRailMap } from './ActualRailMap';
 import { RailMap } from './RailMap';
 import { RailMapNode } from './RailMapNode';
 import { Route } from '../../structs/Scheduling/Route';
+import { RailMapEdge } from './RailMapEdge';
 
-const mapNodes = [];
+const mapNodes: PIXI.Graphics[] = [];
+const mapEdges: PIXI.Graphics[] = [];
 
 export class RailMapCreator {
     static create(store: Store): RailMap {
@@ -124,9 +126,41 @@ export class RailMapCreator {
             globalThis.stageMap.scale.y = scale;
         }
 
-        const railMapNodes = map.getNodes();
+        // edges
+
+        const e = map.getEdges();
+        const railMapEdges: RailMapEdge[] = [];
+        for (let ee of Object.keys(e)) {
+            railMapEdges.push(e[ee]);
+        }
 
         let i = 0;
+        for (; i < railMapEdges.length; i++) {
+            if (!mapEdges[i]) {
+                mapEdges[i] = new PIXI.Graphics();
+                globalThis.stageMap.addChild(mapEdges[i]);
+            }
+
+            mapEdges[i].clear();
+            mapEdges[i].lineStyle(2, 0x000000, 1);
+            const from = railMapEdges[i].from.getCoord();
+            const to = railMapEdges[i].to.getCoord();
+            mapEdges[i].moveTo(from.x, from.z);
+            mapEdges[i].lineTo(to.x, to.z);
+
+            mapEdges[i].zIndex = 10;
+            mapEdges[i].renderable = true;
+        }
+
+        for (; i < mapEdges.length; i++) {
+            mapEdges[i].renderable = false;
+        }
+
+        // nodes
+
+        const railMapNodes = map.getNodes();
+
+        i = 0;
         for (; i < railMapNodes.length; i++) {
             if (!mapNodes[i]) {
                 mapNodes[i] = new PIXI.Graphics();
