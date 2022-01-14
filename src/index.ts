@@ -28,11 +28,9 @@ setTimeout(() => {
   app2.renderer.view.style.zIndex = '0';
   app2.view.id = 'renderCanvasMap';
 
-  app2.stage.scale.x = 3;
-  app2.stage.scale.y = 3;
-
   globalThis.stageMap = app2.stage;
   globalThis.rendererMap = app2.renderer;
+  globalThis.containerMap = container;
 }, 0);
 
 if (globalThis.startParam === '2d') {

@@ -1,3 +1,4 @@
+import * as PIXI from 'pixi.js';
 import { TYPES } from '../../di/TYPES';
 import { Store } from '../../structs/Interfaces/Store';
 import { WhichEnd } from '../../structs/Interfaces/WhichEnd';
@@ -11,6 +12,8 @@ import { ActualRailMap } from './ActualRailMap';
 import { RailMap } from './RailMap';
 import { RailMapNode } from './RailMapNode';
 import { Route } from '../../structs/Scheduling/Route';
+
+const mapNodes = [];
 
 export class RailMapCreator {
     static create(store: Store): RailMap {
@@ -101,6 +104,49 @@ export class RailMapCreator {
         }
 
         map.setBounds({ minX, minZ, maxX, maxZ });
+
+        const boundingRect = new PIXI.Graphics();
+        const border = 20;
+
+        boundingRect.beginFill(0xddffdd);
+        boundingRect.drawRect(minX, minZ, maxX - minX, maxZ - minZ);
+        boundingRect.endFill();
+        boundingRect.zIndex = 15;
+        if (globalThis.stageMap) {
+            globalThis.stageMap.addChild(boundingRect);
+            const scale = Math.min(
+                (globalThis.containerMap.clientWidth - 2 * border) / (maxX - minX),
+                (globalThis.containerMap.clientHeight - 2 * border) / (maxZ - minZ)
+            );
+            globalThis.stageMap.x = -minX * scale + border;
+            globalThis.stageMap.y = -minZ * scale + border;
+            globalThis.stageMap.scale.x = scale;
+            globalThis.stageMap.scale.y = scale;
+        }
+
+        const railMapNodes = map.getNodes();
+
+        let i = 0;
+        for (; i < railMapNodes.length; i++) {
+            if (!mapNodes[i]) {
+                mapNodes[i] = new PIXI.Graphics();
+                globalThis.stageMap.addChild(mapNodes[i]);
+            }
+
+            mapNodes[i].clear();
+            mapNodes[i].lineStyle(0.25, 0x000000, 0.5);
+            mapNodes[i].beginFill(0x00ff00);
+            mapNodes[i].drawCircle(0, 0, railMapNodes[i].getType() === TYPES.PathBlock ? 2 : 5);
+            mapNodes[i].endFill();
+            mapNodes[i].zIndex = 9;
+            mapNodes[i].x = railMapNodes[i].getCoord().x;
+            mapNodes[i].y = railMapNodes[i].getCoord().z;
+            mapNodes[i].renderable = true;
+        }
+
+        for (; i < mapNodes.length; i++) {
+            mapNodes[i].renderable = false;
+        }
 
         return map;
     }

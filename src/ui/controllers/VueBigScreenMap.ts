@@ -2,6 +2,8 @@ import Vue from 'vue';
 import { Store } from '../../structs/Interfaces/Store';
 import RoutePlanner from './RoutePlanner.vue';
 import RailMapShower from './RailMapShower.vue';
+import { RailMapCreator } from '../../modules/RailMap/RailMapCreator';
+import { getStore } from '../../structs/Actuals/Store/StoreForVue';
 
 export class VueBigscreenMap {
   private vmBigScreen: any;
@@ -29,7 +31,7 @@ export class VueBigscreenMap {
   setShow(show: boolean) {
     this.vmBigScreen.show = show;
     if (this.vmBigScreen.show) {
-      // todo invoke that this screen is showing
+      RailMapCreator.create(getStore());
     }
   }
 }
