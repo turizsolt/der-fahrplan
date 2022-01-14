@@ -16,6 +16,7 @@ import { RailMapEdge } from './RailMapEdge';
 
 const mapNodes: PIXI.Graphics[] = [];
 const mapEdges: PIXI.Graphics[] = [];
+let boundingRect: PIXI.Graphics = null;
 
 export class RailMapCreator {
     static create(store: Store): RailMap {
@@ -107,15 +108,22 @@ export class RailMapCreator {
 
         map.setBounds({ minX, minZ, maxX, maxZ });
 
-        const boundingRect = new PIXI.Graphics();
+
         const border = 20;
 
-        boundingRect.beginFill(0xddffdd);
-        boundingRect.drawRect(minX, minZ, maxX - minX, maxZ - minZ);
-        boundingRect.endFill();
-        boundingRect.zIndex = 15;
         if (globalThis.stageMap) {
-            globalThis.stageMap.addChild(boundingRect);
+            if (!boundingRect) {
+                boundingRect = new PIXI.Graphics();
+
+                boundingRect.clear();
+                boundingRect.beginFill(0xddffdd);
+                boundingRect.drawRect(minX, minZ, maxX - minX, maxZ - minZ);
+                boundingRect.endFill();
+                boundingRect.zIndex = 15;
+
+                globalThis.stageMap.addChild(boundingRect);
+            }
+
             const scale = Math.min(
                 (globalThis.containerMap.clientWidth - 2 * border) / (maxX - minX),
                 (globalThis.containerMap.clientHeight - 2 * border) / (maxZ - minZ)
