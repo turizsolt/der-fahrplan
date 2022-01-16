@@ -7,6 +7,9 @@ import { Route2 } from "../Scheduling/Route2";
 import { RoutePart } from "../Scheduling/RoutePart";
 import { RoutePartEdge } from "../Scheduling/RoutePartEdge";
 import { RoutePartJunction } from "../Scheduling/RoutePartJunction";
+import { RoutePartReference } from "../Scheduling/RoutePartReference";
+import { RoutePartReferenceColor } from "../Scheduling/RoutePartReferenceColor";
+import { RoutePartReferenceDuration } from "../Scheduling/RoutePartReferenceDuration";
 import { RoutePartStop } from "../Scheduling/RoutePartStop";
 
 export class BrickFactory {
@@ -14,20 +17,20 @@ export class BrickFactory {
         return new ActualRoute2(no, color);
     }
 
-    createRoutePart(): RoutePart {
-        return new ActualRoutePart();
+    createRoutePart(ref: RoutePartReference): RoutePart {
+        return new ActualRoutePart(ref);
     }
 
-    createRoutePartStop(): RoutePartStop {
-        return new ActualRoutePartStop();
+    createRoutePartStop(ref: RoutePartReferenceColor): RoutePartStop {
+        return new ActualRoutePartStop(ref);
     }
 
-    createRoutePartJunction(): RoutePartJunction {
-        return new ActualRoutePartJunction();
+    createRoutePartJunction(ref: RoutePartReference): RoutePartJunction {
+        return new ActualRoutePartJunction(ref);
     }
 
-    createRoutePartEdge(edge: { duration: number }): RoutePartEdge {
-        return new ActualRoutePartEdge(edge);
+    createRoutePartEdge(ref: RoutePartReferenceDuration): RoutePartEdge {
+        return new ActualRoutePartEdge(ref);
     }
 
     /* singleton pattern */

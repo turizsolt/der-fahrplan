@@ -1,16 +1,16 @@
 import { ActualRoutePart } from "./ActualRoutePart";
 import { RoutePartEdge } from "./RoutePartEdge";
+import { RoutePartReferenceDuration } from "./RoutePartReferenceDuration";
 
 export class ActualRoutePartEdge extends ActualRoutePart implements RoutePartEdge {
-    private ref: { duration: number };
+    protected ref: RoutePartReferenceDuration;
 
-    constructor(ref: { duration: number }) {
-        super();
-        this.ref = ref;
+    constructor(ref: RoutePartReferenceDuration) {
+        super(ref);
     }
 
     getDuration(): number {
-        return this.ref.duration;
+        return this.ref.getDuration();
     }
 
     isStopping(): boolean {
