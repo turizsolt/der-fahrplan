@@ -1,9 +1,11 @@
 import { ActualRoute2 } from "../Scheduling/ActualRoute2";
 import { ActualRoutePart } from "../Scheduling/ActualRoutePart";
+import { ActualRoutePartEdge } from "../Scheduling/ActualRoutePartEdge";
 import { ActualRoutePartJunction } from "../Scheduling/ActualRoutePartJunction";
 import { ActualRoutePartStop } from "../Scheduling/ActualRoutePartStop";
 import { Route2 } from "../Scheduling/Route2";
 import { RoutePart } from "../Scheduling/RoutePart";
+import { RoutePartEdge } from "../Scheduling/RoutePartEdge";
 import { RoutePartJunction } from "../Scheduling/RoutePartJunction";
 import { RoutePartStop } from "../Scheduling/RoutePartStop";
 
@@ -22,6 +24,10 @@ export class BrickFactory {
 
     createRoutePartJunction(): RoutePartJunction {
         return new ActualRoutePartJunction();
+    }
+
+    createRoutePartEdge(edge: { duration: number }): RoutePartEdge {
+        return new ActualRoutePartEdge(edge);
     }
 
     /* singleton pattern */
