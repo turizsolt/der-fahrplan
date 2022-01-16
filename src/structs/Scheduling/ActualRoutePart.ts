@@ -21,4 +21,8 @@ export class ActualRoutePart implements RoutePart {
     getDuration(): number {
         return 0;
     }
+
+    isStopping(): boolean {
+        return false;
+    }
 }

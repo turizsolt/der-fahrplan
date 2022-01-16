@@ -76,4 +76,19 @@ describe('RoutePart', () => {
       expect(edge.getDuration()).equals(FOUR_MINUTES);
     });
   });
+
+  it('isStopping', () => {
+    const stop: RoutePartStop = brickFactory.createRoutePartStop();
+    const part: RoutePart = brickFactory.createRoutePart();
+    const junction: RoutePart = brickFactory.createRoutePartJunction();
+    const edge: RoutePart = brickFactory.createRoutePartEdge({ duration: FOUR_MINUTES });
+
+    expect(stop.isStopping()).equals(true);
+    expect(part.isStopping()).equals(false);
+    expect(junction.isStopping()).equals(false);
+    expect(edge.isStopping()).equals(false);
+
+    stop.setStopping(false);
+    expect(stop.isStopping()).equals(false);
+  });
 });

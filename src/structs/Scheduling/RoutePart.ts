@@ -5,4 +5,6 @@ export interface RoutePart {
     getNext(whichEnd: WhichEnd): RoutePart;
 
     getDuration(): number;
+
+    isStopping(): boolean;
 }

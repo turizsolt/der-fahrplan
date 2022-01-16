@@ -13,4 +13,8 @@ export class ActualRoutePartJunction extends ActualRoutePart implements RoutePar
     getDuration(): number {
         return this.duration;
     }
+
+    isStopping(): boolean {
+        return false;
+    }
 }
