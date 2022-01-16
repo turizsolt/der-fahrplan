@@ -10,4 +10,5 @@ export interface Route2 {
 
     addPart(whichEnd: WhichEnd, part: RoutePart): void;
     getParts(whichEnd: WhichEnd): RoutePart[];
+    removePart(whichEnd: WhichEnd): void;
 }

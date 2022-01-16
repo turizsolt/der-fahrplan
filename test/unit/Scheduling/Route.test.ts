@@ -76,4 +76,24 @@ describe('Route', () => {
     expect(partsB[0]).equals(stop2);
     expect(partsB[1]).equals(stop);
   });
+
+  it('remove two RouteParts from Route', () => {
+    const route: Route2 = brickFactory.createRoute2(ROUTE_NO, ROUTE_COLOR);
+    const stop: RoutePart = brickFactory.createRoutePartStop(REFERENCE_COLOR);
+    const stop2: RoutePart = brickFactory.createRoutePartStop(REFERENCE_COLOR);
+
+    route.addPart(WhichEnd.B, stop);
+    route.addPart(WhichEnd.B, stop2);
+    expect(route.getParts(WhichEnd.A).length).equals(2);
+
+    route.removePart(WhichEnd.B);
+    expect(route.getParts(WhichEnd.A).length).equals(1);
+
+    route.removePart(WhichEnd.B);
+    expect(route.getParts(WhichEnd.A).length).equals(0);
+    expect(route.getParts(WhichEnd.B).length).equals(0);
+
+    route.removePart(WhichEnd.B);
+    expect(route.getParts(WhichEnd.A).length).equals(0);
+  });
 });

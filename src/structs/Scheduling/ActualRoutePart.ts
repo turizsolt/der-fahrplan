@@ -17,7 +17,7 @@ export class ActualRoutePart implements RoutePart {
     setNext(whichEnd: WhichEnd, routePart: RoutePart): void {
         if (this.next[whichEnd] !== routePart) {
             this.next[whichEnd] = routePart;
-            routePart.setNext(otherEnd(whichEnd), this);
+            routePart?.setNext(otherEnd(whichEnd), this);
         }
     }
 

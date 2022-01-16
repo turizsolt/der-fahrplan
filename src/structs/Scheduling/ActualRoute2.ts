@@ -1,4 +1,4 @@
-import { WhichEnd } from "../Interfaces/WhichEnd";
+import { otherEnd, WhichEnd } from "../Interfaces/WhichEnd";
 import { Route2 } from "./Route2";
 import { RoutePart } from "./RoutePart";
 
@@ -50,5 +50,20 @@ export class ActualRoute2 implements Route2 {
             iter = iter.getNext(whichEnd);
         }
         return result;
+    }
+
+    removePart(whichEnd: WhichEnd): void {
+        if (!this.parts[whichEnd]) return;
+
+        const p0 = this.parts[whichEnd];
+        const p1 = p0.getNext(whichEnd);
+
+        if (p1) {
+            p0.setNext(whichEnd, null);
+            p1.setNext(otherEnd(whichEnd), null);
+            this.parts[whichEnd] = p1;
+        } else {
+            this.parts = { A: null, B: null };
+        }
     }
 }
