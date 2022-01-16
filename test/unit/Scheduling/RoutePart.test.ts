@@ -3,6 +3,7 @@ import chaiAlmost from 'chai-almost';
 import { BrickFactory } from '../../../src/structs/Factory/BrickFactory';
 import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
 import { RoutePart } from '../../../src/structs/Scheduling/RoutePart';
+import { RoutePartJunction } from '../../../src/structs/Scheduling/RoutePartJunction';
 import { RoutePartStop } from '../../../src/structs/Scheduling/RoutePartStop';
 chai.use(chaiAlmost());
 
@@ -54,6 +55,16 @@ describe('RoutePart', () => {
 
       rp2.setDuration(FOUR_MINUTES);
       expect(rp2.getDuration()).equals(FOUR_MINUTES);
+    });
+  });
+
+  describe('RoutePartJunction', () => {
+    it('get and set duration', () => {
+      const junction: RoutePartJunction = brickFactory.createRoutePartJunction();
+
+      expect(junction.getDuration()).equals(ZERO_MINUTES);
+      junction.setDuration(FOUR_MINUTES);
+      expect(junction.getDuration()).equals(FOUR_MINUTES);
     });
   });
 });
