@@ -7,8 +7,6 @@ export class ActualRoutePart implements RoutePart {
         [WhichEnd.B]: null
     };
 
-    constructor() { }
-
     setNext(whichEnd: WhichEnd, routePart: RoutePart): void {
         if (this.next[whichEnd] !== routePart) {
             this.next[whichEnd] = routePart;
@@ -18,5 +16,9 @@ export class ActualRoutePart implements RoutePart {
 
     getNext(whichEnd: WhichEnd): RoutePart {
         return this.next[whichEnd];
+    }
+
+    getDuration(): number {
+        return 0;
     }
 }
