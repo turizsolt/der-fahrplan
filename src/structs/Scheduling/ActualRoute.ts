@@ -96,12 +96,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     removeStop(stop: RouteStop): void {
         throw new Error('Method not implemented.');
     }
-    setReverse(route: Route): void {
-        throw new Error('Method not implemented.');
-    }
-    getReverse(): Route {
-        throw new Error('Method not implemented.');
-    }
     getFirstStation(): Station {
         throw new Error('Method not implemented.');
     }
@@ -146,7 +140,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
 export class ActualRoute extends ActualBaseStorable implements Route {
     private name: string;
     private stops: RouteStop[];
-    private reverse: Route;
     private color: string;
 
     init(): Route {
@@ -154,29 +147,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         this.name = this.id;
         this.stops = [];
         return this;
-    }
-
-    setReverse(route: Route): void {
-        this.reverse = route;
-        if (route.getReverse() != this) {
-            route.setReverse(this);
-        }
-    }
-
-    getReverse(): Route {
-        return this.reverse;
-    }
-
-    getColor(): string {
-        return this.color ?? '#fff';
-    }
-
-    setColor(color: string): void {
-        this.color = color;
-    }
-
-    getName(): string {
-        return this.name;
     }
 
     getDetailedName(): string {
@@ -188,10 +158,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
             const last = this.stops[this.stops.length - 1];
             return this.stops[0].getWaypointName() + '>>' + last.getWaypointName();
         }
-    }
-
-    setName(name: string) {
-        this.name = name;
     }
 
     getStops(): RouteStop[] {
@@ -282,7 +248,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
             name: this.name,
             detailedName: this.getDetailedName(),
             stops: this.stops.map(x => x.getId()),
-            reverse: this.getReverse() && this.getReverse().getId(),
             color: this.color
         };
     }
@@ -302,7 +267,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
                 isDepartureStation: ind === 0,
                 isArrivalStation: ind === this.stops.length - 1
             })),
-            reverse: this.getReverse() && this.getReverse().getId(),
             color: this.color
         };
     }
@@ -317,9 +281,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
                 x.setRoute(this);
             }
             this.addWaypoint(x);
-        }
-        if (obj.reverse && store.get(obj.reverse)) {
-            this.setReverse(store.get(obj.reverse) as Route);
         }
         if (obj.color) {
             this.setColor(obj.color);

@@ -21,9 +21,6 @@ export interface Route extends BaseStorable {
 
     // from the old version
 
-    setReverse(route: Route): void;
-    getReverse(): Route;
-
     getStops(): RouteStop[];
     getWaypoints(): RouteStop[];
     addWaypoint(stop: RouteStop): void;
