@@ -137,23 +137,6 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
             this.departureTime + stop.getDepartureTime();
     }
 
-    getStationFollowingStops(station: Station): TripStop[] {
-        const stops = this.getWaypoints();
-        const index = stops.findIndex(s => s.station === station);
-        if (index === -1) return [];
-        return stops.slice(index + 1);
-    }
-
-    isStillInFuture(station: Station): boolean {
-        const stops = this.getWaypoints();
-        const indexStation = stops.findIndex(s => s.station === station);
-        if (indexStation === -1) return false;
-        const indexTrain = stops.findIndex(s => s.station === this.lastStationServed);
-        if (indexTrain < indexStation) return true;
-        if (indexTrain === indexStation) return (this.atStation === station);
-        return false;
-    }
-
     setStationServed(station: Station): void {
         this.lastStationServed = station;
         this.atStation = station;
@@ -183,7 +166,16 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         });
     }
 
-    getRemainingStops(): TripStop[] {
+    // todo make it easier with the new logic
+
+    private getStationFollowingStops(station: Station): TripStop[] {
+        const stops = this.getWaypoints();
+        const index = stops.findIndex(s => s.station === station);
+        if (index === -1) return [];
+        return stops.slice(index + 1);
+    }
+
+    private getRemainingStops(): TripStop[] {
         return this.lastStationServed ? this.getStationFollowingStops(this.lastStationServed) : this.getStops();
     }
 

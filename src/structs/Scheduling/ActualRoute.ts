@@ -6,7 +6,143 @@ import { TYPES } from '../../di/TYPES';
 import { Station } from '../../modules/Station/Station';
 import { Util } from '../Util';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
+import { otherEnd, WhichEnd } from '../Interfaces/WhichEnd';
+import { RoutePart } from './RoutePart';
 
+export class ActualRoute extends ActualBaseStorable implements Route {
+    private name: string;
+    private color: string;
+    private parts: Record<WhichEnd, RoutePart> = {
+        A: null,
+        B: null
+    }
+
+    constructor(no: string, color: string) {
+        super();
+        this.setName(no);
+        this.setColor(color);
+    }
+
+    init(): Route {
+        return this;
+    }
+
+    getName(): string {
+        return this.name;
+    }
+
+    setName(name: string): void {
+        this.name = name;
+    }
+
+    getColor(): string {
+        return this.color;
+    }
+
+    setColor(color: string): void {
+        this.color = color;
+    }
+
+    addPart(whichEnd: WhichEnd, part: RoutePart): void {
+        if (!this.parts.A) {
+            this.parts.A = part;
+            this.parts.B = part;
+        } else {
+            const p = this.parts[whichEnd];
+            part.setNext(whichEnd, p);
+            this.parts[whichEnd] = part;
+        }
+    }
+
+    getParts(whichEnd: WhichEnd): RoutePart[] {
+        const result: RoutePart[] = [];
+        let iter: RoutePart = this.parts[whichEnd];
+        while (iter) {
+            result.push(iter);
+            iter = iter.getNext(whichEnd);
+        }
+        return result;
+    }
+
+    removePart(whichEnd: WhichEnd): void {
+        if (!this.parts[whichEnd]) return;
+
+        const p0 = this.parts[whichEnd];
+        const p1 = p0.getNext(whichEnd);
+
+        if (p1) {
+            p0.setNext(whichEnd, null);
+            p1.setNext(otherEnd(whichEnd), null);
+            this.parts[whichEnd] = p1;
+        } else {
+            this.parts = { A: null, B: null };
+        }
+    }
+
+    /********************/
+
+    getDetailedName(): string {
+        throw new Error('Method not implemented.');
+    }
+    getStops(): RouteStop[] {
+        throw new Error('Method not implemented.');
+    }
+    getWaypoints(): RouteStop[] {
+        throw new Error('Method not implemented.');
+    }
+    addWaypoint(stop: RouteStop): void {
+        throw new Error('Method not implemented.');
+    }
+    removeStop(stop: RouteStop): void {
+        throw new Error('Method not implemented.');
+    }
+    setReverse(route: Route): void {
+        throw new Error('Method not implemented.');
+    }
+    getReverse(): Route {
+        throw new Error('Method not implemented.');
+    }
+    getFirstStation(): Station {
+        throw new Error('Method not implemented.');
+    }
+    getLastStation(): Station {
+        throw new Error('Method not implemented.');
+    }
+    getFirstWaypoint(): RailMapNode {
+        throw new Error('Method not implemented.');
+    }
+    getLastWaypoint(): RailMapNode {
+        throw new Error('Method not implemented.');
+    }
+    getLastStop(): RouteStop {
+        throw new Error('Method not implemented.');
+    }
+    hasCommonEdgeWith(route: Route): boolean {
+        throw new Error('Method not implemented.');
+    }
+    getEdges(): { from: RailMapNode; to: RailMapNode; }[] {
+        throw new Error('Method not implemented.');
+    }
+    update(): void {
+        throw new Error('Method not implemented.');
+    }
+
+    /********************/
+
+    load(obj: Object, store: Store): void {
+
+    }
+
+    persist(): Object {
+        return {}
+    }
+
+    remove(): void {
+        this.store.unregister(this);
+    }
+}
+
+/*
 export class ActualRoute extends ActualBaseStorable implements Route {
     private name: string;
     private stops: RouteStop[];
@@ -29,10 +165,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
 
     getReverse(): Route {
         return this.reverse;
-    }
-
-    remove(): void {
-        this.store.unregister(this);
     }
 
     getColor(): string {
@@ -196,3 +328,4 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         this.update();
     }
 }
+*/
