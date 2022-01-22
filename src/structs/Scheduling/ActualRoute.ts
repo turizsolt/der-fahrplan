@@ -117,9 +117,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     getEdges(): { from: RailMapNode; to: RailMapNode; }[] {
         throw new Error('Method not implemented.');
     }
-    update(): void {
-        throw new Error('Method not implemented.');
-    }
 
     /********************/
 
@@ -223,24 +220,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         return result;
     }
 
-    update(): void {
-        let time = 0;
-        let first = true;
-        for (let waypoint of this.getWaypoints()) {
-            if (first) {
-                waypoint.setArrivalTime(undefined);
-                waypoint.setDepartureTime(0);
-                first = false;
-            } else {
-                time += waypoint.getTimeToStation() + waypoint.getExtraTimeToStation();
-                waypoint.setArrivalTime(time);
-                time += waypoint.getTimeAtStation() + waypoint.getExtraTimeAtStation();
-                waypoint.setDepartureTime(time);
-            }
-        }
-        Util.last(this.getWaypoints())?.setDepartureTime(undefined);
-    }
-
     persist(): Object {
         return {
             id: this.id,
@@ -285,8 +264,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         if (obj.color) {
             this.setColor(obj.color);
         }
-
-        this.update();
     }
 }
 */

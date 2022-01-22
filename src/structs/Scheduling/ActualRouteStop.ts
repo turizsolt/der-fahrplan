@@ -53,12 +53,10 @@ export class ActualRouteStop extends ActualBaseStorable implements RouteStop {
 
     setExtraTimeToStation(time: number): void {
         this.extraTimeToStation = time;
-        this.route?.update();
     }
 
     setExtraTimeAtStation(time: number): void {
         this.extraTimeAtStation = time;
-        this.route?.update();
     }
 
     getTimeToStation(): number {

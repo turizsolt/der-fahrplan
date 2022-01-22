@@ -36,6 +36,4 @@ export interface Route extends BaseStorable {
     getEdges(): { from: RailMapNode; to: RailMapNode }[];
 
     getDetailedName(): string;
-
-    update(): void;
 }
