@@ -23,6 +23,10 @@ export interface Route extends BaseStorable {
 
     getVariants(): RouteVariant[];
 
+    hasCommonEdgeWith(route: Route): boolean;
+    getEdges(): { from: RailMapNode; to: RailMapNode }[];
+    getDetailedName(): string;
+
     // from the old version
 
     // hard part, a lot of rewrite will be needed - in 55 places to be exact
@@ -49,16 +53,4 @@ export interface Route extends BaseStorable {
     // route planner - add stop
     // todo RouteVariant
     getLastStop(): RouteStop;
-
-    // to determine should be on the graph or not
-    // todo - rewrite
-    hasCommonEdgeWith(route: Route): boolean;
-
-    // helper to the former
-    // todo - rewrite
-    getEdges(): { from: RailMapNode; to: RailMapNode }[];
-
-    // to write out, in persist it is important maybe
-    // todo - rewrite
-    getDetailedName(): string;
 }

@@ -19,6 +19,10 @@ export class ActualRoutePart implements RoutePart {
         return TYPES.RoutePart;
     }
 
+    getRef(): RoutePartReference {
+        return this.ref;
+    }
+
     setNext(whichEnd: WhichEnd, routePart: RoutePart): void {
         if (this.next[whichEnd] !== routePart) {
             this.next[whichEnd] = routePart;

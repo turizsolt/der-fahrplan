@@ -4,7 +4,6 @@ import { RouteStop } from './RouteStop';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
 import { Station } from '../../modules/Station/Station';
-import { Util } from '../Util';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { otherEnd, WhichEnd } from '../Interfaces/WhichEnd';
 import { RoutePart } from './RoutePart';
@@ -89,8 +88,47 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     /********************/
 
     getDetailedName(): string {
-        throw new Error('Method not implemented.');
+        const from = this.parts.A?.getName();
+        const to = this.parts.B?.getName();
+
+        if (from && to) {
+            return from + ">>" + to;
+        } else if (from) {
+            return from;
+        } else if (to) {
+            return to;
+        } else return 'Unknown terminus';
     }
+
+    hasCommonEdgeWith(route: Route): boolean {
+        for (let thisEdge of this.getEdges()) {
+            for (let otherEdge of route.getEdges()) {
+                if (thisEdge.from === otherEdge.from && thisEdge.to === otherEdge.to) {
+                    return true;
+                }
+                if (thisEdge.from === otherEdge.to && thisEdge.to === otherEdge.from) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    getEdges(): { from: RailMapNode, to: RailMapNode }[] {
+        const result: { from: RailMapNode, to: RailMapNode }[] = [];
+        for (let part of this.getParts(WhichEnd.A)) {
+            if (part.getType() === TYPES.RoutePartEdge) {
+                result.push({
+                    from: part.getNext(WhichEnd.A).getRef() as RailMapNode,
+                    to: part.getNext(WhichEnd.B).getRef() as RailMapNode,
+                });
+            }
+        }
+        return result;
+    }
+
+    /********************/
+
     getStops(): RouteStop[] {
         throw new Error('Method not implemented.');
     }
@@ -116,12 +154,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         throw new Error('Method not implemented.');
     }
     getLastStop(): RouteStop {
-        throw new Error('Method not implemented.');
-    }
-    hasCommonEdgeWith(route: Route): boolean {
-        throw new Error('Method not implemented.');
-    }
-    getEdges(): { from: RailMapNode; to: RailMapNode; }[] {
         throw new Error('Method not implemented.');
     }
 
@@ -141,92 +173,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
 }
 
 /*
-export class ActualRoute extends ActualBaseStorable implements Route {
-    private name: string;
-    private stops: RouteStop[];
-    private color: string;
-
-    init(): Route {
-        super.initStore(TYPES.Route);
-        this.name = this.id;
-        this.stops = [];
-        return this;
-    }
-
-    getDetailedName(): string {
-        if (this.stops.length === 0) {
-            return 'Unknown terminus';
-        } else if (this.stops.length === 1) {
-            return this.stops[0].getWaypointName();
-        } else {
-            const last = this.stops[this.stops.length - 1];
-            return this.stops[0].getWaypointName() + '>>' + last.getWaypointName();
-        }
-    }
-
-    getStops(): RouteStop[] {
-        return this.stops.filter(s => s.getShouldStop());
-    }
-
-    getWaypoints(): RouteStop[] {
-        return this.stops;
-    }
-
-    addWaypoint(stop: RouteStop): void {
-        this.stops.push(stop);
-        // this.store.getTravelPathes().find(3);
-    }
-
-    removeStop(stop: RouteStop): void {
-        const foundIndex = this.stops.findIndex(s => s === stop);
-        if (foundIndex === 0 || foundIndex === this.stops.length - 1) {
-            this.stops = this.stops.filter(s => s !== stop);
-        }
-        // this.store.getTravelPathes().find(3);
-    }
-
-    getFirstStation(): Station {
-        return Util.first(this.stops)?.getStation();
-    }
-
-    getLastStation(): Station {
-        return Util.last(this.stops)?.getStation();
-    }
-
-    getFirstWaypoint(): RailMapNode {
-        return Util.first(this.stops)?.getWaypoint();
-    }
-
-    getLastWaypoint(): RailMapNode {
-        return Util.last(this.stops)?.getWaypoint();
-    }
-
-    getLastStop(): RouteStop {
-        return Util.last(this.stops);
-    }
-
-    hasCommonEdgeWith(route: Route): boolean {
-        for (let thisEdge of this.getEdges()) {
-            for (let otherEdge of route.getEdges()) {
-                if (thisEdge.from === otherEdge.from && thisEdge.to === otherEdge.to) {
-                    return true;
-                }
-                if (thisEdge.from === otherEdge.to && thisEdge.to === otherEdge.from) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    getEdges(): { from: RailMapNode, to: RailMapNode }[] {
-        const result: { from: RailMapNode, to: RailMapNode }[] = [];
-        for (let i = 1; i < this.stops.length; i++) {
-            result.push({ from: this.stops[i - 1].getWaypoint(), to: this.stops[i].getWaypoint() });
-        }
-        return result;
-    }
-
     persist(): Object {
         return {
             id: this.id,
@@ -272,5 +218,4 @@ export class ActualRoute extends ActualBaseStorable implements Route {
             this.setColor(obj.color);
         }
     }
-}
 */

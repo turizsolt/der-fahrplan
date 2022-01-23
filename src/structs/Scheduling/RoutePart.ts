@@ -1,4 +1,5 @@
 import { WhichEnd } from "../Interfaces/WhichEnd";
+import { RoutePartReference } from "./RoutePartReference";
 
 export interface RoutePart {
     setNext(whichEnd: WhichEnd, routePart: RoutePart): void;
@@ -6,6 +7,7 @@ export interface RoutePart {
 
     getName(): string;
     getType(): symbol;
+    getRef(): RoutePartReference;
 
     getDuration(): number;
 
