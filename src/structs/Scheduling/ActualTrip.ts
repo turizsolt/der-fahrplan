@@ -137,6 +137,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
             this.departureTime + stop.getDepartureTime();
     }
 
+    // set on arrival, set on depart, on arrival again when terminated
     setStationServed(station: Station): void {
         this.lastStationServed = station;
         this.atStation = station;
@@ -153,6 +154,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         this.updateScheduleOnAllStations();
     }
 
+    // set when depart
     setAtStation(atStation: Station): void {
         this.atStation = atStation;
         this.updateScheduleOnAllStations();

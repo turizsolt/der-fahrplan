@@ -17,6 +17,10 @@ export class ActualRouteVariant implements RouteVariant {
         this.startEnd = whichEnd;
     }
 
+    getStartEnd(): WhichEnd {
+        return this.startEnd;
+    }
+
     private getParts(): RoutePart[] {
         return this.route.getParts(this.startEnd);
     }
