@@ -8,6 +8,8 @@ import { Util } from '../Util';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { otherEnd, WhichEnd } from '../Interfaces/WhichEnd';
 import { RoutePart } from './RoutePart';
+import { RouteVariant } from './RouteVariant';
+import { ActualRouteVariant } from './ActualRouteVariant';
 
 export class ActualRoute extends ActualBaseStorable implements Route {
     private name: string;
@@ -16,14 +18,11 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         A: null,
         B: null
     }
-
-    constructor(no: string, color: string) {
-        super();
-        this.setName(no);
-        this.setColor(color);
-    }
+    private variants: RouteVariant[] = [];
 
     init(): Route {
+        this.variants.push(new ActualRouteVariant(this, WhichEnd.A));
+        this.variants.push(new ActualRouteVariant(this, WhichEnd.B));
         return this;
     }
 
@@ -64,6 +63,10 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         return result;
     }
 
+    getEnd(whichEnd: WhichEnd): RoutePart {
+        return this.parts[whichEnd];
+    }
+
     removePart(whichEnd: WhichEnd): void {
         if (!this.parts[whichEnd]) return;
 
@@ -77,6 +80,10 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         } else {
             this.parts = { A: null, B: null };
         }
+    }
+
+    getVariants(): RouteVariant[] {
+        return this.variants;
     }
 
     /********************/

@@ -1,3 +1,4 @@
+import { TYPES } from "../../di/TYPES";
 import { ActualRoutePart } from "./ActualRoutePart";
 import { RoutePartJunction } from "./RoutePartJunction";
 
@@ -5,6 +6,10 @@ const DEFAULT_DURATION = 0;
 
 export class ActualRoutePartJunction extends ActualRoutePart implements RoutePartJunction {
     private duration: number = DEFAULT_DURATION;
+
+    getType(): symbol {
+        return TYPES.RoutePartJunction;
+    }
 
     setDuration(duration: number): void {
         this.duration = duration;

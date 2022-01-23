@@ -106,5 +106,10 @@ export const TYPES = {
     FactoryOfSensor: Symbol.for('Factory<Sensor>'),
     FactoryOfSensorRenderer: Symbol.for('Factory<SensorRenderer>'),
 
-    TrackInputHandler: Symbol.for('TrackInputHandler')
+    TrackInputHandler: Symbol.for('TrackInputHandler'),
+
+    RoutePart: Symbol.for('RoutePart'),
+    RoutePartStop: Symbol.for('RoutePartStop'),
+    RoutePartJunction: Symbol.for('RoutePartJunction'),
+    RoutePartEdge: Symbol.for('RoutePartEdge')
 };

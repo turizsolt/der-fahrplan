@@ -5,6 +5,7 @@ export interface RoutePart {
     getNext(whichEnd: WhichEnd): RoutePart;
 
     getName(): string;
+    getType(): symbol;
 
     getDuration(): number;
 

@@ -1,8 +1,12 @@
+import { getTestStore } from "../../../test/getTestStore";
+import { TYPES } from "../../di/TYPES";
+import { ActualRoute } from "../Scheduling/ActualRoute";
 import { ActualRoute2 } from "../Scheduling/ActualRoute2";
 import { ActualRoutePart } from "../Scheduling/ActualRoutePart";
 import { ActualRoutePartEdge } from "../Scheduling/ActualRoutePartEdge";
 import { ActualRoutePartJunction } from "../Scheduling/ActualRoutePartJunction";
 import { ActualRoutePartStop } from "../Scheduling/ActualRoutePartStop";
+import { Route } from "../Scheduling/Route";
 import { Route2 } from "../Scheduling/Route2";
 import { RoutePart } from "../Scheduling/RoutePart";
 import { RoutePartEdge } from "../Scheduling/RoutePartEdge";
@@ -12,7 +16,17 @@ import { RoutePartReferenceColor } from "../Scheduling/RoutePartReferenceColor";
 import { RoutePartReferenceDuration } from "../Scheduling/RoutePartReferenceDuration";
 import { RoutePartStop } from "../Scheduling/RoutePartStop";
 
+const store = getTestStore();
+
 export class BrickFactory {
+    // todo
+    createRoute(no: string, color: string): Route {
+        const route = store.create<Route>(TYPES.Route).init();
+        route.setName(no);
+        route.setColor(color);
+        return route;
+    }
+
     createRoute2(no: string, color: string): Route2 {
         return new ActualRoute2(no, color);
     }

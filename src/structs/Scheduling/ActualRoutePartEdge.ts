@@ -1,3 +1,4 @@
+import { TYPES } from "../../di/TYPES";
 import { ActualRoutePart } from "./ActualRoutePart";
 import { RoutePartEdge } from "./RoutePartEdge";
 import { RoutePartReferenceDuration } from "./RoutePartReferenceDuration";
@@ -7,6 +8,10 @@ export class ActualRoutePartEdge extends ActualRoutePart implements RoutePartEdg
 
     constructor(ref: RoutePartReferenceDuration) {
         super(ref);
+    }
+
+    getType(): symbol {
+        return TYPES.RoutePartEdge;
     }
 
     getDuration(): number {

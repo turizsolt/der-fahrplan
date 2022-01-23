@@ -1,3 +1,4 @@
+import { TYPES } from "../../di/TYPES";
 import { WhichEnd } from "../Interfaces/WhichEnd";
 import { ActualRoutePart } from "./ActualRoutePart";
 import { RoutePartReferenceColor } from "./RoutePartReferenceColor";
@@ -13,6 +14,10 @@ export class ActualRoutePartStop extends ActualRoutePart implements RoutePartSto
 
     constructor(ref: RoutePartReferenceColor) {
         super(ref);
+    }
+
+    getType(): symbol {
+        return TYPES.RoutePartStop;
     }
 
     setDuration(duration: number): void {

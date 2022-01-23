@@ -4,6 +4,7 @@ import { RouteStop } from './RouteStop';
 import { Station } from '../../modules/Station/Station';
 import { RoutePart } from './RoutePart';
 import { WhichEnd } from '../Interfaces/WhichEnd';
+import { RouteVariant } from './RouteVariant';
 
 export interface Route extends BaseStorable {
     init(): Route;
@@ -16,8 +17,11 @@ export interface Route extends BaseStorable {
     setColor(color: string): void;
 
     addPart(whichEnd: WhichEnd, part: RoutePart): void;
-    getParts(whichEnd: WhichEnd): RoutePart[];
     removePart(whichEnd: WhichEnd): void;
+    getParts(whichEnd: WhichEnd): RoutePart[];
+    getEnd(whichEnd: WhichEnd): RoutePart;
+
+    getVariants(): RouteVariant[];
 
     // from the old version
 

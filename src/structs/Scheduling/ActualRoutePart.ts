@@ -1,3 +1,4 @@
+import { TYPES } from "../../di/TYPES";
 import { otherEnd, WhichEnd } from "../Interfaces/WhichEnd";
 import { RoutePart } from "./RoutePart";
 import { RoutePartReference } from "./RoutePartReference";
@@ -12,6 +13,10 @@ export class ActualRoutePart implements RoutePart {
 
     constructor(ref: RoutePartReference) {
         this.ref = ref;
+    }
+
+    getType(): symbol {
+        return TYPES.RoutePart;
     }
 
     setNext(whichEnd: WhichEnd, routePart: RoutePart): void {
