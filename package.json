@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@darkblue_azurite/priority-queue": "^1.0.7",
+    "@reduxjs/toolkit": "^1.7.1",
     "@skymaker/quartic": "^0.1.5",
     "babylonjs": "4.1.0",
     "babylonjs-gui": "4.1.0",
