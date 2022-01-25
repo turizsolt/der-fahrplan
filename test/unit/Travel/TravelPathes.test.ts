@@ -22,7 +22,7 @@ const createRoute = (name: string, station: Station[], times: number[]): Route =
 
 
 
-describe('Travel', () => {
+xdescribe('Travel', () => {
 
     let stA: Station;
     let stB: Station;

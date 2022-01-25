@@ -8,8 +8,187 @@ import { RouteStop } from './RouteStop';
 import { Platform } from '../../modules/Station/Platform';
 import { Station } from '../../modules/Station/Station';
 import { Util } from '../Util';
+import { RoutePart } from './RoutePart';
+import { RoutePartReference } from './RoutePartReference';
+import { RailMapNode } from '../../modules/RailMap/RailMapNode';
+import { RouteVariant } from './RouteVariant';
+import { BaseStorable } from '../Interfaces/BaseStorable';
 
 export class ActualTrip extends ActualBaseStorable implements Trip {
+    private routeVariant: RouteVariant;
+    private departureTime: number;
+    private routePartAt: RoutePart;
+    private redefinedProps: Record<string, OptionalTripStop> = {};
+
+    private prevTrip: Trip = null;
+    private nextTrip: Trip = null;
+    private nextReverse: boolean = true;
+
+    init(routeVariant: RouteVariant, departureTime: number): Trip {
+        super.initStore(TYPES.Trip);
+        this.routeVariant = routeVariant;
+        this.departureTime = departureTime;
+
+        return this;
+    }
+
+    getRouteVariant(): RouteVariant {
+        return this.routeVariant;
+    }
+
+    getNextTrip(): Trip {
+        return this.nextTrip;
+    }
+
+    setNextTrip(trip: Trip): void {
+        this.nextTrip = trip;
+    }
+
+    getPrevTrip(): Trip {
+        return this.prevTrip;
+    }
+
+    setPrevTrip(trip: Trip): void {
+        this.prevTrip = trip;
+    }
+
+    getNextReverse(): boolean {
+        return this.nextReverse;
+    }
+
+    toggleNextReverse(): void {
+        this.nextReverse = !this.nextReverse;
+    }
+
+    getDepartureTime(): number {
+        return this.departureTime;
+    }
+
+    setDepartureTime(time: number): void {
+        this.departureTime = time;
+    }
+
+    updatePlatformInfo(routePart: RoutePart, props: OptionalTripStop): void {
+        this.redefine(routePart.getRef(), props);
+    }
+
+    redefine(stop: RoutePartReference, props: OptionalTripStop): void {
+        const id = (stop as RailMapNode).getId();
+        this.redefinedProps[id] = {
+            ...this.redefinedProps[id],
+            ...props
+        };
+    }
+
+    undefine(stop: RoutePartReference, props: OptionalTripStop): void {
+        const id = (stop as RailMapNode).getId();
+        for (let prop of Object.keys(props)) {
+            if (this.redefinedProps[id]?.[prop]) {
+                delete this.redefinedProps[id][prop];
+            }
+        }
+    }
+
+    start(): void {
+        this.routePartAt = this.routeVariant.getFirstStop();
+    }
+
+    arrive(ref: RoutePartReference): boolean {
+        this.routePartAt = this.routePartAt.getNext(this.routeVariant.getStartEnd());
+        this.redefine(this.routePartAt.getRef(), { realArrivalTime: this.store.getTickCount() });
+
+        return this.routePartAt.getRef() === ref;
+    }
+
+    depart(): void {
+        this.routePartAt = this.routePartAt.getNext(this.routeVariant.getStartEnd());
+        this.redefine(this.routePartAt.getRef(), { realDepartureTime: this.store.getTickCount() });
+    }
+
+    skip(ref: RoutePartReference): boolean {
+        const ret = this.arrive(ref);
+        this.depart();
+
+        return ret;
+    }
+
+    getStationDepartureTime(station: Station): number {
+        const list = this.routeVariant.getStops().filter(stop => stop.getRef() === station);
+        if (list.length === 0) return null;
+        const stop = list[0];
+
+        let addedTime = 0;
+        const stops = this.routeVariant.getStops();
+        for (let i = 0; i < stops.length; i++) {
+            addedTime += stops[i].getDuration();
+
+            if (stop === stops[i]) break;
+        }
+
+        return this.departureTime + addedTime; //(this.redefinedProps[(stop.getRef() as RailMapNode).getId()]?.departureTime) ??
+    }
+
+    // todo only stopping stations should count
+    getNextStation(): Station {
+        let iter = this.routePartAt;
+        while (iter) {
+            if (iter.getType() === TYPES.RoutePartStop) {
+                return iter.getRef() as Station;
+            }
+            iter = iter.getNext(this.routeVariant.getStartEnd());
+        }
+
+        return null;
+    }
+
+    // todo returning the stops to show on the side
+
+    getWaypoints(): TripStop[] {
+        const stops = this.routeVariant.getWaypoints();
+        const index = stops.findIndex((s: RoutePart) => s === this.routePartAt);
+        return stops.map((stop, ind) => {
+            const sto: TripStop = {
+                trip: null,
+                route: null,
+                routeStop: null,
+                id: this.id,
+
+                station: stop.getRef() as Station,
+                stationRgbColor: (stop.getRef() as Station).getColor().getRgbString(),
+                stationName: stop.getRef().getName(),
+                platform: null,
+                platformNo: '',
+                hasArrivalTime: false,
+                hasDepartureTime: false,
+                arrivalTime: 0,
+                departureTime: 0,
+                realArrivalTime: 0,
+                realDepartureTime: 0,
+                arrivalTimeString: '',
+                departureTimeString: '',
+                realArrivalTimeString: '',
+                realDepartureTimeString: '',
+                isServed: (ind <= index),
+                atStation: (ind === index) && (this.routePartAt === stop),
+                isArrivalStation: ind === stops.length - 1,
+                isDepartureStation: ind === 0,
+                shouldStop: true,
+                isStation: true
+            };
+
+            return sto;
+        });
+    };
+
+    persist(): Object {
+        throw new Error('Method not implemented.');
+    }
+
+    load(obj: Object, store: Store): void {
+        throw new Error('Method not implemented.');
+    }
+
+    /*
     private route: Route = null;
     private departureTime: number;
     private redefinedProps: Record<string, OptionalTripStop> = {};
@@ -181,13 +360,6 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         return this.lastStationServed ? this.getStationFollowingStops(this.lastStationServed) : this.getStops();
     }
 
-    getNextStation(): Station {
-        return Util.first(this.getRemainingStops()
-            .filter(ts => ts.isStation && ts.shouldStop)
-            .map(ts => ts.station as Station)
-        );
-    }
-
     getRoute(): Route {
         return this.route;
     }
@@ -296,4 +468,5 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
             this.toggleNextReverse();
         }
     }
+    */
 }
