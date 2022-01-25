@@ -45,4 +45,11 @@ export class ActualRoutePart implements RoutePart {
     getName(): string {
         return this.ref.getName();
     }
+
+    persist(): Object {
+        return {
+            id: this.ref?.getId(),
+            type: this.getType().description
+        }
+    }
 }

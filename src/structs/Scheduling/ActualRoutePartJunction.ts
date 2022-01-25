@@ -22,4 +22,12 @@ export class ActualRoutePartJunction extends ActualRoutePart implements RoutePar
     isStopping(): boolean {
         return false;
     }
+
+    persist(): Object {
+        return {
+            id: this.ref?.getId(),
+            type: this.getType().description,
+            duration: this.duration
+        }
+    }
 }

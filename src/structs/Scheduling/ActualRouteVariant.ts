@@ -69,11 +69,17 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
     }
 
     persist(): Object {
-        throw new Error("Method not implemented.");
+        return {
+            id: this.id,
+            type: 'RouteVariant',
+            startEnd: this.startEnd,
+            route: this.route.getId()
+        }
     }
 
-    load(obj: Object, store: Store): void {
-        throw new Error("Method not implemented.");
+    load(obj: any, store: Store): void {
+        this.presetId(obj.id);
+        this.init(store.get(obj.route) as Route, obj.startEnd);
     }
 }
 doApply();

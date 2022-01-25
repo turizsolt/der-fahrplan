@@ -21,4 +21,11 @@ export class ActualRoutePartEdge extends ActualRoutePart implements RoutePartEdg
     isStopping(): boolean {
         return false;
     }
+
+    persist(): Object {
+        return {
+            id: this.ref?.getId(),
+            type: this.getType().description
+        }
+    }
 }

@@ -12,4 +12,6 @@ export interface RoutePart {
     getDuration(): number;
 
     isStopping(): boolean;
+
+    persist(): Object;
 }

@@ -6,6 +6,13 @@ import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { otherEnd, WhichEnd } from '../Interfaces/WhichEnd';
 import { RoutePart } from './RoutePart';
 import { RouteVariant } from './RouteVariant';
+import { ActualRoutePart } from './ActualRoutePart';
+import { RoutePartReference } from './RoutePartReference';
+import { ActualRoutePartEdge } from './ActualRoutePartEdge';
+import { ActualRoutePartStop } from './ActualRoutePartStop';
+import { ActualRoutePartJunction } from './ActualRoutePartJunction';
+import { RoutePartReferenceDuration } from './RoutePartReferenceDuration';
+import { RoutePartReferenceColor } from './RoutePartReferenceColor';
 
 export class ActualRoute extends ActualBaseStorable implements Route {
     private name: string;
@@ -134,29 +141,15 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         this.variants.forEach(variant => variant.emit('update', {}));
     }
 
-    load(obj: Object, store: Store): void {
-
-    }
-
-    persist(): Object {
-        return {}
-    }
-
-    remove(): void {
-        this.store.unregister(this);
-    }
-}
-
-/*
     persist(): Object {
         return {
             id: this.id,
             type: 'Route',
             name: this.name,
-            detailedName: this.getDetailedName(),
-            stops: this.stops.map(x => x.getId()),
-            color: this.color
-        };
+            color: this.color,
+            parts: this.getParts(WhichEnd.A).map(part => part.persist()),
+            variants: this.variants.map(variant => variant.getId())
+        }
     }
 
     persistDeep(): Object {
@@ -164,16 +157,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
             id: this.id,
             type: 'Route',
             name: this.name,
-            destination:
-                this.stops.length > 0
-                    ? this.stops[this.stops.length - 1].getWaypointName()
-                    : 'Unknown',
             detailedName: this.getDetailedName(),
-            stops: this.stops.map((x, ind) => ({
-                ...x.persistDeep(),
-                isDepartureStation: ind === 0,
-                isArrivalStation: ind === this.stops.length - 1
-            })),
             color: this.color
         };
     }
@@ -181,16 +165,33 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     load(obj: any, store: Store): void {
         this.presetId(obj.id);
         this.init();
+        this.setColor(obj.color);
         this.setName(obj.name);
-        for (let stopId of obj.stops) {
-            const x = store.get(stopId) as RouteStop;
-            if (x.getType() === TYPES.RouteStop) {
-                x.setRoute(this);
+
+        const parts: RoutePart[] = obj.parts.map(part => {
+            switch (Symbol.for(part.type)) {
+                case TYPES.RoutePartEdge:
+                    return new ActualRoutePartEdge(store.get(part.id) as unknown as RoutePartReferenceDuration);
+
+                case TYPES.RoutePartStop:
+                    return new ActualRoutePartStop(store.get(part.id) as unknown as RoutePartReferenceColor);
+
+                case TYPES.RoutePartEdge:
+                    return new ActualRoutePartJunction(store.get(part.id) as unknown as RoutePartReference);
+
+                default:
+                    return new ActualRoutePart(store.get(part.id) as unknown as RoutePartReference);
             }
-            this.addWaypoint(x);
+        });
+
+        for (let part of parts) {
+            this.addPart(WhichEnd.B, part);
         }
-        if (obj.color) {
-            this.setColor(obj.color);
-        }
+
+        this.variants = obj.variants.map(variant => store.get(variant.id) as RouteVariant);
     }
-*/
+
+    remove(): void {
+        this.store.unregister(this);
+    }
+}

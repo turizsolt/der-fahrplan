@@ -34,26 +34,5 @@ export interface Trip extends BaseStorable {
     getNextStation(): Station;
     updatePlatformInfo(routePart: RoutePart, platform: AbstractPlatform): void;
     isAtLastStation(): boolean;
-
-    /*
-    init(route: Route, startTime: number, hasGroup?: boolean): Trip;
-    getRoute(): Route;
-    getWaypoints(): TripStop[];
-    redefine(stop: RouteStop, props: OptionalTripStop): void;
-    undefine(stop: RouteStop, props: OptionalTripStop): void;
-    setStationServed(station: Station): void;
-    setAtStation(atStation: Station): void;
-    setNextTrip(trip: Trip): void;
-    getNextTrip(): Trip;
-    getPrevTrip(): Trip;
-    setPrevTrip(trip: Trip): void;
-    xpersistDeep(level?: number): Object;
-    setDepartureTime(time: number): void;
-    getDepartureTime(): number;
-    getDepartureTimeStr(): string;
-    getArrivalTimeStr(): string;
-    toggleNextReverse(): void;
-    getNextReverse(): boolean;
-    getHasGroup(): boolean;
-    */
+    xpersistDeep(level: number): void;
 }

@@ -10,10 +10,13 @@ import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { RouteVariant } from './RouteVariant';
 import { otherEnd } from '../Interfaces/WhichEnd';
 import { AbstractPlatform } from '../../modules/Station/AbstractPlatform';
+import { Util } from '../Util';
+import { Platform } from '../../modules/Station/Platform';
 
 export class ActualTrip extends ActualBaseStorable implements Trip {
     private routeVariant: RouteVariant;
     private departureTime: number;
+    private arrivalTime: number;
     private routePartAt: RoutePart;
     private redefinedProps: Record<string, OptionalTripStop> = {};
     private routeVariantSubscribe: (data: any) => void;
@@ -49,6 +52,8 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
             }
             iter = iter.getNext(this.routeVariant.getStartEnd());
         }
+
+        this.arrivalTime = this.redefinedProps[(this.routeVariant.getLastStop().getRef() as RailMapNode).getId()].arrivalTime;
 
         this.undefine(this.routeVariant.getFirstStop().getRef(), { arrivalTime: undefined });
         this.undefine(this.routeVariant.getLastStop().getRef(), { departureTime: undefined });
@@ -223,206 +228,6 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     };
 
     persist(): Object {
-        throw new Error('Method not implemented.');
-    }
-
-    load(obj: Object, store: Store): void {
-        throw new Error('Method not implemented.');
-    }
-
-    /*
-    private route: Route = null;
-    private departureTime: number;
-    private redefinedProps: Record<string, OptionalTripStop> = {};
-    private lastStationServed: Station = null;
-    private atStation: Station = null;
-
-    private prevTrip: Trip = null;
-    private nextTrip: Trip = null;
-    private nextReverse: boolean = true;
-    private hasGroup: boolean = false;
-
-    init(route: Route, departureTime: number, hasGroup: boolean = false): Trip {
-        super.initStore(TYPES.Trip);
-        this.route = route;
-        this.departureTime = departureTime;
-        this.hasGroup = hasGroup;
-
-        const stationsInvolved = this.route.getStops().map((routeStop: RouteStop) => routeStop.getStation());
-        stationsInvolved.map((station: Station) => station?.addTripToSchedule(this));
-        this.updateScheduleOnAllStations(stationsInvolved);
-        return this;
-    }
-
-    setNextTrip(trip: Trip): void {
-        this.nextTrip = trip;
-    }
-
-    getNextTrip(): Trip {
-        return this.nextTrip;
-    }
-
-    getPrevTrip(): Trip {
-        return this.prevTrip;
-    }
-
-    setPrevTrip(trip: Trip): void {
-        this.prevTrip = trip;
-    }
-
-    toggleNextReverse(): void {
-        this.nextReverse = !this.nextReverse;
-    }
-
-    getNextReverse(): boolean {
-        return this.nextReverse;
-    }
-
-    redefine(stop: RouteStop, props: OptionalTripStop): void {
-        const id = stop.getId();
-        this.redefinedProps[id] = {
-            ...this.redefinedProps[id],
-            ...props
-        };
-    }
-
-    undefine(stop: RouteStop, props: OptionalTripStop): void {
-        const id = stop.getId();
-        for (let prop of Object.keys(props)) {
-            if (this.redefinedProps[id]?.[prop]) {
-                delete this.redefinedProps[id][prop];
-            }
-        }
-    }
-
-    getStops(): TripStop[] {
-        return this.getWaypoints().filter(s => s.shouldStop);
-    }
-
-    getWaypoints(): TripStop[] {
-        const stops = this.route.getWaypoints();
-        const index = stops.findIndex((s: RouteStop) => s.getStation() === this.lastStationServed);
-        return stops.map((stop, ind) => {
-            const sto: TripStop = {
-                trip: this,
-                route: this.route,
-                routeStop: stop,
-                id: stop.getId() + '-' + this.id,
-
-                station: stop.getWaypoint(),
-                stationRgbColor: stop.getWaypoint().getColor().getRgbString(),
-                stationName: stop.getWaypointName(),
-                platform: (this.redefinedProps[stop.getId()]?.platform) ??
-                    stop.getPlatform(),
-                platformNo:
-                    (this.redefinedProps[stop.getId()]?.platform?.getNo()) ??
-                    stop.getPlatform()?.getNo(),
-                hasArrivalTime: stop.hasArrivalTime() || !!this.redefinedProps[stop.getId()]?.arrivalTime,
-                hasDepartureTime: stop.hasDepartureTime() || !!this.redefinedProps[stop.getId()]?.departureTime,
-                arrivalTime:
-                    (this.redefinedProps[stop.getId()]?.arrivalTime) ??
-                    this.departureTime + stop.getArrivalTime(),
-                departureTime:
-                    (this.redefinedProps[stop.getId()]?.departureTime) ??
-                    this.departureTime + stop.getDepartureTime(),
-                realArrivalTime: (this.redefinedProps[stop.getId()]?.realArrivalTime) ?? -1,
-                realDepartureTime: (this.redefinedProps[stop.getId()]?.realDepartureTime) ?? -1,
-                arrivalTimeString: '',
-                departureTimeString: '',
-                realArrivalTimeString: '',
-                realDepartureTimeString: '',
-                isServed: (ind <= index),
-                atStation: (ind === index) && (this.atStation === stop.getStation()),
-                isArrivalStation: ind === stops.length - 1,
-                isDepartureStation: ind === 0,
-                shouldStop: stop.getShouldStop(),
-                isStation: stop.isStation()
-            };
-
-            sto.arrivalTimeString = Util.timeToStr(sto.arrivalTime);
-            sto.departureTimeString = Util.timeToStr(sto.departureTime);
-            sto.realArrivalTimeString = Util.timeToStr(sto.realArrivalTime);
-            sto.realDepartureTimeString = Util.timeToStr(sto.realDepartureTime);
-
-            return sto;
-        });
-    }
-
-    getStationDepartureTime(station: Station): number {
-        const list = this.route.getStops().filter(stop => stop.getStation() === station);
-        if (list.length === 0) return null;
-        const stop = list[0];
-
-        // copied from above
-        return (this.redefinedProps[stop.getId()]?.departureTime) ??
-            this.departureTime + stop.getDepartureTime();
-    }
-
-    // set on arrival, set on depart, on arrival again when terminated
-    setStationServed(station: Station): void {
-        this.lastStationServed = station;
-        this.atStation = station;
-
-        const stop = this.route.getStops().find((s: RouteStop) => s.getStation() === station);
-        const time = this.store.getTickCount();
-
-        if (stop) {
-            if (!this.redefinedProps[stop.getId()] || !this.redefinedProps[stop.getId()].realArrivalTime) {
-                this.redefine(stop, { realArrivalTime: time });
-            }
-            this.redefine(stop, { realDepartureTime: time });
-        }
-        this.updateScheduleOnAllStations();
-    }
-
-    // set when depart
-    setAtStation(atStation: Station): void {
-        this.atStation = atStation;
-        this.updateScheduleOnAllStations();
-    }
-
-    private updateScheduleOnAllStations(excludeStations: Station[] = []) {
-        this.store.getAllOf(Symbol.for("Station")).map((station: Station) => {
-            if (!excludeStations.includes(station)) {
-                station.addTripToSchedule(null);
-            }
-        });
-    }
-
-    // todo make it easier with the new logic
-
-    private getStationFollowingStops(station: Station): TripStop[] {
-        const stops = this.getWaypoints();
-        const index = stops.findIndex(s => s.station === station);
-        if (index === -1) return [];
-        return stops.slice(index + 1);
-    }
-
-    private getRemainingStops(): TripStop[] {
-        return this.lastStationServed ? this.getStationFollowingStops(this.lastStationServed) : this.getStops();
-    }
-
-    getRoute(): Route {
-        return this.route;
-    }
-
-    getDepartureTime(): number {
-        return this.departureTime;
-    }
-
-    setDepartureTime(time: number): void {
-        this.departureTime = time;
-    }
-
-    getDepartureTimeStr(): string {
-        return Util.timeToString(this.departureTime);
-    }
-
-    getArrivalTimeStr(): string {
-        return Util.timeToString(this.getArrivalTime());
-    }
-
-    persist(): Object {
         const redefinedProps = {};
         for (let stopId in this.redefinedProps) {
             redefinedProps[stopId] = {
@@ -434,12 +239,11 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         return {
             id: this.id,
             type: 'Trip',
-            route: this.route.getId(),
+            routeVariant: this.routeVariant.getId(),
             departureTime: this.departureTime,
             prevTrip: this.prevTrip?.getId(),
             nextTrip: this.nextTrip?.getId(),
             nextReverse: this.nextReverse,
-            hasGroup: this.hasGroup,
             redefinedProps
         };
     }
@@ -448,30 +252,21 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         return this.xpersistDeep();
     }
 
-    getArrivalTime(): number {
-        return Util.last(this.getWaypoints())?.arrivalTime;
-    }
-
-    getHasGroup(): boolean {
-        return this.hasGroup;
-    }
-
     xpersistDeep(level: number = 1): Object {
         return {
             id: this.id,
             type: 'Trip',
-            routeId: this.route.getId(),
-            route: this.route.persistDeep(),
+            routeVariantId: this.routeVariant.getId(),
+            routeVariant: this.routeVariant.persistDeep(),
             departureTime: this.departureTime,
             departureTimeString: Util.timeToStr(this.departureTime),
-            arrivalTime: this.getArrivalTime(),
-            arrivalTimeString: Util.timeToStr(this.getArrivalTime()),
-            stops: this.getStops(),
+            arrivalTime: this.arrivalTime,
+            arrivalTimeString: Util.timeToStr(this.arrivalTime),
+            stops: this.getWaypoints().filter(x => x.shouldStop),
             waypoints: this.getWaypoints(),
             prevTrip: this.prevTrip?.getId(),
             nextTrip: this.nextTrip?.getId(),
             nextReverse: this.nextReverse,
-            hasGroup: this.hasGroup,
             next: (this.nextTrip && level > 0) ? this.nextTrip.xpersistDeep(level - 1) : null
         };
     }
@@ -479,19 +274,19 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     load(obj: any, store: Store): void {
         // todo should delete trips, when deleting route
         // so no dead reference to route here
-        const route = store.get(obj.route) as Route;
-        if (!route) return;
+        const routeVariant = store.get(obj.routeVariant) as RouteVariant;
+        if (!routeVariant) return;
 
         this.presetId(obj.id);
-        this.init(route, obj.departureTime, obj.hasGroup);
+        this.init(routeVariant, obj.departureTime);
+
         for (let stopId in obj.redefinedProps) {
-            const stop = store.get(stopId) as RouteStop;
-            const all = store.getAll();
-            this.redefine(stop, {
+            this.redefine({ getName: () => '', getId: () => stopId } as RoutePartReference, {
                 ...obj.redefinedProps[stopId],
                 platform: store.get(obj.redefinedProps[stopId].platform) as Platform
             });
         }
+
         if (obj.prevTrip) {
             const trip = store.get(obj.prevTrip) as Trip;
             if (trip) {
@@ -510,5 +305,4 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
             this.toggleNextReverse();
         }
     }
-    */
 }

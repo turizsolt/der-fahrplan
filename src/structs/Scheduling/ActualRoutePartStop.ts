@@ -41,4 +41,12 @@ export class ActualRoutePartStop extends ActualRoutePart implements RoutePartSto
     getColor(): string {
         return this.ref.getColor();
     }
+
+    persist(): Object {
+        return {
+            id: this.ref?.getId(),
+            type: this.getType().description,
+            duration: this.duration
+        }
+    }
 }
