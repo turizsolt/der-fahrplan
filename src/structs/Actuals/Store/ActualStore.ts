@@ -266,14 +266,21 @@ export class ActualStore implements Store {
         return ret;
     }
 
-    loadAll(arr: any[]) {
+    loadAll(arr: any[], version: number) {
         const fx = a => this.typeOrder[Symbol.for(a)] || 999;
+
+        const skipTypes = version === 3 ? [] : ['Route', 'RouteStop', 'Trip'];
 
         arr.sort((a, b) => {
             return fx(b.type) - fx(a.type);
         });
 
         arr.map(elem => {
+            if (skipTypes.includes(elem.type)) {
+                console.log(elem.type, 'has skipped.');
+                return;
+            }
+
             const brick: BaseStorable = this.create<BaseStorable>(
                 Symbol.for(elem.type)
             );

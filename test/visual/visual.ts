@@ -10,7 +10,7 @@ const store = testContainer.get<() => Store>(TYPES.FactoryOfStore)();
 export function runVisualTest(testName: string): void {
     store.clear();
     const json = JSON.parse(fs.readFileSync(path.resolve(__dirname, `cases/${testName}.json`), 'utf8'));
-    store.loadAll(json.data);
+    store.loadAll(json.data, json._version);
     const actionStore = store.getCommandLog();
     actionStore.setActions(json.actions);
     const { result: verdict } = actionStore.runAll();

@@ -167,8 +167,8 @@ export class GlobalController {
     }
   }
 
-  load(data: any) {
-    this.store.loadAll(data);
+  load(data: any, version: number) {
+    this.store.loadAll(data, version);
   }
 
   // specific

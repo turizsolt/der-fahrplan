@@ -160,9 +160,9 @@ if (globalThis.startParam === '2d') {
               const obj = JSON.parse(contents);
 
               if (!obj._version) throw new Error();
-              if (obj._version != 2) throw new Error();
+              if (obj._version < 2) throw new Error();
               if (!obj._format || obj._format !== 'fahrplan') throw new Error();
-              globalController.load(obj.data);
+              globalController.load(obj.data, obj._version);
               globalController.loadSpecific(obj);
             } catch {
               console.error('Not proper JSON, hey!');
@@ -329,9 +329,9 @@ if (globalThis.startParam === '2d') {
               const obj = JSON.parse(contents);
 
               if (!obj._version) throw new Error();
-              if (obj._version != 2) throw new Error();
+              if (obj._version < 2) throw new Error();
               if (!obj._format || obj._format !== 'fahrplan') throw new Error();
-              globalController.load(obj.data);
+              globalController.load(obj.data, obj._version);
               globalController.loadSpecific(obj);
             } catch {
               console.error('Not proper JSON, hey!');
