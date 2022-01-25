@@ -9,7 +9,6 @@ import { TYPES } from '../../di/TYPES';
 import { inject, injectable } from 'inversify';
 import { Color } from '../../structs/Color';
 import { NameGenerator } from '../../structs/NameGenerator';
-import { Route } from '../../structs/Scheduling/Route';
 import { Passenger } from '../Passenger/Passenger';
 import { ActualBoardable } from '../../mixins/ActualBoardable';
 import { Trip } from '../../structs/Scheduling/Trip';
@@ -19,6 +18,8 @@ import { WaitingHall } from './WaitingHall';
 import { applyMixins } from '../../mixins/ApplyMixins';
 import { Emitable } from '../../mixins/Emitable';
 import { PassengerRelocator } from '../Passenger/PassengerRelocator';
+import { RouteVariant } from '../../structs/Scheduling/RouteVariant';
+import { RailMapNode } from '../RailMap/RailMapNode';
 const PriorityQueue = require('@darkblue_azurite/priority-queue');
 
 export interface ActualStation extends Emitable { }
@@ -34,7 +35,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
     private removed: boolean = false;
 
-    private announcedTrips: Route[] = [];
+    private announcedTrips: RouteVariant[] = [];
 
     private scheduledTrips: TripInSchedule[] = [];
 
@@ -112,12 +113,12 @@ export class ActualStation extends ActualBaseBrick implements Station {
         return this;
     }
 
-    announce(trip: Route) {
+    announce(trip: RouteVariant) {
         this.announcedTrips.push(trip);
         this.updatePlatforms();
     }
 
-    deannounce(trip: Route) {
+    deannounce(trip: RouteVariant) {
         this.announcedTrips = this.announcedTrips.filter(t => t !== trip);
         this.updatePlatforms();
     }
@@ -128,11 +129,12 @@ export class ActualStation extends ActualBaseBrick implements Station {
             let record = false;
             let platformHere = null;
             for (let stop of trip.getStops()) {
-                if (stop.getStation() === this) {
-                    record = true;
-                    platformHere = stop.getPlatform();
+                if (stop.getRef() === this) {
+                    // todo - what is this doing?
+                    // record = true;
+                    // platformHere = stop.getPlatform();
                 } else if (record) {
-                    this.platformTo[stop.getStation().getId()] = platformHere;
+                    this.platformTo[(stop.getRef() as RailMapNode).getId()] = platformHere;
                 }
             }
         }
@@ -153,7 +155,7 @@ export class ActualStation extends ActualBaseBrick implements Station {
         }
     }
 
-    getAnnouncedTrips(): Route[] {
+    getAnnouncedTrips(): RouteVariant[] {
         return this.announcedTrips;
     }
 

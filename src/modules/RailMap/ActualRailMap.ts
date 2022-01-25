@@ -36,9 +36,9 @@ export class ActualRailMap implements RailMap {
 
     addRoute(route: Route): void {
         const mapRoute: RailMapRoute = [];
-        const waypoints = route.getWaypoints();
+        const waypoints = route.getVariants()[0].getWaypoints();
         for (let i = 1; i < waypoints.length; i++) {
-            const { from, to } = this.orderNodes(waypoints[i - 1].getWaypoint(), waypoints[i].getWaypoint());
+            const { from, to } = this.orderNodes(waypoints[i - 1].getRef() as RailMapNode, waypoints[i].getRef() as RailMapNode);
             const hash = this.hashNodes(from, to);
             const routeCount = this.edges[hash].routeCount++;
 

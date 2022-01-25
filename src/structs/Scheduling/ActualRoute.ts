@@ -2,7 +2,6 @@ import { ActualBaseStorable } from '../Actuals/ActualStorable';
 import { Route } from './Route';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
-import { Station } from '../../modules/Station/Station';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { otherEnd, WhichEnd } from '../Interfaces/WhichEnd';
 import { RoutePart } from './RoutePart';
@@ -134,38 +133,6 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     private update() {
         this.variants.forEach(variant => variant.emit('update', {}));
     }
-
-    /********************/
-
-    getStops(): RouteStop[] {
-        throw new Error('Method not implemented.');
-    }
-    getWaypoints(): RouteStop[] {
-        throw new Error('Method not implemented.');
-    }
-    addWaypoint(stop: RouteStop): void {
-        throw new Error('Method not implemented.');
-    }
-    removeStop(stop: RouteStop): void {
-        throw new Error('Method not implemented.');
-    }
-    getFirstStation(): Station {
-        throw new Error('Method not implemented.');
-    }
-    getLastStation(): Station {
-        throw new Error('Method not implemented.');
-    }
-    getFirstWaypoint(): RailMapNode {
-        throw new Error('Method not implemented.');
-    }
-    getLastWaypoint(): RailMapNode {
-        throw new Error('Method not implemented.');
-    }
-    getLastStop(): RouteStop {
-        throw new Error('Method not implemented.');
-    }
-
-    /********************/
 
     load(obj: Object, store: Store): void {
 

@@ -123,6 +123,7 @@ export default class TripPlanner extends Vue {
   }
 
   createReverseRoute(vRouteFrom) {
+    /*
     const routeFrom = getStorable(vRouteFrom.id) as Route;
     const route = createStorable<Route>(TYPES.Route);
     route.init();
@@ -134,7 +135,7 @@ export default class TripPlanner extends Vue {
     }
     this.load();
     const routeData = this.routes.find((x) => x.id === route.getId());
-    this.selectRoute(routeData);
+    this.selectRoute(routeData);*/
   }
 
   selectRoute(route) {
@@ -166,7 +167,7 @@ export default class TripPlanner extends Vue {
   }
 
   checkFirstAndLastStop() {
-    const route = getStorable(this.selectedRoute.id) as Route;
+    /*const route = getStorable(this.selectedRoute.id) as Route;
     const stops = route.getWaypoints();
     if (stops.length > 0) {
       const firstStop = stops[0];
@@ -180,7 +181,7 @@ export default class TripPlanner extends Vue {
           lastStop.setShouldStop(true);
         }
       }
-    }
+    }*/
   }
 
   nameChange(event) {

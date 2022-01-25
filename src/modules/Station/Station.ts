@@ -1,6 +1,5 @@
 import { Circle } from '../../structs/Geometry/Circle';
 import { Color } from '../../structs/Color';
-import { Route } from '../../structs/Scheduling/Route';
 import { BaseBrick } from '../../structs/Interfaces/BaseBrick';
 import { Boardable } from '../../mixins/Boardable';
 import { Trip } from '../../structs/Scheduling/Trip';
@@ -9,14 +8,14 @@ import { Train } from '../../modules/Train/Train';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { WaitingHall } from './WaitingHall';
 import { AbstractPlatform } from './AbstractPlatform';
-import { Platform } from './Platform';
+import { RouteVariant } from '../../structs/Scheduling/RouteVariant';
 
 export interface Station extends BaseBrick, Boardable, RailMapNode {
     init(circle: Circle): Station;
     initX(): Station;
     getName(): string;
     setName(name: string);
-    getAnnouncedTrips(): Route[];
+    getAnnouncedTrips(): RouteVariant[];
     getPlatformTo(station: Station): AbstractPlatform;
     getPlatforms(): AbstractPlatform[];
     getCircle(): Circle;
@@ -32,8 +31,8 @@ export interface Station extends BaseBrick, Boardable, RailMapNode {
     removeWaitingHall(waitingHall: WaitingHall): void;
 
     announceArrived(train: Train, platform: AbstractPlatform, trip: Trip);
-    announce(trip: Route);
-    deannounce(trip: Route);
+    announce(trip: RouteVariant);
+    deannounce(trip: RouteVariant);
     updateArrivingPlatform(platform: AbstractPlatform, trip: Trip): void;
 
     addTripToSchedule(trip: Trip);

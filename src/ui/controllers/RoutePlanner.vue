@@ -121,18 +121,18 @@ export default class RoutePlanner extends Vue {
   }
 
   createReverseRoute(vRouteFrom) {
-    const routeFrom = getStorable(vRouteFrom.id) as Route;
+    /*const routeFrom = getStorable(vRouteFrom.id) as Route;
     const route = createStorable<Route>(TYPES.Route);
     route.init();
     route.setName(routeFrom.getName());
     for (let stopFrom of [...routeFrom.getWaypoints()].reverse()) {
       /*const stop = createStorable<RouteStop>(TYPES.RouteStop);
       stop.init(stopFrom.getStation(), stopFrom.getPlatform());
-      route.addWaypoint(stop);*/
+      route.addWaypoint(stop);*
     }
     this.load();
     const routeData = this.routes.find((x) => x.id === route.getId());
-    this.selectRoute(routeData);
+    this.selectRoute(routeData);*/
   }
 
   selectRoute(route) {
@@ -164,7 +164,7 @@ export default class RoutePlanner extends Vue {
   }
 
   checkFirstAndLastStop() {
-    const route = getStorable(this.selectedRoute.id) as Route;
+    /*const route = getStorable(this.selectedRoute.id) as Route;
     const stops = route.getWaypoints();
     if (stops.length > 0) {
       const firstStop = stops[0];
@@ -178,11 +178,11 @@ export default class RoutePlanner extends Vue {
           lastStop.setShouldStop(true);
         }
       }
-    }
+    }*/
   }
 
   addStop(evt, stationId) {
-    if (this.selectedRoute) {
+    /*if (this.selectedRoute) {
       const route = getStorable(this.selectedRoute.id) as Route;
       const station = getStorable(stationId) as Station;
 
@@ -216,10 +216,10 @@ export default class RoutePlanner extends Vue {
         }
         route.addWaypoint(stop);
 
-        i++;*/
+        i++;*
       }
       this.load();
-    }
+    }*/
   }
 
   nameChange(event) {

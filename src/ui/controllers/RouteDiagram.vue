@@ -77,7 +77,6 @@ import { TYPES } from "../../di/TYPES";
 import { Trip } from "../../structs/Scheduling/Trip";
 import { TripStop } from "../../structs/Scheduling/TripStop";
 import { RouteVariant } from "../../structs/Scheduling/RouteVariant";
-import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { Station } from "../../modules/Station/Station";
 import {
   getStore,
