@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux'
 
 import { Store } from '../../structs/Interfaces/Store';
 import { VueSidebar } from './VueSidebar';
@@ -17,6 +18,7 @@ import { VueBigscreen2 } from './VueBigScreen2';
 import { VueBigscreenMap } from './VueBigScreenMap';
 import { VueBigscreenDiagram } from './VueBigScreenDiagram';
 import { Overlay } from '../overlays/Overlay';
+import { overlayStore } from '../overlays/store';
 
 export class GlobalController {
   private viewMode: string = 'terrain';
@@ -48,8 +50,9 @@ export class GlobalController {
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
 
+
     const domContainer = document.querySelector('#overlay-container');
-    ReactDOM.render(<Overlay />, domContainer);
+    ReactDOM.render(<Provider store={overlayStore}><Overlay /></Provider>, domContainer);
 
     this.toolInputHandler = new ToolInputHandler(this.vueToolbox, this.store);
 
