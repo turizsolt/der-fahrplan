@@ -20,6 +20,7 @@ const COLOR = '#ff0000';
 
 const REFERENCE: RoutePartReference = {
   getName: () => NAME,
+  getId: () => 'id'
 };
 
 const REFERENCE_COLOR: RoutePartReferenceColor = {
