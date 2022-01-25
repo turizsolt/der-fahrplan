@@ -2,7 +2,9 @@
   <div class="stop">
     <div
       class="stop-circle"
-      :style="{ backgroundColor: stop.shouldStop ? stop.stationRgbColor : 'transparent' }"
+      :style="{
+        backgroundColor: stop.shouldStop ? stop.stationRgbColor : 'transparent',
+      }"
       @click.stop="$emit('shouldStop')"
     ></div>
     <div v-if="index !== route.stops.length - 1" class="stop-after color"></div>
@@ -10,7 +12,16 @@
       v-if="index === route.stops.length - 1"
       class="stop-after nocolor"
     ></div>
-    <div class="stop-name" :style="{ color: (stop.isServed || !stop.isStation || !stop.shouldStop) ? 'grey' : 'black', fontStyle: (stop.isStation) ? 'normal' : 'italic' }">
+    <div
+      class="stop-name"
+      :style="{
+        color:
+          stop.isServed || !stop.isStation || !stop.shouldStop
+            ? 'grey'
+            : 'black',
+        fontStyle: stop.isStation ? 'normal' : 'italic',
+      }"
+    >
       {{ stop.atStation ? "* " : "" }} {{ stop.stationName.substring(0, 4) }}
       {{ stop.isArrivalStation ? "é." : "" }}
       <span @click="addTime()">+</span>/<span @click="removeTime()">-</span>
@@ -21,7 +32,7 @@
       <div
         v-if="candelete"
         class="stop-button"
-        :class="stop.isReverseStop?'stop-reverse':'stop-non-reverse'"
+        :class="stop.isReverseStop ? 'stop-reverse' : 'stop-non-reverse'"
         @click.stop="$emit('reverse')"
       >
         R
@@ -36,9 +47,21 @@
     </div>
 
     <!-- platform -->
-    <select v-if="!isTrip" size="1" class="stop-select-platform" :value="stop.platform" @change="changePlatform">
+    <select
+      v-if="!isTrip"
+      size="1"
+      class="stop-select-platform"
+      :value="stop.platform"
+      @change="changePlatform"
+    >
       <option value="">?</option>
-      <option v-for="option in stop.platformOptions" :value="option.id">{{option.no}}</option>
+      <option
+        v-for="(option, index) in stop.platformOptions"
+        :value="option.id"
+        :key="index"
+      >
+        {{ option.no }}
+      </option>
     </select>
 
     <!-- arrival departure -->
@@ -85,7 +108,6 @@
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { AbstractPlatform } from "../../modules/Station/AbstractPlatform";
-import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
 import { handleTimeText } from "./HandleTime";
 
@@ -116,32 +138,32 @@ export default class RouteTitle extends Vue {
   }
 
   handleTime(column: string, event: any): void {
-    const {time, timeStr} = handleTimeText(event);
+    const { time, timeStr } = handleTimeText(event);
     event.currentTarget.value = timeStr;
 
-    const stop = getStorable(this.stop.id) as RouteStop;
+    /*const stop = getStorable(this.stop.id) as RouteStop;
     if (column === "arrivalTime") {
       stop.setArrivalTime(time);
     }
     if (column === "departureTime") {
       stop.setDepartureTime(time);
-    }
+    }*/
   }
 
-  changePlatform(event:any):void {
-    const stop = getStorable(this.stop.id) as RouteStop;
+  changePlatform(event: any): void {
+    /*const stop = getStorable(this.stop.id) as RouteStop;
     const platform = getStorable(event.currentTarget.value) as unknown as AbstractPlatform;
-    stop.setPlatform(platform);
+    stop.setPlatform(platform);*/
   }
 
   addTime(): void {
-    const stop = getStorable(this.stop.id) as RouteStop;
-    stop.setExtraTimeToStation(stop.getExtraTimeToStation()+60);
+    /*const stop = getStorable(this.stop.id) as RouteStop;
+    stop.setExtraTimeToStation(stop.getExtraTimeToStation()+60);*/
   }
 
   removeTime(): void {
-    const stop = getStorable(this.stop.id) as RouteStop;
-    stop.setExtraTimeToStation(stop.getExtraTimeToStation()-60);
+    /*const stop = getStorable(this.stop.id) as RouteStop;
+    stop.setExtraTimeToStation(stop.getExtraTimeToStation()-60);*/
   }
 }
 </script>
@@ -210,5 +232,4 @@ export default class RouteTitle extends Vue {
   font-weight: bold;
   color: orange;
 }
-
 </style>

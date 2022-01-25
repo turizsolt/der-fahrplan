@@ -1,6 +1,5 @@
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { BaseStorable } from '../Interfaces/BaseStorable';
-import { RouteStop } from './RouteStop';
 import { Station } from '../../modules/Station/Station';
 import { RoutePart } from './RoutePart';
 import { WhichEnd } from '../Interfaces/WhichEnd';

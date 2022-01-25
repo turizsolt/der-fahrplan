@@ -72,7 +72,6 @@
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import { Route } from "../../structs/Scheduling/Route";
 import { Station } from "../../modules/Station/Station";
-import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { TYPES } from "../../di/TYPES";
 import {
   getStore,
@@ -127,9 +126,9 @@ export default class RoutePlanner extends Vue {
     route.init();
     route.setName(routeFrom.getName());
     for (let stopFrom of [...routeFrom.getWaypoints()].reverse()) {
-      const stop = createStorable<RouteStop>(TYPES.RouteStop);
+      /*const stop = createStorable<RouteStop>(TYPES.RouteStop);
       stop.init(stopFrom.getStation(), stopFrom.getPlatform());
-      route.addWaypoint(stop);
+      route.addWaypoint(stop);*/
     }
     this.load();
     const routeData = this.routes.find((x) => x.id === route.getId());
@@ -142,26 +141,26 @@ export default class RoutePlanner extends Vue {
   }
 
   deleteStop(vStop) {
-    const stop = getStorable(vStop.id) as RouteStop;
+    /*const stop = getStorable(vStop.id) as RouteStop;
     const route = getStorable(this.selectedRoute.id) as Route;
     route.removeStop(stop);
 
     this.checkFirstAndLastStop();
-    this.load();
+    this.load();*/
   }
 
   reverseStop(vStop) {
-    const stop = getStorable(vStop.id) as RouteStop;
+    /*const stop = getStorable(vStop.id) as RouteStop;
     stop.toggleReverseStop();
-    this.load();
+    this.load();*/
   }
 
   shouldStop(vStop) {
-    const stop = getStorable(vStop.id) as RouteStop;
+    /*const stop = getStorable(vStop.id) as RouteStop;
     stop.setShouldStop(!stop.getShouldStop());
 
     this.checkFirstAndLastStop();
-    this.load();
+    this.load();*/
   }
 
   checkFirstAndLastStop() {
@@ -206,7 +205,7 @@ export default class RoutePlanner extends Vue {
       const lastTime = route.getLastStop()?.getDepartureTime() || 0;
 
       for (let station of addingStations) {
-        const stop = createStorable<RouteStop>(TYPES.RouteStop);
+        /*const stop = createStorable<RouteStop>(TYPES.RouteStop);
         distSum += Math.round((dist[i] / 55) * 60) + 60;
         const arrTime = lastTime + distSum;
         const depTime = lastTime + distSum;
@@ -217,7 +216,7 @@ export default class RoutePlanner extends Vue {
         }
         route.addWaypoint(stop);
 
-        i++;
+        i++;*/
       }
       this.load();
     }

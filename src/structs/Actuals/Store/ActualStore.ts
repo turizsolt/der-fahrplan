@@ -7,7 +7,6 @@ import { Track } from '../../../modules/Track/Track';
 import { TrackSwitch } from '../../../modules/Track/TrackSwitch';
 import { TrackJoint } from '../../../modules/Track/TrackJoint/TrackJoint';
 import { Station } from '../../../modules/Station/Station';
-import { RouteStop } from '../../Scheduling/RouteStop';
 import { Route } from '../../Scheduling/Route';
 import { Store } from '../../Interfaces/Store';
 import { Wagon } from '../../Interfaces/Wagon';
@@ -35,7 +34,6 @@ import { SensorRenderer } from '../../Renderers/SensorRenderer';
 import { CapacityCap } from '../../../modules/Signaling/CapacityCap/CapacityCap';
 import { CapacityCapRenderer } from '../../Renderers/CapacityCapRenderer';
 import { InputController } from '../../../ui/controllers/InputController';
-import { TripGroup } from '../../Scheduling/TripGroup';
 import { TravelPathes } from '../../../modules/Travel/TravelPathes';
 import { WaitingHall } from '../../../modules/Station/WaitingHall';
 import { WaitingHallRenderer } from '../../Renderers/WaitingHallRenderer';
@@ -54,9 +52,7 @@ export class ActualStore implements Store {
 
     @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
     @inject(TYPES.FactoryOfRouteVariant) private RouteVariantFactory: () => RouteVariant;
-    @inject(TYPES.FactoryOfRouteStop) private RouteStopFactory: () => RouteStop;
     @inject(TYPES.FactoryOfTrip) private TripFactory: () => Trip;
-    @inject(TYPES.FactoryOfTripGroup) private TripGroupFactory: () => TripGroup;
     @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
     @inject(TYPES.FactoryOfWaitingHall) private WaitingHallFactory: () => WaitingHall;
     @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
@@ -115,8 +111,6 @@ export class ActualStore implements Store {
             [TYPES.Route]: this.RouteFactory,
             [TYPES.RouteVariant]: this.RouteVariantFactory,
             [TYPES.Trip]: this.TripFactory,
-            [TYPES.TripGroup]: this.TripGroupFactory,
-            [TYPES.RouteStop]: this.RouteStopFactory,
             [TYPES.Station]: this.StationFactory,
             [TYPES.WaitingHall]: this.WaitingHallFactory,
             [TYPES.Passenger]: this.PassengerFactory,
@@ -155,11 +149,9 @@ export class ActualStore implements Store {
             [TYPES.PlatformGroup]: -6.2,
             [TYPES.WaitingHall]: -6.3,
 
-            [TYPES.RouteStop]: -7,
-            [TYPES.RouteVariant]: -7.5,
+            [TYPES.RouteVariant]: -7,
             [TYPES.Route]: -8,
             [TYPES.Trip]: -9,
-            [TYPES.TripGroup]: -10,
 
             [TYPES.Passenger]: -11,
             [TYPES.Sensor]: -14,

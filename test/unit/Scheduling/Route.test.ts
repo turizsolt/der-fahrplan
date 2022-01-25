@@ -2,7 +2,7 @@ import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
 import { BrickFactory } from '../../../src/structs/Factory/BrickFactory';
 import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
-import { Route2 } from '../../../src/structs/Scheduling/Route2';
+import { Route } from '../../../src/structs/Scheduling/Route';
 import { RoutePart } from '../../../src/structs/Scheduling/RoutePart';
 import { RoutePartReference } from '../../../src/structs/Scheduling/RoutePartReference';
 import { RoutePartReferenceColor } from '../../../src/structs/Scheduling/RoutePartReferenceColor';
@@ -29,16 +29,16 @@ const REFERENCE_COLOR: RoutePartReferenceColor = {
 
 describe('Route', () => {
   it('create a route', () => {
-    const route: Route2 = brickFactory.createRoute2(ROUTE_NO, ROUTE_COLOR);
+    const route: Route = brickFactory.createRoute(ROUTE_NO, ROUTE_COLOR);
     expect(route).not.undefined;
   });
 
   it('route getters and setters', () => {
-    const route: Route2 = brickFactory.createRoute2(ROUTE_NO, ROUTE_COLOR);
+    const route: Route = brickFactory.createRoute(ROUTE_NO, ROUTE_COLOR);
 
-    expect(route.getNo()).equals(ROUTE_NO);
-    route.setNo(ROUTE_NO2);
-    expect(route.getNo()).equals(ROUTE_NO2);
+    expect(route.getName()).equals(ROUTE_NO);
+    route.setName(ROUTE_NO2);
+    expect(route.getName()).equals(ROUTE_NO2);
 
     expect(route.getColor()).equals(ROUTE_COLOR);
     route.setColor(ROUTE_COLOR2);
@@ -46,7 +46,7 @@ describe('Route', () => {
   });
 
   it('add one RoutePart to Route', () => {
-    const route: Route2 = brickFactory.createRoute2(ROUTE_NO, ROUTE_COLOR);
+    const route: Route = brickFactory.createRoute(ROUTE_NO, ROUTE_COLOR);
     const stop: RoutePart = brickFactory.createRoutePartStop(REFERENCE_COLOR);
 
     expect(route.getParts(WhichEnd.A).length).equals(0);
@@ -61,7 +61,7 @@ describe('Route', () => {
   });
 
   it('add two RouteParts to Route', () => {
-    const route: Route2 = brickFactory.createRoute2(ROUTE_NO, ROUTE_COLOR);
+    const route: Route = brickFactory.createRoute(ROUTE_NO, ROUTE_COLOR);
     const stop: RoutePart = brickFactory.createRoutePartStop(REFERENCE_COLOR);
     const stop2: RoutePart = brickFactory.createRoutePartStop(REFERENCE_COLOR);
 
@@ -78,7 +78,7 @@ describe('Route', () => {
   });
 
   it('remove two RouteParts from Route', () => {
-    const route: Route2 = brickFactory.createRoute2(ROUTE_NO, ROUTE_COLOR);
+    const route: Route = brickFactory.createRoute(ROUTE_NO, ROUTE_COLOR);
     const stop: RoutePart = brickFactory.createRoutePartStop(REFERENCE_COLOR);
     const stop2: RoutePart = brickFactory.createRoutePartStop(REFERENCE_COLOR);
 

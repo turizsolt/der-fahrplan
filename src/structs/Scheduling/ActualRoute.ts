@@ -1,6 +1,5 @@
 import { ActualBaseStorable } from '../Actuals/ActualStorable';
 import { Route } from './Route';
-import { RouteStop } from './RouteStop';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
 import { Station } from '../../modules/Station/Station';

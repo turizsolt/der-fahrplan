@@ -141,7 +141,6 @@
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import { RouteVariant } from "../../structs/Scheduling/RouteVariant";
 import { Trip } from "../../structs/Scheduling/Trip";
-import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { TYPES } from "../../di/TYPES";
 import {
   getAllOfStorable,
@@ -312,15 +311,15 @@ export default class ScheduleGrid extends Vue {
   }
 
   handleExtraTimeMinus(stopId: string): void {
-    const stop = getStorable(stopId) as RouteStop;
+    /*const stop = getStorable(stopId) as RouteStop;
     stop.setExtraTimeToStation(stop.getExtraTimeToStation() - 30);
-    this.update();
+    this.update();*/
   }
 
   handleExtraTimePlus(stopId: string): void {
-    const stop = getStorable(stopId) as RouteStop;
+    /*const stop = getStorable(stopId) as RouteStop;
     stop.setExtraTimeToStation(stop.getExtraTimeToStation() + 30);
-    this.update();
+    this.update();*/
   }
 
   handleShowAdder(tripId: string): void {

@@ -117,7 +117,6 @@
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { TYPES } from "../../di/TYPES";
 import { Trip } from "../../structs/Scheduling/Trip";
-import { TripGroup } from "../../structs/Scheduling/TripGroup";
 import {
   getStorable,
   getAllOfStorable,
@@ -164,9 +163,6 @@ export default class AddTrip extends Vue {
 
   update(): void {
     this.tripList = getAllOfStorable(TYPES.Trip).map((x) =>
-      Object.freeze(x.persistDeep())
-    );
-    this.tripGroupList = getAllOfStorable(TYPES.TripGroup).map((x) =>
       Object.freeze(x.persistDeep())
     );
 
@@ -217,7 +213,7 @@ export default class AddTrip extends Vue {
       const newTrip = createStorable<Trip>(TYPES.Trip).init(route, i);
       trips.push(newTrip);
     }
-    createStorable<TripGroup>(TYPES.TripGroup).init(this.headway, trips);
+    // createStorable<TripGroup>(TYPES.TripGroup).init(this.headway, trips);
     this.update();
   }
 
