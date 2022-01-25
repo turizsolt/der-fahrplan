@@ -1,3 +1,6 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+
 import { Store } from '../../structs/Interfaces/Store';
 import { VueSidebar } from './VueSidebar';
 import { VueBigscreen } from './VueBigScreen';
@@ -13,6 +16,7 @@ import { ToolInputHandler } from './InputHandlers/ToolInputHandler';
 import { VueBigscreen2 } from './VueBigScreen2';
 import { VueBigscreenMap } from './VueBigScreenMap';
 import { VueBigscreenDiagram } from './VueBigScreenDiagram';
+import { Overlay } from '../overlays/Overlay';
 
 export class GlobalController {
   private viewMode: string = 'terrain';
@@ -43,6 +47,9 @@ export class GlobalController {
     this.vueBigScreenDiagram = new VueBigscreenDiagram(this.store);
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
+
+    const domContainer = document.querySelector('#overlay-container');
+    ReactDOM.render(<Overlay />, domContainer);
 
     this.toolInputHandler = new ToolInputHandler(this.vueToolbox, this.store);
 
