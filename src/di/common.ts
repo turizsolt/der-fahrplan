@@ -46,6 +46,8 @@ import { WaitingHall } from '../modules/Station/WaitingHall';
 import { ActualWaitingHall } from '../modules/Station/ActualWaitingHall';
 import { PlatformGroup } from '../modules/Station/PlatformGroup';
 import { ActualPlatformGroup } from '../modules/Station/ActualPlatformGroup';
+import { RouteVariant } from '../structs/Scheduling/RouteVariant';
+import { ActualRouteVariant } from '../structs/Scheduling/ActualRouteVariant';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
     ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
@@ -66,6 +68,7 @@ export const addCommonMaps = (ioc: DependencyContainer): void => {
     ioc.fm<WaitingHall>(T.FactoryOfWaitingHall, T.WaitingHall, ActualWaitingHall);
     ioc.fm<Passenger>(T.FactoryOfPassenger, T.Passenger, ActualPassenger);
     ioc.fm<Route>(T.FactoryOfRoute, T.Route, ActualRoute);
+    ioc.fm<RouteVariant>(T.FactoryOfRouteVariant, T.RouteVariant, ActualRouteVariant);
     ioc.fm<RouteStop>(T.FactoryOfRouteStop, T.RouteStop, ActualRouteStop);
     ioc.fm<Trip>(T.FactoryOfTrip, T.Trip, ActualTrip);
     ioc.fm<TripGroup>(T.FactoryOfTripGroup, T.TripGroup, ActualTripGroup);

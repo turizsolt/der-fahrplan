@@ -81,7 +81,7 @@ export class WagonAnnouncement {
                     station,
                     platform,
                     this.train,
-                    this.trip.getRoute()
+                    this.trip.getRouteVariant()
                 );
             }
         });

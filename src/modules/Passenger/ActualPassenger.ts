@@ -11,8 +11,8 @@ import { Store } from '../../structs/Interfaces/Store';
 import { ActualPassengerStatictics } from './ActualPassengerStatistics';
 import { Platform } from '../Station/Platform';
 import { Train } from '../Train/Train';
-import { Route } from '../../structs/Scheduling/Route';
 import { PassengerRelocator } from './PassengerRelocator';
+import { RouteVariant } from '../../structs/Scheduling/RouteVariant';
 
 @injectable()
 export class ActualPassenger extends ActualBaseBrick implements Passenger {
@@ -20,7 +20,7 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
     private from: Station;
     private next: Station;
     private stats: ActualPassengerStatictics;
-    private waitingFor: Route;
+    private waitingFor: RouteVariant;
 
     private place: Place;
     private pos: Coordinate = Coordinate.Origo();
@@ -37,11 +37,11 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
         return this;
     }
 
-    getWaitingFor(): Route {
+    getWaitingFor(): RouteVariant {
         return this.waitingFor;
     }
 
-    setWaitingFor(route: Route): void {
+    setWaitingFor(route: RouteVariant): void {
         this.waitingFor = route;
     }
 
@@ -51,14 +51,14 @@ export class ActualPassenger extends ActualBaseBrick implements Passenger {
         station: Station,
         platform: Platform,
         train: Train,
-        trip: Route
+        trip: RouteVariant
     ) { }
 
     listenWagonStoppedAtAnnouncement(
         station: Station,
         platform: Platform,
         train: Train,
-        route: Route
+        route: RouteVariant
     ) { }
 
     // getters, setters

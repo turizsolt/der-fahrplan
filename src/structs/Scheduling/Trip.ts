@@ -1,7 +1,5 @@
-import { Route } from './Route';
 import { BaseStorable } from '../Interfaces/BaseStorable';
 import { TripStop, OptionalTripStop } from './TripStop';
-import { RouteStop } from './RouteStop';
 import { Station } from '../../modules/Station/Station';
 import { RoutePartReference } from './RoutePartReference';
 import { RouteVariant } from './RouteVariant';
@@ -35,7 +33,6 @@ export interface Trip extends BaseStorable {
     getNextStation(): Station;
     updatePlatformInfo(routePart: RoutePart, props: OptionalTripStop): void;
 
-    //getRoute(): Route;
     /*
     init(route: Route, startTime: number, hasGroup?: boolean): Trip;
     getRoute(): Route;

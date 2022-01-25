@@ -1,5 +1,5 @@
 <template>
-  <div style="width:100%;">
+  <div style="width: 100%">
     <div>
       <button @click="move(0, -1)">This-</button>
       <button @click="move(0, +1)">This+</button>
@@ -19,17 +19,54 @@
       <button @click="time(0, +1)">Start+</button>
       <button @click="time(1, -1)">End-</button>
       <button @click="time(1, +1)">End+</button>
-      {{minTimeStr}}
-      {{maxTimeStr}}
+      {{ minTimeStr }}
+      {{ maxTimeStr }}
     </div>
     <div id="map-field">
-      <div v-for="line in sideLines" :key="line.id" class="side-line" :style="line.style"></div>  
-      <div v-for="line in stopLines" :key="line.id" class="stop-line" :style="line.style"></div>  
-    
-      <div v-for="stop in sideStops" :key="stop.id" class="side-stop" :title="stop.name" :style="stop.style"></div>
-      <div v-for="stopLine in sideStopLines" :key="stopLine.id" class="side-stop-line" :style="stopLine.style"></div>
-      <div v-for="time in sideTimes" :key="time.id" class="side-time" :title="time.name" :style="time.style"></div>
-      <div v-for="stop in stops" :key="stop.uniqueId" class="stop-plot" :class="selectedStop && stop.id === selectedStop.id ? 'selected-stop' : ''" :title="stop.name" :style="stop.style" @click.stop="select(stop)"></div>
+      <div
+        v-for="line in sideLines"
+        :key="line.id"
+        class="side-line"
+        :style="line.style"
+      ></div>
+      <div
+        v-for="line in stopLines"
+        :key="line.id"
+        class="stop-line"
+        :style="line.style"
+      ></div>
+
+      <div
+        v-for="stop in sideStops"
+        :key="stop.id"
+        class="side-stop"
+        :title="stop.name"
+        :style="stop.style"
+      ></div>
+      <div
+        v-for="stopLine in sideStopLines"
+        :key="stopLine.id"
+        class="side-stop-line"
+        :style="stopLine.style"
+      ></div>
+      <div
+        v-for="time in sideTimes"
+        :key="time.id"
+        class="side-time"
+        :title="time.name"
+        :style="time.style"
+      ></div>
+      <div
+        v-for="stop in stops"
+        :key="stop.uniqueId"
+        class="stop-plot"
+        :class="
+          selectedStop && stop.id === selectedStop.id ? 'selected-stop' : ''
+        "
+        :title="stop.name"
+        :style="stop.style"
+        @click.stop="select(stop)"
+      ></div>
     </div>
   </div>
 </template>
@@ -39,10 +76,14 @@ import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import { TYPES } from "../../di/TYPES";
 import { Trip } from "../../structs/Scheduling/Trip";
 import { TripStop } from "../../structs/Scheduling/TripStop";
-import { Route } from "../../structs/Scheduling/Route";
+import { RouteVariant } from "../../structs/Scheduling/RouteVariant";
 import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { Station } from "../../modules/Station/Station";
-import { getStore, getStorable, getAllOfStorable } from "../../structs/Actuals/Store/StoreForVue";
+import {
+  getStore,
+  getStorable,
+  getAllOfStorable,
+} from "../../structs/Actuals/Store/StoreForVue";
 import { RailMap } from "../../modules/RailMap/RailMap";
 import { RailMapNode } from "../../modules/RailMap/RailMapNode";
 import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";
@@ -62,14 +103,14 @@ export default class RouteDiagram extends Vue {
   sideLines: any[] = [];
   stopLines: any[] = [];
   minTime: number = 0;
-  maxTime: number = 60*60*24;
-  minTimeStr: string = '0:00';
-  maxTimeStr: string = '24:00';
+  maxTime: number = 60 * 60 * 24;
+  minTimeStr: string = "0:00";
+  maxTimeStr: string = "24:00";
   selectedStop: any = null;
 
   constructor() {
     super();
-    
+
     this.init = this.init.bind(this);
     this.diagram = new RailDiagram(getStore());
 
@@ -78,84 +119,94 @@ export default class RouteDiagram extends Vue {
     }, 0);
   }
 
-  @Watch('route') 
+  @Watch("route")
   init() {
-    const route = getStorable(this.route && this.route.id) as Route;
+    const route = getStorable(this.route && this.route.id) as RouteVariant;
     this.diagram.setRoute(route);
 
-    const mapField = document.getElementById('map-field');
+    const mapField = document.getElementById("map-field");
     const h = mapField.clientHeight - 40;
     const w = mapField.clientWidth - 40;
 
     const plotToStyle = (plot) => ({
-      left: (20-2+plot.t*w)+'px',
-      top: (20-2+plot.r*h)+'px',
-      width: '4px',
-      height: '4px'
+      left: 20 - 2 + plot.t * w + "px",
+      top: 20 - 2 + plot.r * h + "px",
+      width: "4px",
+      height: "4px",
     });
 
     this.sideStops = [];
     this.sideStopLines = [];
     this.stops = [];
-    if(route) {
-      const {plots, lines} = this.diagram.getRouteAxis();
-      this.sideStops = plots.map(plot => ({
+    if (route) {
+      const { plots, lines } = this.diagram.getRouteAxis();
+      this.sideStops = plots.map((plot) => ({
         ...plot,
-        style: plotToStyle(plot)
+        style: plotToStyle(plot),
       }));
-      this.sideStopLines = plots.filter(p => p.meta?.hasLine).map(plot => ({
-        ...plot,
-        id: plot.id+'-line',
-        style: {... plotToStyle(plot), top: (20-0.5+plot.r*h)+'px', width: w+'px', height: '1px' }
-      }));
+      this.sideStopLines = plots
+        .filter((p) => p.meta?.hasLine)
+        .map((plot) => ({
+          ...plot,
+          id: plot.id + "-line",
+          style: {
+            ...plotToStyle(plot),
+            top: 20 - 0.5 + plot.r * h + "px",
+            width: w + "px",
+            height: "1px",
+          },
+        }));
 
-      this.sideLines = lines.map(line => {
-        const len = Math.abs(line.from.r-line.to.r)*h;
+      this.sideLines = lines.map((line) => {
+        const len = Math.abs(line.from.r - line.to.r) * h;
         const rotate = 0;
         return {
           ...line,
           style: {
-            left: (20-2+Math.min(line.from.t,line.to.t)*w)+'px',
-            top: (20-2+Math.min(line.from.r,line.to.r)*h)+'px',
-            height: len+'px',
-            width: (line.trackCount*3)+'px',
-            transform: 'rotate('+(-rotate)+'rad)'
-          }
+            left: 20 - 2 + Math.min(line.from.t, line.to.t) * w + "px",
+            top: 20 - 2 + Math.min(line.from.r, line.to.r) * h + "px",
+            height: len + "px",
+            width: line.trackCount * 3 + "px",
+            transform: "rotate(" + -rotate + "rad)",
+          },
         };
       });
-       
-      const {plots: plots2, lines: lines2} = this.diagram.getPlotsAndLines();
-      this.stops = plots2.map(plot => ({
+
+      const { plots: plots2, lines: lines2 } = this.diagram.getPlotsAndLines();
+      this.stops = plots2.map((plot) => ({
         ...plot,
-        style: plotToStyle(plot)
+        style: plotToStyle(plot),
       }));
 
-      this.stopLines = lines2.map(line => {
+      this.stopLines = lines2.map((line) => {
         const len = Math.sqrt(
-          Math.pow((line.from.r-line.to.r)*h, 2) +
-          Math.pow((line.from.t-line.to.t)*w, 2)
+          Math.pow((line.from.r - line.to.r) * h, 2) +
+            Math.pow((line.from.t - line.to.t) * w, 2)
         );
-        const rotate = Math.atan2((line.to.t - line.from.t)*w, (line.to.r - line.from.r)*h);
+        const rotate = Math.atan2(
+          (line.to.t - line.from.t) * w,
+          (line.to.r - line.from.r) * h
+        );
         const wid = 1;
         return {
           ...line,
           style: {
-            left: (20-wid/2+(line.from.t+line.to.t)/2*w)+'px',
-            top: (20-len/2+(line.from.r+line.to.r)/2*h)+'px',
-            height: len+'px',
-            width: wid+'px',
-            transform: 'rotate('+(-rotate)+'rad)'
-          }
+            left: 20 - wid / 2 + ((line.from.t + line.to.t) / 2) * w + "px",
+            top: 20 - len / 2 + ((line.from.r + line.to.r) / 2) * h + "px",
+            height: len + "px",
+            width: wid + "px",
+            transform: "rotate(" + -rotate + "rad)",
+          },
         };
       });
-    }  
+    }
 
     const plots3 = this.diagram.getTimeAxis();
-    this.sideTimes = plots3.map(plot => ({
+    this.sideTimes = plots3.map((plot) => ({
       ...plot,
-      style: plotToStyle(plot)
+      style: plotToStyle(plot),
     }));
-    
+
     const timeBounds = this.diagram.getTimeBounds();
     this.minTime = timeBounds.minTime;
     this.maxTime = timeBounds.maxTime;
@@ -164,47 +215,51 @@ export default class RouteDiagram extends Vue {
     this.maxTimeStr = Util.timeToString(this.maxTime);
   }
 
-  select(stop: TripStop):void {
+  select(stop: TripStop): void {
     this.selectedStop = stop;
   }
 
   time(type: number, time: number): void {
     const timeBounds = this.diagram.getTimeBounds();
-    if(type === 0) {
-      timeBounds.minTime += time*1800;
-    } else if(type === 1) {
-      timeBounds.maxTime += time*1800;
+    if (type === 0) {
+      timeBounds.minTime += time * 1800;
+    } else if (type === 1) {
+      timeBounds.maxTime += time * 1800;
     }
     this.diagram.setTimeBounds(timeBounds.minTime, timeBounds.maxTime);
     this.init();
   }
 
   move(type: number, time: number): void {
-    if(!this.selectedStop) return;
+    if (!this.selectedStop) return;
 
     const route = this.selectedStop.meta.route;
     const routeStop = this.selectedStop.meta.routeStop;
 
-    if(type === 3) {
-      const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
-      for(let trip of trips) {
-        trip.setDepartureTime(trip.getDepartureTime()+time*GAP);
+    if (type === 3) {
+      const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(
+        (t) => t.getRouteVariant() === route
+      );
+      for (let trip of trips) {
+        trip.setDepartureTime(trip.getDepartureTime() + time * GAP);
       }
-    } else if(type === 4) {
-      const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(t => t.getRoute() === route);
-      for(let trip of trips) {
-        trip.setDepartureTime(trip.getDepartureTime()+time*GAP);
+    } else if (type === 4) {
+      const trips = (getAllOfStorable(TYPES.Trip) as Trip[]).filter(
+        (t) => t.getRouteVariant() === route
+      );
+      for (let trip of trips) {
+        trip.setDepartureTime(trip.getDepartureTime() + time * GAP);
       }
-      for(let stop of route.getWaypoints()) {
-        if(stop === routeStop) {
-          stop.setExtraTimeAtStation(stop.getExtraTimeAtStation()-time*GAP);
-        } 
+      for (let stop of route.getWaypoints()) {
+        if (stop === routeStop) {
+          stop.setExtraTimeAtStation(stop.getExtraTimeAtStation() - time * GAP);
+        }
       }
-    } else if(type === 5) {
-      for(let stop of route.getWaypoints()) {
-        if(stop === routeStop) {
-          stop.setExtraTimeAtStation(stop.getExtraTimeAtStation()+time*GAP);
-        } 
+    } else if (type === 5) {
+      for (let stop of route.getWaypoints()) {
+        if (stop === routeStop) {
+          stop.setExtraTimeAtStation(stop.getExtraTimeAtStation() + time * GAP);
+        }
       }
     }
     /*
@@ -349,5 +404,4 @@ export default class RouteDiagram extends Vue {
   background-color: black;
   position: absolute;
 }
-
 </style>

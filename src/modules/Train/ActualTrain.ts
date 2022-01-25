@@ -464,7 +464,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
                     station,
                     platform,
                     this,
-                    trip.getRoute()
+                    trip.getRouteVariant()
                 );
             });
             if (station) {

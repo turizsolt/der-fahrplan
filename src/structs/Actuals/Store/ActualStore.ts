@@ -41,6 +41,7 @@ import { WaitingHall } from '../../../modules/Station/WaitingHall';
 import { WaitingHallRenderer } from '../../Renderers/WaitingHallRenderer';
 import { PlatformGroup } from '../../../modules/Station/PlatformGroup';
 import { StationRenderer } from '../../Renderers/StationRenderer';
+import { RouteVariant } from '../../Scheduling/RouteVariant';
 
 @injectable()
 export class ActualStore implements Store {
@@ -52,6 +53,7 @@ export class ActualStore implements Store {
     private travelPathes: TravelPathes = new TravelPathes(this);
 
     @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
+    @inject(TYPES.FactoryOfRouteVariant) private RouteVariantFactory: () => RouteVariant;
     @inject(TYPES.FactoryOfRouteStop) private RouteStopFactory: () => RouteStop;
     @inject(TYPES.FactoryOfTrip) private TripFactory: () => Trip;
     @inject(TYPES.FactoryOfTripGroup) private TripGroupFactory: () => TripGroup;
@@ -111,6 +113,7 @@ export class ActualStore implements Store {
         this.typedElements = {};
         this.factoryMethods = {
             [TYPES.Route]: this.RouteFactory,
+            [TYPES.RouteVariant]: this.RouteVariantFactory,
             [TYPES.Trip]: this.TripFactory,
             [TYPES.TripGroup]: this.TripGroupFactory,
             [TYPES.RouteStop]: this.RouteStopFactory,
@@ -153,6 +156,7 @@ export class ActualStore implements Store {
             [TYPES.WaitingHall]: -6.3,
 
             [TYPES.RouteStop]: -7,
+            [TYPES.RouteVariant]: -7.5,
             [TYPES.Route]: -8,
             [TYPES.Trip]: -9,
             [TYPES.TripGroup]: -10,

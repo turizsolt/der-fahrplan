@@ -66,7 +66,7 @@ export class ActualTrainStopper {
 
         const onboarders: Passenger[] = this.stoppedAt //.getStation()
             .getBoardedPassengers()
-            .filter(p => p.getWaitingFor() === this.train.getTrips()[0].getRoute());
+            .filter(p => p.getWaitingFor() === this.train.getTrips()[0].getRouteVariant());
 
         onboarders.map(b => {
             const wagon = this.train.getFreeWagon();
@@ -86,7 +86,8 @@ export class ActualTrainStopper {
         this.shouldTurn = false;
         this.shouldStop = false;
         if (this.stoppedAt.getStation()) {
-            this.train.getTrips().map(t => t.setStationServed(this.stoppedAt.getStation()));
+            this.train.getTrips().map(t => t.arrive(this.stoppedAt.getStation()));
+            // this.train.getTrips().map(t => t.setStationServed(this.stoppedAt.getStation()));
         }
         this.train.getWagons()[0].stop();
 
@@ -97,12 +98,12 @@ export class ActualTrainStopper {
         }
 
         // reverse if needed to
-        const thisStop = this.train.getTrips().length > 0 ? this.train.getTrips()[0].getRoute().getStops().find(x => x.getStation() === this.stoppedAt.getStation()) : null;
+        const thisStop = this.train.getTrips().length > 0 ? this.train.getTrips()[0].getRouteVariant().getStops().find(x => x.getRef() === this.stoppedAt.getStation()) : null;
         if (thisStop) {
-            if (thisStop.isReverseStop()) {
-                this.shouldTurn = true;
-                this.shouldStop = false;
-            }
+            // if (thisStop.isReverseStop()) {
+            //     this.shouldTurn = true;
+            this.shouldStop = false;
+            // }
         }
     }
 
@@ -122,7 +123,8 @@ export class ActualTrainStopper {
             this.shouldStop = false;
 
             if (this.stoppedAt.getStation()) {
-                this.train.getTrips().map(t => t.setStationServed(this.stoppedAt.getStation()));
+                this.train.getTrips().map(t => t.start());
+                // this.train.getTrips().map(t => t.setStationServed(this.stoppedAt.getStation()));
             }
         } else {
             this.shouldStop = true;
@@ -131,9 +133,10 @@ export class ActualTrainStopper {
 
     private endStopping(): void {
         if (this.stoppedAt.getStation()) {
-            this.train.getTrips().map(t => t.setStationServed(this.stoppedAt.getStation()));
+            this.train.getTrips().map(t => t.depart());
+            // this.train.getTrips().map(t => t.setStationServed(this.stoppedAt.getStation()));
             this.stoppedAt.getStation().setTripAsGone(this.train.getTrips()[0]);
-            this.train.getTrips().map(t => t.setAtStation(null));
+            // this.train.getTrips().map(t => t.setAtStation(null));
         }
         this.train.getWagons()[0].stop();
         if (this.shouldTurn) {

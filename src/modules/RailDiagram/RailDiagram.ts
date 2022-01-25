@@ -1,18 +1,19 @@
 import { TYPES } from '../../di/TYPES';
 import { Store } from '../../structs/Interfaces/Store';
-import { Route } from '../../structs/Scheduling/Route';
-import { RouteStop } from '../../structs/Scheduling/RouteStop';
+import { RoutePart } from '../../structs/Scheduling/RoutePart';
+import { RouteVariant } from '../../structs/Scheduling/RouteVariant';
 import { Trip } from '../../structs/Scheduling/Trip';
 import { TripStop } from '../../structs/Scheduling/TripStop';
 import { Util } from '../../structs/Util';
 import { RailMap } from '../RailMap/RailMap';
 import { RailMapCreator } from '../RailMap/RailMapCreator';
+import { RailMapNode } from '../RailMap/RailMapNode';
 import { RailDiagramLine } from './RailDiagramLine';
 import { RailDiagramPlot } from './RailDiagramPlot';
 import { RailDiagramPlotsAndLines } from './RailDiagramPlotsAndLines';
 
 export class RailDiagram {
-    private route: Route = null;
+    private route: RouteVariant = null;
     private diagramHeight: number = 0;
     private diagramWidth: number = 0;
     private map: RailMap = null;
@@ -28,7 +29,7 @@ export class RailDiagram {
         this.update();
     }
 
-    setRoute(route: Route) {
+    setRoute(route: RouteVariant) {
         this.route = route;
         this.update();
     }
@@ -55,12 +56,12 @@ export class RailDiagram {
 
     updateDiagramHeight(): void {
         this.diagramHeight = 0;
-        let prevStop: RouteStop = null;
+        let prevStop: RoutePart = null;
         for (let stop of this.route.getWaypoints()) {
             if (prevStop) {
                 this.diagramHeight += this.map.getDistance(
-                    prevStop.getWaypoint(),
-                    stop.getWaypoint()
+                    prevStop.getRef() as RailMapNode,
+                    stop.getRef() as RailMapNode
                 );
             }
             prevStop = stop;
@@ -78,38 +79,38 @@ export class RailDiagram {
 
         let position: number = 0;
         let pos: number = 0;
-        let prevStop: RouteStop = null;
+        let prevStop: RoutePart = null;
         let prevPosition: number = 0;
         for (let stop of this.route.getWaypoints()) {
             if (prevStop) {
                 position = this.map.getDistance(
-                    prevStop.getWaypoint(),
-                    stop.getWaypoint()
+                    prevStop.getRef() as RailMapNode,
+                    stop.getRef() as RailMapNode
                 );
                 pos += position;
                 lines.push({
                     from: { r: prevPosition / this.diagramHeight, t: 0 },
                     to: { r: pos / this.diagramHeight, t: 0 },
                     trackCount: this.map.getTrackCount(
-                        prevStop.getWaypoint(),
-                        stop.getWaypoint()
+                        prevStop.getRef() as RailMapNode,
+                        stop.getRef() as RailMapNode
                     )
                 });
             }
 
             plots.push({
-                id: stop.getWaypoint().getId(),
-                uniqueId: stop.getWaypoint().getId(),
+                id: (stop.getRef() as RailMapNode).getId(),
+                uniqueId: (stop.getRef() as RailMapNode).getId(),
                 position: pos,
-                name: stop.getWaypoint().getName(),
+                name: stop.getRef().getName(),
                 r: pos / this.diagramHeight,
                 t: 0,
                 meta: {
-                    hasLine: stop.getWaypoint().getType() === TYPES.Station
+                    hasLine: (stop.getRef() as RailMapNode).getType() === TYPES.Station
                 }
             });
 
-            this.stopHeights[stop.getWaypoint().getId()] = pos / this.diagramHeight;
+            this.stopHeights[(stop.getRef() as RailMapNode).getId()] = pos / this.diagramHeight;
             prevStop = stop;
             prevPosition = pos;
         }
@@ -139,11 +140,11 @@ export class RailDiagram {
     getPlotsAndLines(): RailDiagramPlotsAndLines {
         const plots: RailDiagramPlot[] = [];
         const lines: RailDiagramLine[] = [];
-        const routesToPlot: Route[] = this.getConnectingRoutes(this.route);
+        const routesToPlot: RouteVariant[] = this.getConnectingRoutes(this.route);
 
         const trips = this.store.getAllOf<Trip>(TYPES.Trip);
         for (let trip of trips) {
-            if (!routesToPlot.includes(trip.getRoute())) continue;
+            if (!routesToPlot.includes(trip.getRouteVariant())) continue;
 
             let prevStop: TripStop = null;
             for (let stop of trip.getWaypoints().filter(w => w.shouldStop)) {
@@ -233,8 +234,8 @@ export class RailDiagram {
         return { plots, lines };
     }
 
-    getConnectingRoutes(pivotRoute: Route): Route[] {
-        return (this.store.getAllOf(TYPES.Route) as Route[]).filter(route => {
+    getConnectingRoutes(pivotRoute: RouteVariant): RouteVariant[] {
+        return (this.store.getAllOf(TYPES.Route) as RouteVariant[]).filter(route => {
             return route.hasCommonEdgeWith(pivotRoute);
         });
     }

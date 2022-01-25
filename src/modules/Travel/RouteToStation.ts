@@ -1,8 +1,8 @@
-import { Route } from "../../structs/Scheduling/Route";
+import { RouteVariant } from "../../structs/Scheduling/RouteVariant";
 import { Station } from "../Station/Station";
 
 export interface RouteToStation {
-    route: Route;
+    route: RouteVariant;
     station: Station;
     time: number;
 }

@@ -20,8 +20,10 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     private variants: RouteVariant[] = [];
 
     init(): Route {
-        this.variants.push(new ActualRouteVariant(this, WhichEnd.A));
-        this.variants.push(new ActualRouteVariant(this, WhichEnd.B));
+        this.initStore(TYPES.Route);
+
+        this.variants.push(this.store.create<RouteVariant>(TYPES.RouteVariant).init(this, WhichEnd.A));
+        this.variants.push(this.store.create<RouteVariant>(TYPES.RouteVariant).init(this, WhichEnd.B));
         return this;
     }
 

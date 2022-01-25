@@ -22,7 +22,7 @@ export class PathQueue {
           r.filter ===
           train
             ?.getTrips()[0]
-            ?.getRoute()
+            ?.getRouteVariant()
             ?.getName())
     );
     if (found) {

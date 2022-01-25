@@ -45,6 +45,9 @@ export const TYPES = {
     Route: Symbol.for('Route'),
     FactoryOfRoute: Symbol.for('Factory<Route>'),
 
+    RouteVariant: Symbol.for('RouteVariant'),
+    FactoryOfRouteVariant: Symbol.for('Factory<RouteVariant>'),
+
     RouteStop: Symbol.for('RouteStop'),
     FactoryOfRouteStop: Symbol.for('Factory<RouteStop>'),
 

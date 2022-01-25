@@ -63,7 +63,7 @@ describe('Trips', () => {
     it('creates a new trip from route', () => {
         const trip = TripFactory().init(route, 0);
 
-        expect(trip.getRoute().getId()).equals(route.getId());
+        expect(trip.getRouteVariant().getId()).equals(route.getId());
     });
 
     it('copies the stops from route', () => {

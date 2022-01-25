@@ -1,26 +1,26 @@
 import { TYPES } from "../../di/TYPES";
 import { getStore } from "../../structs/Actuals/Store/StoreForVue";
-import { Route } from "../../structs/Scheduling/Route";
+import { RouteVariant } from "../../structs/Scheduling/RouteVariant";
 import { Trip } from "../../structs/Scheduling/Trip";
 
 
 const store = getStore();
 
 export class ScheduleGridComputer {
-    static getByRoute(route: Route, adderTripId: string): any {
+    static getByRoute(route: RouteVariant, adderTripId: string): any {
         const stops = route.getStops().map(s =>
         ({
-            name: s.getWaypoint()?.getName(),
-            time: s.getTimeToStation(),
-            extraTime: s.getExtraTimeToStation(),
-            stopId: s.getId()
+            name: s.getRef()?.getName(),
+            time: 0, //s.getTimeToStation(),
+            extraTime: 0, //s.getExtraTimeToStation(),
+            stopId: '' //s.getId()
         })
         );
         const times = stops.slice(1);
         const rowCount = stops.length * 2 + 12;
 
         const trips = store.getAllOf<Trip>(TYPES.Trip)
-            .filter(t => t.getRoute() === route);
+            .filter(t => t.getRouteVariant() === route);
         trips.sort((a, b) => a.getDepartureTime() - b.getDepartureTime());
 
         const timetable = [];
@@ -39,9 +39,9 @@ export class ScheduleGridComputer {
             const next = trip.getNextTrip();
             timetable.push({
                 hasPrev: !!prev, prev: !prev ? {} : {
-                    name: prev.getRoute().getName(),
-                    color: prev.getRoute().getColor(),
-                    timeStr: prev.getArrivalTimeStr()
+                    name: prev.getRouteVariant().getName(),
+                    color: prev.getRouteVariant().getColor(),
+                    timeStr: 0, //prev.getArrivalTimeStr()
                 }
             });
             timetable.push({ actions: { tripId: trip.getId() } });
@@ -49,9 +49,9 @@ export class ScheduleGridComputer {
             timetable.push(...trip.getWaypoints().filter(w => w.shouldStop).map(w => ({ timeStr: w.departureTime ? w.departureTimeString : w.arrivalTimeString })));
             timetable.push({
                 hasNext: !!next, next: !next ? {} : {
-                    name: next.getRoute().getName(),
-                    color: next.getRoute().getColor(),
-                    timeStr: next.getDepartureTimeStr()
+                    name: next.getRouteVariant().getName(),
+                    color: next.getRouteVariant().getColor(),
+                    timeStr: 0, //next.getDepartureTimeStr()
                 }
             });
 
