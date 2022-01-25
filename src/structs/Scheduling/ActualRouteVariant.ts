@@ -1,4 +1,6 @@
 import { TYPES } from "../../di/TYPES";
+import { applyMixins } from "../../mixins/ApplyMixins";
+import { Emitable } from "../../mixins/Emitable";
 import { ActualBaseStorable } from "../Actuals/ActualStorable";
 import { Store } from "../Interfaces/Store";
 import { otherEnd, WhichEnd } from "../Interfaces/WhichEnd";
@@ -6,6 +8,8 @@ import { Route } from "./Route";
 import { RoutePart } from "./RoutePart";
 import { RouteVariant } from "./RouteVariant";
 
+export interface ActualRouteVariant extends Emitable { }
+const doApply = () => applyMixins(ActualRouteVariant, [Emitable]);
 export class ActualRouteVariant extends ActualBaseStorable implements RouteVariant {
     private startEnd: WhichEnd;
     private route: Route;
@@ -72,3 +76,4 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
         throw new Error("Method not implemented.");
     }
 }
+doApply();

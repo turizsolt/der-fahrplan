@@ -8,7 +8,6 @@ import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { otherEnd, WhichEnd } from '../Interfaces/WhichEnd';
 import { RoutePart } from './RoutePart';
 import { RouteVariant } from './RouteVariant';
-import { ActualRouteVariant } from './ActualRouteVariant';
 
 export class ActualRoute extends ActualBaseStorable implements Route {
     private name: string;
@@ -52,6 +51,8 @@ export class ActualRoute extends ActualBaseStorable implements Route {
             part.setNext(whichEnd, p);
             this.parts[whichEnd] = part;
         }
+
+        this.update();
     }
 
     getParts(whichEnd: WhichEnd): RoutePart[] {
@@ -81,6 +82,8 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         } else {
             this.parts = { A: null, B: null };
         }
+
+        this.update();
     }
 
     getVariants(): RouteVariant[] {
@@ -127,6 +130,10 @@ export class ActualRoute extends ActualBaseStorable implements Route {
             }
         }
         return result;
+    }
+
+    private update() {
+        this.variants.forEach(variant => variant.emit('update', {}));
     }
 
     /********************/

@@ -1,8 +1,9 @@
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { Trip } from './Trip';
 import { Route } from './Route';
-import { RouteStop } from './RouteStop';
 import { AbstractPlatform } from '../../modules/Station/AbstractPlatform';
+import { RouteVariant } from './RouteVariant';
+import { RoutePart } from './RoutePart';
 
 export interface TripStop {
     stationName: string;
@@ -14,23 +15,22 @@ export interface TripStop {
     hasDepartureTime: boolean;
     arrivalTime: number;
     departureTime: number;
-    arrivalTimeString: string;
-    departureTimeString: string;
     realArrivalTime: number;
     realDepartureTime: number;
-    realArrivalTimeString: string;
-    realDepartureTimeString: string;
+    duration: number;
     isServed: boolean;
     atStation: boolean;
     isDepartureStation: boolean;
     isArrivalStation: boolean;
     shouldStop: boolean;
     isStation: boolean;
+    isReverseStop: boolean;
 
     id: string;
     trip: Trip;
     route: Route;
-    routeStop: RouteStop;
+    routeVariant: RouteVariant;
+    routePart: RoutePart;
 }
 
 export interface OptionalTripStop {
@@ -39,4 +39,5 @@ export interface OptionalTripStop {
     departureTime?: number;
     realArrivalTime?: number;
     realDepartureTime?: number;
+    duration?: number;
 }

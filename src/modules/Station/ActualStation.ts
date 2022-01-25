@@ -68,21 +68,19 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
 
     updateArrivingPlatform(platform: AbstractPlatform, trip: Trip): void {
-        /* todo
-        const stop = trip.getRouteVariant().getStops().find(s => s.getRef() === this);
-        if (stop && stop.getPlatform() !== platform) {
-            const pax = stop.getPlatform()
-                ? stop.getPlatform().getBoardedPassengers()
+        const stop = trip.getWaypoints().find(s => s.station === this);
+        if (stop && stop.platform !== platform) {
+            const pax = stop.platform
+                ? stop.platform.getBoardedPassengers()
                 : this.getWaitingHalls().map(wh => wh.getBoardedPassengers()).flat();
 
-            trip.updatePlatformInfo(stop, {platform});
+            trip.updatePlatformInfo(stop.routePart, platform);
             //trip.redefine(stop, { platform });
             pax.map(p =>
                 PassengerRelocator.changedPlatform(this.store, p, platform));
 
             this.update();
         }
-        */
     }
 
     // end of neu

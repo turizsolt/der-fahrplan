@@ -1,24 +1,22 @@
 import { ActualBaseStorable } from '../Actuals/ActualStorable';
-import { Route } from './Route';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
 import { Trip } from './Trip';
 import { TripStop, OptionalTripStop } from './TripStop';
-import { RouteStop } from './RouteStop';
-import { Platform } from '../../modules/Station/Platform';
 import { Station } from '../../modules/Station/Station';
-import { Util } from '../Util';
 import { RoutePart } from './RoutePart';
 import { RoutePartReference } from './RoutePartReference';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
 import { RouteVariant } from './RouteVariant';
-import { BaseStorable } from '../Interfaces/BaseStorable';
+import { otherEnd } from '../Interfaces/WhichEnd';
+import { AbstractPlatform } from '../../modules/Station/AbstractPlatform';
 
 export class ActualTrip extends ActualBaseStorable implements Trip {
     private routeVariant: RouteVariant;
     private departureTime: number;
     private routePartAt: RoutePart;
     private redefinedProps: Record<string, OptionalTripStop> = {};
+    private routeVariantSubscribe: (data: any) => void;
 
     private prevTrip: Trip = null;
     private nextTrip: Trip = null;
@@ -29,7 +27,31 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         this.routeVariant = routeVariant;
         this.departureTime = departureTime;
 
+        this.routeVariantSubscribe = () => this.updateRouteVariant();
+        this.routeVariantSubscribe.bind(this);
+
+        this.routeVariant.on('update', this.routeVariantSubscribe);
+        this.updateRouteVariant();
+
         return this;
+    }
+
+    private updateRouteVariant(): void {
+        let time = 0;
+        let iter = this.routeVariant.getFirstStop();
+        while (iter) {
+            const arrivalTime = time;
+            const duration = iter.getDuration();
+            time += duration;
+            const departureTime = time;
+            if (iter.getRef()) {
+                this.redefine(iter.getRef(), { arrivalTime, departureTime, duration });
+            }
+            iter = iter.getNext(this.routeVariant.getStartEnd());
+        }
+
+        this.undefine(this.routeVariant.getFirstStop().getRef(), { arrivalTime: undefined });
+        this.undefine(this.routeVariant.getLastStop().getRef(), { departureTime: undefined });
     }
 
     getRouteVariant(): RouteVariant {
@@ -68,8 +90,8 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         this.departureTime = time;
     }
 
-    updatePlatformInfo(routePart: RoutePart, props: OptionalTripStop): void {
-        this.redefine(routePart.getRef(), props);
+    updatePlatformInfo(routePart: RoutePart, platform: AbstractPlatform): void {
+        this.redefine(routePart.getRef(), { platform });
     }
 
     redefine(stop: RoutePartReference, props: OptionalTripStop): void {
@@ -117,6 +139,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         if (list.length === 0) return null;
         const stop = list[0];
 
+        // todo, it seems useful generally
         let addedTime = 0;
         const stops = this.routeVariant.getStops();
         for (let i = 0; i < stops.length; i++) {
@@ -141,43 +164,62 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         return null;
     }
 
+    isAtLastStation(): boolean {
+        return !this.routePartAt.getNext(this.routeVariant.getStartEnd());
+    }
+
     // todo returning the stops to show on the side
 
+    private getPartData(part: RoutePart, isServed: boolean): TripStop {
+        const redefined = this.redefinedProps[(part.getRef() as RailMapNode).getId()];
+        return {
+            trip: this,
+            route: this.getRouteVariant()?.getRoute(),
+            routeVariant: this.getRouteVariant(),
+            routePart: part,
+
+            id: this.id + '', // todo get id from part
+
+            station: part.getRef() as Station,
+            stationRgbColor: (part.getRef() as Station)?.getColor()?.getRgbString(),
+            stationName: part.getRef()?.getName(),
+            platform: redefined?.platform,
+            platformNo: redefined?.platform?.getNo(),
+
+            hasArrivalTime: redefined.arrivalTime !== undefined,
+            hasDepartureTime: redefined.departureTime !== undefined,
+            arrivalTime: redefined.arrivalTime || 0,
+            departureTime: redefined.departureTime || 0,
+            realArrivalTime: redefined.realArrivalTime || -1,
+            realDepartureTime: redefined.realDepartureTime || -1,
+            duration: redefined.duration || 0,
+
+            isServed,
+            atStation: this.routePartAt === part,
+            isArrivalStation: !part.getNext(this.routeVariant.getStartEnd()),
+            isDepartureStation: !part.getNext(otherEnd(this.routeVariant.getStartEnd())),
+            shouldStop: true,
+            isStation: part.getType() === TYPES.RoutePartStop,
+            isReverseStop: false
+        };
+    }
+
     getWaypoints(): TripStop[] {
-        const stops = this.routeVariant.getWaypoints();
-        const index = stops.findIndex((s: RoutePart) => s === this.routePartAt);
-        return stops.map((stop, ind) => {
-            const sto: TripStop = {
-                trip: null,
-                route: null,
-                routeStop: null,
-                id: this.id,
+        const result: TripStop[] = [];
+        let isServed = true;
+        let iter = this.routeVariant.getFirstStop();
+        while (iter) {
+            if ([TYPES.RoutePartStop, TYPES.RoutePartJunction].includes(iter.getType())) {
+                result.push(this.getPartData(iter, isServed));
+            }
 
-                station: stop.getRef() as Station,
-                stationRgbColor: (stop.getRef() as Station).getColor().getRgbString(),
-                stationName: stop.getRef().getName(),
-                platform: null,
-                platformNo: '',
-                hasArrivalTime: false,
-                hasDepartureTime: false,
-                arrivalTime: 0,
-                departureTime: 0,
-                realArrivalTime: 0,
-                realDepartureTime: 0,
-                arrivalTimeString: '',
-                departureTimeString: '',
-                realArrivalTimeString: '',
-                realDepartureTimeString: '',
-                isServed: (ind <= index),
-                atStation: (ind === index) && (this.routePartAt === stop),
-                isArrivalStation: ind === stops.length - 1,
-                isDepartureStation: ind === 0,
-                shouldStop: true,
-                isStation: true
-            };
+            if (this.routePartAt === iter) {
+                isServed = false;
+            }
 
-            return sto;
-        });
+            iter = iter.getNext(this.routeVariant.getStartEnd());
+        }
+        return result;
     };
 
     persist(): Object {

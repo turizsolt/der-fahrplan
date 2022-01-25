@@ -1,6 +1,5 @@
 import { Platform } from "../Station/Platform";
 import { Store } from "../../structs/Interfaces/Store";
-import { Util } from "../../structs/Util";
 import { Passenger } from "../Passenger/Passenger";
 import { PassengerRelocator } from "../Passenger/PassengerRelocator";
 import { SightMarker } from "./Sight/SightMarker";
@@ -92,18 +91,17 @@ export class ActualTrainStopper {
         this.train.getWagons()[0].stop();
 
         // reverse at the end of the trip, and also get the next trip
-        const lastStop = this.train.getTrips().length > 0 ? Util.last(this.train.getTrips()[0].getWaypoints()) : null;
-        if (lastStop && lastStop.station === this.stoppedAt.getStation()) {
+        if (this.train.getTrips()?.[0]?.isAtLastStation()) {
             this.arrivedToLastStation();
         }
 
         // reverse if needed to
-        const thisStop = this.train.getTrips().length > 0 ? this.train.getTrips()[0].getRouteVariant().getStops().find(x => x.getRef() === this.stoppedAt.getStation()) : null;
+        const thisStop = this.train.getTrips().length > 0 ? this.train.getTrips()[0].getWaypoints().find(x => x.station === this.stoppedAt.getStation()) : null;
         if (thisStop) {
-            // if (thisStop.isReverseStop()) {
-            //     this.shouldTurn = true;
-            this.shouldStop = false;
-            // }
+            if (thisStop.isReverseStop) {
+                this.shouldTurn = true;
+                this.shouldStop = false;
+            }
         }
     }
 

@@ -2,6 +2,7 @@ import { TYPES } from "../../di/TYPES";
 import { getStore } from "../../structs/Actuals/Store/StoreForVue";
 import { RouteVariant } from "../../structs/Scheduling/RouteVariant";
 import { Trip } from "../../structs/Scheduling/Trip";
+import { Util } from "../../structs/Util";
 
 
 const store = getStore();
@@ -46,7 +47,7 @@ export class ScheduleGridComputer {
             });
             timetable.push({ actions: { tripId: trip.getId() } });
             timetable.push({ sign: { name: route.getName(), color: route.getColor() } });
-            timetable.push(...trip.getWaypoints().filter(w => w.shouldStop).map(w => ({ timeStr: w.departureTime ? w.departureTimeString : w.arrivalTimeString })));
+            timetable.push(...trip.getWaypoints().filter(w => w.shouldStop).map(w => ({ timeStr: w.departureTime ? Util.timeToString(w.departureTime) : Util.timeToString(w.arrivalTime) })));
             timetable.push({
                 hasNext: !!next, next: !next ? {} : {
                     name: next.getRouteVariant().getName(),

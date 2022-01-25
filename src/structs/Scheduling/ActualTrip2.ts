@@ -113,7 +113,8 @@ export class ActualTrip2 extends ActualBaseStorable implements Trip2 {
             const sto: TripStop = {
                 trip: null,
                 route: null,
-                routeStop: null,
+                routePart: null,
+                routeVariant: null,
                 id: this.id,
 
                 station: stop.getRef() as Station,
@@ -127,16 +128,14 @@ export class ActualTrip2 extends ActualBaseStorable implements Trip2 {
                 departureTime: 0,
                 realArrivalTime: 0,
                 realDepartureTime: 0,
-                arrivalTimeString: '',
-                departureTimeString: '',
-                realArrivalTimeString: '',
-                realDepartureTimeString: '',
+                duration: 0,
                 isServed: (ind <= index),
                 atStation: (ind === index) && (this.routePartAt === stop),
                 isArrivalStation: ind === stops.length - 1,
                 isDepartureStation: ind === 0,
                 shouldStop: true,
-                isStation: true
+                isStation: true,
+                isReverseStop: false
             };
 
             return sto;

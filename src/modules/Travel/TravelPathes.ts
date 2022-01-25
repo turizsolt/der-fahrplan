@@ -55,11 +55,21 @@ export class TravelPathes {
         for (let route of this.routes) {
             const stops: RoutePart[] = route.getStops();
             for (let i = 0; i < stops.length; i++) {
+                if (![TYPES.RoutePartStop, TYPES.RoutePartJunction].includes(stops[i].getType())) continue;
+
+                let dur = 0;
                 for (let j = i + 1; j < stops.length; j++) {
+                    if (![TYPES.RoutePartStop, TYPES.RoutePartJunction].includes(stops[j].getType())) {
+                        dur += stops[j].getDuration();
+                        continue;
+                    }
+
                     const from: Station = stops[i].getRef() as Station;
                     const to: Station = stops[j].getRef() as Station;
-                    const dist: number = 12; // todo stops[j].getArrivalTime() - stops[i].getDepartureTime();
+                    const dist: number = dur; // todo stops[j].getArrivalTime() - stops[i].getDepartureTime();
                     this.pathes[from.getId()][to.getId()].push({ score: dist, changes: [{ route, station: to, time: dist }] });
+
+                    dur += stops[j].getDuration();
                 }
             }
         }
