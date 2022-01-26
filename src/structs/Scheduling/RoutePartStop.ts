@@ -1,7 +1,8 @@
+import { Color } from "../Color";
 import { RoutePart } from "./RoutePart";
 
 export interface RoutePartStop extends RoutePart {
     setDuration(frames: number): void;
     setStopping(stopping: boolean): void;
-    getColor(): string;
+    getColor(): Color;
 }

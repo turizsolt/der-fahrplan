@@ -1,5 +1,6 @@
 import chai, { expect } from 'chai';
 import chaiAlmost from 'chai-almost';
+import { Color } from '../../../src/structs/Color';
 import { BrickFactory } from '../../../src/structs/Factory/BrickFactory';
 import { WhichEnd } from '../../../src/structs/Interfaces/WhichEnd';
 import { RoutePart } from '../../../src/structs/Scheduling/RoutePart';
@@ -18,7 +19,7 @@ const HALF_MINUTES = 30 * 60;
 const ZERO_MINUTES = 0;
 
 const NAME = 'Name';
-const COLOR = '#ff0000';
+const COLOR = new Color(1, 0, 0);
 
 const REFERENCE: RoutePartReference = {
   getName: () => NAME,

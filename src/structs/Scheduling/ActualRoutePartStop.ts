@@ -1,4 +1,5 @@
 import { TYPES } from "../../di/TYPES";
+import { Color } from "../Color";
 import { WhichEnd } from "../Interfaces/WhichEnd";
 import { ActualRoutePart } from "./ActualRoutePart";
 import { RoutePartReferenceColor } from "./RoutePartReferenceColor";
@@ -38,7 +39,7 @@ export class ActualRoutePartStop extends ActualRoutePart implements RoutePartSto
         this.stopping = stopping;
     }
 
-    getColor(): string {
+    getColor(): Color {
         return this.ref.getColor();
     }
 
