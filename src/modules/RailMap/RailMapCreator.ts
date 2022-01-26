@@ -211,8 +211,8 @@ export class RailMapCreator {
 
                 routeEdges[i].clear();
                 routeEdges[i].lineStyle(4, parseInt(edge.color.slice(1), 16), 1);
-                const from = edge.from.coord;
-                const to = edge.to.coord;
+                const from = edge.from.fromHere(Math.PI / 2, 4 * edge.no).coord;
+                const to = edge.to.fromHere(-Math.PI / 2, 4 * edge.no).coord;
                 routeEdges[i].moveTo(from.x, from.z);
                 routeEdges[i].lineTo(to.x, to.z);
 
