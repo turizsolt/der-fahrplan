@@ -255,11 +255,4 @@ export default class RoutePlanner extends Vue {
 .column-add-stops {
   overflow-y: scroll;
 }
-
-#pixi-map-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  border: 1px solid red;
-}
 </style>
