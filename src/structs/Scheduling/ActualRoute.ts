@@ -31,6 +31,11 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         return this;
     }
 
+    xinit(): Route {
+        this.initStore(TYPES.Route);
+        return this;
+    }
+
     getName(): string {
         return this.name;
     }
@@ -158,13 +163,16 @@ export class ActualRoute extends ActualBaseStorable implements Route {
             type: 'Route',
             name: this.name,
             detailedName: this.getDetailedName(),
-            color: this.color
+            fistStationName: this.getEnd(WhichEnd.A)?.getName(),
+            lastStationName: this.getEnd(WhichEnd.B)?.getName(),
+            color: this.color,
+            variants: this.variants.map(v => v?.getId())
         };
     }
 
     load(obj: any, store: Store): void {
         this.presetId(obj.id);
-        this.init();
+        this.xinit();
         this.setColor(obj.color);
         this.setName(obj.name);
 
@@ -188,7 +196,10 @@ export class ActualRoute extends ActualBaseStorable implements Route {
             this.addPart(WhichEnd.B, part);
         }
 
-        this.variants = obj.variants.map(variant => store.get(variant.id) as RouteVariant);
+        // TODO two-phase loading to apply globally
+        setTimeout(() => {
+            this.variants = obj.variants.map(variant => store.get(variant) as RouteVariant);
+        }, 0);
     }
 
     remove(): void {

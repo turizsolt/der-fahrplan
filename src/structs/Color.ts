@@ -36,4 +36,12 @@ export class Color {
   getRgbString(): string {
     return `rgb(${this.red * 255},${this.green * 255},${this.blue * 255})`;
   }
+
+  private toHex(n: number): string {
+    return (n < 16 ? '0' : '') + Math.floor(n).toString();
+  }
+
+  getHexaString(): string {
+    return `#${this.toHex(this.red * 255)}${this.toHex(this.green * 255)}${this.toHex(this.blue * 255)}`;
+  }
 }

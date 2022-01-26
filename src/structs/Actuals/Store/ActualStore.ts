@@ -149,8 +149,8 @@ export class ActualStore implements Store {
             [TYPES.PlatformGroup]: -6.2,
             [TYPES.WaitingHall]: -6.3,
 
-            [TYPES.RouteVariant]: -7,
-            [TYPES.Route]: -8,
+            [TYPES.Route]: -7,
+            [TYPES.RouteVariant]: -8,
             [TYPES.Trip]: -9,
 
             [TYPES.Passenger]: -11,
