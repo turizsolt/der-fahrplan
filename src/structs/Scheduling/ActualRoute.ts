@@ -184,7 +184,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
                 case TYPES.RoutePartStop:
                     return new ActualRoutePartStop(store.get(part.id) as unknown as RoutePartReferenceColor);
 
-                case TYPES.RoutePartEdge:
+                case TYPES.RoutePartJunction:
                     return new ActualRoutePartJunction(store.get(part.id) as unknown as RoutePartReference);
 
                 default:
