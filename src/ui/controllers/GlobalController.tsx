@@ -18,7 +18,7 @@ import { VueBigscreen2 } from './VueBigScreen2';
 import { VueBigscreenMap } from './VueBigScreenMap';
 import { VueBigscreenDiagram } from './VueBigScreenDiagram';
 import { Overlay } from '../overlays/Overlay';
-import { overlayStore } from '../overlays/store';
+import { overlayStore, setOverlayMode } from '../overlays/store';
 
 export class GlobalController {
   private viewMode: string = 'terrain';
@@ -72,13 +72,13 @@ export class GlobalController {
     this.vueTestPanel = new VueTestPanel(this.store);
     this.store.getCommandLog().setInputController(this);
 
-    this.vueViewbox.addButton({ id: 'terrain', text: 'Default' });
+    this.vueViewbox.addButton({ id: 'terrain', text: 'Terrain' });
     this.vueViewbox.addButton({ id: 'map', text: 'Map' });
     this.vueViewbox.addButton({ id: 'schedule', text: 'Schedule' });
     this.vueViewbox.addButton({ id: 'diagram', text: 'Diagram' });
     this.vueViewbox.addButton({ id: 'connector', text: 'Connect' });
     this.vueViewbox.addButton({ id: 'builder', text: 'Builder' });
-    this.vueViewbox.setSelected('terrain');
+    this.selectView('map');
   }
 
   getInputController(): InputController {
@@ -96,42 +96,19 @@ export class GlobalController {
   selectView(mode: string) {
     this.viewMode = mode;
     this.vueViewbox.setSelected(mode);
+    overlayStore.dispatch(setOverlayMode(mode));
 
-    if (mode === 'schedule') {
-      this.selectMode(InputMode.SELECT);
-      this.vueBigScreen.setShow(true);
-    } else {
-      this.selectMode(InputMode.CAMERA);
-      this.vueBigScreen.setShow(false);
-    }
-
-    if (mode === 'connector') {
-      this.selectMode(InputMode.SELECT);
-      this.vueBigScreen2.setShow(true);
-    } else {
-      this.selectMode(InputMode.CAMERA);
-      this.vueBigScreen2.setShow(false);
-    }
-
-    if (mode === 'map') {
-      this.selectMode(InputMode.SELECT);
-      this.vueBigScreenMap.setShow(true);
-    } else {
-      this.selectMode(InputMode.CAMERA);
+    if (mode === 'terrain') {
       this.vueBigScreenMap.setShow(false);
-    }
-
-    if (mode === 'diagram') {
-      this.selectMode(InputMode.SELECT);
-      this.vueBigScreenDiagram.setShow(true);
-    } else {
       this.selectMode(InputMode.CAMERA);
-      this.vueBigScreenDiagram.setShow(false);
-    }
-
-    if (mode === 'builder') {
+      this.vueToolbox.setShow(false);
+    } else if (mode === 'builder') {
+      this.vueBigScreenMap.setShow(false);
+      this.selectMode(InputMode.CAMERA);
       this.vueToolbox.setShow(true);
     } else {
+      this.vueBigScreenMap.setShow(true);
+      this.selectMode(InputMode.SELECT);
       this.vueToolbox.setShow(false);
     }
   }
