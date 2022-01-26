@@ -18,6 +18,7 @@ import { OverlayController } from '../../ui/overlays/OverlayController';
 
 const mapNodes: PIXI.Graphics[] = [];
 const mapEdges: PIXI.Graphics[] = [];
+const routeEdges: PIXI.Graphics[] = [];
 let boundingRect: PIXI.Graphics = null;
 
 export class RailMapCreator {
@@ -184,7 +185,7 @@ export class RailMapCreator {
             mapNodes[i].beginFill(0x00ff00);
             mapNodes[i].drawCircle(0, 0, railMapNodes[i].getType() === TYPES.PathBlock ? 2 : 5);
             mapNodes[i].endFill();
-            mapNodes[i].zIndex = 9;
+            mapNodes[i].zIndex = 8;
             mapNodes[i].x = railMapNodes[i].getCoord().x;
             mapNodes[i].y = railMapNodes[i].getCoord().z;
             mapNodes[i].renderable = true;
@@ -195,6 +196,34 @@ export class RailMapCreator {
 
         for (; i < mapNodes.length; i++) {
             mapNodes[i].renderable = false;
+        }
+
+        // routes
+
+        i = 0;
+        for (let route of map.getRoutes()) {
+            for (let edge of route) {
+
+                if (!routeEdges[i]) {
+                    routeEdges[i] = new PIXI.Graphics();
+                    globalThis.stageMap.addChild(routeEdges[i]);
+                }
+
+                routeEdges[i].clear();
+                routeEdges[i].lineStyle(4, parseInt(edge.color.slice(1), 16), 1);
+                const from = edge.from.coord;
+                const to = edge.to.coord;
+                routeEdges[i].moveTo(from.x, from.z);
+                routeEdges[i].lineTo(to.x, to.z);
+
+                routeEdges[i].zIndex = 9;
+                routeEdges[i].renderable = true;
+                i++;
+            }
+        }
+
+        for (; i < routeEdges.length; i++) {
+            routeEdges[i].renderable = false;
         }
 
         return map;
