@@ -62,6 +62,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.2",
     "shortid": "^2.2.15",
+    "typestyle": "^2.2.0",
     "vue": "^2.5.2",
     "vue-property-decorator": "^6.0.0",
     "vue-ts-loader": "^0.0.3"
