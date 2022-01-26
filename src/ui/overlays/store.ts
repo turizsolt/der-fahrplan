@@ -1,12 +1,20 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit';
+import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+interface OverlayState {
+    overlayMode: string,
+    routeList: string[]
+}
+
+const initialState: OverlayState = {
+    overlayMode: 'none',
+    routeList: [],
+};
 
 export const counterSlice = createSlice({
     name: 'counter',
-    initialState: {
-        overlayMode: 'none',
-    },
+    initialState,
     reducers: {
-        setOverlayMode: (state, action) => {
+        setOverlayMode: (state, action: PayloadAction<string>) => {
             state.overlayMode = action.payload
         },
     },
@@ -20,3 +28,6 @@ export const overlayStore = configureStore({
         overlay: counterSlice.reducer
     },
 });
+
+export type RootState = ReturnType<typeof overlayStore.getState>
+export type AppDispatch = typeof overlayStore.dispatch

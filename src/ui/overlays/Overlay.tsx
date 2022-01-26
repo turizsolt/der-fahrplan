@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { style } from 'typestyle';
+import { RootState } from './store';
 
 interface Props { };
 
@@ -55,7 +56,7 @@ const connectorStyle = style({
 
 export const Overlay: React.FC<Props> = props => {
 
-    const mode = useSelector((state: any) => state.overlay.overlayMode);
+    const mode = useSelector((state: RootState) => state.overlay.overlayMode);
 
     const whenMap = mode === 'map' ? 'visible' : 'hidden';
     const whenDiagram = mode === 'diagram' ? 'visible' : 'hidden';
