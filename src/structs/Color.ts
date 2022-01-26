@@ -38,7 +38,7 @@ export class Color {
   }
 
   private toHex(n: number): string {
-    return (n < 16 ? '0' : '') + Math.floor(n).toString();
+    return (n < 16 ? '0' : '') + Math.floor(n).toString(16);
   }
 
   getHexaString(): string {
