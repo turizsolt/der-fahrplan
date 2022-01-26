@@ -25,4 +25,8 @@ export class Util {
     const min = Math.floor((time - hour * 3600) / 60);
     return hour + ':' + (min < 10 ? '0' : '') + min;
   }
+
+  public static generateRouteName(): string {
+    return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(Math.floor(Math.random() * 26)) + (Math.floor(Math.random() * 90 + 10)).toString();
+  }
 }

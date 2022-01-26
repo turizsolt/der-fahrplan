@@ -14,6 +14,7 @@ import { RailMapNode } from './RailMapNode';
 import { Route } from '../../structs/Scheduling/Route';
 import { RailMapEdge } from './RailMapEdge';
 import { PixiClickGeneral } from '../../ui/babylon/PixiClick';
+import { OverlayController } from '../../ui/overlays/OverlayController';
 
 const mapNodes: PIXI.Graphics[] = [];
 const mapEdges: PIXI.Graphics[] = [];
@@ -167,6 +168,8 @@ export class RailMapCreator {
 
         // nodes
 
+        const overlayController = OverlayController.getInstance();
+
         const railMapNodes = map.getNodes();
 
         i = 0;
@@ -185,7 +188,9 @@ export class RailMapCreator {
             mapNodes[i].x = railMapNodes[i].getCoord().x;
             mapNodes[i].y = railMapNodes[i].getCoord().z;
             mapNodes[i].renderable = true;
-            PixiClickGeneral(mapNodes[i], railMapNodes[i].getType().description, railMapNodes[i].getId(), (x, y, type, id) => console.log(type, id, x, y));
+            PixiClickGeneral(mapNodes[i], railMapNodes[i].getType().description, railMapNodes[i].getId(),
+                (x, y, type, id) => overlayController.controll(type, id)
+            );
         }
 
         for (; i < mapNodes.length; i++) {

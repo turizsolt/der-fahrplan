@@ -23,7 +23,7 @@ const initialState: OverlayState = {
     routeList: [],
 };
 
-export const counterSlice = createSlice({
+export const overlaySlice = createSlice({
     name: 'counter',
     initialState,
     reducers: {
@@ -39,11 +39,11 @@ export const counterSlice = createSlice({
     },
 })
 
-export const { setOverlayMode, selectRoute, updateRouteList } = counterSlice.actions
+export const { setOverlayMode, selectRoute, updateRouteList } = overlaySlice.actions
 
 export const overlayStore = configureStore({
     reducer: {
-        overlay: counterSlice.reducer
+        overlay: overlaySlice.reducer
     },
 });
 

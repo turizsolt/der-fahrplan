@@ -1,13 +1,12 @@
 import React, { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { TYPES } from '../../di/TYPES';
-import { createStorable, getAllOfStorable } from '../../structs/Actuals/Store/StoreForVue';
-import { Color } from '../../structs/Color';
-import { Route } from '../../structs/Scheduling/Route';
-import { AppDispatch, RootState, selectRoute, StorableRoute, updateRouteList } from './store';
+import { useSelector } from 'react-redux';
+import { OverlayController } from './OverlayController';
+import { RootState } from './store';
 import { routeListStyle } from './styles';
 
 interface Props { };
+
+const overlayController = OverlayController.getInstance();
 
 export const RouteList: React.FC<Props> = props => {
 
@@ -15,37 +14,33 @@ export const RouteList: React.FC<Props> = props => {
 
     const whenMapOrDiagram = (overlayMode === 'map' || overlayMode === 'diagram') ? 'visible' : 'hidden';
 
-    const dispatch = useDispatch<AppDispatch>();
-
-    const handleLoad = useCallback(() => {
-        const rl = getAllOfStorable(TYPES.Route).map(r => r.persistDeep()) as StorableRoute[];
-        dispatch(updateRouteList(rl));
+    const handleUpdateRouteList = useCallback(() => {
+        overlayController.updateRouteList();
     }, []);
 
     const handleSelect = useCallback((sel: string) => () => {
-        dispatch(selectRoute(sel));
+        overlayController.selectRoute(sel);
+    }, []);
+
+    const handleUpdateMap = useCallback(() => {
+        overlayController.updateMap();
     }, []);
 
     const handleCreate = useCallback(() => {
-        const route = createStorable<Route>(TYPES.Route).init();
-        route.setName("ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(Math.floor(Math.random() * 26)) + (Math.floor(Math.random() * 90 + 10)).toString());
-        route.setColor(Color.CreateRandom().getHexaString());
-
-        const rl = getAllOfStorable(TYPES.Route).map(r => r.persistDeep()) as StorableRoute[];
-        dispatch(updateRouteList(rl));
-        dispatch(selectRoute(route.getId()));
+        overlayController.createRoute();
     }, []);
 
     return <div className={routeListStyle} style={{ visibility: whenMapOrDiagram }} >
         Route list
-        <button onClick={handleLoad}>Load</button>
+        <button onClick={handleUpdateRouteList}>Load</button>
         <button onClick={handleCreate}>Create</button>
+        <button onClick={handleUpdateMap}>UpdMap</button>
         <div>Selected: {selectedRoute}</div>
         <div onClick={handleSelect(null)}>Select nothing</div>
         {routeList.map(route => <div key={route.id} onClick={handleSelect(route.id)}>
             {route.name}
             [{route.id}]
-            {route.variants?.[0]}
+            {route.detailedName}
         </div>)}
     </div>
 }
