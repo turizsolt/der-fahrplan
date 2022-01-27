@@ -17,18 +17,17 @@ export const RouteList: React.FC<Props> = props => {
 
     const handleUpdateRouteList = useCallback(() => {
         overlayController.updateRouteList();
+        overlayController.updateMap();
     }, []);
 
     const handleSelect = useCallback((sel: string) => () => {
         overlayController.selectRoute(sel === selectedRoute ? null : sel);
-    }, [selectedRoute]);
-
-    const handleUpdateMap = useCallback(() => {
         overlayController.updateMap();
-    }, []);
+    }, [selectedRoute]);
 
     const handleCreate = useCallback(() => {
         overlayController.createRoute();
+        overlayController.updateMap();
     }, []);
 
     const handleCreateExampleTrip = useCallback(() => {
@@ -39,9 +38,8 @@ export const RouteList: React.FC<Props> = props => {
 
     return <div className={routeListStyle} style={{ visibility: whenMapOrDiagram }} >
         Route list
-        <button onClick={handleUpdateRouteList}>Load</button>
+        <button onClick={handleUpdateRouteList}>Update</button>
         <button onClick={handleCreate}>Create</button>
-        <button onClick={handleUpdateMap}>UpdMap</button>
         <button onClick={handleCreateExampleTrip}>ExTrip</button>
         <hr />
         {routeList.map(route => <Route

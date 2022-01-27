@@ -51,7 +51,8 @@ export class ActualRailMap implements RailMap {
                 from: new Ray(fromCoord, fromDir),
                 to: new Ray(toCoord, toDir),
                 no: routeCount,
-                color: route.getColor()
+                color: route.getColor(),
+                routeId: route.getId()
             });
         }
         this.routes.push(mapRoute);

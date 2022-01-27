@@ -15,6 +15,7 @@ import { Route } from '../../structs/Scheduling/Route';
 import { RailMapEdge } from './RailMapEdge';
 import { PixiClickGeneral } from '../../ui/babylon/PixiClick';
 import { OverlayController } from '../../ui/overlays/OverlayController';
+import { overlayStore } from '../../ui/overlays/store';
 
 const mapNodes: PIXI.Graphics[] = [];
 const mapEdges: PIXI.Graphics[] = [];
@@ -153,7 +154,7 @@ export class RailMapCreator {
             }
 
             mapEdges[i].clear();
-            mapEdges[i].lineStyle(2, 0x000000, 1);
+            mapEdges[i].lineStyle(2, 0xafafaf, railMapEdges[i].routeCount > 0 ? 0 : 0.5);
             const from = railMapEdges[i].from.getCoord();
             const to = railMapEdges[i].to.getCoord();
             mapEdges[i].moveTo(from.x, from.z);
@@ -169,9 +170,14 @@ export class RailMapCreator {
 
         // routes
 
+        const selectedRouteId = overlayStore.getState().overlay.selectedRoute;
+
         i = 0;
         for (let route of map.getRoutes()) {
             for (let edge of route) {
+                const normalColor = parseInt(edge.color.slice(1), 16);
+                const shouldSee = (!selectedRouteId || edge.routeId === selectedRouteId);
+                const color = shouldSee ? normalColor : 0xafafaf;
 
                 if (!routeEdges[i]) {
                     routeEdges[i] = new PIXI.Graphics();
@@ -179,7 +185,7 @@ export class RailMapCreator {
                 }
 
                 routeEdges[i].clear();
-                routeEdges[i].lineStyle(4, parseInt(edge.color.slice(1), 16), 1);
+                routeEdges[i].lineStyle(4, color, shouldSee ? 1 : 0.5);
                 const from = edge.from.fromHere(Math.PI / 2, 6 * edge.no).coord;
                 const to = edge.to.fromHere(-Math.PI / 2, 6 * edge.no).coord;
                 routeEdges[i].moveTo(from.x, from.z);
