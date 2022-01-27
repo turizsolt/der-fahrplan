@@ -28,6 +28,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     init(routeVariant: RouteVariant, departureTime: number): Trip {
         super.initStore(TYPES.Trip);
         this.routeVariant = routeVariant;
+        this.routePartAt = this.routeVariant.getFirstStop();
         this.departureTime = departureTime;
 
         this.routeVariantSubscribe = () => this.updateRouteVariant();
@@ -121,15 +122,16 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     }
 
     arrive(ref: RoutePartReference): boolean {
-        this.routePartAt = this.routePartAt.getNext(this.routeVariant.getStartEnd());
+        if (ref !== this.routePartAt.getRef()) {
+            this.routePartAt = this.routePartAt.getNext(this.routeVariant.getStartEnd());
+        }
         this.redefine(this.routePartAt.getRef(), { realArrivalTime: this.store.getTickCount() });
-
         return this.routePartAt.getRef() === ref;
     }
 
     depart(): void {
-        this.routePartAt = this.routePartAt.getNext(this.routeVariant.getStartEnd());
         this.redefine(this.routePartAt.getRef(), { realDepartureTime: this.store.getTickCount() });
+        this.routePartAt = this.routePartAt.getNext(this.routeVariant.getStartEnd());
     }
 
     skip(ref: RoutePartReference): boolean {
@@ -140,20 +142,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     }
 
     getStationDepartureTime(station: Station): number {
-        const list = this.routeVariant.getStops().filter(stop => stop.getRef() === station);
-        if (list.length === 0) return null;
-        const stop = list[0];
-
-        // todo, it seems useful generally
-        let addedTime = 0;
-        const stops = this.routeVariant.getStops();
-        for (let i = 0; i < stops.length; i++) {
-            addedTime += stops[i].getDuration();
-
-            if (stop === stops[i]) break;
-        }
-
-        return this.departureTime + addedTime; //(this.redefinedProps[(stop.getRef() as RailMapNode).getId()]?.departureTime) ??
+        return this.departureTime + this.redefinedProps[station.getId()].departureTime || 0;
     }
 
     // todo only stopping stations should count
