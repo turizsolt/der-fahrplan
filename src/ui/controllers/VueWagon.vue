@@ -3,14 +3,17 @@
     <div class="item-type">🚂 Mozdony</div>
     <div class="item-id">{{ idt }}</div>
     <div class="item-id">
-      Mode: {{obj.autoMode ? 'AUTO' : 'Manual'}}<br />
-      Shunting: {{obj.shunting ? 'SHUNTING' : 'Normal'}}<br />
+      Mode: {{ obj.autoMode ? "AUTO" : "Manual" }}<br />
+      Shunting: {{ obj.shunting ? "SHUNTING" : "Normal" }}<br />
       Speed: {{ obj.speed ? Math.round(obj.speed * 40) : "STOPPED" }}<br />
-      Next: {{obj.nextStationName}}
+      Next: {{ obj.nextStationName }}
       <br />
-      <div v-if="obj.sight" style="height: 8em; overflow: hidden;">
-        Sight dist: {{Math.floor(obj.sight.distance)}}<br />
-        <div v-for="marker in obj.sight.markers">{{marker.speed === 0 ? 'STOP' : 'go'}} {{Math.floor(marker.distance)}} {{marker.type}}</div>
+      <div v-if="obj.sight" style="height: 8em; overflow: hidden">
+        Sight dist: {{ Math.floor(obj.sight.distance) }}<br />
+        <div v-for="(marker, index) in obj.sight.markers" :key="index">
+          {{ marker.speed === 0 ? "STOP" : "go" }}
+          {{ Math.floor(marker.distance) }} {{ marker.type }}
+        </div>
       </div>
     </div>
 
@@ -48,12 +51,15 @@
     </div>
 
     <div>
-      <div class="trip-selector" v-if="showTripList && trips && trips.length > 0">
+      <div
+        class="trip-selector"
+        v-if="showTripList && trips && trips.length > 0"
+      >
         <div>Útirány kiválasztása...</div>
         <trip-title
           :key="trip.id"
           v-for="trip in trips"
-          :route="trip.route"
+          :route="trip.routeVariant"
           :trip="trip"
           @click="assignTrip(trip.id)"
         />
@@ -70,18 +76,20 @@
     <div :key="trip.id" v-for="(trip, index) in obj.train.trips">
       <div class="trip" @click="assignTrip(trip.id, true)">
         <div
-          :style="'background-color: ' + trip.route.color + ';'"
+          :style="'background-color: ' + trip.routeVariant.color + ';'"
           :class="'trip-name pattern-' + (index + 1)"
         >
-          {{ trip.route.name }}
+          {{ trip.routeVariant.name }}
         </div>
-        <div class="trip-destination">▶ {{ trip.route.destination }}</div>
+        <div class="trip-destination">
+          ▶ {{ trip.routeVariant.destination }}
+        </div>
       </div>
 
       <route-stop
         v-for="(stop, index) in trip.stops"
-        :key="stop.id"
-        :route="trip.route"
+        :key="index"
+        :route="trip.routeVariant"
         :stop="stop"
         :index="index"
         isTrip
@@ -92,8 +100,8 @@
         Next trip: <br />
         <route-stop
           v-for="(stop, index) in trip.next.stops"
-          :key="stop.id"
-          :route="trip.route"
+          :key="index"
+          :route="trip.routeVariant"
           :stop="stop"
           :index="index"
           isTrip
@@ -107,7 +115,10 @@
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
 import { Wagon } from "../../structs/Interfaces/Wagon";
-import { getStorable, getAllOfStorable } from "../../structs/Actuals/Store/StoreForVue";
+import {
+  getStorable,
+  getAllOfStorable,
+} from "../../structs/Actuals/Store/StoreForVue";
 import { Train } from "../../modules/Train/Train";
 import { Trip } from "../../structs/Scheduling/Trip";
 import { TYPES } from "../../di/TYPES";
@@ -116,7 +127,7 @@ import { TYPES } from "../../di/TYPES";
 export default class VueWagon extends Vue {
   @Prop() idt: string;
   @Prop() obj: any;
-  
+
   trips: any[] = [];
   selectedWagons: Record<string, boolean> = {};
   selectedCount: number = 0;
@@ -191,7 +202,7 @@ export default class VueWagon extends Vue {
 
   showTrips() {
     this.trips = getAllOfStorable<Trip>(TYPES.Trip)
-      .map(x => Object.freeze(x.persistDeep()))
+      .map((x) => Object.freeze(x.persistDeep()))
       .sort((a: any, b: any) => a.departureTime - b.departureTime);
 
     this.showTripList = true;
@@ -328,5 +339,4 @@ export default class VueWagon extends Vue {
   height: 800px;
   overflow-x: hidden;
 }
-
 </style>

@@ -193,8 +193,8 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
             hasArrivalTime: redefined.arrivalTime !== undefined,
             hasDepartureTime: redefined.departureTime !== undefined,
-            arrivalTime: redefined.arrivalTime || 0,
-            departureTime: redefined.departureTime || 0,
+            arrivalTime: this.departureTime + redefined.arrivalTime || 0,
+            departureTime: this.departureTime + redefined.departureTime || 0,
             realArrivalTime: redefined.realArrivalTime || -1,
             realDepartureTime: redefined.realDepartureTime || -1,
             duration: redefined.duration || 0,

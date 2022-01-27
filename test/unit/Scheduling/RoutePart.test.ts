@@ -14,8 +14,8 @@ chai.use(chaiAlmost());
 
 const brickFactory = BrickFactory.getInstance();
 
-const FOUR_MINUTES = 4 * 60 * 60;
-const HALF_MINUTES = 30 * 60;
+const FOUR_MINUTES = 4 * 60;
+const HALF_MINUTES = 30;
 const ZERO_MINUTES = 0;
 
 const NAME = 'Name';

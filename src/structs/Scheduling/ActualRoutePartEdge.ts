@@ -15,7 +15,7 @@ export class ActualRoutePartEdge extends ActualRoutePart implements RoutePartEdg
     }
 
     getDuration(): number {
-        return this.ref.getDuration();
+        return this.ref?.getDuration();
     }
 
     isStopping(): boolean {

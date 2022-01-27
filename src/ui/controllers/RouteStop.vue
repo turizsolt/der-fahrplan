@@ -22,12 +22,12 @@
         fontStyle: stop.isStation ? 'normal' : 'italic',
       }"
     >
-      {{ stop.atStation ? "* " : "" }} {{ stop.stationName.substring(0, 4) }}
+      {{ stop.atStation ? "* " : "" }} {{ stop.stationName }}
       {{ stop.isArrivalStation ? "é." : "" }}
-      <span @click="addTime()">+</span>/<span @click="removeTime()">-</span>
+      <!--<span @click="addTime()">+</span>/<span @click="removeTime()">-</span>-->
     </div>
 
-    <!-- buttons -->
+    <!-- buttons 
     <div class="stop-button-holder">
       <div
         v-if="candelete"
@@ -45,6 +45,7 @@
         x
       </div>
     </div>
+    -->
 
     <!-- platform -->
     <select
@@ -69,7 +70,7 @@
       v-if="!isTrip && !stop.isDepartureStation"
       class="stop-input-time"
       type="text"
-      v-model="stop.arrivalTimeString"
+      v-model="arrivalTime"
       @keyup.stop="handleTime('arrivalTime', $event)"
     />
     <div v-if="!isTrip && stop.isDepartureStation" class="stop-input-time">
@@ -79,17 +80,13 @@
       v-if="!isTrip && !stop.isArrivalStation"
       class="stop-input-time"
       type="text"
-      v-model="stop.departureTimeString"
+      v-model="departureTime"
       @keyup.stop="handleTime('departureTime', $event)"
     />
     <div v-if="!isTrip && stop.isArrivalStation" class="stop-input-time">-</div>
 
     <div v-if="isTrip" class="trip-stop-time">
-      {{
-        stop.isArrivalStation
-          ? stop.arrivalTimeString
-          : stop.departureTimeString
-      }}
+      {{ stop.isArrivalStation ? arrivalTime : departureTime }}
     </div>
     <div v-if="isTrip" class="trip-stop-time" :style="{ color: realColor }">
       {{
@@ -98,8 +95,8 @@
           : stop.realDepartureTime) === -1
           ? "?"
           : stop.isArrivalStation
-          ? stop.realArrivalTimeString
-          : stop.realDepartureTimeString
+          ? realArrivalTime
+          : realDepartureTime
       }}
     </div>
   </div>
@@ -107,8 +104,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import { AbstractPlatform } from "../../modules/Station/AbstractPlatform";
-import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
+import { Util } from "../../structs/Util";
 import { handleTimeText } from "./HandleTime";
 
 @Component
@@ -119,6 +115,22 @@ export default class RouteTitle extends Vue {
   @Prop() candelete?: boolean;
   @Prop() canmove?: boolean;
   @Prop() isTrip?: boolean;
+
+  get arrivalTime(): string {
+    return Util.timeToString(this.stop.arrivalTime);
+  }
+
+  get departureTime(): string {
+    return Util.timeToString(this.stop.departureTime);
+  }
+
+  get realArrivalTime(): string {
+    return Util.timeToString(this.stop.realArrivalTime);
+  }
+
+  get realDepartureTime(): string {
+    return Util.timeToString(this.stop.realDepartureTime);
+  }
 
   get realColor(): string {
     const defVal = this.stop.isArrivalStation

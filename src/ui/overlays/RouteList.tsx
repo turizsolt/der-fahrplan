@@ -30,11 +30,18 @@ export const RouteList: React.FC<Props> = props => {
         overlayController.createRoute();
     }, []);
 
+    const handleCreateExampleTrip = useCallback(() => {
+        if (selectedRoute) {
+            overlayController.createExampleTrips(selectedRoute);
+        }
+    }, [selectedRoute]);
+
     return <div className={routeListStyle} style={{ visibility: whenMapOrDiagram }} >
         Route list
         <button onClick={handleUpdateRouteList}>Load</button>
         <button onClick={handleCreate}>Create</button>
         <button onClick={handleUpdateMap}>UpdMap</button>
+        <button onClick={handleCreateExampleTrip}>ExTrip</button>
         <div>Selected: {selectedRoute}</div>
         <div onClick={handleSelect(null)}>Select nothing</div>
         {routeList.map(route => <div key={route.id} onClick={handleSelect(route.id)}>

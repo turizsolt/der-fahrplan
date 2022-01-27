@@ -5,7 +5,7 @@ import { ActualRoutePart } from "./ActualRoutePart";
 import { RoutePartReferenceColor } from "./RoutePartReferenceColor";
 import { RoutePartStop } from "./RoutePartStop";
 
-const DEFAULT_DURATION = 30 * 60;
+const DEFAULT_DURATION = 30;
 
 export class ActualRoutePartStop extends ActualRoutePart implements RoutePartStop {
     protected ref: RoutePartReferenceColor;

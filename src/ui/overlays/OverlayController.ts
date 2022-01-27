@@ -10,6 +10,7 @@ import { ActualRoutePartEdge } from "../../structs/Scheduling/ActualRoutePartEdg
 import { ActualRoutePartJunction } from "../../structs/Scheduling/ActualRoutePartJunction";
 import { ActualRoutePartStop } from "../../structs/Scheduling/ActualRoutePartStop";
 import { Route } from "../../structs/Scheduling/Route";
+import { Trip } from "../../structs/Scheduling/Trip";
 import { Util } from "../../structs/Util";
 import { overlayStore, selectRoute, StorableRoute, updateRouteList } from "./store";
 
@@ -27,20 +28,20 @@ export class OverlayController {
 
     private constructor() { }
 
-    updateMap() {
+    updateMap(): void {
         this.map = RailMapCreator.create(getStore());
     }
 
-    updateRouteList() {
+    updateRouteList(): void {
         const rl = getAllOfStorable(TYPES.Route).map(r => r.persistDeep()) as StorableRoute[];
         overlayStore.dispatch(updateRouteList(rl));
     }
 
-    selectRoute(routeId: string) {
+    selectRoute(routeId: string): void {
         overlayStore.dispatch(selectRoute(routeId));
     }
 
-    createRoute() {
+    createRoute(): void {
         const route = createStorable<Route>(TYPES.Route).init();
         route.setName(Util.generateRouteName());
         route.setColor(Color.CreateRandom().getHexaString());
@@ -49,8 +50,18 @@ export class OverlayController {
         this.updateRouteList();
     }
 
+    createExampleTrips(routeId: string): void {
+        const route = getStorable(routeId) as Route;
+        const variants = route.getVariants();
+
+        const trip1 = createStorable<Trip>(TYPES.Trip).init(variants[0], 4 * 3600 + Math.floor(Math.random() * 3600));
+        const trip2 = createStorable<Trip>(TYPES.Trip).init(variants[1], 5 * 3600 + Math.floor(Math.random() * 3600));
+        trip1.setNextTrip(trip2);
+        trip2.setPrevTrip(trip1);
+    }
+
     // TODO
-    controll(type: string, nodeId: string) {
+    controll(type: string, nodeId: string): void {
         const state = overlayStore.getState().overlay;
         const routeId = state.selectedRoute;
 

@@ -1,6 +1,7 @@
 import { TYPES } from "../../di/TYPES";
 import { applyMixins } from "../../mixins/ApplyMixins";
 import { Emitable } from "../../mixins/Emitable";
+import { Station } from "../../modules/Station/Station";
 import { ActualBaseStorable } from "../Actuals/ActualStorable";
 import { Store } from "../Interfaces/Store";
 import { otherEnd, WhichEnd } from "../Interfaces/WhichEnd";
@@ -73,7 +74,28 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
             id: this.id,
             type: 'RouteVariant',
             startEnd: this.startEnd,
-            route: this.route.getId()
+            route: this.route.getId(),
+        }
+    }
+
+    private stopPersist(s: RoutePart): Object {
+        return {
+            ...s.persist(),
+            stationRgbColor: (s.getRef() as Station)?.getColor()?.getHexaString() || '#000000',
+            stationName: s.getName()
+        }
+    }
+
+    persistDeep(): Object {
+        return {
+            id: this.id,
+            type: 'RouteVariant',
+            startEnd: this.startEnd,
+            route: this.route.getId(),
+            stops: this.getStops().map(s => this.stopPersist(s)),
+            color: this.getColor(),
+            name: this.getName(),
+            destination: this.getLastStop().getRef().getName()
         }
     }
 
