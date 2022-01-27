@@ -52,10 +52,18 @@ export class ActualRailMap implements RailMap {
                 to: new Ray(toCoord, toDir),
                 no: routeCount,
                 color: route.getColor(),
-                routeId: route.getId()
+                routeId: route.getId(),
+                hash,
+                count: 1
             });
         }
         this.routes.push(mapRoute);
+
+        for (let route of this.routes) {
+            for (let edge of route) {
+                edge.count = this.edges[edge.hash].routeCount;
+            }
+        }
     }
 
     getEdges(): Record<string, RailMapEdge> {
