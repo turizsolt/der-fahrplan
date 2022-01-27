@@ -167,6 +167,34 @@ export class RailMapCreator {
             mapEdges[i].renderable = false;
         }
 
+        // routes
+
+        i = 0;
+        for (let route of map.getRoutes()) {
+            for (let edge of route) {
+
+                if (!routeEdges[i]) {
+                    routeEdges[i] = new PIXI.Graphics();
+                    globalThis.stageMap.addChild(routeEdges[i]);
+                }
+
+                routeEdges[i].clear();
+                routeEdges[i].lineStyle(4, parseInt(edge.color.slice(1), 16), 1);
+                const from = edge.from.fromHere(Math.PI / 2, 6 * edge.no).coord;
+                const to = edge.to.fromHere(-Math.PI / 2, 6 * edge.no).coord;
+                routeEdges[i].moveTo(from.x, from.z);
+                routeEdges[i].lineTo(to.x, to.z);
+
+                routeEdges[i].zIndex = 9;
+                routeEdges[i].renderable = true;
+                i++;
+            }
+        }
+
+        for (; i < routeEdges.length; i++) {
+            routeEdges[i].renderable = false;
+        }
+
         // nodes
 
         const overlayController = OverlayController.getInstance();
@@ -196,34 +224,6 @@ export class RailMapCreator {
 
         for (; i < mapNodes.length; i++) {
             mapNodes[i].renderable = false;
-        }
-
-        // routes
-
-        i = 0;
-        for (let route of map.getRoutes()) {
-            for (let edge of route) {
-
-                if (!routeEdges[i]) {
-                    routeEdges[i] = new PIXI.Graphics();
-                    globalThis.stageMap.addChild(routeEdges[i]);
-                }
-
-                routeEdges[i].clear();
-                routeEdges[i].lineStyle(4, parseInt(edge.color.slice(1), 16), 1);
-                const from = edge.from.fromHere(Math.PI / 2, 6 * edge.no).coord;
-                const to = edge.to.fromHere(-Math.PI / 2, 6 * edge.no).coord;
-                routeEdges[i].moveTo(from.x, from.z);
-                routeEdges[i].lineTo(to.x, to.z);
-
-                routeEdges[i].zIndex = 9;
-                routeEdges[i].renderable = true;
-                i++;
-            }
-        }
-
-        for (; i < routeEdges.length; i++) {
-            routeEdges[i].renderable = false;
         }
 
         return map;
