@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { OverlayController } from './OverlayController';
+import { Route } from './Route';
 import { RootState } from './store';
 import { routeListStyle } from './styles';
 
@@ -19,8 +20,8 @@ export const RouteList: React.FC<Props> = props => {
     }, []);
 
     const handleSelect = useCallback((sel: string) => () => {
-        overlayController.selectRoute(sel);
-    }, []);
+        overlayController.selectRoute(sel === selectedRoute ? null : sel);
+    }, [selectedRoute]);
 
     const handleUpdateMap = useCallback(() => {
         overlayController.updateMap();
@@ -42,12 +43,15 @@ export const RouteList: React.FC<Props> = props => {
         <button onClick={handleCreate}>Create</button>
         <button onClick={handleUpdateMap}>UpdMap</button>
         <button onClick={handleCreateExampleTrip}>ExTrip</button>
-        <div>Selected: {selectedRoute}</div>
-        <div onClick={handleSelect(null)}>Select nothing</div>
-        {routeList.map(route => <div key={route.id} onClick={handleSelect(route.id)}>
-            {route.name}
-            [{route.id}]
-            {route.detailedName}
-        </div>)}
+        <hr />
+        {routeList.map(route => <Route
+            key={route.id}
+            routeName={route.name}
+            routeColor={route.color}
+            startStationName={route.fistStationName}
+            endStationName={route.lastStationName}
+            selected={route.id === selectedRoute}
+            onSelect={handleSelect(route.id)}
+        />)}
     </div>
 }

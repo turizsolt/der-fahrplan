@@ -48,3 +48,34 @@ export const connectorStyle = style({
     left: '0px',
     top: '0px'
 });
+
+export const routeStyle = style({
+    border: '1px solid black',
+    borderRadius: '3px',
+    display: 'flex',
+    backgroundColor: '#aca',
+    height: '40px',
+    margin: '5px 5px 0 5px',
+    cursor: 'pointer'
+});
+
+export const routeNameStyle = style({
+    border: '1px solid black',
+    borderRadius: '3px',
+    width: '40px',
+    textAlign: 'center',
+    height: '1em',
+    margin: 'auto 5px auto 5px'
+});
+
+export const routeTerminiStyle = style({
+    margin: 'auto 5px auto 5px'
+});
+
+export const getContrastColor = (hexcolor: string): string => {
+    var r = parseInt(hexcolor.substr(1, 2), 16);
+    var g = parseInt(hexcolor.substr(3, 2), 16);
+    var b = parseInt(hexcolor.substr(5, 2), 16);
+    var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? 'black' : 'white';
+}
