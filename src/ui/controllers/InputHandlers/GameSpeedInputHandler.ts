@@ -17,6 +17,8 @@ export class GameSpeedInputHandler extends InputHandler {
     this.reg(keyUp('8'), () => this.store.setTickSpeed(20));
     this.reg(keyUp('9'), () => this.store.setTickSpeed(60));
 
+    this.reg(keyUp('Q'), () => this.store.tick());
+
     this.reg(keyUp(' '), () => {
       if (this.store.getTickSpeed() === 0) {
         this.store.setTickSpeed(1);
