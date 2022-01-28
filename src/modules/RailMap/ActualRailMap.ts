@@ -5,9 +5,10 @@ import { RailMap } from "./RailMap";
 import { RailMapBounds } from "./RailMapBounds";
 import { RailMapEdge } from "./RailMapEdge";
 import { RailMapNode } from "./RailMapNode";
-import { RailMapRouteArray, RailMapRouteDraw } from "./RailMapRoute";
+import { RailMapRoute, RailMapRouteArray, RailMapRouteDraw } from "./RailMapRoute";
 
-const DEFAULT_GAP = 6;
+const DEFAULT_ROUTE_GAP = 6;
+const DEFAULT_STATION_GAP = 3;
 
 export class ActualRailMap implements RailMap {
     private nodes: RailMapNode[] = [];
@@ -30,7 +31,7 @@ export class ActualRailMap implements RailMap {
         let { from, to } = this.orderNodes(nodeFrom, nodeTo);
         const hash = this.hashNodes(from, to);
         if (!this.edges[hash]) {
-            this.edges[hash] = { from, to, count: 0, avgDistance: 0, distances: [], routeCount: 0 };
+            this.edges[hash] = { from, to, count: 0, avgDistance: 0, distances: [], routeCount: 0, opposite: from === nodeTo };
             this.neighbours[nodeFrom.getId()].push(nodeTo);
             this.neighbours[nodeTo.getId()].push(nodeFrom);
         }
@@ -52,7 +53,7 @@ export class ActualRailMap implements RailMap {
             const fromDir: number = fromCoord.whichDir2d(toCoord);
             const toDir: number = toCoord.whichDir2d(fromCoord);
 
-            const routeProps = {
+            const routeProps: RailMapRoute = {
                 from: new Ray(fromCoord, fromDir),
                 to: new Ray(toCoord, toDir),
                 fromOriginal: new Ray(fromCoord, fromDir),
@@ -63,7 +64,8 @@ export class ActualRailMap implements RailMap {
                 color: route.getColor(),
                 routeId: route.getId(),
                 hash,
-                count: 1
+                count: 1,
+                opposite: this.edges[hash].opposite
             };
 
             mapRoute.push(routeProps);
@@ -109,8 +111,9 @@ export class ActualRailMap implements RailMap {
         for (let route of this.routes) {
             for (let edge of route) {
                 edge.count = this.edges[edge.hash].routeCount;
-                edge.from = edge.fromOriginal.fromHere(0, edge.count * 5).fromHere(Math.PI / 2, DEFAULT_GAP * edge.no);
-                edge.to = edge.toOriginal.fromHere(0, edge.count * 5).fromHere(-Math.PI / 2, DEFAULT_GAP * edge.no);
+                const no = (- ((edge.count - 1) / 2) + edge.no) * (edge.opposite ? -1 : 1);
+                edge.from = edge.fromOriginal.fromHere(0, edge.count * DEFAULT_STATION_GAP).fromHere(Math.PI / 2, DEFAULT_ROUTE_GAP * no);
+                edge.to = edge.toOriginal.fromHere(0, edge.count * DEFAULT_STATION_GAP).fromHere(-Math.PI / 2, DEFAULT_ROUTE_GAP * no);
             }
         }
 

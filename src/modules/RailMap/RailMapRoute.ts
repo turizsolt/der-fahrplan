@@ -12,7 +12,8 @@ export interface RailMapRoute {
     count: number,
     hash: string,
     color: string,
-    routeId: string
+    routeId: string,
+    opposite: boolean
 };
 
 export interface RailMapRouteDraw {

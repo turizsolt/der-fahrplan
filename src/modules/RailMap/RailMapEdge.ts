@@ -7,4 +7,5 @@ export interface RailMapEdge {
     avgDistance: number;
     distances: number[];
     routeCount: number;
+    opposite: boolean;
 }
