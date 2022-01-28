@@ -170,7 +170,7 @@ export class RailMapCreator {
 
         // routes
 
-        const selectedRouteId = overlayStore.getState().overlay.selectedRoute;
+        const selectedRouteId = overlayStore.getState().overlay.selectedRoute?.id;
 
         i = 0;
         for (let route of map.getRoutes()) {

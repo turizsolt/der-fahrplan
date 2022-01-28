@@ -27,10 +27,11 @@ export const rightColumnStyle = style({
 });
 
 export const pixiMapSettingsStyle = style({
-    width: '100%',
-    height: '40px',
+    width: 'calc(100% - 20px)',
+    height: '25px',
     border: '1px solid green',
-    marginBottom: '10px'
+    marginBottom: '10px',
+    padding: '10px 10px 10px 10px'
 });
 
 export const pixiMapContainerStyle = style({
@@ -65,7 +66,8 @@ export const routeNameStyle = style({
     width: '40px',
     textAlign: 'center',
     height: '1em',
-    margin: 'auto 5px auto 5px'
+    margin: 'auto 5px auto 5px',
+    overflow: 'hidden'
 });
 
 export const routeTerminiStyle = style({

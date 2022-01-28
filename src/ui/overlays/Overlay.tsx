@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { MapSettings } from './MapSettings';
 import { RouteList } from './RouteList';
 import { RootState } from './store';
 import { connectorStyle, overlayStyle, pixiMapContainerStyle, pixiMapSettingsStyle, rightColumnStyle, routeListStyle } from './styles';
@@ -8,7 +9,7 @@ interface Props { };
 
 export const Overlay: React.FC<Props> = props => {
 
-    const mode = useSelector((state: RootState) => state.overlay.overlayMode);
+    const { overlayMode: mode, selectedRoute } = useSelector((state: RootState) => state.overlay);
 
     const whenMap = mode === 'map' ? 'visible' : 'hidden';
     const whenDiagram = mode === 'diagram' ? 'visible' : 'hidden';
@@ -17,7 +18,7 @@ export const Overlay: React.FC<Props> = props => {
     return <div className={overlayStyle}>
         <RouteList />
         <div className={rightColumnStyle} style={{ visibility: whenMap }}>
-            <div className={pixiMapSettingsStyle} >Map settings</div>
+            <MapSettings key={selectedRoute?.id} route={selectedRoute} />
             <div className={pixiMapContainerStyle} id="pixi-map-container"></div>
         </div>
         <div className={rightColumnStyle} style={{ visibility: whenDiagram }}>

@@ -4,6 +4,7 @@ import { OverlayController } from './OverlayController';
 import { Route } from './Route';
 import { RootState } from './store';
 import { routeListStyle } from './styles';
+import { StorableRoute } from './store';
 
 interface Props { };
 
@@ -20,8 +21,8 @@ export const RouteList: React.FC<Props> = props => {
         overlayController.updateMap();
     }, []);
 
-    const handleSelect = useCallback((sel: string) => () => {
-        overlayController.selectRoute(sel === selectedRoute ? null : sel);
+    const handleSelect = useCallback((sel: StorableRoute) => () => {
+        overlayController.selectRoute(sel.id === selectedRoute?.id ? null : sel);
         overlayController.updateMap();
     }, [selectedRoute]);
 
@@ -32,7 +33,7 @@ export const RouteList: React.FC<Props> = props => {
 
     const handleCreateExampleTrip = useCallback(() => {
         if (selectedRoute) {
-            overlayController.createExampleTrips(selectedRoute);
+            overlayController.createExampleTrips(selectedRoute?.id);
         }
     }, [selectedRoute]);
 
@@ -48,8 +49,8 @@ export const RouteList: React.FC<Props> = props => {
             routeColor={route.color}
             startStationName={route.fistStationName}
             endStationName={route.lastStationName}
-            selected={route.id === selectedRoute}
-            onSelect={handleSelect(route.id)}
+            selected={route.id === selectedRoute?.id}
+            onSelect={handleSelect(route)}
         />)}
     </div>
 }

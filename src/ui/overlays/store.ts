@@ -13,14 +13,16 @@ export interface StorableRoute {
 
 export interface OverlayState {
     overlayMode: string,
-    selectedRoute: string,
+    selectedRoute: StorableRoute,
     routeList: StorableRoute[],
+    createExpress: boolean
 }
 
 const initialState: OverlayState = {
     overlayMode: 'none',
     selectedRoute: null,
     routeList: [],
+    createExpress: false
 };
 
 export const overlaySlice = createSlice({
@@ -28,18 +30,21 @@ export const overlaySlice = createSlice({
     initialState,
     reducers: {
         setOverlayMode: (state, action: PayloadAction<string>) => {
-            state.overlayMode = action.payload
+            state.overlayMode = action.payload;
         },
-        selectRoute: (state, action: PayloadAction<string>) => {
-            state.selectedRoute = action.payload
+        selectRoute: (state, action: PayloadAction<StorableRoute>) => {
+            state.selectedRoute = action.payload;
         },
         updateRouteList: (state, action: PayloadAction<StorableRoute[]>) => {
-            state.routeList = action.payload
+            state.routeList = action.payload;
+        },
+        setCreateExpress: (state, action: PayloadAction<boolean>) => {
+            state.createExpress = action.payload;
         },
     },
 })
 
-export const { setOverlayMode, selectRoute, updateRouteList } = overlaySlice.actions
+export const { setOverlayMode, selectRoute, updateRouteList, setCreateExpress } = overlaySlice.actions
 
 export const overlayStore = configureStore({
     reducer: {

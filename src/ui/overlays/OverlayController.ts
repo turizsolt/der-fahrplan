@@ -12,7 +12,7 @@ import { ActualRoutePartStop } from "../../structs/Scheduling/ActualRoutePartSto
 import { Route } from "../../structs/Scheduling/Route";
 import { Trip } from "../../structs/Scheduling/Trip";
 import { Util } from "../../structs/Util";
-import { overlayStore, selectRoute, StorableRoute, updateRouteList } from "./store";
+import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress } from "./store";
 
 export class OverlayController {
     private map: RailMap;
@@ -37,8 +37,12 @@ export class OverlayController {
         overlayStore.dispatch(updateRouteList(rl));
     }
 
-    selectRoute(routeId: string): void {
-        overlayStore.dispatch(selectRoute(routeId));
+    selectRoute(route: StorableRoute): void {
+        overlayStore.dispatch(selectRoute(route));
+    }
+
+    setSelectExpress(express: boolean) {
+        overlayStore.dispatch(setCreateExpress(express));
     }
 
     createRoute(): void {
@@ -46,7 +50,7 @@ export class OverlayController {
         route.setName(Util.generateRouteName());
         route.setColor(Color.CreateRandom().getHexaString());
 
-        this.selectRoute(route.getId());
+        this.selectRoute(route.persistDeep() as StorableRoute);
         this.updateRouteList();
     }
 
@@ -63,7 +67,7 @@ export class OverlayController {
     // TODO
     controll(type: string, nodeId: string): void {
         const state = overlayStore.getState().overlay;
-        const routeId = state.selectedRoute;
+        const routeId = state.selectedRoute.id;
 
         if (routeId) {
             const route = getStorable(routeId) as Route;
