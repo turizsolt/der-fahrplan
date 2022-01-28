@@ -183,7 +183,7 @@ export class ActualRailMap implements RailMap {
         return this.edges[hash]?.count;
     }
 
-    getShortestPath(from: RailMapNode, to: RailMapNode): RailMapNode[] {
+    getShortestPath(from: RailMapNode, to: RailMapNode, forbiddenNodes: RailMapNode[]): RailMapNode[] {
         const queue: RailMapNode[] = [from];
         const comesFrom: Record<string, RailMapNode> = { [from.getId()]: null };
 
@@ -204,6 +204,8 @@ export class ActualRailMap implements RailMap {
             }
 
             for (let e of this.getNeighboursOf(next)) {
+                if (forbiddenNodes.includes(e)) continue;
+
                 if (comesFrom[e.getId()] === undefined) {
                     comesFrom[e.getId()] = next;
                     queue.push(e);

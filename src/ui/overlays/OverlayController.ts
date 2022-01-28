@@ -2,7 +2,6 @@ import { TYPES } from "../../di/TYPES";
 import { RailMap } from "../../modules/RailMap/RailMap";
 import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";
 import { RailMapNode } from "../../modules/RailMap/RailMapNode";
-import { Station } from "../../modules/Station/Station";
 import { createStorable, getAllOfStorable, getStorable, getStore } from "../../structs/Actuals/Store/StoreForVue";
 import { Color } from "../../structs/Color";
 import { WhichEnd } from "../../structs/Interfaces/WhichEnd";
@@ -10,12 +9,15 @@ import { ActualRoutePartEdge } from "../../structs/Scheduling/ActualRoutePartEdg
 import { ActualRoutePartJunction } from "../../structs/Scheduling/ActualRoutePartJunction";
 import { ActualRoutePartStop } from "../../structs/Scheduling/ActualRoutePartStop";
 import { Route } from "../../structs/Scheduling/Route";
+import { RoutePartStop } from "../../structs/Scheduling/RoutePartStop";
 import { Trip } from "../../structs/Scheduling/Trip";
 import { Util } from "../../structs/Util";
+import { RouteManipulator } from "./RouteManipulator";
 import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress } from "./store";
 
 export class OverlayController {
     private map: RailMap;
+    private routeManipulator: RouteManipulator;
 
     static _instance: OverlayController = null;
 
@@ -26,7 +28,9 @@ export class OverlayController {
         return OverlayController._instance;
     }
 
-    private constructor() { }
+    private constructor() {
+        this.routeManipulator = new RouteManipulator();
+    }
 
     updateMap(): void {
         this.map = RailMapCreator.create(getStore());
@@ -64,45 +68,78 @@ export class OverlayController {
         trip2.setPrevTrip(trip1);
     }
 
-    // TODO
     controll(type: string, nodeId: string): void {
         const state = overlayStore.getState().overlay;
         const routeId = state.selectedRoute.id;
+        const express = state.createExpress;
 
         if (routeId) {
             const route = getStorable(routeId) as Route;
-            const routeVariant = route.getVariants()[0];
-            const station = getStorable(nodeId) as Station;
+            const variants = route.getVariants();
+            const station = getStorable(nodeId) as unknown as RailMapNode;
 
-            let addingStations: RailMapNode[] = [station];
-            let dist: number[] = [];
-            if (routeVariant.getLastStop()) {
-                const result = this.map.getShortestPath(
-                    routeVariant.getLastStop().getRef() as RailMapNode,
-                    station
-                );
-                for (let i = 1; i < result.length; i++) {
-                    dist.push(this.map.getDistance(result[i - 1], result[i]));
-                }
-                addingStations = result.slice(1);
-            }
-            const last = addingStations[addingStations.length - 1];
-
-            let i = 0;
-            for (let station of addingStations) {
-                if (i !== 0 || addingStations.length !== 1) {
-                    const part = new ActualRoutePartEdge({ getDuration: () => 120, getId: () => '', getName: () => '' });
-                    route.addPart(WhichEnd.B, part);
-                }
+            if (this.routeManipulator.isRouteEmpty(route)) {
+                console.log('first');
                 const part = station.getType() === TYPES.Station ? new ActualRoutePartStop(station as RailMapNode) : new ActualRoutePartJunction(station);
                 route.addPart(WhichEnd.B, part);
+            } else if (this.routeManipulator.isOnRoute(route, station)) {
+                if (route.getParts(WhichEnd.A).length === 1) {
+                    console.log('remove the only one');
+                    route.removePart(WhichEnd.A);
+                } else {
+                    if (variants[0].getFirstStop().getRef() === station) {
+                        console.log('on route - first stop');
+                        do {
+                            route.removePart(WhichEnd.A);
+                            route.removePart(WhichEnd.A);
+                        } while (!variants[0].getFirstStop().isStopping() && route.getEnd(WhichEnd.A));
+                    } else if (variants[0].getLastStop().getRef() === station) {
+                        console.log('on route - last stop');
+                        do {
+                            route.removePart(WhichEnd.B);
+                            route.removePart(WhichEnd.B);
+                        } while (!variants[1].getFirstStop().isStopping() && route.getEnd(WhichEnd.B));
+                    } else if (station.getType() === TYPES.Station) {
+                        console.log('on route - intermediate station');
+                        const part: RoutePartStop = route.getParts(WhichEnd.B).find(x => x.getRef() === station) as RoutePartStop;
+                        part.setStopping(!part.isStopping());
+                    } else {
+                        console.log('on route - intermediate pathblock - nothing to do');
+                    }
+                }
+            } else {
+                const { addingStations: as0, distance: d0 } = this.routeManipulator.findShortestRoute(
+                    this.map, variants[0], variants[0].getLastStop().getRef() as RailMapNode, station
+                );
+                const { addingStations: as1, distance: d1 } = this.routeManipulator.findShortestRoute(
+                    this.map, variants[1], variants[1].getLastStop().getRef() as RailMapNode, station
+                );
 
-                // todo if express
-                // if (station !== last) {
-                //     stop.setShouldStop(false);
-                // }
+                // console.log(d0, d1, as0, as1);
 
-                i++;
+                if (d0 === Number.POSITIVE_INFINITY && d1 === Number.POSITIVE_INFINITY) {
+                    console.log('no possible route');
+                    return;
+                }
+
+                const addingStations = d0 < d1 ? as0 : as1;
+                const whichEnd = d0 < d1 ? WhichEnd.B : WhichEnd.A;
+                const lastStation = variants[d0 < d1 ? 0 : 1].getLastStop().getRef();
+
+                let i = 0;
+                for (let station of addingStations) {
+                    const part0 = new ActualRoutePartEdge({ getDuration: () => 120, getId: () => '', getName: () => '' });
+                    route.addPart(whichEnd, part0);
+                    const part = station.getType() === TYPES.Station ? new ActualRoutePartStop(station as RailMapNode) : new ActualRoutePartJunction(station);
+                    route.addPart(whichEnd, part);
+
+                    if (express && part.getType() === TYPES.RoutePartStop && station !== lastStation) {
+                        (part as RoutePartStop).setStopping(false);
+                    }
+
+                    i++;
+                }
+                console.log('added some');
             }
 
             this.updateRouteList();
