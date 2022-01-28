@@ -253,8 +253,8 @@ export class RailMapCreator {
                 const selected = railMapStops[j].routeId === selectedRouteId;
                 const color = shouldSee ? parseInt(railMapStops[j].color.slice(1), 16) : 0xafafaf;
                 mapStops[i].clear();
-                mapStops[i].lineStyle(2, railMapStops[j].stopping ? 0xcceecc : color, 1);
-                mapStops[i].beginFill(color);
+                mapStops[i].lineStyle(2, railMapStops[j].stopping ? 0x000000 : color, 1);
+                mapStops[i].beginFill(0xcceecc);//color);
                 mapStops[i].drawCircle(0, 0, (selected ? 1.2 : 1) * (railMapStops[j].stopping ? 3 : 1.5));
                 mapStops[i].endFill();
                 mapStops[i].zIndex = selected ? 30 : 25;
