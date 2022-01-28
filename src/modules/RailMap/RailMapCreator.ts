@@ -128,6 +128,7 @@ export class RailMapCreator {
                 boundingRect.drawRect(minX, minZ, maxX - minX, maxZ - minZ);
                 boundingRect.endFill();
                 boundingRect.zIndex = 1;
+                boundingRect.renderable = false;
 
                 globalThis.stageMap.addChild(boundingRect);
             }

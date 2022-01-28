@@ -15,6 +15,8 @@ import { Util } from "../../structs/Util";
 import { RouteManipulator } from "./RouteManipulator";
 import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress, setOverlayMode } from "./store";
 
+const DEFAULT_ROUTE_COLORS = ['#fe9812', '#688e26', '#002500', '#10423f', '#20837e', '#f25757', '#e41111', '#432337'];
+
 export class OverlayController {
     private map: RailMap;
     private routeManipulator: RouteManipulator;
@@ -60,9 +62,12 @@ export class OverlayController {
     }
 
     createRoute(): void {
+        const routeCount = getAllOfStorable<Route>(TYPES.Route).length;
+        const color = DEFAULT_ROUTE_COLORS[routeCount] || Color.CreateRandom().getHexaString();
+
         const route = createStorable<Route>(TYPES.Route).init();
         route.setName(Util.generateRouteName());
-        route.setColor(Color.CreateRandom().getHexaString());
+        route.setColor(color);
 
         this.selectRoute(route.persistDeep() as StorableRoute);
         this.updateRouteList();
