@@ -206,6 +206,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
     }
 
     remove(): void {
+        this.variants.map(v => v.remove());
         this.store.unregister(this);
     }
 }

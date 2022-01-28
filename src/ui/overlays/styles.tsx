@@ -78,6 +78,14 @@ export const routeTerminiStyle = style({
     margin: 'auto 5px auto 5px'
 });
 
+export const settingsButtonStyle = style({
+    height: '21px',
+    whiteSpace: 'nowrap',
+    width: 'auto',
+    marginLeft: '10px',
+    padding: '0 5px 0 5px'
+});
+
 export const getContrastColor = (hexcolor: string): string => {
     var r = parseInt(hexcolor.substr(1, 2), 16);
     var g = parseInt(hexcolor.substr(3, 2), 16);

@@ -102,5 +102,9 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
         this.presetId(obj.id);
         this.init(store.get(obj.route) as Route, obj.startEnd);
     }
+
+    remove(): void {
+        this.store.unregister(this);
+    }
 }
 doApply();

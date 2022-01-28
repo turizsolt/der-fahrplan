@@ -4,7 +4,7 @@ import { getStorable } from '../../structs/Actuals/Store/StoreForVue';
 import { Route } from '../../structs/Scheduling/Route';
 import { OverlayController } from './OverlayController';
 import { RootState, StorableRoute } from './store';
-import { pixiMapSettingsStyle } from './styles';
+import { pixiMapSettingsStyle, settingsButtonStyle } from './styles';
 
 interface Props {
     route: StorableRoute;
@@ -39,11 +39,16 @@ export const MapSettings: React.FC<Props> = props => {
         overlayController.setSelectExpress(express);
     }, []);
 
+    const handleDeleteRoute = useCallback((id: string) => () => {
+        overlayController.deleteRoute(id);
+    }, []);
+
     return <div className={pixiMapSettingsStyle} style={{ display: 'flex', justifyContent: 'space-between' }} >
         <div>
             {route && <>
                 Name: <input type="text" defaultValue={route.name} onChange={handleNameChange} onKeyDown={handleStopPropagation} onKeyUp={handleStopPropagation} style={{ marginRight: '10px', width: '4em', textAlign: 'center' }} />
-                Color: <input type="color" defaultValue={route.color} onChange={handleColorChange} style={{ height: '21px' }} />
+                Color: <input type="color" defaultValue={route.color} onChange={handleColorChange} style={{ height: '21px', width: '4em' }} />
+                <button className={settingsButtonStyle} onClick={handleDeleteRoute(route.id)}>Delete Route</button>
             </>}
         </div>
         <div>

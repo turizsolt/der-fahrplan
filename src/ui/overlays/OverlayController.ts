@@ -47,6 +47,16 @@ export class OverlayController {
         overlayStore.dispatch(selectRoute(route));
     }
 
+    deleteRoute(id: string) {
+        const route = getStorable(id) as Route;
+        route.remove();
+
+        overlayStore.dispatch(selectRoute(null));
+
+        this.updateRouteList();
+        this.updateMap();
+    }
+
     setSelectExpress(express: boolean) {
         overlayStore.dispatch(setCreateExpress(express));
     }
@@ -62,12 +72,13 @@ export class OverlayController {
     }
 
     createRoute(): void {
-        const routeCount = getAllOfStorable<Route>(TYPES.Route).length;
-        const color = DEFAULT_ROUTE_COLORS[routeCount] || Color.CreateRandom().getHexaString();
+        const routes = getAllOfStorable<Route>(TYPES.Route);
+        const usedColors = routes.map(r => r.getColor());
+        const unused = DEFAULT_ROUTE_COLORS.find(color => !usedColors.includes(color));
 
         const route = createStorable<Route>(TYPES.Route).init();
         route.setName(Util.generateRouteName());
-        route.setColor(color);
+        route.setColor(unused || Color.CreateRandom().getHexaString());
 
         this.selectRoute(route.persistDeep() as StorableRoute);
         this.updateRouteList();
