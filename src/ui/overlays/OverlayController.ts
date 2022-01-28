@@ -13,7 +13,7 @@ import { RoutePartStop } from "../../structs/Scheduling/RoutePartStop";
 import { Trip } from "../../structs/Scheduling/Trip";
 import { Util } from "../../structs/Util";
 import { RouteManipulator } from "./RouteManipulator";
-import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress } from "./store";
+import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress, setOverlayMode } from "./store";
 
 export class OverlayController {
     private map: RailMap;
@@ -47,6 +47,16 @@ export class OverlayController {
 
     setSelectExpress(express: boolean) {
         overlayStore.dispatch(setCreateExpress(express));
+    }
+
+    setOverlayMode(mode: string) {
+        overlayStore.dispatch(setOverlayMode(mode));
+        if (mode === 'map' || mode === 'diagram') {
+            this.updateRouteList();
+        }
+        if (mode === 'map') {
+            this.updateMap();
+        }
     }
 
     createRoute(): void {

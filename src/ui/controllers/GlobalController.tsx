@@ -18,7 +18,8 @@ import { VueBigscreen2 } from './VueBigScreen2';
 import { VueBigscreenMap } from './VueBigScreenMap';
 import { VueBigscreenDiagram } from './VueBigScreenDiagram';
 import { Overlay } from '../overlays/Overlay';
-import { overlayStore, setOverlayMode } from '../overlays/store';
+import { overlayStore } from '../overlays/store';
+import { OverlayController } from '../overlays/OverlayController';
 
 export class GlobalController {
   private viewMode: string = 'terrain';
@@ -32,6 +33,8 @@ export class GlobalController {
   private vueSidebar: VueSidebar;
   private vueTestPanel: VueTestPanel;
   private toolInputHandler: ToolInputHandler;
+
+  private overlayController: OverlayController;
 
   private targetPassengerCount: number = 9999999;
 
@@ -50,6 +53,7 @@ export class GlobalController {
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
 
+    this.overlayController = OverlayController.getInstance();
 
     const domContainer = document.querySelector('#overlay-container');
     ReactDOM.render(<Provider store={overlayStore}><Overlay /></Provider>, domContainer);
@@ -96,7 +100,7 @@ export class GlobalController {
   selectView(mode: string) {
     this.viewMode = mode;
     this.vueViewbox.setSelected(mode);
-    overlayStore.dispatch(setOverlayMode(mode));
+    this.overlayController.setOverlayMode(mode);
 
     if (mode === 'terrain') {
       this.vueBigScreenMap.setShow(false);

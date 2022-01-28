@@ -1,5 +1,5 @@
 import React from 'react';
-import { getContrastColor, routeNameStyle, routeStyle, routeTerminiStyle } from './styles';
+import { createRouteStyle, getContrastColor, routeNameStyle, routeStyle, routeTerminiStyle } from './styles';
 
 interface Props {
     routeName: string;
@@ -19,5 +19,18 @@ export const Route: React.FC<Props> = props => {
             <span>{startStationName}</span>
             {endStationName && startStationName !== endStationName && <><br /><span>{endStationName}</span></>}
         </div>
+    </div>;
+}
+
+
+interface CreateProps {
+    onSelect: () => void;
+};
+
+export const RouteCreator: React.FC<CreateProps> = props => {
+    const { onSelect } = props;
+
+    return <div className={routeStyle} onClick={onSelect}>
+        <div className={createRouteStyle}>Create Route</div>
     </div>;
 }

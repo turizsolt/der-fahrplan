@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { OverlayController } from './OverlayController';
-import { Route } from './Route';
+import { Route, RouteCreator } from './Route';
 import { RootState } from './store';
 import { routeListStyle } from './styles';
 import { StorableRoute } from './store';
@@ -40,7 +40,6 @@ export const RouteList: React.FC<Props> = props => {
     return <div className={routeListStyle} style={{ visibility: whenMapOrDiagram }} >
         Route list
         <button onClick={handleUpdateRouteList}>Update</button>
-        <button onClick={handleCreate}>Create</button>
         <button onClick={handleCreateExampleTrip}>ExTrip</button>
         <hr />
         {routeList.map(route => <Route
@@ -52,5 +51,6 @@ export const RouteList: React.FC<Props> = props => {
             selected={route.id === selectedRoute?.id}
             onSelect={handleSelect(route)}
         />)}
+        <RouteCreator onSelect={handleCreate} />
     </div>
 }

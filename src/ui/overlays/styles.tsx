@@ -54,10 +54,14 @@ export const routeStyle = style({
     border: '1px solid black',
     borderRadius: '3px',
     display: 'flex',
-    backgroundColor: '#aca',
+    backgroundColor: '#cec',
     height: '40px',
     margin: '5px 5px 0 5px',
     cursor: 'pointer'
+});
+
+export const createRouteStyle = style({
+    margin: 'auto 5px auto 5px',
 });
 
 export const routeNameStyle = style({
