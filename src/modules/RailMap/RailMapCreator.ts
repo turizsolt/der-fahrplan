@@ -20,6 +20,7 @@ import { overlayStore } from '../../ui/overlays/store';
 const DEFAULT_NODE_SIZE = 5;
 
 const mapNodes: PIXI.Graphics[] = [];
+const mapNodeTexts: PIXI.Text[] = [];
 const mapStops: PIXI.Graphics[] = [];
 const mapEdges: PIXI.Graphics[] = [];
 const routeEdges: PIXI.Graphics[] = [];
@@ -235,6 +236,38 @@ export class RailMapCreator {
 
         for (; i < mapNodes.length; i++) {
             mapNodes[i].renderable = false;
+        }
+
+        // nodeTexts
+
+        const settings: Partial<PIXI.ITextStyle> = {
+            fontFamily: 'Arial',
+            fontSize: 12,
+            fill: 0x000000,
+            align: 'left',
+            fontWeight: '400',
+        };
+
+        i = 0;
+        for (; i < railMapNodes.length; i++) {
+            if (!mapNodeTexts[i]) {
+                mapNodeTexts[i] = new PIXI.Text('', settings);
+                globalThis.stageMap.addChild(mapNodeTexts[i]);
+            }
+
+            mapNodeTexts[i].text = railMapNodes[i].getName();
+            const extra = nodeSizes[railMapNodes[i].getId()] * DEFAULT_NODE_SIZE;
+            mapNodeTexts[i].x = railMapNodes[i].getCoord().x + extra;
+            mapNodeTexts[i].y = railMapNodes[i].getCoord().z + extra;
+            mapNodeTexts[i].zIndex = 41;
+            mapNodeTexts[i].resolution = 10;
+            mapNodeTexts[i].anchor.x = 0;
+            mapNodeTexts[i].anchor.y = 0;
+            mapNodeTexts[i].renderable = railMapNodes[i].getType() !== TYPES.PathBlock;
+        }
+
+        for (; i < mapNodeTexts.length; i++) {
+            mapNodeTexts[i].renderable = false;
         }
 
         // stops
