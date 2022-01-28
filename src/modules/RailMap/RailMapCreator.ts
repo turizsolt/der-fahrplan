@@ -256,7 +256,7 @@ export class RailMapCreator {
             }
 
             mapNodeTexts[i].text = railMapNodes[i].getName();
-            const extra = nodeSizes[railMapNodes[i].getId()] * DEFAULT_NODE_SIZE;
+            const extra = (nodeSizes[railMapNodes[i].getId()] || 0) * DEFAULT_NODE_SIZE;
             mapNodeTexts[i].x = railMapNodes[i].getCoord().x + extra;
             mapNodeTexts[i].y = railMapNodes[i].getCoord().z + extra;
             mapNodeTexts[i].zIndex = 41;
