@@ -80,7 +80,7 @@ export class OverlayController {
 
     controll(type: string, nodeId: string): void {
         const state = overlayStore.getState().overlay;
-        const routeId = state.selectedRoute.id;
+        const routeId = state.selectedRoute?.id;
         const express = state.createExpress;
 
         if (routeId) {
@@ -134,16 +134,15 @@ export class OverlayController {
 
                 const addingStations = d0 < d1 ? as0 : as1;
                 const whichEnd = d0 < d1 ? WhichEnd.B : WhichEnd.A;
-                const lastStation = variants[d0 < d1 ? 0 : 1].getLastStop().getRef();
 
                 let i = 0;
-                for (let station of addingStations) {
+                for (let station3 of addingStations) {
                     const part0 = new ActualRoutePartEdge({ getDuration: () => 120, getId: () => '', getName: () => '' });
                     route.addPart(whichEnd, part0);
-                    const part = station.getType() === TYPES.Station ? new ActualRoutePartStop(station as RailMapNode) : new ActualRoutePartJunction(station);
+                    const part = station3.getType() === TYPES.Station ? new ActualRoutePartStop(station3 as RailMapNode) : new ActualRoutePartJunction(station3);
                     route.addPart(whichEnd, part);
 
-                    if (express && part.getType() === TYPES.RoutePartStop && station !== lastStation) {
+                    if (express && part.getType() === TYPES.RoutePartStop && station !== station3) {
                         (part as RoutePartStop).setStopping(false);
                     }
 

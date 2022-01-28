@@ -9,7 +9,7 @@ import { RailMapNode } from "./RailMapNode";
 import { RailMapRoute, RailMapRouteArray, RailMapRouteDraw, RailMapStop } from "./RailMapRoute";
 
 const DEFAULT_ROUTE_GAP = 6;
-const DEFAULT_STATION_GAP = 3;
+const DEFAULT_STATION_GAP = 4;
 
 export class ActualRailMap implements RailMap {
     private nodes: RailMapNode[] = [];
@@ -132,13 +132,15 @@ export class ActualRailMap implements RailMap {
             for (let key2 of Object.keys(this.nodesWithRoute[key])) {
                 const arr = this.nodesWithRoute[key][key2];
 
+                let k = 0;
                 for (let a of arr) {
                     this.stops.push({
                         color: a.routeProps.color,
                         point: a.routeProps[a.which],
                         routeId: a.routeProps.routeId,
-                        stopping: (a.routeProps[a.which + 'Obj'] as RoutePart).isStopping()
+                        stopping: (a.routeProps[a.which + 'Obj'] as RoutePart).isStopping() && k === 0
                     });
+                    k++;
                 }
 
                 // console.log(arr.length);

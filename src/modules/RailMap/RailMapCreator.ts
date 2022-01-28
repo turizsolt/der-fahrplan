@@ -178,6 +178,7 @@ export class RailMapCreator {
             for (let edge of route) {
                 const normalColor = parseInt(edge.color.slice(1), 16);
                 const shouldSee = (!selectedRouteId || edge.routeId === selectedRouteId);
+                const selected = edge.routeId === selectedRouteId;
                 const color = shouldSee ? normalColor : 0xafafaf;
 
                 if (!routeEdges[i]) {
@@ -192,7 +193,7 @@ export class RailMapCreator {
                 routeEdges[i].moveTo(from.x, from.z);
                 routeEdges[i].lineTo(to.x, to.z);
 
-                routeEdges[i].zIndex = 11;
+                routeEdges[i].zIndex = selected ? 26 : 11;
                 routeEdges[i].renderable = true;
                 i++;
             }
