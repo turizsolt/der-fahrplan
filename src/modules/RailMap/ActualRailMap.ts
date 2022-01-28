@@ -5,14 +5,19 @@ import { RailMap } from "./RailMap";
 import { RailMapBounds } from "./RailMapBounds";
 import { RailMapEdge } from "./RailMapEdge";
 import { RailMapNode } from "./RailMapNode";
-import { RailMapRoute } from "./RailMapRoute";
+import { RailMapRouteArray, RailMapRouteDraw } from "./RailMapRoute";
+
+const DEFAULT_GAP = 6;
 
 export class ActualRailMap implements RailMap {
     private nodes: RailMapNode[] = [];
     private edges: Record<string, RailMapEdge> = {};
     private bounds: RailMapBounds;
     private neighbours: Record<string, RailMapNode[]> = {};
-    private routes: RailMapRoute[] = [];
+    private routes: RailMapRouteArray[] = [];
+    private routesDraw: RailMapRouteDraw[][] = [];
+    private nodesWithHash: Record<string, Record<string, any[]>> = {};
+    private nodesWithRoute: Record<string, Record<string, any[]>> = {};
 
     addNodes(nodes: RailMapNode[]): void {
         this.nodes.push(...nodes);
@@ -35,7 +40,7 @@ export class ActualRailMap implements RailMap {
     }
 
     addRoute(route: Route): void {
-        const mapRoute: RailMapRoute = [];
+        const mapRoute: RailMapRouteArray = [];
         const waypoints = route.getVariants()[0].getWaypoints();
         for (let i = 1; i < waypoints.length; i++) {
             const { from, to } = this.orderNodes(waypoints[i - 1].getRef() as RailMapNode, waypoints[i].getRef() as RailMapNode);
@@ -47,21 +52,92 @@ export class ActualRailMap implements RailMap {
             const fromDir: number = fromCoord.whichDir2d(toCoord);
             const toDir: number = toCoord.whichDir2d(fromCoord);
 
-            mapRoute.push({
+            const routeProps = {
                 from: new Ray(fromCoord, fromDir),
                 to: new Ray(toCoord, toDir),
+                fromOriginal: new Ray(fromCoord, fromDir),
+                toOriginal: new Ray(toCoord, toDir),
+                fromId: from.getId(),
+                toId: to.getId(),
                 no: routeCount,
                 color: route.getColor(),
                 routeId: route.getId(),
                 hash,
                 count: 1
-            });
+            };
+
+            mapRoute.push(routeProps);
+
+            if (!this.nodesWithHash[from.getId()]) {
+                this.nodesWithHash[from.getId()] = {};
+            }
+            if (!this.nodesWithHash[from.getId()][to.getId()]) {
+                this.nodesWithHash[from.getId()][to.getId()] = [];
+            }
+
+            if (!this.nodesWithHash[to.getId()]) {
+                this.nodesWithHash[to.getId()] = {};
+            }
+            if (!this.nodesWithHash[to.getId()][from.getId()]) {
+                this.nodesWithHash[to.getId()][from.getId()] = [];
+            }
+
+            this.nodesWithHash[from.getId()][to.getId()].push({ which: 'from', routeProps });
+            this.nodesWithHash[to.getId()][from.getId()].push({ which: 'to', routeProps });
+
+            if (!this.nodesWithRoute[from.getId()]) {
+                this.nodesWithRoute[from.getId()] = {};
+            }
+            if (!this.nodesWithRoute[from.getId()][route.getId()]) {
+                this.nodesWithRoute[from.getId()][route.getId()] = [];
+            }
+
+            if (!this.nodesWithRoute[to.getId()]) {
+                this.nodesWithRoute[to.getId()] = {};
+            }
+            if (!this.nodesWithRoute[to.getId()][route.getId()]) {
+                this.nodesWithRoute[to.getId()][route.getId()] = [];
+            }
+
+            this.nodesWithRoute[from.getId()][route.getId()].push({ which: 'from', routeProps });
+            this.nodesWithRoute[to.getId()][route.getId()].push({ which: 'to', routeProps });
         }
         this.routes.push(mapRoute);
+
+        // b
 
         for (let route of this.routes) {
             for (let edge of route) {
                 edge.count = this.edges[edge.hash].routeCount;
+                edge.from = edge.fromOriginal.fromHere(0, edge.count * 5).fromHere(Math.PI / 2, DEFAULT_GAP * edge.no);
+                edge.to = edge.toOriginal.fromHere(0, edge.count * 5).fromHere(-Math.PI / 2, DEFAULT_GAP * edge.no);
+            }
+        }
+
+        // c
+        this.routesDraw = [];
+        for (let key of Object.keys(this.nodesWithRoute)) {
+            for (let key2 of Object.keys(this.nodesWithRoute[key])) {
+                const arr = this.nodesWithRoute[key][key2];
+
+                // console.log(arr.length);
+                if (arr.length === 2) {
+                    const a0: Ray = arr[0].routeProps[arr[0].which];
+                    const a1: Ray = arr[1].routeProps[arr[1].which];
+                    /*
+                    const aMid = a0.computeMidpoint(a1);
+                    if (aMid) {
+                        arr[0].routeProps[arr[0].which] = new Ray(aMid, a0.dirXZ);
+                        arr[1].routeProps[arr[1].which] = new Ray(aMid, a1.dirXZ);
+                    }
+                    */
+                    this.routesDraw.push([{
+                        from: a0,
+                        to: a1,
+                        color: arr[0].routeProps.color,
+                        routeId: key2
+                    }]);
+                }
             }
         }
     }
@@ -74,8 +150,8 @@ export class ActualRailMap implements RailMap {
         return this.nodes;
     }
 
-    getRoutes(): RailMapRoute[] {
-        return this.routes;
+    getRoutes(): RailMapRouteDraw[][] {
+        return [...this.routes, ...this.routesDraw];
     }
 
     getNeighboursOf(node: RailMapNode): RailMapNode[] {

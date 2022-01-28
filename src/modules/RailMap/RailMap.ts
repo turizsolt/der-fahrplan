@@ -2,7 +2,7 @@ import { Route } from "../../structs/Scheduling/Route";
 import { RailMapBounds } from "./RailMapBounds";
 import { RailMapEdge } from "./RailMapEdge";
 import { RailMapNode } from "./RailMapNode";
-import { RailMapRoute } from "./RailMapRoute";
+import { RailMapRouteDraw } from "./RailMapRoute";
 
 export interface RailMap {
     addNodes(nodes: RailMapNode[]): void;
@@ -10,7 +10,7 @@ export interface RailMap {
     addRoute(route: Route): void;
     getEdges(): Record<string, RailMapEdge>;
     getNodes(): RailMapNode[];
-    getRoutes(): RailMapRoute[];
+    getRoutes(): RailMapRouteDraw[][];
     getNeighboursOf(node: RailMapNode): RailMapNode[];
     setBounds(bounds: RailMapBounds): void;
     getBounds(): RailMapBounds;
