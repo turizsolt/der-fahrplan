@@ -149,7 +149,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
     getNextStation(): Station {
         let iter = this.routePartAt;
         while (iter) {
-            if (iter.getType() === TYPES.RoutePartStop) {
+            if (iter.getType() === TYPES.RoutePartStop && iter.isStopping()) {
                 return iter.getRef() as Station;
             }
             iter = iter.getNext(this.routeVariant.getStartEnd());
@@ -192,7 +192,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
             atStation: this.routePartAt === part,
             isArrivalStation: !part.getNext(this.routeVariant.getStartEnd()),
             isDepartureStation: !part.getNext(otherEnd(this.routeVariant.getStartEnd())),
-            shouldStop: true,
+            shouldStop: part.isStopping(),
             isStation: part.getType() === TYPES.RoutePartStop,
             isReverseStop: false
         };

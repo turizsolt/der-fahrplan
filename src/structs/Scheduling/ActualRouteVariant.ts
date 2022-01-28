@@ -56,9 +56,8 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
         return this.route.getEnd(otherEnd(this.startEnd));
     }
 
-    // todo just return where it stops
     getStops(): RoutePart[] {
-        return this.getParts().filter(p => p.getType() === TYPES.RoutePartStop);
+        return this.getParts().filter(p => p.getType() === TYPES.RoutePartStop && p.isStopping());
     }
 
     getWaypoints(): RoutePart[] {

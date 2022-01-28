@@ -182,7 +182,10 @@ export class ActualRoute extends ActualBaseStorable implements Route {
                     return new ActualRoutePartEdge(store.get(part.id) as unknown as RoutePartReferenceDuration);
 
                 case TYPES.RoutePartStop:
-                    return new ActualRoutePartStop(store.get(part.id) as unknown as RoutePartReferenceColor);
+                    const stop = new ActualRoutePartStop(store.get(part.id) as unknown as RoutePartReferenceColor);
+                    stop.setStopping(part.isStopping);
+                    stop.setDuration(part.duration);
+                    return stop;
 
                 case TYPES.RoutePartJunction:
                     return new ActualRoutePartJunction(store.get(part.id) as unknown as RoutePartReference);

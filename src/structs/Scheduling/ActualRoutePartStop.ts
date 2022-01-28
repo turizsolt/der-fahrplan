@@ -47,7 +47,8 @@ export class ActualRoutePartStop extends ActualRoutePart implements RoutePartSto
         return {
             id: this.ref?.getId(),
             type: this.getType().description,
-            duration: this.duration
+            duration: this.duration,
+            isStopping: this.stopping
         }
     }
 }
