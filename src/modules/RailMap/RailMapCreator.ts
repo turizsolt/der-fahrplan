@@ -17,6 +17,8 @@ import { PixiClickGeneral } from '../../ui/babylon/PixiClick';
 import { OverlayController } from '../../ui/overlays/OverlayController';
 import { overlayStore } from '../../ui/overlays/store';
 
+const DEFAULT_NODE_SIZE = 5;
+
 const mapNodes: PIXI.Graphics[] = [];
 const mapStops: PIXI.Graphics[] = [];
 const mapEdges: PIXI.Graphics[] = [];
@@ -155,7 +157,7 @@ export class RailMapCreator {
             }
 
             mapEdges[i].clear();
-            mapEdges[i].lineStyle(2, 0xafafaf, railMapEdges[i].routeCount > 0 ? 0 : 0.5);
+            mapEdges[i].lineStyle(1, 0xafafaf, railMapEdges[i].routeCount > 0 ? 0 : 0.5);
             const from = railMapEdges[i].from.getCoord();
             const to = railMapEdges[i].to.getCoord();
             mapEdges[i].moveTo(from.x, from.z);
@@ -208,6 +210,7 @@ export class RailMapCreator {
         const overlayController = OverlayController.getInstance();
 
         const railMapNodes = map.getNodes();
+        const nodeSizes = map.getNodesSize();
 
         i = 0;
         for (; i < railMapNodes.length; i++) {
@@ -217,14 +220,14 @@ export class RailMapCreator {
             }
 
             mapNodes[i].clear();
-            mapNodes[i].lineStyle(1, 0x000000, 0.5);
+            mapNodes[i].lineStyle(1, railMapNodes[i].getType() === TYPES.PathBlock ? 0xff0000 : 0x000000, 0.5);
             mapNodes[i].beginFill(0xcfcfcf);
-            mapNodes[i].drawCircle(0, 0, railMapNodes[i].getType() === TYPES.PathBlock ? 10 : 20);
+            mapNodes[i].drawCircle(0, 0, railMapNodes[i].getType() === TYPES.PathBlock ? 5 : ((nodeSizes[railMapNodes[i].getId()] || 0) + 1) * DEFAULT_NODE_SIZE);
             mapNodes[i].endFill();
             mapNodes[i].zIndex = 5;
             mapNodes[i].x = railMapNodes[i].getCoord().x;
             mapNodes[i].y = railMapNodes[i].getCoord().z;
-            mapNodes[i].renderable = true;
+            mapNodes[i].renderable = (railMapNodes[i].getType() !== TYPES.PathBlock || !!selectedRouteId);
             PixiClickGeneral(mapNodes[i], railMapNodes[i].getType().description, railMapNodes[i].getId(),
                 (x, y, type, id) => overlayController.controll(type, id)
             );

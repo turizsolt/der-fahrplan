@@ -12,6 +12,7 @@ export interface RailMap {
     getNodes(): RailMapNode[];
     getRoutes(): RailMapRouteDraw[][];
     getStops(): RailMapStop[];
+    getNodesSize(): Record<string, number>;
     getNeighboursOf(node: RailMapNode): RailMapNode[];
     setBounds(bounds: RailMapBounds): void;
     getBounds(): RailMapBounds;

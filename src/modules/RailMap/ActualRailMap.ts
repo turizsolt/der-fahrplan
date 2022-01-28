@@ -21,6 +21,7 @@ export class ActualRailMap implements RailMap {
     private nodesWithHash: Record<string, Record<string, any[]>> = {};
     private nodesWithRoute: Record<string, Record<string, any[]>> = {};
     private stops: RailMapStop[] = [];
+    private nodesSize: Record<string, number> = {};
 
     addNodes(nodes: RailMapNode[]): void {
         this.nodes.push(...nodes);
@@ -128,6 +129,7 @@ export class ActualRailMap implements RailMap {
         // c
         this.routesDraw = [];
         this.stops = [];
+        this.nodesSize = {};
         for (let key of Object.keys(this.nodesWithRoute)) {
             for (let key2 of Object.keys(this.nodesWithRoute[key])) {
                 const arr = this.nodesWithRoute[key][key2];
@@ -163,6 +165,14 @@ export class ActualRailMap implements RailMap {
                 }
             }
         }
+
+        for (let key of Object.keys(this.nodesWithHash)) {
+            let size = 0;
+            for (let key2 of Object.keys(this.nodesWithHash[key])) {
+                size = Math.max(size, this.nodesWithHash[key][key2].length);
+            }
+            this.nodesSize[key] = size;
+        }
     }
 
     getEdges(): Record<string, RailMapEdge> {
@@ -171,6 +181,10 @@ export class ActualRailMap implements RailMap {
 
     getNodes(): RailMapNode[] {
         return this.nodes;
+    }
+
+    getNodesSize(): Record<string, number> {
+        return this.nodesSize;
     }
 
     getStops(): RailMapStop[] {
