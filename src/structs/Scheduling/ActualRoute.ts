@@ -183,7 +183,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
 
                 case TYPES.RoutePartStop:
                     const stop = new ActualRoutePartStop(store.get(part.id) as unknown as RoutePartReferenceColor);
-                    stop.setStopping(part.isStopping);
+                    stop.setStopping(part.isStopping !== undefined ? part.isStopping : true);
                     stop.setDuration(part.duration);
                     return stop;
 

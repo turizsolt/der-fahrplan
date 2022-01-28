@@ -29,6 +29,7 @@ setTimeout(() => {
   app2.view.id = 'renderCanvasMap';
 
   globalThis.stageMap = app2.stage;
+  globalThis.stageMap.sortableChildren = true;
   globalThis.rendererMap = app2.renderer;
   globalThis.containerMap = container;
 }, 0);

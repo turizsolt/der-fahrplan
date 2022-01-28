@@ -1,11 +1,12 @@
 import { Coordinate } from "../../structs/Geometry/Coordinate";
 import { Ray } from "../../structs/Geometry/Ray";
 import { Route } from "../../structs/Scheduling/Route";
+import { RoutePart } from "../../structs/Scheduling/RoutePart";
 import { RailMap } from "./RailMap";
 import { RailMapBounds } from "./RailMapBounds";
 import { RailMapEdge } from "./RailMapEdge";
 import { RailMapNode } from "./RailMapNode";
-import { RailMapRoute, RailMapRouteArray, RailMapRouteDraw } from "./RailMapRoute";
+import { RailMapRoute, RailMapRouteArray, RailMapRouteDraw, RailMapStop } from "./RailMapRoute";
 
 const DEFAULT_ROUTE_GAP = 6;
 const DEFAULT_STATION_GAP = 3;
@@ -19,6 +20,7 @@ export class ActualRailMap implements RailMap {
     private routesDraw: RailMapRouteDraw[][] = [];
     private nodesWithHash: Record<string, Record<string, any[]>> = {};
     private nodesWithRoute: Record<string, Record<string, any[]>> = {};
+    private stops: RailMapStop[] = [];
 
     addNodes(nodes: RailMapNode[]): void {
         this.nodes.push(...nodes);
@@ -45,6 +47,10 @@ export class ActualRailMap implements RailMap {
         const waypoints = route.getVariants()[0].getWaypoints();
         for (let i = 1; i < waypoints.length; i++) {
             const { from, to } = this.orderNodes(waypoints[i - 1].getRef() as RailMapNode, waypoints[i].getRef() as RailMapNode);
+
+            const fromObj: RoutePart = from === waypoints[i - 1].getRef() ? waypoints[i - 1] : waypoints[i];
+            const toObj: RoutePart = from === waypoints[i - 1].getRef() ? waypoints[i] : waypoints[i - 1];
+
             const hash = this.hashNodes(from, to);
             const routeCount = this.edges[hash].routeCount++;
 
@@ -60,6 +66,8 @@ export class ActualRailMap implements RailMap {
                 toOriginal: new Ray(toCoord, toDir),
                 fromId: from.getId(),
                 toId: to.getId(),
+                fromObj: fromObj,
+                toObj: toObj,
                 no: routeCount,
                 color: route.getColor(),
                 routeId: route.getId(),
@@ -119,9 +127,19 @@ export class ActualRailMap implements RailMap {
 
         // c
         this.routesDraw = [];
+        this.stops = [];
         for (let key of Object.keys(this.nodesWithRoute)) {
             for (let key2 of Object.keys(this.nodesWithRoute[key])) {
                 const arr = this.nodesWithRoute[key][key2];
+
+                for (let a of arr) {
+                    this.stops.push({
+                        color: a.routeProps.color,
+                        point: a.routeProps[a.which],
+                        routeId: a.routeProps.routeId,
+                        stopping: (a.routeProps[a.which + 'Obj'] as RoutePart).isStopping()
+                    });
+                }
 
                 // console.log(arr.length);
                 if (arr.length === 2) {
@@ -151,6 +169,10 @@ export class ActualRailMap implements RailMap {
 
     getNodes(): RailMapNode[] {
         return this.nodes;
+    }
+
+    getStops(): RailMapStop[] {
+        return this.stops;
     }
 
     getRoutes(): RailMapRouteDraw[][] {

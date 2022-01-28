@@ -18,6 +18,7 @@ import { OverlayController } from '../../ui/overlays/OverlayController';
 import { overlayStore } from '../../ui/overlays/store';
 
 const mapNodes: PIXI.Graphics[] = [];
+const mapStops: PIXI.Graphics[] = [];
 const mapEdges: PIXI.Graphics[] = [];
 const routeEdges: PIXI.Graphics[] = [];
 let boundingRect: PIXI.Graphics = null;
@@ -123,7 +124,7 @@ export class RailMapCreator {
                 boundingRect.beginFill(0xddffdd);
                 boundingRect.drawRect(minX, minZ, maxX - minX, maxZ - minZ);
                 boundingRect.endFill();
-                boundingRect.zIndex = 15;
+                boundingRect.zIndex = 1;
 
                 globalThis.stageMap.addChild(boundingRect);
             }
@@ -191,7 +192,7 @@ export class RailMapCreator {
                 routeEdges[i].moveTo(from.x, from.z);
                 routeEdges[i].lineTo(to.x, to.z);
 
-                routeEdges[i].zIndex = 9;
+                routeEdges[i].zIndex = 11;
                 routeEdges[i].renderable = true;
                 i++;
             }
@@ -215,11 +216,11 @@ export class RailMapCreator {
             }
 
             mapNodes[i].clear();
-            mapNodes[i].lineStyle(0.25, 0x000000, 0.5);
-            mapNodes[i].beginFill(0x00ff00);
-            mapNodes[i].drawCircle(0, 0, railMapNodes[i].getType() === TYPES.PathBlock ? 2 : 5);
+            mapNodes[i].lineStyle(1, 0x000000, 0.5);
+            mapNodes[i].beginFill(0xcfcfcf);
+            mapNodes[i].drawCircle(0, 0, railMapNodes[i].getType() === TYPES.PathBlock ? 10 : 20);
             mapNodes[i].endFill();
-            mapNodes[i].zIndex = 8;
+            mapNodes[i].zIndex = 5;
             mapNodes[i].x = railMapNodes[i].getCoord().x;
             mapNodes[i].y = railMapNodes[i].getCoord().z;
             mapNodes[i].renderable = true;
@@ -230,6 +231,38 @@ export class RailMapCreator {
 
         for (; i < mapNodes.length; i++) {
             mapNodes[i].renderable = false;
+        }
+
+        // stops
+
+        const railMapStops = map.getStops();
+
+        i = 0; let j = 0;
+        for (; j < railMapStops.length; j++) {
+            if (railMapStops[j].stopping) {
+                if (!mapStops[i]) {
+                    mapStops[i] = new PIXI.Graphics();
+                    globalThis.stageMap.addChild(mapStops[i]);
+                }
+
+                const shouldSee = (!selectedRouteId || railMapStops[j].routeId === selectedRouteId);
+                const selected = railMapStops[j].routeId === selectedRouteId;
+                const color = shouldSee ? parseInt(railMapStops[j].color.slice(1), 16) : 0xafafaf;
+                mapStops[i].clear();
+                mapStops[i].lineStyle(2, railMapStops[j].stopping ? 0xcceecc : color, 1);
+                mapStops[i].beginFill(color);
+                mapStops[i].drawCircle(0, 0, (selected ? 1.2 : 1) * (railMapStops[j].stopping ? 3 : 1.5));
+                mapStops[i].endFill();
+                mapStops[i].zIndex = selected ? 30 : 25;
+                mapStops[i].x = railMapStops[j].point.coord.x;
+                mapStops[i].y = railMapStops[j].point.coord.z;
+                mapStops[i].renderable = true;
+                i++;
+            }
+        }
+
+        for (; i < mapStops.length; i++) {
+            mapStops[i].renderable = false;
         }
 
         return map;
