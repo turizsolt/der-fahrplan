@@ -231,7 +231,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
                 const ccap: CapacityCap = next.value.blockJoint.getCapacityCap(convertFrom(next.value.blockJoint, next.positionOnTrack));
                 if (bjend) {
                     bjend.checkin(this);
-                    if (bjend.getType() === TYPES.PathBlockEnd) {
+                    if (bjend.getType() === TYPES.PathBlockEnd && this.trips && this.trips[0]) {
                         this.trips[0].skip((bjend as PathBlockEnd).getPathBlock());
                     }
                 }
