@@ -19,19 +19,34 @@ const productionContainer =
 
 setTimeout(() => {
   const app2 = new PIXI.Application({ width: 5120, height: 5120 });
-  const container = document.getElementById('pixi-map-container');
-  container.appendChild(app2.view);
+  const container2 = document.getElementById('pixi-map-container');
+  container2.appendChild(app2.view);
   app2.renderer.backgroundColor = 0xcceecc;
   app2.renderer.view.style.position = 'absolute';
   app2.renderer.view.style.display = 'block';
-  app2.renderer.resize(container.clientWidth - 1, container.clientHeight - 1);
+  app2.renderer.resize(container2.clientWidth - 1, container2.clientHeight - 1);
   app2.renderer.view.style.zIndex = '0';
   app2.view.id = 'renderCanvasMap';
 
   globalThis.stageMap = app2.stage;
   globalThis.stageMap.sortableChildren = true;
   globalThis.rendererMap = app2.renderer;
-  globalThis.containerMap = container;
+  globalThis.containerMap = container2;
+
+  const app3 = new PIXI.Application({ width: 5120, height: 5120 });
+  const container3 = document.getElementById('pixi-diagram-container');
+  container3.appendChild(app3.view);
+  app3.renderer.backgroundColor = 0xcceecc;
+  app3.renderer.view.style.position = 'absolute';
+  app3.renderer.view.style.display = 'block';
+  app3.renderer.resize(container3.clientWidth - 1, container3.clientHeight - 1);
+  app3.renderer.view.style.zIndex = '0';
+  app3.view.id = 'renderCanvasDiagram';
+
+  globalThis.stageDiagram = app3.stage;
+  globalThis.stageDiagram.sortableChildren = true;
+  globalThis.rendererDiagram = app3.renderer;
+  globalThis.containerDiagram = container3;
 }, 0);
 
 if (globalThis.startParam === '2d') {

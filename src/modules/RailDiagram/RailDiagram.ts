@@ -13,7 +13,7 @@ import { RailDiagramPlot } from './RailDiagramPlot';
 import { RailDiagramPlotsAndLines } from './RailDiagramPlotsAndLines';
 
 export class RailDiagram {
-    private route: RouteVariant = null;
+    private routeVariant: RouteVariant = null;
     private diagramHeight: number = 0;
     private diagramWidth: number = 0;
     private map: RailMap = null;
@@ -29,8 +29,8 @@ export class RailDiagram {
         this.update();
     }
 
-    setRoute(route: RouteVariant) {
-        this.route = route;
+    setRoute(routeVariant: RouteVariant) {
+        this.routeVariant = routeVariant;
         this.update();
     }
 
@@ -48,7 +48,7 @@ export class RailDiagram {
     }
 
     update(): void {
-        if (this.route) {
+        if (this.routeVariant) {
             this.updateDiagramHeight();
         }
         this.updateDiagramWidth();
@@ -57,7 +57,7 @@ export class RailDiagram {
     updateDiagramHeight(): void {
         this.diagramHeight = 0;
         let prevStop: RoutePart = null;
-        for (let stop of this.route.getWaypoints()) {
+        for (let stop of this.routeVariant.getWaypoints()) {
             if (prevStop) {
                 this.diagramHeight += this.map.getDistance(
                     prevStop.getRef() as RailMapNode,
@@ -81,7 +81,7 @@ export class RailDiagram {
         let pos: number = 0;
         let prevStop: RoutePart = null;
         let prevPosition: number = 0;
-        for (let stop of this.route.getWaypoints()) {
+        for (let stop of this.routeVariant.getWaypoints()) {
             if (prevStop) {
                 position = this.map.getDistance(
                     prevStop.getRef() as RailMapNode,
@@ -140,7 +140,7 @@ export class RailDiagram {
     getPlotsAndLines(): RailDiagramPlotsAndLines {
         const plots: RailDiagramPlot[] = [];
         const lines: RailDiagramLine[] = [];
-        const routesToPlot: RouteVariant[] = this.getConnectingRoutes(this.route);
+        const routesToPlot: RouteVariant[] = this.getConnectingRoutes(this.routeVariant);
 
         const trips = this.store.getAllOf<Trip>(TYPES.Trip);
         for (let trip of trips) {

@@ -4,6 +4,7 @@ import RoutePlanner from './RoutePlanner.vue';
 import RailMapShower from './RailMapShower.vue';
 import { RailMapCreator } from '../../modules/RailMap/RailMapCreator';
 import { getStore } from '../../structs/Actuals/Store/StoreForVue';
+import { DiagramCreator } from '../overlays/DiagramCreator';
 
 export class VueBigscreenMap {
   private vmBigScreen: any;
@@ -31,7 +32,9 @@ export class VueBigscreenMap {
   setShow(show: boolean) {
     this.vmBigScreen.show = show;
     if (this.vmBigScreen.show) {
-      RailMapCreator.create(getStore());
+      const store: Store = getStore();
+      RailMapCreator.create(store);
+      setTimeout(() => DiagramCreator.create(store), 0);
     }
   }
 }

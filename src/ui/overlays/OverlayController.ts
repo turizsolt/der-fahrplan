@@ -12,6 +12,7 @@ import { Route } from "../../structs/Scheduling/Route";
 import { RoutePartStop } from "../../structs/Scheduling/RoutePartStop";
 import { Trip } from "../../structs/Scheduling/Trip";
 import { Util } from "../../structs/Util";
+import { DiagramCreator } from "./DiagramCreator";
 import { RouteManipulator } from "./RouteManipulator";
 import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress, setOverlayMode } from "./store";
 
@@ -45,6 +46,9 @@ export class OverlayController {
 
     selectRoute(route: StorableRoute): void {
         overlayStore.dispatch(selectRoute(route));
+
+        // todo
+        DiagramCreator.create(getStore());
     }
 
     deleteRoute(id: string) {

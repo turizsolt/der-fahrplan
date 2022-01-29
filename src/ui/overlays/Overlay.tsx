@@ -23,7 +23,7 @@ export const Overlay: React.FC<Props> = props => {
         </div>
         <div className={rightColumnStyle} style={{ visibility: whenDiagram }}>
             <div className={pixiMapSettingsStyle}>Diagram settings</div>
-            <div className={pixiMapContainerStyle} id="pixi-diagram-container">Pixi diagram</div>
+            <div className={pixiMapContainerStyle} id="pixi-diagram-container"></div>
         </div>
         <div className={connectorStyle} style={{ visibility: whenConnector }}>Connector</div>
     </div>;
