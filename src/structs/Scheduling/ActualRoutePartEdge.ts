@@ -1,4 +1,5 @@
 import { TYPES } from "../../di/TYPES";
+import { WhichEnd } from "../Interfaces/WhichEnd";
 import { ActualRoutePart } from "./ActualRoutePart";
 import { RoutePartEdge } from "./RoutePartEdge";
 import { RoutePartReferenceDuration } from "./RoutePartReferenceDuration";
@@ -15,7 +16,8 @@ export class ActualRoutePartEdge extends ActualRoutePart implements RoutePartEdg
     }
 
     getDuration(): number {
-        return this.ref?.getDuration();
+        const adjacentStops = (this.getNext(WhichEnd.A)?.isStopping() ? 1 : 0) + (this.getNext(WhichEnd.B)?.isStopping() ? 1 : 0);
+        return (this.ref?.getDuration() || 0) + adjacentStops * 50;
     }
 
     isStopping(): boolean {
@@ -25,7 +27,8 @@ export class ActualRoutePartEdge extends ActualRoutePart implements RoutePartEdg
     persist(): Object {
         return {
             id: this.ref?.getId(),
-            type: this.getType().description
+            type: this.getType().description,
+            duration: this.ref?.getDuration() || 0
         }
     }
 }

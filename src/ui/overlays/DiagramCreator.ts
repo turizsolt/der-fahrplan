@@ -11,6 +11,8 @@ import { overlayStore } from './store';
 const routePlotGraphics: PIXI.Graphics[] = [];
 const routeLineGraphics: PIXI.Graphics[] = [];
 const timePlotGraphics: PIXI.Graphics[] = [];
+const tripPlotGraphics: PIXI.Graphics[] = [];
+const tripLineGraphics: PIXI.Graphics[] = [];
 
 export class DiagramCreator {
     private static drawPlot(graphics: PIXI.Graphics, plot: RailDiagramPlot): void {
@@ -48,10 +50,14 @@ export class DiagramCreator {
 
         const { plots: routePlots, lines: routeLines } = diagram.getRouteAxis();
         const timePlots = diagram.getTimeAxis();
+        const { plots: tripPlots, lines: tripLines } = diagram.getPlotsAndLines();
 
         drawCycle<PIXI.Graphics, RailDiagramPlot>(routePlotGraphics, routePlots, createGraphics, DiagramCreator.drawPlot, eraseGraphics);
         drawCycle<PIXI.Graphics, RailDiagramLine>(routeLineGraphics, routeLines, createGraphics, DiagramCreator.drawLine, eraseGraphics);
         drawCycle<PIXI.Graphics, RailDiagramPlot>(timePlotGraphics, timePlots, createGraphics, DiagramCreator.drawPlot, eraseGraphics);
+
+        drawCycle<PIXI.Graphics, RailDiagramPlot>(tripPlotGraphics, tripPlots, createGraphics, DiagramCreator.drawPlot, eraseGraphics);
+        drawCycle<PIXI.Graphics, RailDiagramLine>(tripLineGraphics, tripLines, createGraphics, DiagramCreator.drawLine, eraseGraphics);
     }
 }
 

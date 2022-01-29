@@ -156,8 +156,12 @@ export class OverlayController {
                 const whichEnd = d0 < d1 ? WhichEnd.B : WhichEnd.A;
 
                 let i = 0;
+                let prevPart = route.getEnd(whichEnd);
+
                 for (let station3 of addingStations) {
-                    const part0 = new ActualRoutePartEdge({ getDuration: () => 120, getId: () => '', getName: () => '' });
+                    const distance = this.map.getDistance(prevPart.getRef() as RailMapNode, station3);
+
+                    const part0 = new ActualRoutePartEdge({ getDuration: () => Math.ceil((distance / 3) / 10) * 10 /*3=maxSpeed*/, getId: () => '', getName: () => '' });
                     route.addPart(whichEnd, part0);
                     const part = station3.getType() === TYPES.Station ? new ActualRoutePartStop(station3 as RailMapNode) : new ActualRoutePartJunction(station3);
                     route.addPart(whichEnd, part);
@@ -167,6 +171,7 @@ export class OverlayController {
                     }
 
                     i++;
+                    prevPart = part;
                 }
                 console.log('added some');
             }

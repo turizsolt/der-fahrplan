@@ -235,7 +235,7 @@ export class RailDiagram {
     }
 
     getConnectingRoutes(pivotRoute: RouteVariant): RouteVariant[] {
-        return (this.store.getAllOf(TYPES.Route) as RouteVariant[]).filter(route => {
+        return (this.store.getAllOf(TYPES.RouteVariant) as RouteVariant[]).filter(route => {
             return route.hasCommonEdgeWith(pivotRoute);
         });
     }
