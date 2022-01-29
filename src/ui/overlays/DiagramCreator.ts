@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { RailDiagram } from '../../modules/RailDiagram/RailDiagram';
+import { RailDiagramLine } from '../../modules/RailDiagram/RailDiagramLine';
 import { RailDiagramPlot } from '../../modules/RailDiagram/RailDiagramPlot';
 import { getStorable } from '../../structs/Actuals/Store/StoreForVue';
 import { Store } from "../../structs/Interfaces/Store";
@@ -8,6 +9,7 @@ import { PixiClickGeneral } from '../babylon/PixiClick';
 import { overlayStore } from './store';
 
 const routePlotGraphics: PIXI.Graphics[] = [];
+const routeLineGraphics: PIXI.Graphics[] = [];
 const timePlotGraphics: PIXI.Graphics[] = [];
 
 export class DiagramCreator {
@@ -27,6 +29,15 @@ export class DiagramCreator {
         // );
     }
 
+    private static drawLine(graphics: PIXI.Graphics, line: RailDiagramLine): void {
+        graphics.clear();
+        graphics.lineStyle(1, 0xff0000, 1);
+        graphics.moveTo(line.from.t * 500 + 40, line.from.r * 500 + 40);
+        graphics.lineTo(line.to.t * 500 + 40, line.to.r * 500 + 40);
+        graphics.zIndex = 4;
+        graphics.renderable = true;
+    }
+
     static create(store: Store): void {
         const route = overlayStore.getState().overlay.selectedRoute;
         const routeVariant = getStorable(route && route.variants[0]) as RouteVariant;
@@ -39,6 +50,7 @@ export class DiagramCreator {
         const timePlots = diagram.getTimeAxis();
 
         drawCycle<PIXI.Graphics, RailDiagramPlot>(routePlotGraphics, routePlots, createGraphics, DiagramCreator.drawPlot, eraseGraphics);
+        drawCycle<PIXI.Graphics, RailDiagramLine>(routeLineGraphics, routeLines, createGraphics, DiagramCreator.drawLine, eraseGraphics);
         drawCycle<PIXI.Graphics, RailDiagramPlot>(timePlotGraphics, timePlots, createGraphics, DiagramCreator.drawPlot, eraseGraphics);
     }
 }
