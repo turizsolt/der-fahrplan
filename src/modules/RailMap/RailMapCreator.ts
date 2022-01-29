@@ -261,7 +261,7 @@ export class RailMapCreator {
             mapNodeTexts[i].x = railMapNodes[i].getCoord().x + extra;
             mapNodeTexts[i].y = railMapNodes[i].getCoord().z + extra;
             mapNodeTexts[i].zIndex = 41;
-            mapNodeTexts[i].resolution = 10;
+            mapNodeTexts[i].resolution = 2;
             mapNodeTexts[i].anchor.x = 0;
             mapNodeTexts[i].anchor.y = 0;
             mapNodeTexts[i].renderable = railMapNodes[i].getType() !== TYPES.PathBlock;

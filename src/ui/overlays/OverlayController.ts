@@ -36,7 +36,15 @@ export class OverlayController {
     }
 
     updateMap(): void {
-        this.map = RailMapCreator.create(getStore());
+        if (overlayStore.getState().overlay.overlayMode === 'map') {
+            this.map = RailMapCreator.create(getStore());
+        }
+    }
+
+    updateDiagram(): void {
+        if (overlayStore.getState().overlay.overlayMode === 'diagram') {
+            DiagramCreator.create(getStore());
+        }
     }
 
     updateRouteList(): void {
@@ -46,9 +54,7 @@ export class OverlayController {
 
     selectRoute(route: StorableRoute): void {
         overlayStore.dispatch(selectRoute(route));
-
-        // todo
-        DiagramCreator.create(getStore());
+        this.updateDiagram();
     }
 
     deleteRoute(id: string) {
@@ -72,6 +78,9 @@ export class OverlayController {
         }
         if (mode === 'map') {
             this.updateMap();
+        }
+        if (mode === 'diagram') {
+            this.updateDiagram();
         }
     }
 

@@ -8,4 +8,6 @@ export interface RailDiagramLine {
         t: number;
     };
     trackCount: number;
+    zIndex?: number;
+    meta?: any;
 }

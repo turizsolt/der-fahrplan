@@ -94,7 +94,8 @@ export class RailDiagram {
                     trackCount: this.map.getTrackCount(
                         prevStop.getRef() as RailMapNode,
                         stop.getRef() as RailMapNode
-                    )
+                    ),
+                    zIndex: 60
                 });
             }
 
@@ -106,8 +107,11 @@ export class RailDiagram {
                 r: pos / this.diagramHeight,
                 t: 0,
                 meta: {
-                    hasLine: (stop.getRef() as RailMapNode).getType() === TYPES.Station
-                }
+                    hasLine: (stop.getRef() as RailMapNode).getType() === TYPES.Station,
+                    routeColor: (stop.getRef() as RailMapNode).getType() === TYPES.Station ? 0x000000 : 0x9f9f9f,
+                    stopping: stop.isStopping()
+                },
+                zIndex: 70
             });
 
             this.stopHeights[(stop.getRef() as RailMapNode).getId()] = pos / this.diagramHeight;
@@ -131,7 +135,8 @@ export class RailDiagram {
                 name: Util.timeToString(time),
                 position: 1,
                 t: (time - this.minTime) / this.diagramWidth,
-                r: 1
+                r: 1,
+                zIndex: 70
             });
         }
         return plots;
@@ -160,7 +165,10 @@ export class RailDiagram {
                             r: this.stopHeights[stop.station.getId()],
                             t: (stop.arrivalTime - this.minTime) / this.diagramWidth
                         },
-                        trackCount: 1
+                        trackCount: 1,
+                        meta: {
+                            routeColor: stop.route.getColor()
+                        }
                     });
                 }
 
@@ -179,6 +187,7 @@ export class RailDiagram {
                             route: stop.route,
                             tripStop: stop,
                             trip: stop.trip,
+                            routeColor: stop.route.getColor()
                         }
                     });
                     plots.push({
@@ -195,6 +204,7 @@ export class RailDiagram {
                             route: stop.route,
                             tripStop: stop,
                             trip: stop.trip,
+                            routeColor: stop.route.getColor()
                         }
                     });
                     lines.push({
@@ -206,7 +216,10 @@ export class RailDiagram {
                             r: this.stopHeights[stop.station.getId()],
                             t: (stop.departureTime - this.minTime) / this.diagramWidth
                         },
-                        trackCount: 1
+                        trackCount: 1,
+                        meta: {
+                            routeColor: stop.route.getColor()
+                        }
                     });
                 } else {
                     plots.push({
@@ -223,6 +236,7 @@ export class RailDiagram {
                             route: stop.route,
                             tripStop: stop,
                             trip: stop.trip,
+                            routeColor: stop.route.getColor()
                         }
                     });
                 }
