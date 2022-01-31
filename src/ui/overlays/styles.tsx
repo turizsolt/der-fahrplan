@@ -16,13 +16,34 @@ export const routeListStyle = style({
     top: '0px'
 });
 
-export const rightColumnStyle = style({
+export const rightMapColumnStyle = style({
     display: 'flex',
     flexDirection: 'column',
     position: 'absolute',
-    width: 'calc(100% - 270px)',
+    width: 'calc(100% - 270px - 2px)',
     height: 'calc(100% - 20px)',
     left: '250px',
+    top: '0px'
+});
+
+export const rightColumnDiagramStyle = style({
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'absolute',
+    width: 'calc(100% - 270px - 93px)',
+    height: 'calc(100% - 20px)',
+    left: '250px',
+    top: '0px'
+});
+
+export const rightRightColumnDiagramStyle = style({
+    border: '1px solid purple',
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'absolute',
+    width: '80px',
+    height: 'calc(100% - 20px)',
+    right: '20px',
     top: '0px'
 });
 
@@ -121,6 +142,18 @@ export const timeDotStyle = style({
 export const invertStyle = style({
     backgroundColor: '#1a7700',
     color: '#cceecc'
+});
+
+export const addTripsStyle = style({
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%'
+});
+
+export const addTripsTextareaStyle = style({
+    height: '50%',
+    width: '74px',
+    resize: 'none'
 });
 
 export const getContrastColor = (hexcolor: string): string => {

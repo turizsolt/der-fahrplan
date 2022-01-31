@@ -23,7 +23,28 @@ export class Util {
   public static timeToString(time: number): string {
     const hour = Math.floor(time / 3600);
     const min = Math.floor((time - hour * 3600) / 60);
-    return hour + ':' + (min < 10 ? '0' : '') + min;
+    const sec = Math.floor((time - hour * 3600) % 60)
+    return hour + ':' + (min < 10 ? '0' : '') + min + (sec === 0 ? '' : (sec % 10 === 0 ? ('.' + sec / 10) : ('.' + (sec < 10 ? '0' : '') + sec)));
+  }
+
+  public static stringToTime(str: string): number {
+    const dotPos = str.indexOf('.');
+    let result = 0;
+    if (dotPos !== -1) {
+      const lastBit = str.slice(dotPos + 1);
+      result = parseInt(lastBit, 10);
+      if (lastBit.length === 1) {
+        result *= 10;
+      }
+
+      str = str.slice(0, dotPos);
+    }
+    const colonPos = str.indexOf(':');
+
+    if (colonPos !== -1) {
+      return result + parseInt(str.slice(0, colonPos), 10) * 3600 + parseInt(str.slice(colonPos + 1), 10) * 60;
+    }
+    return result + parseInt(str, 10) * 60;
   }
 
   public static generateRouteName(): string {
