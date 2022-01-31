@@ -41,6 +41,24 @@ export const pixiMapContainerStyle = style({
     border: '1px solid red',
 });
 
+export const pixiDiagramContainerStyle = style({
+    width: '100%',
+    height: 'calc(100% - 60px)',
+    position: 'relative',
+    border: '1px solid red',
+});
+
+export const pixiDiagramTimeStyle = style({
+    width: '100%',
+    marginTop: '10px',
+    height: '40px',
+    position: 'relative',
+    border: '1px solid blue',
+    display: 'flex',
+    justifyContent: 'space-between',
+    flexDirection: 'column'
+});
+
 export const connectorStyle = style({
     border: '1px solid red',
     position: 'absolute',
@@ -84,6 +102,25 @@ export const settingsButtonStyle = style({
     width: 'auto',
     marginLeft: '10px',
     padding: '0 5px 0 5px'
+});
+
+export const timeDotStyle = style({
+    border: '1px solid #1a7700',
+    borderRadius: '6px',
+    height: '12px',
+    width: '12px',
+    fontSize: '10px',
+    textAlign: 'center',
+    backgroundColor: '#cceecc',
+    color: '#1a7700',
+    '&:hover': {
+        cursor: 'pointer'
+    }
+} as any);
+
+export const invertStyle = style({
+    backgroundColor: '#1a7700',
+    color: '#cceecc'
 });
 
 export const getContrastColor = (hexcolor: string): string => {

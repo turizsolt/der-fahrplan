@@ -82,7 +82,7 @@ export class GlobalController {
     this.vueViewbox.addButton({ id: 'diagram', text: 'Diagram' });
     this.vueViewbox.addButton({ id: 'connector', text: 'Connect' });
     this.vueViewbox.addButton({ id: 'builder', text: 'Builder' });
-    this.selectView('map');
+    this.selectView('diagram');
   }
 
   getInputController(): InputController {

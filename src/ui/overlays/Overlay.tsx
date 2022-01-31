@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { DiagramTime } from './DiagramTime';
 import { MapSettings } from './MapSettings';
 import { RouteList } from './RouteList';
 import { RootState } from './store';
-import { connectorStyle, overlayStyle, pixiMapContainerStyle, pixiMapSettingsStyle, rightColumnStyle, routeListStyle } from './styles';
+import { connectorStyle, overlayStyle, pixiDiagramContainerStyle, pixiMapContainerStyle, pixiMapSettingsStyle, rightColumnStyle, routeListStyle } from './styles';
 
 interface Props { };
 
@@ -23,7 +24,8 @@ export const Overlay: React.FC<Props> = props => {
         </div>
         <div className={rightColumnStyle} style={{ visibility: whenDiagram }}>
             <div className={pixiMapSettingsStyle}>Diagram settings</div>
-            <div className={pixiMapContainerStyle} id="pixi-diagram-container"></div>
+            <div className={pixiDiagramContainerStyle} id="pixi-diagram-container"></div>
+            <DiagramTime />
         </div>
         <div className={connectorStyle} style={{ visibility: whenConnector }}>Connector</div>
     </div>;

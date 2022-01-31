@@ -97,10 +97,11 @@ export class DiagramCreator {
         if (!routeVariant) return;
 
         width = globalThis.containerMap.clientWidth - 2 * border - stationHolder;
-        height = globalThis.containerMap.clientHeight - 2 * border - timeHolder;
+        height = globalThis.containerMap.clientHeight - 2 * border - timeHolder - 50;
 
         const diagram = new RailDiagram(store);
         diagram.setRoute(routeVariant);
+        diagram.setTimeBounds(overlayStore.getState().overlay.startTime, overlayStore.getState().overlay.endTime);
 
         const { plots: routePlots, lines: routeLines } = diagram.getRouteAxis();
         const timePlots = diagram.getTimeAxis();
@@ -114,12 +115,12 @@ export class DiagramCreator {
 
             boundingRect.clear();
             boundingRect.beginFill(0xcceecc);
-            boundingRect.drawRect(0, 0, border + stationHolder, globalThis.containerMap.clientHeight);
+            boundingRect.drawRect(0, 0, border + stationHolder, globalThis.containerMap.clientHeight + 1);
             boundingRect.endFill();
             boundingRect.zIndex = 59;
             boundingRect.renderable = true;
 
-            globalThis.stageMap.addChild(boundingRect);
+            globalThis.stageDiagram.addChild(boundingRect);
         }
 
         drawCycle<PIXI.Graphics, RailDiagramPlot>(routePlotGraphics, routePlots, createGraphics, DiagramCreator.drawPlot, eraseGraphics);

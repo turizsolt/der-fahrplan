@@ -14,7 +14,7 @@ import { Trip } from "../../structs/Scheduling/Trip";
 import { Util } from "../../structs/Util";
 import { DiagramCreator } from "./DiagramCreator";
 import { RouteManipulator } from "./RouteManipulator";
-import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress, setOverlayMode } from "./store";
+import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress, setOverlayMode, setEndTime, setStartTime } from "./store";
 
 const DEFAULT_ROUTE_COLORS = ['#fe9812', '#688e26', '#002500', '#10423f', '#20837e', '#f25757', '#e41111', '#432337'];
 
@@ -33,6 +33,16 @@ export class OverlayController {
 
     private constructor() {
         this.routeManipulator = new RouteManipulator();
+    }
+
+    setStartTime(t: number) {
+        overlayStore.dispatch(setStartTime(t));
+        this.updateDiagram();
+    }
+
+    setEndTime(t: number) {
+        overlayStore.dispatch(setEndTime(t));
+        this.updateDiagram();
     }
 
     updateMap(): void {
