@@ -21,7 +21,8 @@ export interface OverlayState {
     selectedTripStop: {
         tripId: string,
         routePartNo: number
-    }
+    },
+    keyVersion: number
 }
 
 const initialState: OverlayState = {
@@ -31,7 +32,8 @@ const initialState: OverlayState = {
     createExpress: false,
     startTime: parseInt(localStorage.getItem('startTime'), 10) || 4 * 3600,
     endTime: parseInt(localStorage.getItem('endTime'), 10) || 7 * 3600,
-    selectedTripStop: null
+    selectedTripStop: null,
+    keyVersion: 0
 };
 
 export const overlaySlice = createSlice({
@@ -71,10 +73,13 @@ export const overlaySlice = createSlice({
         }>) => {
             state.selectedTripStop = action.payload
         },
+        incrementKeyVersion: (state, action: PayloadAction<void>) => {
+            state.keyVersion++
+        },
     },
 })
 
-export const { setOverlayMode, selectRoute, updateRouteList, setCreateExpress, setStartTime, setEndTime, setSelectedTripStop } = overlaySlice.actions
+export const { setOverlayMode, selectRoute, updateRouteList, setCreateExpress, setStartTime, setEndTime, setSelectedTripStop, incrementKeyVersion } = overlaySlice.actions
 
 export const overlayStore = configureStore({
     reducer: {

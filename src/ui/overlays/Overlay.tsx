@@ -12,7 +12,7 @@ interface Props { };
 
 export const Overlay: React.FC<Props> = props => {
 
-    const { overlayMode: mode, selectedRoute } = useSelector((state: RootState) => state.overlay);
+    const { overlayMode: mode, selectedRoute, keyVersion } = useSelector((state: RootState) => state.overlay);
 
     const whenMap = mode === 'map' ? 'visible' : 'hidden';
     const whenDiagram = mode === 'diagram' ? 'visible' : 'hidden';
@@ -30,7 +30,7 @@ export const Overlay: React.FC<Props> = props => {
             <DiagramTime />
         </div>
         <div className={rightRightColumnDiagramStyle} style={{ visibility: whenDiagram }}>
-            <DiagramAddTrips key={selectedRoute?.id} route={selectedRoute} />
+            <DiagramAddTrips key={selectedRoute?.id + '-' + keyVersion} route={selectedRoute} />
         </div>
         <div className={connectorStyle} style={{ visibility: whenConnector }}>Connector</div>
     </div>;

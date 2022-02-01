@@ -16,7 +16,7 @@ import { TripStop } from "../../structs/Scheduling/TripStop";
 import { Util } from "../../structs/Util";
 import { DiagramCreator } from "./DiagramCreator";
 import { RouteManipulator } from "./RouteManipulator";
-import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress, setOverlayMode, setEndTime, setStartTime, setSelectedTripStop } from "./store";
+import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress, setOverlayMode, setEndTime, setStartTime, setSelectedTripStop, incrementKeyVersion } from "./store";
 
 const DEFAULT_ROUTE_COLORS = ['#fe9812', '#688e26', '#002500', '#10423f', '#20837e', '#f25757', '#e41111', '#432337'];
 
@@ -90,6 +90,7 @@ export class OverlayController {
     moveAll(time: number) {
         if (this.moveAllNoUpdate(time)) {
             this.updateDiagram();
+            overlayStore.dispatch(incrementKeyVersion());
         }
     }
 
@@ -135,6 +136,7 @@ export class OverlayController {
 
         if (ret && ret.diff && this.moveAllNoUpdate(Math.min(ret.diff, time))) {
             this.updateDiagram();
+            overlayStore.dispatch(incrementKeyVersion());
         }
     }
 
