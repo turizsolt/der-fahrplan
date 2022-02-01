@@ -186,6 +186,7 @@ export class RailDiagram {
                         r: this.stopHeights[stop.station.getId()],
                         meta: {
                             routePart: stop.routePart,
+                            routePartNo: stop.routePartNo,
                             route: stop.route,
                             tripStop: stop,
                             trip: stop.trip,
@@ -203,6 +204,7 @@ export class RailDiagram {
                         r: this.stopHeights[stop.station.getId()],
                         meta: {
                             routePart: stop.routePart,
+                            routePartNo: stop.routePartNo,
                             route: stop.route,
                             tripStop: stop,
                             trip: stop.trip,
@@ -235,6 +237,7 @@ export class RailDiagram {
                         r: this.stopHeights[stop.station.getId()],
                         meta: {
                             routePart: stop.routePart,
+                            routePartNo: stop.routePartNo,
                             route: stop.route,
                             tripStop: stop,
                             trip: stop.trip,

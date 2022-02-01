@@ -31,6 +31,7 @@ export interface TripStop {
     route: Route;
     routeVariant: RouteVariant;
     routePart: RoutePart;
+    routePartNo: number;
 }
 
 export interface OptionalTripStop {

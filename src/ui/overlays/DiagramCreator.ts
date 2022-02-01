@@ -6,6 +6,7 @@ import { getStorable } from '../../structs/Actuals/Store/StoreForVue';
 import { Store } from "../../structs/Interfaces/Store";
 import { RouteVariant } from '../../structs/Scheduling/RouteVariant';
 import { PixiClickGeneral } from '../babylon/PixiClick';
+import { OverlayController } from './OverlayController';
 import { overlayStore } from './store';
 
 const routePlotGraphics: PIXI.Graphics[] = [];
@@ -27,18 +28,27 @@ let timeHolder = 10;
 
 export class DiagramCreator {
     private static drawPlot(graphics: PIXI.Graphics, plot: RailDiagramPlot): void {
+        const overlayController = OverlayController.getInstance();
+        const selectedTripStop = overlayStore.getState().overlay.selectedTripStop;
+        const isSelected = selectedTripStop && selectedTripStop?.tripId === plot.meta?.trip?.id && selectedTripStop?.routePartNo === plot.meta?.routePartNo;
+
         graphics.clear();
         graphics.lineStyle(1, plot.meta?.routeColor ? 0x000000 : 0xff0000, 1);
-        graphics.beginFill(plot.meta?.routeColor ? 0xffffff : 0xcfcfcf);
+        graphics.beginFill(isSelected ? 0x000000 : (plot.meta?.routeColor ? 0xffffff : 0xcfcfcf));
         graphics.drawCircle(0, 0, 3);
         graphics.endFill();
         graphics.zIndex = plot.zIndex || 5;
         graphics.x = plot.t * width + border + stationHolder;
         graphics.y = plot.r * height + border;
         graphics.renderable = true;
-        // PixiClickGeneral(graphics, 'point', 'abc',
-        //     (x, y, type, id) => console.log(x, y, type, id)
-        // );
+        PixiClickGeneral(graphics, 'tripStop', plot.meta?.tripStop,
+            (x, y, type, id) => {
+                console.log(x, y, type, id);
+                if (plot.meta?.tripStop) {
+                    overlayController.selectTripStop(isSelected ? null : plot.meta?.tripStop);
+                }
+            }
+        );
     }
 
     private static drawText(text: PIXI.Text, plot: RailDiagramPlot): void {
@@ -127,7 +137,7 @@ export class DiagramCreator {
         drawCycle<PIXI.Graphics, RailDiagramPlot>(routePlotLineGraphics, routePlots, createGraphics, DiagramCreator.drawRouteLine, eraseGraphics);
         drawCycle<PIXI.Text, RailDiagramPlot>(routePlotText, routePlots, createText, DiagramCreator.drawText, eraseGraphics);
         drawCycle<PIXI.Graphics, RailDiagramLine>(routeLineGraphics, routeLines, createGraphics, DiagramCreator.drawLine, eraseGraphics);
-        drawCycle<PIXI.Graphics, RailDiagramPlot>(timePlotGraphics, timePlots, createGraphics, DiagramCreator.drawPlot, eraseGraphics);
+        // drawCycle<PIXI.Graphics, RailDiagramPlot>(timePlotGraphics, timePlots, createGraphics, DiagramCreator.drawPlot, eraseGraphics);
         drawCycle<PIXI.Graphics, RailDiagramPlot>(timePlotLineGraphics, timePlots, createGraphics, DiagramCreator.drawTimeLine, eraseGraphics);
         drawCycle<PIXI.Text, RailDiagramPlot>(timePlotText, timePlots, createTextTime, DiagramCreator.drawTextTime, eraseGraphics);
     }

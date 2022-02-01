@@ -164,13 +164,14 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
     // todo returning the stops to show on the side
 
-    private getPartData(part: RoutePart, isServed: boolean): TripStop {
+    private getPartData(part: RoutePart, isServed: boolean, index: number): TripStop {
         const redefined = this.redefinedProps[(part.getRef() as RailMapNode).getId()];
         return {
             trip: this,
             route: this.getRouteVariant()?.getRoute(),
             routeVariant: this.getRouteVariant(),
             routePart: part,
+            routePartNo: index,
 
             id: this.id + '', // todo get id from part
 
@@ -202,9 +203,10 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         const result: TripStop[] = [];
         let isServed = true;
         let iter = this.routeVariant.getFirstStop();
+        let i = 0;
         while (iter) {
             if ([TYPES.RoutePartStop, TYPES.RoutePartJunction].includes(iter.getType())) {
-                result.push(this.getPartData(iter, isServed));
+                result.push(this.getPartData(iter, isServed, i));
             }
 
             if (this.routePartAt === iter) {
@@ -212,6 +214,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
             }
 
             iter = iter.getNext(this.routeVariant.getStartEnd());
+            i++;
         }
         return result;
     };
