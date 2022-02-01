@@ -207,6 +207,7 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         while (iter) {
             if ([TYPES.RoutePartStop, TYPES.RoutePartJunction].includes(iter.getType())) {
                 result.push(this.getPartData(iter, isServed, i));
+                i++;
             }
 
             if (this.routePartAt === iter) {
@@ -214,7 +215,6 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
             }
 
             iter = iter.getNext(this.routeVariant.getStartEnd());
-            i++;
         }
         return result;
     };

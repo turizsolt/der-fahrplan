@@ -125,6 +125,10 @@ export const settingsButtonStyle = style({
     padding: '0 5px 0 5px'
 });
 
+export const departureButtonStyle = style({
+    backgroundColor: '#ebe7c4'
+});
+
 export const timeDotStyle = style({
     border: '1px solid #1a7700',
     borderRadius: '6px',

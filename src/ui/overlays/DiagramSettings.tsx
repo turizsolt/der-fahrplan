@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { OverlayController } from './OverlayController';
-import { pixiMapSettingsStyle, settingsButtonStyle } from './styles';
+import { departureButtonStyle, pixiMapSettingsStyle, settingsButtonStyle } from './styles';
 
 interface Props {
 };
@@ -13,10 +13,19 @@ export const DiagramSettings: React.FC<Props> = props => {
         overlayController.moveAll(time);
     }, []);
 
+    const handleMoveDeparture = useCallback((time: number) => () => {
+        overlayController.moveDeparture(time);
+    }, []);
+
     return <div className={pixiMapSettingsStyle} style={{ display: 'flex' }} >
         <button className={settingsButtonStyle} onClick={handleMoveAll(-60)}>All--</button>
         <button className={settingsButtonStyle} onClick={handleMoveAll(-10)}>All-</button>
         <button className={settingsButtonStyle} onClick={handleMoveAll(+10)}>All+</button>
         <button className={settingsButtonStyle} onClick={handleMoveAll(+60)}>All++</button>
+
+        <button className={settingsButtonStyle + ' ' + departureButtonStyle} onClick={handleMoveDeparture(-60)}>Dep--</button>
+        <button className={settingsButtonStyle + ' ' + departureButtonStyle} onClick={handleMoveDeparture(-10)}>Dep-</button>
+        <button className={settingsButtonStyle + ' ' + departureButtonStyle} onClick={handleMoveDeparture(+10)}>Dep+</button>
+        <button className={settingsButtonStyle + ' ' + departureButtonStyle} onClick={handleMoveDeparture(+60)}>Dep++</button>
     </div>;
 }

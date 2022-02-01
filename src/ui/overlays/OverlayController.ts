@@ -9,6 +9,7 @@ import { ActualRoutePartEdge } from "../../structs/Scheduling/ActualRoutePartEdg
 import { ActualRoutePartJunction } from "../../structs/Scheduling/ActualRoutePartJunction";
 import { ActualRoutePartStop } from "../../structs/Scheduling/ActualRoutePartStop";
 import { Route } from "../../structs/Scheduling/Route";
+import { RoutePart } from "../../structs/Scheduling/RoutePart";
 import { RoutePartStop } from "../../structs/Scheduling/RoutePartStop";
 import { Trip } from "../../structs/Scheduling/Trip";
 import { TripStop } from "../../structs/Scheduling/TripStop";
@@ -93,6 +94,22 @@ export class OverlayController {
             const trip = getStorable(tripStop.tripId) as Trip;
             const routeVariant = trip.getRouteVariant();
             routeVariant.moveAll(time);
+
+            this.updateDiagram();
+        }
+    }
+
+    moveDeparture(time: number) {
+        const tripStop = overlayStore.getState().overlay.selectedTripStop;
+
+        if (tripStop) {
+            const trip = getStorable(tripStop.tripId) as Trip;
+            const routePart: RoutePart = trip.getWaypoints()[tripStop.routePartNo].routePart;
+
+            if (routePart.getType() === TYPES.RoutePartStop) {
+                (routePart as RoutePartStop).setDuration(Math.max(0, routePart.getDuration() + time));
+                trip.getRouteVariant().emit('update', {});
+            }
 
             this.updateDiagram();
         }
