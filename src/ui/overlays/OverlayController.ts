@@ -124,7 +124,7 @@ export class OverlayController {
                 const newDuration = Math.max(0, oldDuration + time);
 
                 (routePart as RoutePartStop).setDuration(newDuration);
-                trip.getRouteVariant().emit('update', {});
+                trip.getRouteVariant().getRoute().getVariants().map(v => v.emit('update', {}));
 
                 return { diff: oldDuration - newDuration };
             }

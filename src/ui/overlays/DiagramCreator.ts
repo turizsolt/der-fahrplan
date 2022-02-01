@@ -43,7 +43,6 @@ export class DiagramCreator {
         graphics.renderable = true;
         PixiClickGeneral(graphics, 'tripStop', plot.meta?.tripStop,
             (x, y, type, id) => {
-                console.log(x, y, type, id);
                 if (plot.meta?.tripStop) {
                     overlayController.selectTripStop(isSelected ? null : plot.meta?.tripStop);
                 }
