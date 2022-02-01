@@ -3,6 +3,7 @@ import { WhichEnd } from '../Interfaces/WhichEnd';
 import { BaseStorable } from '../Interfaces/BaseStorable';
 import { Route } from './Route';
 import { Emitable } from '../../mixins/Emitable';
+import { TimeOrHeadway } from './TimeOrHeadway';
 
 export interface RouteVariant extends BaseStorable, Emitable {
     init(route: Route, startEnd: WhichEnd): RouteVariant;
@@ -21,4 +22,7 @@ export interface RouteVariant extends BaseStorable, Emitable {
     getWaypoints(): RoutePart[];
 
     hasCommonEdgeWith(routeVariant: RouteVariant): boolean;
+
+    updateTimeCode(timesOrHeadways: TimeOrHeadway[]): void;
+    getTimesOrHeadways(): TimeOrHeadway[];
 }

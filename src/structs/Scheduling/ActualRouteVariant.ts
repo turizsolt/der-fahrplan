@@ -8,12 +8,15 @@ import { otherEnd, WhichEnd } from "../Interfaces/WhichEnd";
 import { Route } from "./Route";
 import { RoutePart } from "./RoutePart";
 import { RouteVariant } from "./RouteVariant";
+import { TimeOrHeadway, timesOrHeadwaysToTimes } from "./TimeOrHeadway";
+import { Trip } from "./Trip";
 
 export interface ActualRouteVariant extends Emitable { }
 const doApply = () => applyMixins(ActualRouteVariant, [Emitable]);
 export class ActualRouteVariant extends ActualBaseStorable implements RouteVariant {
     private startEnd: WhichEnd;
     private route: Route;
+    private timesOrHeadways: TimeOrHeadway[] = [];
 
     init(route: Route, startEnd: WhichEnd): RouteVariant {
         this.initStore(TYPES.RouteVariant);
@@ -68,12 +71,30 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
         return this.route.hasCommonEdgeWith(routeVariant.getRoute());
     }
 
+    updateTimeCode(timesOrHeadways: TimeOrHeadway[]): void {
+        this.timesOrHeadways = timesOrHeadways;
+
+        const trips: Trip[] = this.store.getAllOf<Trip>(TYPES.Trip).filter(trip => trip.getRouteVariant().getId() === this.id);
+        trips.forEach(trip => trip.remove());
+
+        const times = timesOrHeadwaysToTimes(this.timesOrHeadways);
+
+        times.forEach(time => {
+            this.store.create<Trip>(TYPES.Trip).init(this, time);
+        });
+    }
+
+    getTimesOrHeadways(): TimeOrHeadway[] {
+        return this.timesOrHeadways;
+    }
+
     persist(): Object {
         return {
             id: this.id,
             type: 'RouteVariant',
             startEnd: this.startEnd,
             route: this.route.getId(),
+            timesOrHeadways: this.timesOrHeadways
         }
     }
 
@@ -101,6 +122,9 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
     load(obj: any, store: Store): void {
         this.presetId(obj.id);
         this.init(store.get(obj.route) as Route, obj.startEnd);
+        if (obj.timesOrHeadways) {
+            this.updateTimeCode(obj.timesOrHeadways);
+        }
     }
 
     remove(): void {

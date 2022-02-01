@@ -29,7 +29,7 @@ export const Overlay: React.FC<Props> = props => {
             <DiagramTime />
         </div>
         <div className={rightRightColumnDiagramStyle} style={{ visibility: whenDiagram }}>
-            <DiagramAddTrips />
+            <DiagramAddTrips key={selectedRoute?.id} route={selectedRoute} />
         </div>
         <div className={connectorStyle} style={{ visibility: whenConnector }}>Connector</div>
     </div>;

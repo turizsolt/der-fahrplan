@@ -1,69 +1,65 @@
 import React, { useCallback } from 'react';
+import { getStorable } from '../../structs/Actuals/Store/StoreForVue';
+import { RouteVariant } from '../../structs/Scheduling/RouteVariant';
+import { textToTimesOrHeadways, timesOrHeadwaysToText, timesOrHeadwaysToTimes } from '../../structs/Scheduling/TimeOrHeadway';
 import { Util } from '../../structs/Util';
+import { OverlayController } from './OverlayController';
+import { StorableRoute } from './store';
 import { addTripsStyle, addTripsTextareaStyle } from './styles';
 
-export const DiagramAddTrips: React.FC = () => {
+const overlayController = OverlayController.getInstance();
+
+interface Props {
+    route: StorableRoute;
+};
+
+export const DiagramAddTrips: React.FC<Props> = (props) => {
+    const { route } = props;
+
+    const text0 = route && timesOrHeadwaysToText((getStorable(route.variants[0]) as RouteVariant).getTimesOrHeadways());
+    const text1 = route && timesOrHeadwaysToText((getStorable(route.variants[1]) as RouteVariant).getTimesOrHeadways());
+
     const handleStopPropagation = useCallback((event: any) => {
         event.stopPropagation();
         event.nativeEvent.stopImmediatePropagation();
     }, []);
 
     const handleTopTrips = useCallback((event: any) => {
-        process(event.target.value);
+        process(event.target.value, route.variants[0]);
+        overlayController.updateDiagram();
     }, []);
 
     const handleBottomTrips = useCallback((event: any) => {
-        process(event.target.value);
+        process(event.target.value, route.variants[1]);
+        overlayController.updateDiagram();
     }, []);
 
     return <div className={addTripsStyle}>
-        <textarea className={addTripsTextareaStyle} onBlur={handleTopTrips} onKeyDown={handleStopPropagation} onKeyUp={handleStopPropagation}></textarea>
-        <textarea className={addTripsTextareaStyle} onBlur={handleBottomTrips} onKeyDown={handleStopPropagation} onKeyUp={handleStopPropagation}></textarea>
+        {route && <>
+            <textarea
+                className={addTripsTextareaStyle}
+                onBlur={handleTopTrips}
+                onKeyDown={handleStopPropagation}
+                onKeyUp={handleStopPropagation}
+                defaultValue={text0}
+            ></textarea>
+            <textarea
+                className={addTripsTextareaStyle}
+                onBlur={handleBottomTrips}
+                onKeyDown={handleStopPropagation}
+                onKeyUp={handleStopPropagation}
+                defaultValue={text1}
+            ></textarea>
+        </>}
     </div>;
 }
 
-function process(str: string): number[] {
-    const times: number[] = [];
+function process(str: string, routeVariantId: string): void {
+    const routeVariant = (getStorable(routeVariantId) as RouteVariant);
+    const toh = textToTimesOrHeadways(str);
+    routeVariant.updateTimeCode(toh);
 
-    const regex = /([^-\s]+)/g;
-    let matches;
-
-    let lastTime: number = 4 * 3600;
-    let lastIntervals: number[] = [];
-    while (matches = regex.exec(str)) {
-        const chunk = matches[1];
-
-        if (chunk.match(/^[0-9]{1,2}:[0-9]{2}(\.[0-9]{1,2})?$/)) {
-            const time = Util.stringToTime(chunk);
-            // console.log('time', chunk, time);
-
-            if (time > lastTime) {
-                if (lastIntervals.length > 0) {
-                    let i = 0;
-                    let nextTime = lastTime + lastIntervals[i];
-                    i = (i + 1) % lastIntervals.length;
-                    while (nextTime <= (time - lastIntervals[i])) {
-                        times.push(nextTime);
-                        nextTime += lastIntervals[i];
-                        i = (i + 1) % lastIntervals.length;
-                    }
-                }
-
-                times.push(time);
-                lastTime = time;
-                lastIntervals = [];
-            }
-        } else if (chunk.match(/^[0-9]{1,3}(\.[0-9]{1,2})?$/)) {
-            const time = Util.stringToTime(chunk);
-            // console.log('headway', chunk, time);
-
-            lastIntervals.push(time);
-        } else {
-            // console.log('not recognised', chunk);
-        }
-    }
-
-    // console.log(times);
+    // todo optional
+    const times = timesOrHeadwaysToTimes(toh);
     console.log(times.map(t => Util.timeToString(t)));
-    return times;
 }

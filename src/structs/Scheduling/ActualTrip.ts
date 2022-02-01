@@ -294,4 +294,9 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
             this.toggleNextReverse();
         }
     }
+
+    remove(): void {
+        // todo also remove from wagons
+        this.store.unregister(this);
+    }
 }

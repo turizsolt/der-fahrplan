@@ -27,6 +27,12 @@ export class Util {
     return hour + ':' + (min < 10 ? '0' : '') + min + (sec === 0 ? '' : (sec % 10 === 0 ? ('.' + sec / 10) : ('.' + (sec < 10 ? '0' : '') + sec)));
   }
 
+  public static timeToStringNoHour(time: number): string {
+    const min = Math.floor(time / 60);
+    const sec = Math.floor(time % 60)
+    return (min < 10 ? '0' : '') + min + (sec === 0 ? '' : (sec % 10 === 0 ? ('.' + sec / 10) : ('.' + (sec < 10 ? '0' : '') + sec)));
+  }
+
   public static stringToTime(str: string): number {
     const dotPos = str.indexOf('.');
     let result = 0;
