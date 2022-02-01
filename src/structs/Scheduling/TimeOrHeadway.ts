@@ -22,11 +22,31 @@ export const textToTimesOrHeadways = (text: string): TimeOrHeadway[] => {
 
 export const timesOrHeadwaysToText = (timesOrHeadways: TimeOrHeadway[]): string => {
     let text: string = '';
-    for (const toh of timesOrHeadways) {
+    for (let i = 0; i < timesOrHeadways.length; i++) {
+        const toh = timesOrHeadways[i];
+        const nextToh = timesOrHeadways?.[i + 1];
+        const nextNextToh = timesOrHeadways?.[i + 2];
+
         if (toh.type === 'time') {
-            text += Util.timeToString(toh.time) + '\n';
+            text += Util.timeToString(toh.time);
+
+            if (nextToh?.type === 'headway') {
+                if (nextNextToh?.type === 'headway') {
+                    text += '\n';
+                } else {
+                    text += ' ';
+                }
+            } else {
+                text += '\n';
+            }
         } else {
-            text += Util.timeToStringNoHour(toh.headway) + '\n';
+            text += Util.timeToStringNoHour(toh.headway);
+
+            if (nextToh?.type === 'time') {
+                text += '\n';
+            } else {
+                text += ' ';
+            }
         }
     }
     return text;

@@ -25,12 +25,12 @@ export const DiagramAddTrips: React.FC<Props> = (props) => {
     }, []);
 
     const handleTopTrips = useCallback((event: any) => {
-        process(event.target.value, route.variants[0]);
+        event.target.value = process(event.target.value, route.variants[0]);
         overlayController.updateDiagram();
     }, []);
 
     const handleBottomTrips = useCallback((event: any) => {
-        process(event.target.value, route.variants[1]);
+        event.target.value = process(event.target.value, route.variants[1]);
         overlayController.updateDiagram();
     }, []);
 
@@ -54,7 +54,7 @@ export const DiagramAddTrips: React.FC<Props> = (props) => {
     </div>;
 }
 
-function process(str: string, routeVariantId: string): void {
+function process(str: string, routeVariantId: string): string {
     const routeVariant = (getStorable(routeVariantId) as RouteVariant);
     const toh = textToTimesOrHeadways(str);
     routeVariant.updateTimeCode(toh);
@@ -62,4 +62,6 @@ function process(str: string, routeVariantId: string): void {
     // todo optional
     const times = timesOrHeadwaysToTimes(toh);
     console.log(times.map(t => Util.timeToString(t)));
+
+    return timesOrHeadwaysToText(toh);
 }

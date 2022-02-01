@@ -96,7 +96,7 @@ export class DiagramCreator {
         const routeVariant = getStorable(route && route.variants[0]) as RouteVariant;
         if (!routeVariant) return;
 
-        width = globalThis.containerMap.clientWidth - 2 * border - stationHolder;
+        width = globalThis.containerMap.clientWidth - 2 * border - stationHolder - 90;
         height = globalThis.containerMap.clientHeight - 2 * border - timeHolder - 50;
 
         const diagram = new RailDiagram(store);
