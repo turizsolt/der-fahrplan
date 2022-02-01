@@ -125,6 +125,10 @@ export const settingsButtonStyle = style({
     padding: '0 5px 0 5px'
 });
 
+export const arrivalButtonStyle = style({
+    backgroundColor: '#c4e7eb'
+});
+
 export const departureButtonStyle = style({
     backgroundColor: '#ebe7c4'
 });

@@ -88,6 +88,12 @@ export class OverlayController {
     }
 
     moveAll(time: number) {
+        if (this.moveAllNoUpdate(time)) {
+            this.updateDiagram();
+        }
+    }
+
+    private moveAllNoUpdate(time: number) {
         const tripStop = overlayStore.getState().overlay.selectedTripStop;
 
         if (tripStop) {
@@ -95,11 +101,17 @@ export class OverlayController {
             const routeVariant = trip.getRouteVariant();
             routeVariant.moveAll(time);
 
-            this.updateDiagram();
+            return true;
         }
     }
 
     moveDeparture(time: number) {
+        if (this.moveDepartureNoUpdate(time)) {
+            this.updateDiagram();
+        }
+    }
+
+    private moveDepartureNoUpdate(time: number) {
         const tripStop = overlayStore.getState().overlay.selectedTripStop;
 
         if (tripStop) {
@@ -107,10 +119,21 @@ export class OverlayController {
             const routePart: RoutePart = trip.getWaypoints()[tripStop.routePartNo].routePart;
 
             if (routePart.getType() === TYPES.RoutePartStop) {
-                (routePart as RoutePartStop).setDuration(Math.max(0, routePart.getDuration() + time));
-                trip.getRouteVariant().emit('update', {});
-            }
+                const oldDuration = routePart.getDuration();
+                const newDuration = Math.max(0, oldDuration + time);
 
+                (routePart as RoutePartStop).setDuration(newDuration);
+                trip.getRouteVariant().emit('update', {});
+
+                return { diff: oldDuration - newDuration };
+            }
+        }
+    }
+
+    moveArrival(time: number) {
+        const ret = this.moveDepartureNoUpdate(-time);
+
+        if (ret && ret.diff && this.moveAllNoUpdate(Math.min(ret.diff, time))) {
             this.updateDiagram();
         }
     }
