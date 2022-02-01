@@ -37,6 +37,8 @@ export class RailDiagram {
     setTimeBounds(minTime: number, maxTime: number): void {
         this.minTime = minTime;
         this.maxTime = maxTime;
+        const duration = maxTime - minTime;
+        this.timeIntervals = duration > 8 * 3600 ? 3600 : (duration > 3 * 3600 ? 1800 : (duration > 3600) ? 900 : 300);
         this.update();
     }
 
