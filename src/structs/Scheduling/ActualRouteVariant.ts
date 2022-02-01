@@ -88,6 +88,13 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
         return this.timesOrHeadways;
     }
 
+    moveAll(time: number): void {
+        const trips: Trip[] = this.store.getAllOf<Trip>(TYPES.Trip).filter(trip => trip.getRouteVariant().getId() === this.id);
+        trips.forEach(trip => trip.setDepartureTime(trip.getDepartureTime() + time));
+
+        this.timesOrHeadways = this.timesOrHeadways.map(toh => toh.type === 'time' ? ({ ...toh, time: toh.time + time }) : toh);
+    }
+
     persist(): Object {
         return {
             id: this.id,

@@ -25,4 +25,5 @@ export interface RouteVariant extends BaseStorable, Emitable {
 
     updateTimeCode(timesOrHeadways: TimeOrHeadway[]): void;
     getTimesOrHeadways(): TimeOrHeadway[];
+    moveAll(time: number): void;
 }

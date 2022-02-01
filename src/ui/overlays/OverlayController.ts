@@ -86,6 +86,18 @@ export class OverlayController {
         this.updateMap();
     }
 
+    moveAll(time: number) {
+        const tripStop = overlayStore.getState().overlay.selectedTripStop;
+
+        if (tripStop) {
+            const trip = getStorable(tripStop.tripId) as Trip;
+            const routeVariant = trip.getRouteVariant();
+            routeVariant.moveAll(time);
+
+            this.updateDiagram();
+        }
+    }
+
     setSelectExpress(express: boolean) {
         overlayStore.dispatch(setCreateExpress(express));
     }

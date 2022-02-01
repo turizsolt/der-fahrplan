@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { DiagramAddTrips } from './DiagramAddTrips';
+import { DiagramSettings } from './DiagramSettings';
 import { DiagramTime } from './DiagramTime';
 import { MapSettings } from './MapSettings';
 import { RouteList } from './RouteList';
@@ -24,7 +25,7 @@ export const Overlay: React.FC<Props> = props => {
             <div className={pixiMapContainerStyle} id="pixi-map-container"></div>
         </div>
         <div className={rightColumnDiagramStyle} style={{ visibility: whenDiagram }}>
-            <div className={pixiMapSettingsStyle}>Diagram settings</div>
+            <DiagramSettings />
             <div className={pixiDiagramContainerStyle} id="pixi-diagram-container"></div>
             <DiagramTime />
         </div>
