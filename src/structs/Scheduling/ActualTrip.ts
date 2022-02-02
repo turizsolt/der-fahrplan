@@ -296,6 +296,8 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         if (obj.nextReverse === false) {
             this.toggleNextReverse();
         }
+
+        this.updateRouteVariant();
     }
 
     remove(): void {

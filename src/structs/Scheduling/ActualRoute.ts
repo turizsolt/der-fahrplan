@@ -179,7 +179,7 @@ export class ActualRoute extends ActualBaseStorable implements Route {
         const parts: RoutePart[] = obj.parts.map(part => {
             switch (Symbol.for(part.type)) {
                 case TYPES.RoutePartEdge:
-                    return new ActualRoutePartEdge({ getDuration: () => obj.duration || 0, getId: () => '', getName: () => '' });
+                    return new ActualRoutePartEdge({ getDuration: () => part.duration || 0, getId: () => '', getName: () => '' });
 
                 case TYPES.RoutePartStop:
                     const stop = new ActualRoutePartStop(store.get(part.id) as unknown as RoutePartReferenceColor);

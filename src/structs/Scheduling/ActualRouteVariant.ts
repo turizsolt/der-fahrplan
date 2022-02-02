@@ -130,7 +130,7 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
         this.presetId(obj.id);
         this.init(store.get(obj.route) as Route, obj.startEnd);
         if (obj.timesOrHeadways) {
-            this.updateTimeCode(obj.timesOrHeadways);
+            this.timesOrHeadways = obj.timesOrHeadways;
         }
     }
 
