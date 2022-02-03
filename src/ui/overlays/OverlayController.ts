@@ -40,6 +40,26 @@ export class OverlayController {
         this.routeManipulator = new RouteManipulator();
     }
 
+    detachTrip(fromId: string, toId: string) {
+        const from = getStorable(fromId) as Trip;
+        const to = getStorable(toId) as Trip;
+
+        from.setNextTrip(null);
+        to.setPrevTrip(null);
+
+        this.updateConnectingTrips();
+    }
+
+    connectTrip(fromId: string, toId: string) {
+        const from = getStorable(fromId) as Trip;
+        const to = getStorable(toId) as Trip;
+
+        from.setNextTrip(to);
+        to.setPrevTrip(from);
+
+        this.updateConnectingTrips();
+    }
+
     selectDepartings(selectedDepartings: string[]): void {
         overlayStore.dispatch(setSelectedDepartingList(selectedDepartings));
         this.updateConnectingTrips();
@@ -245,6 +265,9 @@ export class OverlayController {
         }
         if (mode === 'diagram') {
             this.updateDiagram();
+        }
+        if (mode === 'connect') {
+            this.updateConnectingTrips();
         }
     }
 

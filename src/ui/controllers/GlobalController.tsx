@@ -80,7 +80,7 @@ export class GlobalController {
     this.vueViewbox.addButton({ id: 'map', text: 'Map' });
     this.vueViewbox.addButton({ id: 'schedule', text: 'Schedule' });
     this.vueViewbox.addButton({ id: 'diagram', text: 'Diagram' });
-    this.vueViewbox.addButton({ id: 'connector', text: 'Connect' });
+    this.vueViewbox.addButton({ id: 'connect', text: 'Connect' });
     this.vueViewbox.addButton({ id: 'builder', text: 'Builder' });
     this.selectView('diagram');
   }

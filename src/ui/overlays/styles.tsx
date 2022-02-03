@@ -203,6 +203,40 @@ export const connectorMiddleStyle = style({
     overflowY: 'scroll'
 });
 
+export const connectorEndStyle = style({
+    border: '1px solid #cec',
+    textAlign: 'center',
+    width: '80px',
+    height: '20px',
+    backgroundColor: 'darkblue',
+    color: 'white',
+    '&:hover': {
+        cursor: 'pointer'
+    }
+} as any);
+
+export const connectorFullEndStyle = style({
+    border: '1px solid #cec',
+    textAlign: 'center',
+    width: '180px',
+    height: '20px',
+    backgroundColor: 'darkred',
+    color: 'white',
+    '&:hover': {
+        cursor: 'pointer'
+    }
+} as any);
+
+export const connectorNotEndStyle = style({
+    width: '80px',
+    height: '20px',
+});
+
+export const connectorMiddleEndStyle = style({
+    width: '20px',
+    height: '20px',
+});
+
 export const getContrastColor = (hexcolor: string): string => {
     var r = parseInt(hexcolor.substr(1, 2), 16);
     var g = parseInt(hexcolor.substr(3, 2), 16);

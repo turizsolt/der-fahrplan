@@ -1,11 +1,11 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { TripWithEnd } from '../../structs/Scheduling/TripWithEnd';
 import { Util } from '../../structs/Util';
 import { OverlayController } from './OverlayController';
 import { RouteSign } from './RouteSign';
 import { RootState } from './store';
-import { connectorLeftStyle, connectorMiddleStyle, connectorRightStyle, connectorStyle, connectorTopStyle } from './styles';
+import { connectorEndStyle, connectorFullEndStyle, connectorLeftStyle, connectorMiddleEndStyle, connectorMiddleStyle, connectorNotEndStyle, connectorRightStyle, connectorStyle, connectorTopStyle } from './styles';
 
 interface Props { };
 
@@ -15,7 +15,7 @@ export const Connector: React.FC<Props> = props => {
     const { overlayMode: mode, stationList, selectedStation, arrivingVariantList, departingVariantList,
         selectedArrivingVariantList, selectedDepartingVariantList, dualTripList } = useSelector((state: RootState) => state.overlay);
 
-    const whenConnector = mode === 'connector' ? 'visible' : 'hidden';
+    const whenConnector = mode === 'connect' ? 'visible' : 'hidden';
 
     const handleStationChange = useCallback((event: any) => {
         const selectedId = event.target.value;
@@ -42,6 +42,27 @@ export const Connector: React.FC<Props> = props => {
         overlayController.selectDepartings([]);
     }, []);
 
+    const [from, setFrom] = useState<string>(null);
+
+    const handleFromTrip = useCallback((tripId: string) => () => {
+        if (tripId) {
+            setFrom(tripId);
+        }
+    }, []);
+
+    const handleToTrip = useCallback((tripId: string) => () => {
+        if (tripId && from) {
+            overlayController.connectTrip(from, tripId);
+            setFrom(null);
+        }
+    }, [from]);
+
+    const handleDetachTrip = useCallback((fromId: string, toId: string) => () => {
+        if (fromId && toId) {
+            overlayController.detachTrip(fromId, toId);
+        }
+    }, []);
+
     return <div className={connectorStyle} style={{ visibility: whenConnector }}>
         <div className={connectorTopStyle}>
             <select size={1} onChange={handleStationChange} value={selectedStation?.id}>
@@ -62,6 +83,12 @@ export const Connector: React.FC<Props> = props => {
             {dualTripList.map((dual, index) => <div key={index}>
                 <div style={{ display: 'flex' }}>
                     <TripLast trip={dual.Last} />
+                    {dual.First && dual.Last && <div className={connectorFullEndStyle} onClick={handleDetachTrip(dual.Last?.trip.id, dual.First?.trip.id)}>connected</div>}
+                    {(!dual.First || !dual.Last) && <>
+                        <div className={dual.Last ? connectorEndStyle : connectorNotEndStyle} onClick={dual.Last?.trip.nextTrip ? handleDetachTrip(dual.Last?.trip.id, dual.Last?.trip.nextTrip) : handleFromTrip(dual.Last?.trip.id)}>{from === dual.Last?.trip.id ? 'from' : dual.Last?.trip.nextTrip}</div>
+                        <div className={connectorMiddleEndStyle}></div>
+                        <div className={dual.First ? connectorEndStyle : connectorNotEndStyle} onClick={dual.First?.trip.prevTrip ? handleDetachTrip(dual.First?.trip.prevTrip, dual.First?.trip.id) : handleToTrip(dual.First?.trip.id)}>{dual.First?.trip.prevTrip}</div>
+                    </>}
                     <TripFirst trip={dual.First} />
                 </div>
             </div>)}
@@ -82,7 +109,7 @@ type THProps = {
 export const TripLast: React.FC<THProps> = props => {
     const { trip } = props;
 
-    return <div style={{ display: 'flex', width: '50%', justifyContent: 'flex-end' }}>
+    return <div style={{ display: 'flex', width: 'calc(50% - 180px)', justifyContent: 'flex-end' }}>
         {trip && <>
             <div>{trip.trip.firstStationName}</div>
             <RouteSign routeColor={trip.trip.color} routeName={trip.trip.name} />
@@ -94,7 +121,7 @@ export const TripLast: React.FC<THProps> = props => {
 export const TripFirst: React.FC<THProps> = props => {
     const { trip } = props;
 
-    return <div style={{ display: 'flex', width: '50%', justifyContent: 'flex-start' }}>
+    return <div style={{ display: 'flex', width: 'calc(50% - 180px)', justifyContent: 'flex-start' }}>
         {trip && <>
             <div>{Util.timeToString(trip.time)}</div>
             <RouteSign routeColor={trip.trip.color} routeName={trip.trip.name} />
