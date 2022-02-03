@@ -2,6 +2,7 @@ import { TYPES } from "../../di/TYPES";
 import { applyMixins } from "../../mixins/ApplyMixins";
 import { Emitable } from "../../mixins/Emitable";
 import { Station } from "../../modules/Station/Station";
+import { StorableRouteVariant } from "../../ui/overlays/store";
 import { ActualBaseStorable } from "../Actuals/ActualStorable";
 import { Store } from "../Interfaces/Store";
 import { otherEnd, WhichEnd } from "../Interfaces/WhichEnd";
@@ -113,16 +114,19 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
         }
     }
 
-    persistDeep(): Object {
+    persistDeep(): StorableRouteVariant {
         return {
             id: this.id,
             type: 'RouteVariant',
-            startEnd: this.startEnd,
-            route: this.route.getId(),
-            stops: this.getStops().map(s => this.stopPersist(s)),
+            // startEnd: this.startEnd,
+            // route: this.route.getId(),
+            // stops: this.getStops().map(s => this.stopPersist(s)),
             color: this.getColor(),
             name: this.getName(),
-            destination: this.getLastStop().getRef().getName()
+            lastStationId: this.getLastStop().getRef().getId(),
+            firstStationId: this.getFirstStop().getRef().getId(),
+            lastStationName: this.getLastStop().getRef().getName(),
+            firstStationName: this.getFirstStop().getRef().getName(),
         }
     }
 

@@ -1,12 +1,13 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { Connector } from './Connector';
 import { DiagramAddTrips } from './DiagramAddTrips';
 import { DiagramSettings } from './DiagramSettings';
 import { DiagramTime } from './DiagramTime';
 import { MapSettings } from './MapSettings';
 import { RouteList } from './RouteList';
 import { RootState } from './store';
-import { connectorStyle, overlayStyle, pixiDiagramContainerStyle, pixiMapContainerStyle, pixiMapSettingsStyle, rightColumnDiagramStyle, rightMapColumnStyle, rightRightColumnDiagramStyle, routeListStyle } from './styles';
+import { overlayStyle, pixiDiagramContainerStyle, pixiMapContainerStyle, pixiMapSettingsStyle, rightColumnDiagramStyle, rightMapColumnStyle, rightRightColumnDiagramStyle, routeListStyle } from './styles';
 
 interface Props { };
 
@@ -16,7 +17,6 @@ export const Overlay: React.FC<Props> = props => {
 
     const whenMap = mode === 'map' ? 'visible' : 'hidden';
     const whenDiagram = mode === 'diagram' ? 'visible' : 'hidden';
-    const whenConnector = mode === 'connector' ? 'visible' : 'hidden';
 
     return <div className={overlayStyle}>
         <RouteList />
@@ -32,6 +32,6 @@ export const Overlay: React.FC<Props> = props => {
         <div className={rightRightColumnDiagramStyle} style={{ visibility: whenDiagram }}>
             <DiagramAddTrips key={selectedRoute?.id + '-' + keyVersion} route={selectedRoute} />
         </div>
-        <div className={connectorStyle} style={{ visibility: whenConnector }}>Connector</div>
+        <Connector />
     </div>;
 }

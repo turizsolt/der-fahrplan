@@ -11,6 +11,22 @@ export interface StorableRoute {
     variants: string[]
 };
 
+export interface StorableRouteVariant {
+    id: string;
+    type: string;
+    name: string;
+    firstStationId: string;
+    firstStationName: string;
+    lastStationId: string;
+    lastStationName: string;
+    color: string;
+}
+
+export interface StorableStation {
+    id: string;
+    name: string;
+}
+
 export interface OverlayState {
     overlayMode: string,
     selectedRoute: StorableRoute,
@@ -22,7 +38,12 @@ export interface OverlayState {
         tripId: string,
         routePartNo: number
     },
-    keyVersion: number
+    keyVersion: number,
+    routeVariantList: StorableRouteVariant[],
+    selectedStation: StorableStation,
+    arrivingVariantList: StorableRouteVariant[],
+    departingVariantList: StorableRouteVariant[],
+    stationList: StorableStation[]
 }
 
 const initialState: OverlayState = {
@@ -33,7 +54,12 @@ const initialState: OverlayState = {
     startTime: parseInt(localStorage.getItem('startTime'), 10) || 4 * 3600,
     endTime: parseInt(localStorage.getItem('endTime'), 10) || 7 * 3600,
     selectedTripStop: null,
-    keyVersion: 0
+    keyVersion: 0,
+    routeVariantList: [],
+    arrivingVariantList: [],
+    departingVariantList: [],
+    selectedStation: null,
+    stationList: []
 };
 
 export const overlaySlice = createSlice({
@@ -46,8 +72,12 @@ export const overlaySlice = createSlice({
         selectRoute: (state, action: PayloadAction<StorableRoute>) => {
             state.selectedRoute = action.payload;
         },
-        updateRouteList: (state, action: PayloadAction<StorableRoute[]>) => {
-            state.routeList = action.payload;
+        updateRouteList: (state, action: PayloadAction<{ routeList: StorableRoute[], routeVariantList: StorableRouteVariant[] }>) => {
+            state.routeList = action.payload.routeList;
+            state.routeVariantList = action.payload.routeVariantList;
+        },
+        updateStationList: (state, action: PayloadAction<StorableStation[]>) => {
+            state.stationList = action.payload;
         },
         setCreateExpress: (state, action: PayloadAction<boolean>) => {
             state.createExpress = action.payload;
@@ -76,10 +106,15 @@ export const overlaySlice = createSlice({
         incrementKeyVersion: (state, action: PayloadAction<void>) => {
             state.keyVersion++
         },
+        setSelectedStation: (state, action: PayloadAction<{ station: StorableStation, arrivingVariantList: StorableRouteVariant[], departingVariantList: StorableRouteVariant[] }>) => {
+            state.selectedStation = action.payload.station;
+            state.arrivingVariantList = action.payload.arrivingVariantList;
+            state.departingVariantList = action.payload.departingVariantList;
+        },
     },
 })
 
-export const { setOverlayMode, selectRoute, updateRouteList, setCreateExpress, setStartTime, setEndTime, setSelectedTripStop, incrementKeyVersion } = overlaySlice.actions
+export const { setOverlayMode, selectRoute, updateStationList, updateRouteList, setCreateExpress, setStartTime, setEndTime, setSelectedTripStop, incrementKeyVersion, setSelectedStation } = overlaySlice.actions
 
 export const overlayStore = configureStore({
     reducer: {

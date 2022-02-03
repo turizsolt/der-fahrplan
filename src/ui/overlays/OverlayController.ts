@@ -2,6 +2,7 @@ import { TYPES } from "../../di/TYPES";
 import { RailMap } from "../../modules/RailMap/RailMap";
 import { RailMapCreator } from "../../modules/RailMap/RailMapCreator";
 import { RailMapNode } from "../../modules/RailMap/RailMapNode";
+import { Station } from "../../modules/Station/Station";
 import { createStorable, getAllOfStorable, getStorable, getStore } from "../../structs/Actuals/Store/StoreForVue";
 import { Color } from "../../structs/Color";
 import { WhichEnd } from "../../structs/Interfaces/WhichEnd";
@@ -16,7 +17,7 @@ import { TripStop } from "../../structs/Scheduling/TripStop";
 import { Util } from "../../structs/Util";
 import { DiagramCreator } from "./DiagramCreator";
 import { RouteManipulator } from "./RouteManipulator";
-import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress, setOverlayMode, setEndTime, setStartTime, setSelectedTripStop, incrementKeyVersion } from "./store";
+import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress, setOverlayMode, setEndTime, setStartTime, setSelectedTripStop, incrementKeyVersion, StorableRouteVariant, updateStationList, setSelectedStation } from "./store";
 
 const DEFAULT_ROUTE_COLORS = ['#fe9812', '#688e26', '#002500', '#10423f', '#20837e', '#f25757', '#e41111', '#432337'];
 
@@ -68,13 +69,28 @@ export class OverlayController {
     }
 
     updateRouteList(): void {
-        const rl = getAllOfStorable(TYPES.Route).map(r => r.persistDeep()) as StorableRoute[];
-        overlayStore.dispatch(updateRouteList(rl));
+        const routeList = getAllOfStorable(TYPES.Route).map(r => r.persistDeep()) as StorableRoute[];
+        const routeVariantList = getAllOfStorable(TYPES.RouteVariant).map(r => r.persistDeep()) as StorableRouteVariant[];
+        const stationList = (getAllOfStorable(TYPES.Station) as Station[]).map(r => ({ id: r.getId(), name: r.getName() }));
+        overlayStore.dispatch(updateRouteList({ routeList, routeVariantList }));
+        overlayStore.dispatch(updateStationList(stationList));
     }
 
     selectRoute(route: StorableRoute): void {
         overlayStore.dispatch(selectRoute(route));
         this.updateDiagram();
+    }
+
+    selectStation(selectedId: string): void {
+        if (selectedId === 'no-station') {
+            overlayStore.dispatch(setSelectedStation({ station: null, arrivingVariantList: [], departingVariantList: [] }));
+        } else {
+            const stationObj = getStorable(selectedId) as Station;
+            const station = { id: stationObj.getId(), name: stationObj.getName() };
+            const arrivingVariantList = overlayStore.getState().overlay.routeVariantList.filter(rv => rv.lastStationId === station.id);
+            const departingVariantList = overlayStore.getState().overlay.routeVariantList.filter(rv => rv.firstStationId === station.id);
+            overlayStore.dispatch(setSelectedStation({ station, arrivingVariantList, departingVariantList }));
+        }
     }
 
     deleteRoute(id: string) {
