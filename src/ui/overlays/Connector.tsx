@@ -109,7 +109,7 @@ type THProps = {
 export const TripLast: React.FC<THProps> = props => {
     const { trip } = props;
 
-    return <div style={{ display: 'flex', width: 'calc(50% - 180px)', justifyContent: 'flex-end' }}>
+    return <div style={{ display: 'flex', width: 'calc(50% - 90px)', justifyContent: 'flex-end' }}>
         {trip && <>
             <div>{trip.trip.firstStationName}</div>
             <RouteSign routeColor={trip.trip.color} routeName={trip.trip.name} />
@@ -121,7 +121,7 @@ export const TripLast: React.FC<THProps> = props => {
 export const TripFirst: React.FC<THProps> = props => {
     const { trip } = props;
 
-    return <div style={{ display: 'flex', width: 'calc(50% - 180px)', justifyContent: 'flex-start' }}>
+    return <div style={{ display: 'flex', width: 'calc(50% - 90px)', justifyContent: 'flex-start' }}>
         {trip && <>
             <div>{Util.timeToString(trip.time)}</div>
             <RouteSign routeColor={trip.trip.color} routeName={trip.trip.name} />
