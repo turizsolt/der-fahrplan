@@ -63,6 +63,10 @@ export const Connector: React.FC<Props> = props => {
         }
     }, []);
 
+    const handleAutoConnect = useCallback(() => {
+        overlayController.autoConnect();
+    }, []);
+
     return <div className={connectorStyle} style={{ visibility: whenConnector }}>
         <div className={connectorTopStyle}>
             <select size={1} onChange={handleStationChange} value={selectedStation?.id}>
@@ -98,6 +102,8 @@ export const Connector: React.FC<Props> = props => {
             <select multiple onChange={handleDepartingVariantsChange} size={departingVariantList.length} value={selectedDepartingVariantList}>
                 {departingVariantList.map(vl => <option key={vl.id} value={vl.id}>{vl.name} to {vl.lastStationName}</option>)}
             </select>
+            <hr />
+            <button onClick={handleAutoConnect}>Auto</button>
         </div>
     </div>;
 }

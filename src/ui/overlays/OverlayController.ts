@@ -74,6 +74,33 @@ export class OverlayController {
         overlayStore.dispatch(setDualTripList(this.getDualTripList()));
     }
 
+    autoConnect(): void {
+        const dual = this.getDualTripList().filter(d => !d.Last || !d.First);
+
+        let i = 0;
+        let j = 0;
+        do {
+            while (i < dual.length && !dual[i].Last) {
+                i++;
+            }
+            if (j < i) {
+                j = i;
+            }
+            while (j < dual.length && !dual[j].First) {
+                j++;
+            }
+
+            if (i < dual.length && j < dual.length && dual[i].Last && dual[j].First) {
+                this.connectTrip(dual[i].Last?.trip.id, dual[j].First?.trip.id);
+            }
+
+            i++;
+            j++;
+        } while (i < dual.length && j < dual.length);
+
+        this.updateConnectingTrips();
+    }
+
     private getDualTripList(): Record<TripEnd, TripWithEnd>[] {
         const tripList = getAllOfStorable(TYPES.Trip) as Trip[];
         const lastRoutes = overlayStore.getState().overlay.selectedArrivingVariantList;
@@ -266,7 +293,7 @@ export class OverlayController {
 
     setOverlayMode(mode: string) {
         overlayStore.dispatch(setOverlayMode(mode));
-        if (mode === 'map' || mode === 'diagram') {
+        if (mode === 'map' || mode === 'diagram' || mode === 'connect') {
             this.updateRouteList();
         }
         if (mode === 'map') {
