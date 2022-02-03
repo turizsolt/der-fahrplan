@@ -1,4 +1,6 @@
 import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { TripEnd } from '../../structs/Scheduling/TripEnd';
+import { TripWithEnd } from '../../structs/Scheduling/TripWithEnd';
 
 export interface StorableRoute {
     id: string,
@@ -45,7 +47,8 @@ export interface OverlayState {
     departingVariantList: StorableRouteVariant[],
     selectedArrivingVariantList: string[],
     selectedDepartingVariantList: string[],
-    stationList: StorableStation[]
+    stationList: StorableStation[],
+    dualTripList: Record<TripEnd, TripWithEnd>[]
 }
 
 const initialState: OverlayState = {
@@ -63,7 +66,8 @@ const initialState: OverlayState = {
     selectedArrivingVariantList: [],
     selectedDepartingVariantList: [],
     selectedStation: null,
-    stationList: []
+    stationList: [],
+    dualTripList: []
 };
 
 export const overlaySlice = createSlice({
@@ -121,12 +125,15 @@ export const overlaySlice = createSlice({
         setSelectedArrivingList: (state, action: PayloadAction<string[]>) => {
             state.selectedArrivingVariantList = action.payload;
         },
+        setDualTripList: (state, action: PayloadAction<Record<TripEnd, TripWithEnd>[]>) => {
+            state.dualTripList = action.payload;
+        },
     },
 })
 
 export const { setOverlayMode, selectRoute, updateStationList, updateRouteList, setCreateExpress,
     setStartTime, setEndTime, setSelectedTripStop, incrementKeyVersion, setSelectedStation,
-    setSelectedArrivingList, setSelectedDepartingList } = overlaySlice.actions
+    setSelectedArrivingList, setSelectedDepartingList, setDualTripList } = overlaySlice.actions
 
 export const overlayStore = configureStore({
     reducer: {

@@ -1,8 +1,11 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { TripWithEnd } from '../../structs/Scheduling/TripWithEnd';
+import { Util } from '../../structs/Util';
 import { OverlayController } from './OverlayController';
+import { RouteSign } from './RouteSign';
 import { RootState } from './store';
-import { connectorStyle } from './styles';
+import { connectorLeftStyle, connectorMiddleStyle, connectorRightStyle, connectorStyle, connectorTopStyle } from './styles';
 
 interface Props { };
 
@@ -10,7 +13,7 @@ const overlayController = OverlayController.getInstance();
 
 export const Connector: React.FC<Props> = props => {
     const { overlayMode: mode, stationList, selectedStation, arrivingVariantList, departingVariantList,
-        selectedArrivingVariantList, selectedDepartingVariantList } = useSelector((state: RootState) => state.overlay);
+        selectedArrivingVariantList, selectedDepartingVariantList, dualTripList } = useSelector((state: RootState) => state.overlay);
 
     const whenConnector = mode === 'connector' ? 'visible' : 'hidden';
 
@@ -40,26 +43,62 @@ export const Connector: React.FC<Props> = props => {
     }, []);
 
     return <div className={connectorStyle} style={{ visibility: whenConnector }}>
-        <div>
+        <div className={connectorTopStyle}>
             <select size={1} onChange={handleStationChange} value={selectedStation?.id}>
                 <option value={'no-station'}>Select a station</option>
                 {stationList.map(station => <option key={station.id} value={station.id}>{station.name}</option>)}
             </select>
         </div>
-        <div>
+        <div className={connectorLeftStyle}>
             <div>Arriving:</div>
             <select multiple onChange={handleArrivingVariantsChange} size={arrivingVariantList.length} value={selectedArrivingVariantList}>
                 {arrivingVariantList.map(vl => <option key={vl.id} value={vl.id}>{vl.name} from {vl.firstStationName}</option>)}
             </select>
+            <hr />
+            <button onClick={handleSelectAllVariants}>Select all</button>
+            <button onClick={handleSelectNoneVariants}>Select none</button>
         </div>
-        <div>
+        <div className={connectorMiddleStyle}>
+            {dualTripList.map((dual, index) => <div key={index}>
+                <div style={{ display: 'flex' }}>
+                    <TripLast trip={dual.Last} />
+                    <TripFirst trip={dual.First} />
+                </div>
+            </div>)}
+        </div>
+        <div className={connectorRightStyle}>
             <div>Departing:</div>
             <select multiple onChange={handleDepartingVariantsChange} size={departingVariantList.length} value={selectedDepartingVariantList}>
                 {departingVariantList.map(vl => <option key={vl.id} value={vl.id}>{vl.name} to {vl.lastStationName}</option>)}
             </select>
         </div>
-        <button onClick={handleSelectAllVariants}>Select all</button>
-        <button onClick={handleSelectNoneVariants}>Select none</button>
-        <hr />
+    </div>;
+}
+
+type THProps = {
+    trip: TripWithEnd;
+};
+
+export const TripLast: React.FC<THProps> = props => {
+    const { trip } = props;
+
+    return <div style={{ display: 'flex', width: '50%', justifyContent: 'flex-end' }}>
+        {trip && <>
+            <div>{trip.trip.firstStationName}</div>
+            <RouteSign routeColor={trip.trip.color} routeName={trip.trip.name} />
+            <div>{Util.timeToString(trip.time)}</div>
+        </>}
+    </div>;
+}
+
+export const TripFirst: React.FC<THProps> = props => {
+    const { trip } = props;
+
+    return <div style={{ display: 'flex', width: '50%', justifyContent: 'flex-start' }}>
+        {trip && <>
+            <div>{Util.timeToString(trip.time)}</div>
+            <RouteSign routeColor={trip.trip.color} routeName={trip.trip.name} />
+            <div>{trip.trip.firstStationName}</div>
+        </>}
     </div>;
 }

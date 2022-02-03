@@ -21,6 +21,7 @@ export interface Trip extends BaseStorable {
     toggleNextReverse(): void;
 
     getDepartureTime(): number;
+    getArrivalTime(): number;
     setDepartureTime(time: number): void;
 
     start(): void;

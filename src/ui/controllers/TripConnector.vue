@@ -391,6 +391,7 @@ export default class TripConnector extends Vue {
   }
 
   autoReverse(): void {
+    /*
     const dual = this.tripsWithEnd;
 
     for (let d of dual) {
@@ -401,6 +402,7 @@ export default class TripConnector extends Vue {
     }
 
     this.update();
+    */
   }
 }
 </script>

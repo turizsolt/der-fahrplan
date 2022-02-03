@@ -13,11 +13,13 @@ import { Route } from "../../structs/Scheduling/Route";
 import { RoutePart } from "../../structs/Scheduling/RoutePart";
 import { RoutePartStop } from "../../structs/Scheduling/RoutePartStop";
 import { Trip } from "../../structs/Scheduling/Trip";
+import { TripEnd } from "../../structs/Scheduling/TripEnd";
 import { TripStop } from "../../structs/Scheduling/TripStop";
+import { TripWithEnd } from "../../structs/Scheduling/TripWithEnd";
 import { Util } from "../../structs/Util";
 import { DiagramCreator } from "./DiagramCreator";
 import { RouteManipulator } from "./RouteManipulator";
-import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress, setOverlayMode, setEndTime, setStartTime, setSelectedTripStop, incrementKeyVersion, StorableRouteVariant, updateStationList, setSelectedStation, setSelectedDepartingList, setSelectedArrivingList } from "./store";
+import { overlayStore, selectRoute, StorableRoute, updateRouteList, setCreateExpress, setOverlayMode, setEndTime, setStartTime, setSelectedTripStop, incrementKeyVersion, StorableRouteVariant, updateStationList, setSelectedStation, setSelectedDepartingList, setSelectedArrivingList, setDualTripList } from "./store";
 
 const DEFAULT_ROUTE_COLORS = ['#fe9812', '#688e26', '#002500', '#10423f', '#20837e', '#f25757', '#e41111', '#432337'];
 
@@ -49,8 +51,64 @@ export class OverlayController {
     }
 
     updateConnectingTrips(): void {
-
+        overlayStore.dispatch(setDualTripList(this.getDualTripList()));
     }
+
+    private getDualTripList(): Record<TripEnd, TripWithEnd>[] {
+        const tripList = getAllOfStorable(TYPES.Trip) as Trip[];
+        const lastRoutes = overlayStore.getState().overlay.selectedArrivingVariantList;
+        const firstRoutes = overlayStore.getState().overlay.selectedDepartingVariantList;
+
+        const lasts = tripList.filter((t) =>
+            lastRoutes.includes(t.getRouteVariant().getId())
+        );
+        const firsts = tripList.filter((t) =>
+            firstRoutes.includes(t.getRouteVariant().getId())
+        );
+        const all: TripWithEnd[] = [];
+        all.push(
+            ...lasts.map((t) => ({
+                end: TripEnd.Last,
+                trip: t.persistShallow(),
+                time: t.getArrivalTime(),
+            }))
+        );
+        all.push(
+            ...firsts.map((t) => ({
+                end: TripEnd.First,
+                trip: t.persistShallow(),
+                time: t.getDepartureTime(),
+            }))
+        );
+        all.sort((a, b) => {
+            if (a.time === b.time) return a.end > b.end ? -1 : 1;
+            return a.time - b.time;
+        });
+
+        const dual: Record<TripEnd, TripWithEnd>[] = [];
+        for (let i = 0; i < all.length; i++) {
+            if (all[i].end === TripEnd.Last) {
+                if (
+                    all[i + 1] &&
+                    all[i + 1].end === TripEnd.First &&
+                    all[i].trip.nextTrip === all[i + 1].trip.id &&
+                    all[i].trip.id === all[i + 1].trip.prevTrip
+                ) {
+                    dual.push({ Last: all[i], First: all[i + 1] });
+                    i++;
+                } else {
+                    dual.push({ Last: all[i], First: null });
+                }
+            } else {
+                dual.push({ Last: null, First: all[i] });
+            }
+        }
+
+        return dual;
+        //.filter((x) => !this.showUnattachedOnly || !(x.First && x.Last))
+        //.filter((x) => !this.showAttachedOnly || (x.First && x.Last));
+    }
+
 
     selectTripStop(tripStop: TripStop): void {
         overlayStore.dispatch(setSelectedTripStop(tripStop ? {
@@ -105,6 +163,9 @@ export class OverlayController {
             const departingVariantList = overlayStore.getState().overlay.routeVariantList.filter(rv => rv.firstStationId === station.id);
             overlayStore.dispatch(setSelectedStation({ station, arrivingVariantList, departingVariantList }));
         }
+        overlayStore.dispatch(setSelectedArrivingList([]));
+        overlayStore.dispatch(setSelectedDepartingList([]));
+        this.updateConnectingTrips();
     }
 
     deleteRoute(id: string) {

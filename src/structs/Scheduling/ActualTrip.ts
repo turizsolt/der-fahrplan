@@ -92,6 +92,10 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         return this.departureTime;
     }
 
+    getArrivalTime(): number {
+        return this.departureTime + this.redefinedProps[this.routeVariant.getLastStop().getRef().getId()].arrivalTime;
+    }
+
     setDepartureTime(time: number): void {
         this.departureTime = time;
     }
@@ -242,6 +246,21 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
 
     persistDeep(): Object {
         return this.xpersistDeep();
+    }
+
+    persistShallow(): Object {
+        return {
+            id: this.id,
+            type: 'Trip',
+            departureTime: this.departureTime,
+            arrivalTime: this.arrivalTime,
+            prevTrip: this.prevTrip?.getId(),
+            nextTrip: this.nextTrip?.getId(),
+            color: this.routeVariant.getColor(),
+            name: this.routeVariant.getName(),
+            firstStationName: this.routeVariant.getFirstStop().getRef().getName(),
+            lastStationName: this.routeVariant.getLastStop().getRef().getName(),
+        }
     }
 
     xpersistDeep(level: number = 1): Object {
