@@ -94,7 +94,7 @@ export class OverlayController {
             }))
         );
         all.push(
-            ...firsts.map((t) => ({
+            ...firsts.filter(t => !t.getPrevTrip()).map((t) => ({
                 end: TripEnd.First,
                 trip: t.persistShallow(),
                 time: t.getDepartureTime(),
@@ -104,6 +104,15 @@ export class OverlayController {
             if (a.time === b.time) return a.end > b.end ? -1 : 1;
             return a.time - b.time;
         });
+
+        const getTrip = (id: string) => {
+            const trip = getStorable(id) as Trip;
+            return {
+                end: TripEnd.First,
+                trip: trip.persistShallow(),
+                time: trip.getDepartureTime()
+            };
+        };
 
         const dual: Record<TripEnd, TripWithEnd>[] = [];
         for (let i = 0; i < all.length; i++) {
@@ -117,7 +126,7 @@ export class OverlayController {
                     dual.push({ Last: all[i], First: all[i + 1] });
                     i++;
                 } else {
-                    dual.push({ Last: all[i], First: null });
+                    dual.push({ Last: all[i], First: all[i].trip.nextTrip ? getTrip(all[i].trip.nextTrip) : null });
                 }
             } else {
                 dual.push({ Last: null, First: all[i] });
