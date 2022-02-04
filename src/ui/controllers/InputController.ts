@@ -23,6 +23,7 @@ export class InputController {
   private downProps: boolean = false;
   private downAt: number = 0;
   private mouseDownEvent: PointerEvent = null;
+  private turnedOn: boolean = true;
 
   constructor(
     private store: Store,
@@ -30,6 +31,14 @@ export class InputController {
     private specificController: GUISpecificController
   ) {
     store.setInputController(this);
+  }
+
+  turnOn(): void {
+    this.turnedOn = true;
+  }
+
+  turnOff(): void {
+    this.turnedOn = false;
   }
 
   // todo proper injection thingy
@@ -76,6 +85,8 @@ export class InputController {
   }
 
   down(event: PointerEvent) {
+    if (!this.turnedOn) return;
+
     this.downProps = true;
     this.downAt = new Date().getTime();
     this.handleMouse(Input.MouseDown, event);
@@ -83,6 +94,8 @@ export class InputController {
   }
 
   move(event: PointerEvent) {
+    if (!this.turnedOn) return;
+
     const now = new Date().getTime();
     if (now - this.downAt < 500) return;
 
@@ -100,6 +113,7 @@ export class InputController {
   }
 
   up(event: PointerEvent) {
+    if (!this.turnedOn) return;
     if (!this.downProps) return;
 
     const now = new Date().getTime();
@@ -142,6 +156,8 @@ export class InputController {
   }
 
   wheel(event: WheelEvent) {
+    if (!this.turnedOn) return;
+
     this.inputHandler.handle({
       input: Input.Wheel,
       type:
@@ -153,14 +169,20 @@ export class InputController {
   // keyboard handling
 
   keyDown(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    if (!this.turnedOn) return;
+
     this.inputHandler.handle(this.getHandle(Input.KeyboardDown, key, mods));
   }
 
   keyUp(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    if (!this.turnedOn) return;
+
     this.inputHandler.handle(this.getHandle(Input.KeyboardUp, key, mods));
   }
 
   keyHold(key: string, mods: { shift: boolean; ctrl: boolean }): void {
+    if (!this.turnedOn) return;
+
     this.inputHandler.handle(this.getHandle(Input.KeyboardHold, key, mods));
   }
 

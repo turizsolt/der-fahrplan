@@ -97,14 +97,17 @@ export class GlobalController {
       this.vueBigScreenMap.setShow(false);
       this.selectMode(InputMode.CAMERA);
       this.vueToolbox.setShow(false);
+      this.inputController.turnOn();
     } else if (mode === 'builder') {
       this.vueBigScreenMap.setShow(false);
       this.selectMode(InputMode.CAMERA);
       this.vueToolbox.setShow(true);
+      this.inputController.turnOn();
     } else {
       this.vueBigScreenMap.setShow(true);
       this.selectMode(InputMode.SELECT);
       this.vueToolbox.setShow(false);
+      this.inputController.turnOff();
     }
   }
 
