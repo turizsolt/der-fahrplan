@@ -4,7 +4,6 @@ import { Provider } from 'react-redux'
 
 import { Store } from '../../structs/Interfaces/Store';
 import { VueSidebar } from './VueSidebar';
-import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
 import { VueViewbox } from './VueViewbox';
 import { VueTestPanel } from './VueTestPanel';
@@ -14,9 +13,7 @@ import { ChainedInputHandler } from './InputHandlers/ChainedInputHandler';
 import { InputController } from './InputController';
 import { InputMode } from './InputHandlers/InputMode';
 import { ToolInputHandler } from './InputHandlers/ToolInputHandler';
-import { VueBigscreen2 } from './VueBigScreen2';
 import { VueBigscreenMap } from './VueBigScreenMap';
-import { VueBigscreenDiagram } from './VueBigScreenDiagram';
 import { Overlay } from '../overlays/Overlay';
 import { overlayStore } from '../overlays/store';
 import { OverlayController } from '../overlays/OverlayController';
@@ -26,10 +23,7 @@ export class GlobalController {
 
   private vueToolbox: VueToolbox;
   private vueViewbox: VueViewbox;
-  private vueBigScreen: VueBigscreen;
-  private vueBigScreen2: VueBigscreen2;
   private vueBigScreenMap: VueBigscreenMap;
-  private vueBigScreenDiagram: VueBigscreenDiagram;
   private vueSidebar: VueSidebar;
   private vueTestPanel: VueTestPanel;
   private toolInputHandler: ToolInputHandler;
@@ -46,10 +40,7 @@ export class GlobalController {
     private specificController: GUISpecificController
   ) {
     this.vueSidebar = new VueSidebar(this.store);
-    this.vueBigScreen = new VueBigscreen(this.store);
-    this.vueBigScreen2 = new VueBigscreen2(this.store);
     this.vueBigScreenMap = new VueBigscreenMap(this.store);
-    this.vueBigScreenDiagram = new VueBigscreenDiagram(this.store);
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
 
