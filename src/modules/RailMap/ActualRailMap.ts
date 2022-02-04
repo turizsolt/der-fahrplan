@@ -1,3 +1,4 @@
+import { ScaleBlock } from "babylonjs/Materials/Node/Blocks/scaleBlock";
 import { Coordinate } from "../../structs/Geometry/Coordinate";
 import { Ray } from "../../structs/Geometry/Ray";
 import { Route } from "../../structs/Scheduling/Route";
@@ -23,6 +24,9 @@ export class ActualRailMap implements RailMap {
     private stops: RailMapStop[] = [];
     private nodesSize: Record<string, number> = {};
 
+    private routeGap = 6;
+    private stationGap = 4;
+
     addNodes(nodes: RailMapNode[]): void {
         this.nodes.push(...nodes);
         for (let node of nodes) {
@@ -44,6 +48,17 @@ export class ActualRailMap implements RailMap {
     }
 
     addRoute(route: Route): void {
+        // todo this is not the right place
+        const bounds = this.getBounds();
+        const border = 20;
+
+        const scale = Math.min(
+            (globalThis.containerMap.clientWidth - 2 * border) / (bounds.maxX - bounds.minX),
+            (globalThis.containerMap.clientHeight - 2 * border) / (bounds.maxZ - bounds.minZ)
+        );
+        this.routeGap = DEFAULT_ROUTE_GAP / scale;
+        this.stationGap = DEFAULT_STATION_GAP / scale;
+
         const mapRoute: RailMapRouteArray = [];
         const waypoints = route.getVariants()[0].getWaypoints();
         for (let i = 1; i < waypoints.length; i++) {
@@ -121,8 +136,8 @@ export class ActualRailMap implements RailMap {
             for (let edge of route) {
                 edge.count = this.edges[edge.hash].routeCount;
                 const no = (- ((edge.count - 1) / 2) + edge.no) * (edge.opposite ? -1 : 1);
-                edge.from = edge.fromOriginal.fromHere(0, edge.count * DEFAULT_STATION_GAP).fromHere(Math.PI / 2, DEFAULT_ROUTE_GAP * no);
-                edge.to = edge.toOriginal.fromHere(0, edge.count * DEFAULT_STATION_GAP).fromHere(-Math.PI / 2, DEFAULT_ROUTE_GAP * no);
+                edge.from = edge.fromOriginal.fromHere(0, edge.count * this.stationGap).fromHere(Math.PI / 2, this.routeGap * no);
+                edge.to = edge.toOriginal.fromHere(0, edge.count * this.stationGap).fromHere(-Math.PI / 2, this.routeGap * no);
             }
         }
 
@@ -204,7 +219,7 @@ export class ActualRailMap implements RailMap {
     }
 
     getBounds(): RailMapBounds {
-        return this.bounds
+        return this.bounds;
     }
 
     getDistance(nodeFrom: RailMapNode, nodeTo: RailMapNode): number {

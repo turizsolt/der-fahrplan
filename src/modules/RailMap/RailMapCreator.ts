@@ -97,10 +97,6 @@ export class RailMapCreator {
             }
         }
 
-        for (let route of routes) {
-            map.addRoute(route);
-        }
-
         let minX = Number.POSITIVE_INFINITY;
         let maxX = Number.NEGATIVE_INFINITY;
         let minZ = Number.POSITIVE_INFINITY;
@@ -116,8 +112,12 @@ export class RailMapCreator {
 
         map.setBounds({ minX, minZ, maxX, maxZ });
 
+        for (let route of routes) {
+            map.addRoute(route);
+        }
 
         const border = 20;
+        let invScale = 1;
 
         if (globalThis.stageMap) {
             if (!boundingRect) {
@@ -133,15 +133,18 @@ export class RailMapCreator {
                 globalThis.stageMap.addChild(boundingRect);
             }
 
-            const scale = Math.min(
+            invScale = Math.min(
                 (globalThis.containerMap.clientWidth - 2 * border) / (maxX - minX),
                 (globalThis.containerMap.clientHeight - 2 * border) / (maxZ - minZ)
             );
-            globalThis.stageMap.x = -minX * scale + border;
-            globalThis.stageMap.y = -minZ * scale + border;
-            globalThis.stageMap.scale.x = scale;
-            globalThis.stageMap.scale.y = scale;
+            globalThis.stageMap.x = -minX * invScale + border;
+            globalThis.stageMap.y = -minZ * invScale + border;
+            globalThis.stageMap.scale.x = 1;
+            globalThis.stageMap.scale.y = 1;
         }
+
+        // todo this scaling should not be final
+        const scale = invScale;
 
         // edges
 
@@ -162,8 +165,8 @@ export class RailMapCreator {
             mapEdges[i].lineStyle(1, 0xafafaf, railMapEdges[i].routeCount > 0 ? 0 : 0.5);
             const from = railMapEdges[i].from.getCoord();
             const to = railMapEdges[i].to.getCoord();
-            mapEdges[i].moveTo(from.x, from.z);
-            mapEdges[i].lineTo(to.x, to.z);
+            mapEdges[i].moveTo(from.x * scale, from.z * scale);
+            mapEdges[i].lineTo(to.x * scale, to.z * scale);
 
             mapEdges[i].zIndex = 10;
             mapEdges[i].renderable = true;
@@ -194,8 +197,8 @@ export class RailMapCreator {
                 routeEdges[i].lineStyle(4, color, shouldSee ? 1 : 0.5);
                 const from = edge.from.coord; //fromHere(0, edge.count * 5).fromHere(Math.PI / 2, 6 * edge.no).coord;
                 const to = edge.to.coord; //fromHere(0, edge.count * 5).fromHere(-Math.PI / 2, 6 * edge.no).coord;
-                routeEdges[i].moveTo(from.x, from.z);
-                routeEdges[i].lineTo(to.x, to.z);
+                routeEdges[i].moveTo(from.x * scale, from.z * scale);
+                routeEdges[i].lineTo(to.x * scale, to.z * scale);
 
                 routeEdges[i].zIndex = selected ? 26 : 11;
                 routeEdges[i].renderable = true;
@@ -227,8 +230,8 @@ export class RailMapCreator {
             mapNodes[i].drawCircle(0, 0, railMapNodes[i].getType() === TYPES.PathBlock ? 5 : ((nodeSizes[railMapNodes[i].getId()] || 0) + 1) * DEFAULT_NODE_SIZE);
             mapNodes[i].endFill();
             mapNodes[i].zIndex = 5;
-            mapNodes[i].x = railMapNodes[i].getCoord().x;
-            mapNodes[i].y = railMapNodes[i].getCoord().z;
+            mapNodes[i].x = railMapNodes[i].getCoord().x * scale;
+            mapNodes[i].y = railMapNodes[i].getCoord().z * scale;
             mapNodes[i].renderable = (railMapNodes[i].getType() !== TYPES.PathBlock || !!selectedRouteId);
             PixiClickGeneral(mapNodes[i], railMapNodes[i].getType().description, railMapNodes[i].getId(),
                 (x, y, type, id) => overlayController.controll(type, id)
@@ -258,8 +261,8 @@ export class RailMapCreator {
 
             mapNodeTexts[i].text = railMapNodes[i].getName();
             const extra = (nodeSizes[railMapNodes[i].getId()] || 0) * DEFAULT_NODE_SIZE;
-            mapNodeTexts[i].x = railMapNodes[i].getCoord().x + extra;
-            mapNodeTexts[i].y = railMapNodes[i].getCoord().z + extra;
+            mapNodeTexts[i].x = (railMapNodes[i].getCoord().x * scale) + extra;
+            mapNodeTexts[i].y = (railMapNodes[i].getCoord().z * scale) + extra;
             mapNodeTexts[i].zIndex = 41;
             mapNodeTexts[i].resolution = 2;
             mapNodeTexts[i].anchor.x = 0;
@@ -292,8 +295,8 @@ export class RailMapCreator {
                 mapStops[i].drawCircle(0, 0, (selected ? 1.2 : 1) * (railMapStops[j].stopping ? 3 : 1.5));
                 mapStops[i].endFill();
                 mapStops[i].zIndex = selected ? 30 : 25;
-                mapStops[i].x = railMapStops[j].point.coord.x;
-                mapStops[i].y = railMapStops[j].point.coord.z;
+                mapStops[i].x = railMapStops[j].point.coord.x * scale;
+                mapStops[i].y = railMapStops[j].point.coord.z * scale;
                 mapStops[i].renderable = true;
                 i++;
             }
