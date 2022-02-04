@@ -98,6 +98,24 @@ export class OverlayController {
         this.updateConnectingTrips();
     }
 
+    autoDisconnect(): void {
+        const dual = this.getDualTripList();
+
+        for (let i = 0; i < dual.length; i++) {
+            if (!dual[i].Last) continue;
+            if (!dual[i].Last.trip.nextTrip) continue;
+            this.detachTrip(dual[i].Last.trip.id, dual[i].Last.trip.nextTrip);
+        }
+
+        for (let j = 0; j < dual.length; j++) {
+            if (!dual[j].First) continue;
+            if (!dual[j].First.trip.prevTrip) continue;
+            this.detachTrip(dual[j].First.trip.prevTrip, dual[j].First.trip.id);
+        }
+
+        this.updateConnectingTrips();
+    }
+
     private getDualTripList(): Record<TripEnd, TripWithEnd>[] {
         const tripList = getAllOfStorable(TYPES.Trip) as Trip[];
         const lastRoutes = overlayStore.getState().overlay.selectedArrivingVariantList;

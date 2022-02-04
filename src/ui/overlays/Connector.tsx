@@ -78,6 +78,10 @@ export const Connector: React.FC<Props> = props => {
         overlayController.autoConnect(minAuto, maxAuto);
     }, [minAuto, maxAuto]);
 
+    const handleAutoDisconnect = useCallback(() => {
+        overlayController.autoDisconnect();
+    }, []);
+
     return <div className={connectorStyle} style={{ visibility: whenConnector }}>
         <div className={connectorTopStyle}>
             <select size={1} onChange={handleStationChange} value={selectedStation?.id}>
@@ -115,6 +119,7 @@ export const Connector: React.FC<Props> = props => {
             </select>
             <hr />
             <button onClick={handleAutoConnect}>Auto</button><br />
+            <button onClick={handleAutoDisconnect}>Dis all</button><br />
             <input type="text" value={minAuto} onChange={handleMinAutoChange} placeholder="min" /><br />
             <input type="text" value={maxAuto} onChange={handleMaxAutoChange} placeholder="max" />
         </div>
