@@ -114,19 +114,19 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
         }
     }
 
-    persistDeep(): StorableRouteVariant {
+    persistDeep(): Object {
         return {
             id: this.id,
             type: 'RouteVariant',
-            // startEnd: this.startEnd,
-            // route: this.route.getId(),
-            // stops: this.getStops().map(s => this.stopPersist(s)),
+            startEnd: this.startEnd,
+            route: this.route.getId(),
+            stops: this.getStops().map(s => this.stopPersist(s)),
             color: this.getColor(),
             name: this.getName(),
-            lastStationId: this.getLastStop().getRef().getId(),
-            firstStationId: this.getFirstStop().getRef().getId(),
-            lastStationName: this.getLastStop().getRef().getName(),
-            firstStationName: this.getFirstStop().getRef().getName(),
+            lastStationId: this.getLastStop()?.getRef().getId(),
+            firstStationId: this.getFirstStop()?.getRef().getId(),
+            lastStationName: this.getLastStop()?.getRef().getName(),
+            firstStationName: this.getFirstStop()?.getRef().getName(),
         }
     }
 
