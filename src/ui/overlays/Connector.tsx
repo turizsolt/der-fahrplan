@@ -17,6 +17,17 @@ export const Connector: React.FC<Props> = props => {
 
     const whenConnector = mode === 'connect' ? 'visible' : 'hidden';
 
+    const [minAuto, setMinAuto] = useState<string>('');
+    const [maxAuto, setMaxAuto] = useState<string>('');
+
+    const handleMinAutoChange = useCallback((event: any) => {
+        setMinAuto(event.target.value);
+    }, []);
+
+    const handleMaxAutoChange = useCallback((event: any) => {
+        setMaxAuto(event.target.value);
+    }, []);
+
     const handleStationChange = useCallback((event: any) => {
         const selectedId = event.target.value;
         overlayController.selectStation(selectedId);
@@ -64,8 +75,8 @@ export const Connector: React.FC<Props> = props => {
     }, []);
 
     const handleAutoConnect = useCallback(() => {
-        overlayController.autoConnect();
-    }, []);
+        overlayController.autoConnect(minAuto, maxAuto);
+    }, [minAuto, maxAuto]);
 
     return <div className={connectorStyle} style={{ visibility: whenConnector }}>
         <div className={connectorTopStyle}>
@@ -103,7 +114,9 @@ export const Connector: React.FC<Props> = props => {
                 {departingVariantList.map(vl => <option key={vl.id} value={vl.id}>{vl.name} to {vl.lastStationName}</option>)}
             </select>
             <hr />
-            <button onClick={handleAutoConnect}>Auto</button>
+            <button onClick={handleAutoConnect}>Auto</button><br />
+            <input type="text" value={minAuto} onChange={handleMinAutoChange} placeholder="min" /><br />
+            <input type="text" value={maxAuto} onChange={handleMaxAutoChange} placeholder="max" />
         </div>
     </div>;
 }

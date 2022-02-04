@@ -74,29 +74,26 @@ export class OverlayController {
         overlayStore.dispatch(setDualTripList(this.getDualTripList()));
     }
 
-    autoConnect(): void {
+    autoConnect(minStr: string, maxStr: string): void {
+        const minValue = Util.stringToTime(minStr) || 0;
+        const maxValue = Util.stringToTime(maxStr) || 86400;
+
         const dual = this.getDualTripList().filter(d => !d.Last || !d.First);
 
-        let i = 0;
-        let j = 0;
-        do {
-            while (i < dual.length && !dual[i].Last) {
-                i++;
-            }
-            if (j < i) {
-                j = i;
-            }
-            while (j < dual.length && !dual[j].First) {
-                j++;
-            }
+        for (let i = 0; i < dual.length; i++) {
+            if (!dual[i].Last) continue;
+            if (dual[i].Last.trip.nextTrip) continue;
+            for (let j = i + 1; j < dual.length; j++) {
+                if (!dual[j].First) continue;
+                if (dual[j].First.trip.prevTrip) continue;
 
-            if (i < dual.length && j < dual.length && dual[i].Last && dual[j].First) {
-                this.connectTrip(dual[i].Last?.trip.id, dual[j].First?.trip.id);
+                const diff = dual[j].First.time - dual[i].Last.time;
+                if (minValue <= diff && diff <= maxValue) {
+                    this.connectTrip(dual[i].Last?.trip.id, dual[j].First?.trip.id);
+                    break;
+                }
             }
-
-            i++;
-            j++;
-        } while (i < dual.length && j < dual.length);
+        }
 
         this.updateConnectingTrips();
     }
