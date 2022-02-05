@@ -408,10 +408,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         this.allowedPathes.map(this.allowBlock);
 
         setTimeout(() => {
-            console.log('load station', obj.station);
             if (obj.station) {
                 const loaded = store.get(obj.station) as Station;
-                console.log('loaded station', loaded?.getName());
                 this.setStation(loaded);
             }
         }, 0);
