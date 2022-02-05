@@ -21,6 +21,7 @@ import { BlockJoint } from './BlockJoint';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { Color } from '../../structs/Color';
 import { PathRequest } from './PathRequest';
+import { Station } from '../Station/Station';
 
 export interface ActualPathBlock extends Emitable { }
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -31,6 +32,7 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     private coord: Coordinate;
     private key: Record<string, number> = {};
     private light: boolean = false;
+    private station: Station = null;
 
     init(jointEnds: BlockJointEnd[]): PathBlock {
         this.initStore(TYPES.PathBlock);
@@ -49,6 +51,14 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
 
         this.emit('init', this.persist());
         return this;
+    }
+
+    setStation(station: Station): void {
+        this.station = station;
+    }
+
+    getStation(): Station {
+        return this.station;
     }
 
     update(jointEnds: BlockJointEnd[]): void {
@@ -301,7 +311,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
             allowedPathes: this.allowedPathes.map(this.persistAllowedPath),
             coord: { x: this.getCoord().x, y: this.getCoord().y, z: this.getCoord().z },
             key: this.key,
-            light: this.light
+            light: this.light,
+            station: this.station?.getId()
         };
     }
 
@@ -347,6 +358,10 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         this.queue.load(obj.queue, store);
         this.allowedPathes = obj.allowedPathes.map(ap => this.loadAllowedPath(ap, store));
         this.allowedPathes.map(this.allowBlock);
+
+        if (obj.station) {
+            this.setStation(store.get(obj.station) as Station);
+        }
     }
 }
 doApply();

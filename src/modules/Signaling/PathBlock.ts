@@ -6,6 +6,7 @@ import { PathRule } from './PathRule';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { RailMapNode } from '../RailMap/RailMapNode';
 import { PathRequest } from './PathRequest';
+import { Station } from '../Station/Station';
 
 export interface PathBlock extends BaseBrick, RailMapNode {
   init(jointEnds: BlockJointEnd[]): PathBlock;
@@ -27,4 +28,6 @@ export interface PathBlock extends BaseBrick, RailMapNode {
   tick(): void;
   getCoord(): Coordinate;
   highlight(light: boolean): void;
+  setStation(station: Station): void;
+  getStation(): Station;
 }
