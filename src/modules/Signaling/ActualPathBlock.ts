@@ -253,16 +253,16 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
 
                 if (otherSide?.getStation() === this.station) {
                     if (station === this.station) {
-                        console.log('allowing - stopping station');
+                        // console.log('allowing - stopping station');
                     } else {
                         otherSide?.requestPath(nextOtherEnd as PathBlockEnd, train);
-                        console.log('allowing - going through');
+                        // console.log('allowing - going through');
                     }
                 } else {
-                    console.log('allowing - leaving')
+                    // console.log('allowing - leaving')
                 }
             } else {
-                console.log('allowing - no station info');
+                // console.log('allowing - no station info');
             }
         }
 
