@@ -22,6 +22,9 @@ import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { Color } from '../../structs/Color';
 import { PathRequest } from './PathRequest';
 import { Station } from '../Station/Station';
+import { DirectedBlock } from './DirectedBlock';
+import { TrackDirection } from '../Track/TrackDirection';
+import { BlockEnd } from './BlockEnd';
 
 export interface ActualPathBlock extends Emitable { }
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -218,6 +221,51 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
             }
         }
 
+        if (!!backFromHere) {
+            const station = train.getTrips()?.[0].getNextStation();
+            // console.log('names', station?.getName(), this.station?.getName());
+            if (station && this.station) {
+                let start: DirectedBlock = endPathBlockEnd.getOtherEnd().getStart();
+                let nextOtherEnd: BlockEnd = null;
+                let oneAheadEnd: BlockEnd = endPathBlockEnd;
+
+                let otherSide: PathBlock = null;
+
+                while (start) {
+                    const nextEnd = start
+                        .getBlock()
+                        .getEnd(
+                            start.getDirection() === TrackDirection.AB
+                                ? WhichEnd.B
+                                : WhichEnd.A
+                        );
+                    oneAheadEnd = nextEnd;
+                    nextOtherEnd = nextEnd.getOtherEnd();
+
+                    // todo cannot expect there is blockEnd everywhere
+                    if (nextOtherEnd?.getType() === TYPES.PathBlockEnd) {
+                        otherSide = (nextOtherEnd as PathBlockEnd).getPathBlock();
+                        break;
+                    }
+
+                    start = start.next();
+                }
+
+                if (otherSide?.getStation() === this.station) {
+                    if (station === this.station) {
+                        console.log('allowing - stopping station');
+                    } else {
+                        otherSide?.requestPath(nextOtherEnd as PathBlockEnd, train);
+                        console.log('allowing - going through');
+                    }
+                } else {
+                    console.log('allowing - leaving')
+                }
+            } else {
+                console.log('allowing - no station info');
+            }
+        }
+
         return !!backFromHere;
     }
 
@@ -359,9 +407,14 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         this.allowedPathes = obj.allowedPathes.map(ap => this.loadAllowedPath(ap, store));
         this.allowedPathes.map(this.allowBlock);
 
-        if (obj.station) {
-            this.setStation(store.get(obj.station) as Station);
-        }
+        setTimeout(() => {
+            console.log('load station', obj.station);
+            if (obj.station) {
+                const loaded = store.get(obj.station) as Station;
+                console.log('loaded station', loaded?.getName());
+                this.setStation(loaded);
+            }
+        }, 0);
     }
 }
 doApply();
