@@ -29,7 +29,7 @@
     <div class="route-name">
       {{
         route.stops[0]
-          ? route.stops[route.stops.length - 1].stationName
+          ? route.stops[0].stationName
           : "Unknown"
       }}
     </div>
