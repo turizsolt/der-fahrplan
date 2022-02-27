@@ -1,6 +1,9 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux'
+
 import { Store } from '../../structs/Interfaces/Store';
 import { VueSidebar } from './VueSidebar';
-import { VueBigscreen } from './VueBigScreen';
 import { VueToolbox } from './VueToolbox';
 import { VueViewbox } from './VueViewbox';
 import { VueTestPanel } from './VueTestPanel';
@@ -10,22 +13,22 @@ import { ChainedInputHandler } from './InputHandlers/ChainedInputHandler';
 import { InputController } from './InputController';
 import { InputMode } from './InputHandlers/InputMode';
 import { ToolInputHandler } from './InputHandlers/ToolInputHandler';
-import { VueBigscreen2 } from './VueBigScreen2';
 import { VueBigscreenMap } from './VueBigScreenMap';
-import { VueBigscreenDiagram } from './VueBigScreenDiagram';
+import { Overlay } from '../overlays/Overlay';
+import { overlayStore } from '../overlays/store';
+import { OverlayController } from '../overlays/OverlayController';
 
 export class GlobalController {
   private viewMode: string = 'terrain';
 
   private vueToolbox: VueToolbox;
   private vueViewbox: VueViewbox;
-  private vueBigScreen: VueBigscreen;
-  private vueBigScreen2: VueBigscreen2;
   private vueBigScreenMap: VueBigscreenMap;
-  private vueBigScreenDiagram: VueBigscreenDiagram;
   private vueSidebar: VueSidebar;
   private vueTestPanel: VueTestPanel;
   private toolInputHandler: ToolInputHandler;
+
+  private overlayController: OverlayController;
 
   private targetPassengerCount: number = 9999999;
 
@@ -37,12 +40,14 @@ export class GlobalController {
     private specificController: GUISpecificController
   ) {
     this.vueSidebar = new VueSidebar(this.store);
-    this.vueBigScreen = new VueBigscreen(this.store);
-    this.vueBigScreen2 = new VueBigscreen2(this.store);
     this.vueBigScreenMap = new VueBigscreenMap(this.store);
-    this.vueBigScreenDiagram = new VueBigscreenDiagram(this.store);
     this.vueToolbox = new VueToolbox(this);
     this.vueViewbox = new VueViewbox(this);
+
+    this.overlayController = OverlayController.getInstance();
+
+    const domContainer = document.querySelector('#overlay-container');
+    ReactDOM.render(<Provider store={overlayStore}><Overlay /></Provider>, domContainer);
 
     this.toolInputHandler = new ToolInputHandler(this.vueToolbox, this.store);
 
@@ -62,13 +67,13 @@ export class GlobalController {
     this.vueTestPanel = new VueTestPanel(this.store);
     this.store.getCommandLog().setInputController(this);
 
-    this.vueViewbox.addButton({ id: 'terrain', text: 'Default' });
+    this.vueViewbox.addButton({ id: 'terrain', text: 'Terrain' });
     this.vueViewbox.addButton({ id: 'map', text: 'Map' });
     this.vueViewbox.addButton({ id: 'schedule', text: 'Schedule' });
     this.vueViewbox.addButton({ id: 'diagram', text: 'Diagram' });
-    this.vueViewbox.addButton({ id: 'connector', text: 'Connect' });
+    this.vueViewbox.addButton({ id: 'connect', text: 'Connect' });
     this.vueViewbox.addButton({ id: 'builder', text: 'Builder' });
-    this.vueViewbox.setSelected('terrain');
+    this.selectView('diagram');
   }
 
   getInputController(): InputController {
@@ -86,43 +91,23 @@ export class GlobalController {
   selectView(mode: string) {
     this.viewMode = mode;
     this.vueViewbox.setSelected(mode);
+    this.overlayController.setOverlayMode(mode);
 
-    if (mode === 'schedule') {
-      this.selectMode(InputMode.SELECT);
-      this.vueBigScreen.setShow(true);
-    } else {
-      this.selectMode(InputMode.CAMERA);
-      this.vueBigScreen.setShow(false);
-    }
-
-    if (mode === 'connector') {
-      this.selectMode(InputMode.SELECT);
-      this.vueBigScreen2.setShow(true);
-    } else {
-      this.selectMode(InputMode.CAMERA);
-      this.vueBigScreen2.setShow(false);
-    }
-
-    if (mode === 'map') {
-      this.selectMode(InputMode.SELECT);
-      this.vueBigScreenMap.setShow(true);
-    } else {
-      this.selectMode(InputMode.CAMERA);
+    if (mode === 'terrain') {
       this.vueBigScreenMap.setShow(false);
-    }
-
-    if (mode === 'diagram') {
-      this.selectMode(InputMode.SELECT);
-      this.vueBigScreenDiagram.setShow(true);
-    } else {
       this.selectMode(InputMode.CAMERA);
-      this.vueBigScreenDiagram.setShow(false);
-    }
-
-    if (mode === 'builder') {
-      this.vueToolbox.setShow(true);
-    } else {
       this.vueToolbox.setShow(false);
+      this.inputController.turnOn();
+    } else if (mode === 'builder') {
+      this.vueBigScreenMap.setShow(false);
+      this.selectMode(InputMode.CAMERA);
+      this.vueToolbox.setShow(true);
+      this.inputController.turnOn();
+    } else {
+      this.vueBigScreenMap.setShow(true);
+      this.selectMode(InputMode.SELECT);
+      this.vueToolbox.setShow(false);
+      this.inputController.turnOff();
     }
   }
 
@@ -167,8 +152,8 @@ export class GlobalController {
     }
   }
 
-  load(data: any) {
-    this.store.loadAll(data);
+  load(data: any, version: number) {
+    this.store.loadAll(data, version);
   }
 
   // specific

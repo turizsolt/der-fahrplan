@@ -45,17 +45,14 @@ export const TYPES = {
     Route: Symbol.for('Route'),
     FactoryOfRoute: Symbol.for('Factory<Route>'),
 
-    RouteStop: Symbol.for('RouteStop'),
-    FactoryOfRouteStop: Symbol.for('Factory<RouteStop>'),
+    RouteVariant: Symbol.for('RouteVariant'),
+    FactoryOfRouteVariant: Symbol.for('Factory<RouteVariant>'),
 
     Trip: Symbol.for('Trip'),
     FactoryOfTrip: Symbol.for('Factory<Trip>'),
 
     TripStop: Symbol.for('TripStop'),
     FactoryOfTripStop: Symbol.for('Factory<TripStop>'),
-
-    TripGroup: Symbol.for('TripGroup'),
-    FactoryOfTripGroup: Symbol.for('Factory<TripGroup>'),
 
     Station: Symbol.for('Station'),
     StationRenderer: Symbol.for('StationRenderer'),
@@ -106,5 +103,10 @@ export const TYPES = {
     FactoryOfSensor: Symbol.for('Factory<Sensor>'),
     FactoryOfSensorRenderer: Symbol.for('Factory<SensorRenderer>'),
 
-    TrackInputHandler: Symbol.for('TrackInputHandler')
+    TrackInputHandler: Symbol.for('TrackInputHandler'),
+
+    RoutePart: Symbol.for('RoutePart'),
+    RoutePartStop: Symbol.for('RoutePartStop'),
+    RoutePartJunction: Symbol.for('RoutePartJunction'),
+    RoutePartEdge: Symbol.for('RoutePartEdge')
 };

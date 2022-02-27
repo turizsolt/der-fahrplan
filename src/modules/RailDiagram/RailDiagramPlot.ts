@@ -6,4 +6,5 @@ export interface RailDiagramPlot {
     r: number;
     t: number;
     meta?: any;
+    zIndex?: number;
 }

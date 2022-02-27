@@ -1,18 +1,19 @@
 import { TYPES } from '../../di/TYPES';
 import { Store } from '../../structs/Interfaces/Store';
-import { Route } from '../../structs/Scheduling/Route';
-import { RouteStop } from '../../structs/Scheduling/RouteStop';
+import { RoutePart } from '../../structs/Scheduling/RoutePart';
+import { RouteVariant } from '../../structs/Scheduling/RouteVariant';
 import { Trip } from '../../structs/Scheduling/Trip';
 import { TripStop } from '../../structs/Scheduling/TripStop';
 import { Util } from '../../structs/Util';
 import { RailMap } from '../RailMap/RailMap';
 import { RailMapCreator } from '../RailMap/RailMapCreator';
+import { RailMapNode } from '../RailMap/RailMapNode';
 import { RailDiagramLine } from './RailDiagramLine';
 import { RailDiagramPlot } from './RailDiagramPlot';
 import { RailDiagramPlotsAndLines } from './RailDiagramPlotsAndLines';
 
 export class RailDiagram {
-    private route: Route = null;
+    private routeVariant: RouteVariant = null;
     private diagramHeight: number = 0;
     private diagramWidth: number = 0;
     private map: RailMap = null;
@@ -28,13 +29,28 @@ export class RailDiagram {
         this.update();
     }
 
-    setRoute(route: Route) {
-        this.route = route;
+    setRoute(routeVariant: RouteVariant) {
+        this.routeVariant = routeVariant;
         this.update();
     }
 
+    setTimeBounds(minTime: number, maxTime: number): void {
+        this.minTime = minTime;
+        this.maxTime = maxTime;
+        const duration = maxTime - minTime;
+        this.timeIntervals = duration > 8 * 3600 ? 3600 : (duration > 3 * 3600 ? 1800 : (duration > 3600) ? 900 : 300);
+        this.update();
+    }
+
+    getTimeBounds(): { minTime: number, maxTime: number } {
+        return {
+            minTime: this.minTime,
+            maxTime: this.maxTime
+        }
+    }
+
     update(): void {
-        if (this.route) {
+        if (this.routeVariant) {
             this.updateDiagramHeight();
         }
         this.updateDiagramWidth();
@@ -42,12 +58,12 @@ export class RailDiagram {
 
     updateDiagramHeight(): void {
         this.diagramHeight = 0;
-        let prevStop: RouteStop = null;
-        for (let stop of this.route.getWaypoints()) {
+        let prevStop: RoutePart = null;
+        for (let stop of this.routeVariant.getWaypoints()) {
             if (prevStop) {
                 this.diagramHeight += this.map.getDistance(
-                    prevStop.getWaypoint(),
-                    stop.getWaypoint()
+                    prevStop.getRef() as RailMapNode,
+                    stop.getRef() as RailMapNode
                 );
             }
             prevStop = stop;
@@ -65,35 +81,42 @@ export class RailDiagram {
 
         let position: number = 0;
         let pos: number = 0;
-        let prevStop: RouteStop = null;
+        let prevStop: RoutePart = null;
         let prevPosition: number = 0;
-        for (let stop of this.route.getWaypoints()) {
+        for (let stop of this.routeVariant.getWaypoints()) {
             if (prevStop) {
                 position = this.map.getDistance(
-                    prevStop.getWaypoint(),
-                    stop.getWaypoint()
+                    prevStop.getRef() as RailMapNode,
+                    stop.getRef() as RailMapNode
                 );
                 pos += position;
                 lines.push({
                     from: { r: prevPosition / this.diagramHeight, t: 0 },
                     to: { r: pos / this.diagramHeight, t: 0 },
                     trackCount: this.map.getTrackCount(
-                        prevStop.getWaypoint(),
-                        stop.getWaypoint()
-                    )
+                        prevStop.getRef() as RailMapNode,
+                        stop.getRef() as RailMapNode
+                    ),
+                    zIndex: 60
                 });
             }
 
             plots.push({
-                id: stop.getWaypoint().getId(),
-                uniqueId: stop.getWaypoint().getId(),
+                id: (stop.getRef() as RailMapNode).getId(),
+                uniqueId: (stop.getRef() as RailMapNode).getId(),
                 position: pos,
-                name: stop.getWaypoint().getName(),
+                name: stop.getRef().getName(),
                 r: pos / this.diagramHeight,
-                t: 0
+                t: 0,
+                meta: {
+                    hasLine: (stop.getRef() as RailMapNode).getType() === TYPES.Station,
+                    routeColor: (stop.getRef() as RailMapNode).getType() === TYPES.Station ? 0x000000 : 0x9f9f9f,
+                    stopping: stop.isStopping()
+                },
+                zIndex: 70
             });
 
-            this.stopHeights[stop.getWaypoint().getId()] = pos / this.diagramHeight;
+            this.stopHeights[(stop.getRef() as RailMapNode).getId()] = pos / this.diagramHeight;
             prevStop = stop;
             prevPosition = pos;
         }
@@ -114,7 +137,8 @@ export class RailDiagram {
                 name: Util.timeToString(time),
                 position: 1,
                 t: (time - this.minTime) / this.diagramWidth,
-                r: 1
+                r: 1,
+                zIndex: 70
             });
         }
         return plots;
@@ -123,14 +147,14 @@ export class RailDiagram {
     getPlotsAndLines(): RailDiagramPlotsAndLines {
         const plots: RailDiagramPlot[] = [];
         const lines: RailDiagramLine[] = [];
-        const routesToPlot: Route[] = this.getConnectingRoutes(this.route);
+        const routesToPlot: RouteVariant[] = this.getConnectingRoutes(this.routeVariant);
 
         const trips = this.store.getAllOf<Trip>(TYPES.Trip);
         for (let trip of trips) {
-            if (!routesToPlot.includes(trip.getRoute())) continue;
+            if (!routesToPlot.includes(trip.getRouteVariant())) continue;
 
             let prevStop: TripStop = null;
-            for (let stop of trip.getWaypoints()) {
+            for (let stop of trip.getWaypoints().filter(w => w.shouldStop)) {
                 if (this.stopHeights[stop.station.getId()] === undefined) continue;
 
                 if (prevStop) {
@@ -143,7 +167,10 @@ export class RailDiagram {
                             r: this.stopHeights[stop.station.getId()],
                             t: (stop.arrivalTime - this.minTime) / this.diagramWidth
                         },
-                        trackCount: 1
+                        trackCount: 1,
+                        meta: {
+                            routeColor: stop.route.getColor()
+                        }
                     });
                 }
 
@@ -158,10 +185,12 @@ export class RailDiagram {
                             this.diagramWidth,
                         r: this.stopHeights[stop.station.getId()],
                         meta: {
-                            routeStop: stop.routeStop,
+                            routePart: stop.routePart,
+                            routePartNo: stop.routePartNo,
                             route: stop.route,
                             tripStop: stop,
                             trip: stop.trip,
+                            routeColor: stop.route.getColor()
                         }
                     });
                     plots.push({
@@ -174,10 +203,12 @@ export class RailDiagram {
                             this.diagramWidth,
                         r: this.stopHeights[stop.station.getId()],
                         meta: {
-                            routeStop: stop.routeStop,
+                            routePart: stop.routePart,
+                            routePartNo: stop.routePartNo,
                             route: stop.route,
                             tripStop: stop,
                             trip: stop.trip,
+                            routeColor: stop.route.getColor()
                         }
                     });
                     lines.push({
@@ -189,7 +220,10 @@ export class RailDiagram {
                             r: this.stopHeights[stop.station.getId()],
                             t: (stop.departureTime - this.minTime) / this.diagramWidth
                         },
-                        trackCount: 1
+                        trackCount: 1,
+                        meta: {
+                            routeColor: stop.route.getColor()
+                        }
                     });
                 } else {
                     plots.push({
@@ -202,10 +236,12 @@ export class RailDiagram {
                             this.diagramWidth,
                         r: this.stopHeights[stop.station.getId()],
                         meta: {
-                            routeStop: stop.routeStop,
+                            routePart: stop.routePart,
+                            routePartNo: stop.routePartNo,
                             route: stop.route,
                             tripStop: stop,
                             trip: stop.trip,
+                            routeColor: stop.route.getColor()
                         }
                     });
                 }
@@ -217,8 +253,8 @@ export class RailDiagram {
         return { plots, lines };
     }
 
-    getConnectingRoutes(pivotRoute: Route): Route[] {
-        return (this.store.getAllOf(TYPES.Route) as Route[]).filter(route => {
+    getConnectingRoutes(pivotRoute: RouteVariant): RouteVariant[] {
+        return (this.store.getAllOf(TYPES.RouteVariant) as RouteVariant[]).filter(route => {
             return route.hasCommonEdgeWith(pivotRoute);
         });
     }

@@ -5,60 +5,27 @@ import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { Ray } from '../../structs/Geometry/Ray';
 import { CapacityCapRenderer } from '../../structs/Renderers/CapacityCapRenderer';
 import { ITextStyle } from 'pixi.js';
-
+import { PixiClick } from './PixiClick';
 @injectable()
 export class CapacityCapPixiRenderer extends BasePixiRenderer
   implements CapacityCapRenderer {
   private texts: PIXI.Text[] = [];
+  private circle: PIXI.Graphics;
 
   init(data: any): void {
     for (let ray of data.rays) {
-      const circle = new PIXI.Graphics();
-      circle.interactive = true;
-      circle.buttonMode = true;
-      circle.beginFill(0xcf44ff);
-      circle.drawCircle(0, 0, 3);
-      circle.endFill();
+      this.circle = new PIXI.Graphics();
+      this.circle.beginFill(0xcf44ff);
+      this.circle.drawCircle(0, 0, 3);
+      this.circle.endFill();
 
-      circle.x = ray.x;
-      circle.y = ray.z;
-      circle.zIndex = 40;
+      this.circle.x = ray.x;
+      this.circle.y = ray.z;
+      this.circle.zIndex = 40;
 
-      circle.on('pointerdown', (event: PIXI.InteractionEvent) => {
-        const x =
-          (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-        const y =
-          (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-        event.data.global.x = x;
-        event.data.global.y = y;
-        globalThis.inputController.down({
-          ...event,
-          meshId: 'clickable-capacityCap-' + data.id,
-          button: event.data.button
-        });
+      PixiClick(this.circle, 'capacityCap', data.id);
 
-        event.stopPropagation();
-        event.data.originalEvent.stopPropagation();
-      });
-
-      circle.on('pointerup', (event: PIXI.InteractionEvent) => {
-        const x =
-          (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-        const y =
-          (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-        event.data.global.x = x;
-        event.data.global.y = y;
-        globalThis.inputController.up({
-          ...event,
-          meshId: 'clickable-capacityCap-' + data.id,
-          button: event.data.button
-        });
-
-        event.stopPropagation();
-        event.data.originalEvent.stopPropagation();
-      });
-
-      globalThis.stage.addChild(circle);
+      globalThis.stage.addChild(this.circle);
 
       const settings: Partial<ITextStyle> = {
         fontFamily: 'Arial',
@@ -67,7 +34,7 @@ export class CapacityCapPixiRenderer extends BasePixiRenderer
         align: 'center'
       };
 
-      let text = new PIXI.Text((data.cap - data.trainCount).toString(), settings);
+      const text = new PIXI.Text((data.cap - data.trainCount).toString(), settings);
       text.x = ray.x;
       text.y = ray.z;
       text.zIndex = 41;
@@ -85,5 +52,13 @@ export class CapacityCapPixiRenderer extends BasePixiRenderer
     for (let text of this.texts) {
       text.text = (data.cap - data.trainCount).toString();
     }
+  }
+
+  remove(): void {
+    this.circle.clear();
+    this.circle.renderable = false;
+    this.texts.map((t: PIXI.Text) => {
+      t.renderable = false;
+    });
   }
 }

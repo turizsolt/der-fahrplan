@@ -31,13 +31,14 @@ import { SensorRenderer } from '../structs/Renderers/SensorRenderer';
 import { SensorDummyRenderer } from '../../test/dummies/SensorDummyRenderer';
 import { CapacityCapRenderer } from '../structs/Renderers/CapacityCapRenderer';
 import { CapacityCapDummyRenderer } from '../../test/dummies/CapacityCapDummyRenderer';
+import { WaitingHallRenderer } from '../structs/Renderers/WaitingHallRenderer';
+import { WaitingHallDummyRenderer } from '../../test/dummies/WaitingHallDummyRenderer';
 
 export const testContainer = new Container();
 const ioc = new DependencyContainer(testContainer);
 addCommonMaps(ioc);
 ioc.map<TrackRenderer>(T.TrackRenderer, TrackDummyRenderer);
 ioc.map<TrackSwitchRenderer>(T.TrackSwitchRenderer, TrackSwitchDummyRenderer);
-ioc.map<StationRenderer>(T.StationRenderer, StationDummyRenderer);
 ioc.map<PlatformRenderer>(T.PlatformRenderer, PlatformDummyRenderer);
 ioc.map<PassengerRenderer>(T.PassengerRenderer, PassengerDummyRenderer);
 
@@ -85,4 +86,14 @@ ioc.fm<CapacityCapRenderer>(
   T.FactoryOfCapacityCapRenderer,
   T.CapacityCapRenderer,
   CapacityCapDummyRenderer
+);
+ioc.fm<WaitingHallRenderer>(
+  T.FactoryOfWaitingHallRenderer,
+  T.WaitingHallRenderer,
+  WaitingHallDummyRenderer
+);
+ioc.fm<StationRenderer>(
+  T.FactoryOfStationRenderer,
+  T.StationRenderer,
+  StationDummyRenderer
 );

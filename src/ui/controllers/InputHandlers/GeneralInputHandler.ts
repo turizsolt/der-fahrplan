@@ -45,7 +45,7 @@ export class GeneralInputHandler extends InputHandler {
       const data = {
         data: this.store.persistAll(),
         ...globalController.saveSpecific(),
-        _version: 2,
+        _version: 3,
         _format: 'fahrplan'
       };
 

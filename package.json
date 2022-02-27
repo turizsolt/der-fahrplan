@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack",
     "start": "webpack-dev-server --open",
-    "test:this": "ts-mocha --require mocha-steps --slow 5 test/Geometry/LineSegmentChain.test.ts",
+    "test:this": "ts-mocha --require mocha-steps --slow 5 test/unit/Scheduling/Route*.test.ts",
     "test:only": "ts-mocha --require mocha-steps --slow 5 test/unit/**/*.test.{ts,tsx}",
     "test": "nyc ts-mocha --require mocha-steps test/unit/**/*.test.{ts,tsx}",
     "posttest": "nyc report --reporter=json && nyc report --reporter=html"
@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@darkblue_azurite/priority-queue": "^1.0.7",
+    "@reduxjs/toolkit": "^1.7.1",
     "@skymaker/quartic": "^0.1.5",
     "babylonjs": "4.1.0",
     "babylonjs-gui": "4.1.0",
@@ -55,9 +56,13 @@
     "lodash": "^4.17.21",
     "oimo": "^1.0.9",
     "pixi.js": "^6.0.4",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.6",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.2",
     "shortid": "^2.2.15",
+    "typestyle": "^2.2.0",
     "vue": "^2.5.2",
     "vue-property-decorator": "^6.0.0",
     "vue-ts-loader": "^0.0.3"

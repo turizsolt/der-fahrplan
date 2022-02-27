@@ -21,6 +21,10 @@ import { BlockJoint } from './BlockJoint';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { Color } from '../../structs/Color';
 import { PathRequest } from './PathRequest';
+import { Station } from '../Station/Station';
+import { DirectedBlock } from './DirectedBlock';
+import { TrackDirection } from '../Track/TrackDirection';
+import { BlockEnd } from './BlockEnd';
 
 export interface ActualPathBlock extends Emitable { }
 const doApply = () => applyMixins(ActualPathBlock, [Emitable]);
@@ -30,6 +34,8 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
     private queue: PathQueue;
     private coord: Coordinate;
     private key: Record<string, number> = {};
+    private light: boolean = false;
+    private station: Station = null;
 
     init(jointEnds: BlockJointEnd[]): PathBlock {
         this.initStore(TYPES.PathBlock);
@@ -37,16 +43,67 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         this.queue = new PathQueue(this);
 
         this.pathBlockEnds = jointEnds.map(je => new ActualPathBlockEnd(je, this));
-        this.coord = jointEnds.map(je => je.joint.getPosition().getRay().coord).reduce((a, b) => new Coordinate(a.x + b.x, a.y + b.y, a.z + b.z), new Coordinate(0, 0, 0));
-        const n = jointEnds.length;
-        this.coord = new Coordinate(this.coord.x / n, this.coord.y / n, this.coord.z / n);
 
         for (let i = 0; i < this.pathBlockEnds.length; i++) {
             this.key[this.pathBlockEnds[i].getJointEnd().joint.getId() + '-' + this.pathBlockEnds[i].getJointEnd().end] = i;
         }
 
+        this.coord = jointEnds.map(je => je.joint.getPosition().getRay().coord).reduce((a, b) => new Coordinate(a.x + b.x, a.y + b.y, a.z + b.z), new Coordinate(0, 0, 0));
+        const n = jointEnds.length;
+        this.coord = new Coordinate(this.coord.x / n, this.coord.y / n, this.coord.z / n);
+
         this.emit('init', this.persist());
         return this;
+    }
+
+    setStation(station: Station): void {
+        this.station = station;
+    }
+
+    getStation(): Station {
+        return this.station;
+    }
+
+    update(jointEnds: BlockJointEnd[]): void {
+
+        this.pathBlockEnds = jointEnds.map(je => new ActualPathBlockEnd(je, this));
+
+        this.key = {};
+        for (let i = 0; i < this.pathBlockEnds.length; i++) {
+            this.key[this.pathBlockEnds[i].getJointEnd().joint.getId() + '-' + this.pathBlockEnds[i].getJointEnd().end] = i;
+        }
+
+        this.coord = jointEnds.map(je => je.joint.getPosition().getRay().coord).reduce((a, b) => new Coordinate(a.x + b.x, a.y + b.y, a.z + b.z), new Coordinate(0, 0, 0));
+        const n = jointEnds.length;
+        this.coord = new Coordinate(this.coord.x / n, this.coord.y / n, this.coord.z / n);
+
+        this.queue.updateRules(this.pathBlockEnds);
+
+        this.emit('update', this.persist());
+    }
+
+    empty(): void {
+        if (this.allowedPathes.length > 0) return;
+
+        this.pathBlockEnds.map(pbe => pbe.pathDisconnect());
+        this.pathBlockEnds = [];
+
+        this.key = {};
+
+        this.emit('update', this.persist());
+    }
+
+    remove() {
+        if (this.allowedPathes.length > 0) return;
+
+        this.pathBlockEnds.map(pbe => pbe.pathDisconnect());
+        this.emit('remove', this.id);
+        super.remove();
+    }
+
+    highlight(light: boolean): void {
+        this.light = light;
+        this.emit('update', this.persist());
     }
 
     getName(): string {
@@ -164,6 +221,51 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
             }
         }
 
+        if (!!backFromHere) {
+            const station = train.getTrips()?.[0].getNextStation();
+            // console.log('names', station?.getName(), this.station?.getName());
+            if (station && this.station) {
+                let start: DirectedBlock = endPathBlockEnd.getOtherEnd().getStart();
+                let nextOtherEnd: BlockEnd = null;
+                let oneAheadEnd: BlockEnd = endPathBlockEnd;
+
+                let otherSide: PathBlock = null;
+
+                while (start) {
+                    const nextEnd = start
+                        .getBlock()
+                        .getEnd(
+                            start.getDirection() === TrackDirection.AB
+                                ? WhichEnd.B
+                                : WhichEnd.A
+                        );
+                    oneAheadEnd = nextEnd;
+                    nextOtherEnd = nextEnd.getOtherEnd();
+
+                    // todo cannot expect there is blockEnd everywhere
+                    if (nextOtherEnd?.getType() === TYPES.PathBlockEnd) {
+                        otherSide = (nextOtherEnd as PathBlockEnd).getPathBlock();
+                        break;
+                    }
+
+                    start = start.next();
+                }
+
+                if (otherSide?.getStation() === this.station) {
+                    if (station === this.station) {
+                        // console.log('allowing - stopping station');
+                    } else {
+                        otherSide?.requestPath(nextOtherEnd as PathBlockEnd, train);
+                        // console.log('allowing - going through');
+                    }
+                } else {
+                    // console.log('allowing - leaving')
+                }
+            } else {
+                // console.log('allowing - no station info');
+            }
+        }
+
         return !!backFromHere;
     }
 
@@ -256,7 +358,9 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
             queue: this.queue.persist(),
             allowedPathes: this.allowedPathes.map(this.persistAllowedPath),
             coord: { x: this.getCoord().x, y: this.getCoord().y, z: this.getCoord().z },
-            key: this.key
+            key: this.key,
+            light: this.light,
+            station: this.station?.getId()
         };
     }
 
@@ -302,6 +406,13 @@ export class ActualPathBlock extends ActualBaseBrick implements PathBlock {
         this.queue.load(obj.queue, store);
         this.allowedPathes = obj.allowedPathes.map(ap => this.loadAllowedPath(ap, store));
         this.allowedPathes.map(this.allowBlock);
+
+        setTimeout(() => {
+            if (obj.station) {
+                const loaded = store.get(obj.station) as Station;
+                this.setStation(loaded);
+            }
+        }, 0);
     }
 }
 doApply();

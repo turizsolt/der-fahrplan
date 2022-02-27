@@ -5,6 +5,7 @@ import { Ray } from '../../structs/Geometry/Ray';
 import { SignalRenderer } from '../../structs/Renderers/SignalRenderer';
 import { Left } from '../../structs/Geometry/Directions';
 import { SignalSignal } from '../../modules/Signaling/SignalSignal';
+import { PixiClick } from './PixiClick';
 
 @injectable()
 export class SignalPixiRenderer extends BasePixiRenderer
@@ -37,6 +38,8 @@ export class SignalPixiRenderer extends BasePixiRenderer
     this.circle.x = rayPost.coord.x;
     this.circle.y = rayPost.coord.z;
 
+    PixiClick(this.circle, 'signal', data.id);
+
     globalThis.stage.addChild(this.circle);
     globalThis.stage.addChild(this.post);
   }
@@ -48,5 +51,12 @@ export class SignalPixiRenderer extends BasePixiRenderer
     );
     this.circle.drawCircle(0, 0, 2);
     this.circle.endFill();
+  }
+
+  remove() {
+    this.circle.clear();
+    this.circle.renderable = false;
+    this.post.clear();
+    this.post.renderable = false;
   }
 }

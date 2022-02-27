@@ -12,7 +12,7 @@ export class TrackInputHandlerPixi implements TrackInputHandlerPlugin {
   private fromPoint: PIXI.Graphics;
   private dir: number = 0;
 
-  constructor() {}
+  constructor() { }
   init() {
     this.toPoint = new PIXI.Graphics();
     this.toPoint.beginFill(0xff0000); //0x0bef47);
@@ -54,7 +54,7 @@ export class TrackInputHandlerPixi implements TrackInputHandlerPlugin {
   }
 
   roam(props: InputProps) {
-    const ray = snapHexaXZ(props.point);
+    const ray = props.snappedPoint;
 
     this.line.clear();
 
@@ -68,7 +68,7 @@ export class TrackInputHandlerPixi implements TrackInputHandlerPlugin {
   }
 
   move(downProps: InputProps, props: InputProps) {
-    const ray = snapHexaXZ(props.point);
+    const ray = props.snappedPoint;
     this.toPoint.x = ray.coord.x;
     this.toPoint.y = ray.coord.z;
     this.toPoint.renderable = !props.snappedJoint;

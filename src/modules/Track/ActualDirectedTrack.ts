@@ -71,7 +71,14 @@ export class ActualDirectedTrack implements DirectedTrack {
   }
 
   removeMarker(marker: TrackMarker): void {
-    this.markers = this.markers.filter(x => x.marker.train !== marker.train);
+    // todo unify
+    this.markers = this.markers.filter(x => (
+      (!x.marker.train || x.marker.train !== marker.train) &&
+      (!x.marker.blockJoint || x.marker.blockJoint !== marker.blockJoint) &&
+      (!x.marker.platform || x.marker.platform !== marker.platform) &&
+      (!x.marker.sensor || x.marker.sensor !== marker.sensor) &&
+      (!x.marker.signal || x.marker.signal !== marker.signal)
+    ));
   }
 
   addMarkerBothDirections(position: number, marker: TrackMarker): void {

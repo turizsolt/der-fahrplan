@@ -22,7 +22,7 @@ export class PathQueue {
           r.filter ===
           train
             ?.getTrips()[0]
-            ?.getRoute()
+            ?.getRouteVariant()
             ?.getName())
     );
     if (found) {
@@ -42,14 +42,21 @@ export class PathQueue {
     const toEval = [...this.queue];
     this.queue = [];
 
+    const dict: Record<string, boolean> = {};
+
     for (let next of toEval) {
       let succ = false;
-      for (let to of next.toOptions) {
-        if (this.pathBlock.allow(next.from, to, next, next.train)) {
-          succ = true;
-          break;
+
+      if (!dict[next.from.getHash()]) {
+        for (let to of next.toOptions) {
+          if (this.pathBlock.allow(next.from, to, next, next.train)) {
+            succ = true;
+            dict[next.from.getHash()] = true;
+            break;
+          }
         }
       }
+      dict[next.from.getHash()] = true;
 
       if (!succ) {
         this.queue.push(next);
@@ -67,6 +74,25 @@ export class PathQueue {
 
   setFilterToRule(index: number, filter: string): void {
     this.rules[index].filter = filter;
+  }
+
+  updateRules(jointEnds: PathBlockEnd[]): void {
+    const newRules: PathRule[] = [];
+    for (let rule of this.rules) {
+      if (jointEnds.some(je => je.getHash() === rule.from.getHash())) {
+        const toOptions: PathBlockEnd[] = [];
+        for (let to of rule.toOptions) {
+          if (jointEnds.some(je => je.getHash() === to.getHash())) {
+            toOptions.push(to);
+          }
+        }
+        if (toOptions.length > 0) {
+          newRules.push({ from: rule.from, toOptions, filter: rule.filter });
+        }
+      }
+    }
+
+    this.rules = newRules;
   }
 
   persist(): Object {

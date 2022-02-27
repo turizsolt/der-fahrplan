@@ -43,7 +43,7 @@ export class ActualLand implements Land {
     const loadLevel = () => {
       if (levels[levelId]) {
         setTimeout(() => {
-          store.loadAll(levels[levelId].data);
+          store.loadAll(levels[levelId].data, levels[levelId]._version);
           if (levels[levelId].camera) {
             globalController.loadSpecific(levels[levelId]);
           }

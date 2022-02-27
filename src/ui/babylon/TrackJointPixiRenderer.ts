@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import { injectable } from 'inversify';
 import { BasePixiRenderer } from './BasePixiRenderer';
 import { TrackJointRenderer } from '../../structs/Renderers/TrackJointRenderer';
+import { PixiClick } from './PixiClick';
 
 @injectable()
 export class TrackJointPixiRenderer extends BasePixiRenderer
@@ -11,8 +12,6 @@ export class TrackJointPixiRenderer extends BasePixiRenderer
 
   init(data: any) {
     this.rectangle = new PIXI.Graphics();
-    this.rectangle.interactive = true;
-    this.rectangle.buttonMode = true;
     this.rectangle.beginFill(0xa8a632);
     this.rectangle.drawRect(-0.5, -1.5, 1, 1.5);
     this.rectangle.endFill();
@@ -22,44 +21,11 @@ export class TrackJointPixiRenderer extends BasePixiRenderer
     this.rectangle.rotation = -data.ray.dirXZ;
     this.rectangle.zIndex = 1;
 
-    this.rectangle.on('pointerdown', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.down({
-        ...event,
-        meshId: 'clickable-trackjoint-' + data.id,
-        button: event.data.button
-      });
-
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
-
-    this.rectangle.on('pointerup', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.up({
-        ...event,
-        meshId: 'clickable-trackjoint-' + data.id,
-        button: event.data.button
-      });
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
+    PixiClick(this.rectangle, 'trackjoint', data.id);
 
     ///////////////////////
 
     this.rectangle2 = new PIXI.Graphics();
-    this.rectangle2.interactive = true;
-    this.rectangle2.buttonMode = true;
     this.rectangle2.beginFill(0x470bef);
     this.rectangle2.drawRect(-0.5, 0, 1, 1.5);
     this.rectangle2.endFill();
@@ -69,39 +35,7 @@ export class TrackJointPixiRenderer extends BasePixiRenderer
     this.rectangle2.rotation = -data.ray.dirXZ;
     this.rectangle2.zIndex = 1;
 
-    this.rectangle2.on('pointerdown', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.down({
-        ...event,
-        meshId: 'clickable-trackjoint-' + data.id,
-        button: event.data.button
-      });
-
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
-
-    this.rectangle2.on('pointerup', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.up({
-        ...event,
-        meshId: 'clickable-trackjoint-' + data.id,
-        button: event.data.button
-      });
-
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
+    PixiClick(this.rectangle2, 'trackjoint', data.id);
 
     globalThis.stage.addChild(this.rectangle);
     globalThis.stage.addChild(this.rectangle2);
@@ -110,6 +44,9 @@ export class TrackJointPixiRenderer extends BasePixiRenderer
   update() { }
 
   remove() {
+    this.rectangle.clear();
     this.rectangle.renderable = false;
+    this.rectangle2.clear();
+    this.rectangle2.renderable = false;
   }
 }

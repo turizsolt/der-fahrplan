@@ -7,7 +7,6 @@ import { Track } from '../../../modules/Track/Track';
 import { TrackSwitch } from '../../../modules/Track/TrackSwitch';
 import { TrackJoint } from '../../../modules/Track/TrackJoint/TrackJoint';
 import { Station } from '../../../modules/Station/Station';
-import { RouteStop } from '../../Scheduling/RouteStop';
 import { Route } from '../../Scheduling/Route';
 import { Store } from '../../Interfaces/Store';
 import { Wagon } from '../../Interfaces/Wagon';
@@ -35,12 +34,12 @@ import { SensorRenderer } from '../../Renderers/SensorRenderer';
 import { CapacityCap } from '../../../modules/Signaling/CapacityCap/CapacityCap';
 import { CapacityCapRenderer } from '../../Renderers/CapacityCapRenderer';
 import { InputController } from '../../../ui/controllers/InputController';
-import { TripGroup } from '../../Scheduling/TripGroup';
 import { TravelPathes } from '../../../modules/Travel/TravelPathes';
 import { WaitingHall } from '../../../modules/Station/WaitingHall';
 import { WaitingHallRenderer } from '../../Renderers/WaitingHallRenderer';
 import { PlatformGroup } from '../../../modules/Station/PlatformGroup';
 import { StationRenderer } from '../../Renderers/StationRenderer';
+import { RouteVariant } from '../../Scheduling/RouteVariant';
 
 @injectable()
 export class ActualStore implements Store {
@@ -52,9 +51,8 @@ export class ActualStore implements Store {
     private travelPathes: TravelPathes = new TravelPathes(this);
 
     @inject(TYPES.FactoryOfRoute) private RouteFactory: () => Route;
-    @inject(TYPES.FactoryOfRouteStop) private RouteStopFactory: () => RouteStop;
+    @inject(TYPES.FactoryOfRouteVariant) private RouteVariantFactory: () => RouteVariant;
     @inject(TYPES.FactoryOfTrip) private TripFactory: () => Trip;
-    @inject(TYPES.FactoryOfTripGroup) private TripGroupFactory: () => TripGroup;
     @inject(TYPES.FactoryOfStation) private StationFactory: () => Station;
     @inject(TYPES.FactoryOfWaitingHall) private WaitingHallFactory: () => WaitingHall;
     @inject(TYPES.FactoryOfPassenger) private PassengerFactory: () => Passenger;
@@ -111,9 +109,8 @@ export class ActualStore implements Store {
         this.typedElements = {};
         this.factoryMethods = {
             [TYPES.Route]: this.RouteFactory,
+            [TYPES.RouteVariant]: this.RouteVariantFactory,
             [TYPES.Trip]: this.TripFactory,
-            [TYPES.TripGroup]: this.TripGroupFactory,
-            [TYPES.RouteStop]: this.RouteStopFactory,
             [TYPES.Station]: this.StationFactory,
             [TYPES.WaitingHall]: this.WaitingHallFactory,
             [TYPES.Passenger]: this.PassengerFactory,
@@ -152,10 +149,9 @@ export class ActualStore implements Store {
             [TYPES.PlatformGroup]: -6.2,
             [TYPES.WaitingHall]: -6.3,
 
-            [TYPES.RouteStop]: -7,
-            [TYPES.Route]: -8,
+            [TYPES.Route]: -7,
+            [TYPES.RouteVariant]: -8,
             [TYPES.Trip]: -9,
-            [TYPES.TripGroup]: -10,
 
             [TYPES.Passenger]: -11,
             [TYPES.Sensor]: -14,
@@ -197,7 +193,7 @@ export class ActualStore implements Store {
                 // todo prettify
                 ((created as any) as Emitable).on('init', data => g.init(data));
                 ((created as any) as Emitable).on('update', data => g.update(data));
-                ((created as any) as Emitable).on('remove', data => g.remove(data));
+                ((created as any) as Emitable).on('remove', id => g.remove(id));
                 ((created as any) as Emitable).on('remove', id =>
                     this.unregister(this.get(id))
                 );
@@ -270,14 +266,21 @@ export class ActualStore implements Store {
         return ret;
     }
 
-    loadAll(arr: any[]) {
+    loadAll(arr: any[], version: number) {
         const fx = a => this.typeOrder[Symbol.for(a)] || 999;
+
+        const skipTypes = version === 3 ? [] : ['Route', 'RouteStop', 'Trip'];
 
         arr.sort((a, b) => {
             return fx(b.type) - fx(a.type);
         });
 
         arr.map(elem => {
+            if (skipTypes.includes(elem.type)) {
+                console.log(elem.type, 'has skipped.');
+                return;
+            }
+
             const brick: BaseStorable = this.create<BaseStorable>(
                 Symbol.for(elem.type)
             );

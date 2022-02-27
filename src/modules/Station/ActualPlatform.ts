@@ -253,12 +253,16 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
 
     remove(): boolean {
         this.store.unregister(this);
+
+        this.xposition.removeMarker({ type: 'Platform', platform: this });
+        this.xopposition.removeMarker({ type: 'Platform', platform: this });
+
         this.removed = true;
         if (this.station) {
             this.station.removePlatform(this);
             this.station = null;
         }
-        this.renderer.update();
+        this.renderer.remove();
         return true;
     }
 

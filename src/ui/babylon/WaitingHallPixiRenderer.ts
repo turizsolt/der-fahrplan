@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import { injectable } from 'inversify';
 import { BasePixiRenderer } from './BasePixiRenderer';
 import { WaitingHallRenderer } from '../../structs/Renderers/WaitingHallRenderer';
+import { PixiClick } from './PixiClick';
 
 @injectable()
 export class WaitingHallPixiRenderer extends BasePixiRenderer
@@ -12,43 +13,9 @@ export class WaitingHallPixiRenderer extends BasePixiRenderer
 
     init(waitingHall: any) {
         this.rect = new PIXI.Graphics();
-        this.rect.interactive = true;
-        this.rect.buttonMode = true;
         this.rect.zIndex = 1;
 
-        this.rect.on('pointerdown', (event: PIXI.InteractionEvent) => {
-            const x =
-                (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-            const y =
-                (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-            event.data.global.x = x;
-            event.data.global.y = y;
-            globalThis.inputController.down({
-                ...event,
-                meshId: 'clickable-waitingHall-' + waitingHall.id,
-                button: event.data.button
-            });
-
-            event.stopPropagation();
-            event.data.originalEvent.stopPropagation();
-        });
-
-        this.rect.on('pointerup', (event: PIXI.InteractionEvent) => {
-            const x =
-                (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-            const y =
-                (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-            event.data.global.x = x;
-            event.data.global.y = y;
-            globalThis.inputController.up({
-                ...event,
-                meshId: 'clickable-waitingHall-' + waitingHall.id,
-                button: event.data.button
-            });
-
-            event.stopPropagation();
-            event.data.originalEvent.stopPropagation();
-        });
+        PixiClick(this.rect, 'waitingHall', waitingHall.id);
 
         globalThis.stage.addChild(this.rect);
 
@@ -69,5 +36,10 @@ export class WaitingHallPixiRenderer extends BasePixiRenderer
         this.rect.beginFill(fillColor, 1);
         this.rect.drawCircle(0, 0, waitingHall.radius);
         this.rect.endFill();
+    }
+
+    remove() {
+        this.rect.clear();
+        this.rect.renderable = false;
     }
 }

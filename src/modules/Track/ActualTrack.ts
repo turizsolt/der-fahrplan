@@ -71,6 +71,9 @@ export class ActualTrack extends ActualTrackBase implements Track {
   }
 
   remove(): boolean {
+    if (this.getDirected(TrackDirection.AB).getMarkers().length > 0) return false;
+    if (this.getDirected(TrackDirection.BA).getMarkers().length > 0) return false;
+
     const removable = super.remove();
     if (removable) {
       this.renderer.remove();

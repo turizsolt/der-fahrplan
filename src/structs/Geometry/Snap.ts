@@ -16,7 +16,7 @@ function snap(p) {
 }
 
 export function snapHexaXZ(p: Ray): Ray {
-  const a = snapHexaHeight(p.coord.z) / HEIGHT;
+  const a = Math.round(snapHexaHeight(p.coord.z) / HEIGHT);
   const par = a % 2 === 0 ? 0 : WIDTH / 2;
   return new Ray(
     new Coordinate(snapHexaWidth(p.coord.x, par), 0, snapHexaHeight(p.coord.z)),

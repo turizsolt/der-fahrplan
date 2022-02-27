@@ -70,9 +70,10 @@ describe('TrainSight', () => {
         const sight: Sight = trainSight.getSight(pos, 30);
         const expectedSight: Sight = {
             distance: 20,
-            markers: [
-                { type: 'End', distance: 20, speed: 0, object: undefined },
-            ]
+            markers: [],
+            // todo when using ends again
+            //    { type: 'End', distance: 20, speed: 0, object: undefined },
+            //]
         };
         expect(sight).deep.equals(expectedSight);
     });

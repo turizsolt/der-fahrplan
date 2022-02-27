@@ -4,6 +4,7 @@ import { BasePixiRenderer } from './BasePixiRenderer';
 import { PlatformRenderer } from '../../structs/Renderers/PlatformRenderer';
 import { Platform } from '../../modules/Station/Platform';
 import { ITextStyle } from 'pixi.js';
+import { PixiClick } from './PixiClick';
 
 @injectable()
 export class PlatformPixiRenderer extends BasePixiRenderer
@@ -24,39 +25,7 @@ export class PlatformPixiRenderer extends BasePixiRenderer
         this.rect.rotation = -platform.getRotation();
         this.rect.zIndex = 4;
 
-        this.rect.on('pointerdown', (event: PIXI.InteractionEvent) => {
-            const x =
-                (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-            const y =
-                (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-            event.data.global.x = x;
-            event.data.global.y = y;
-            globalThis.inputController.down({
-                ...event,
-                meshId: 'clickable-platform-' + platform.getId(),
-                button: event.data.button
-            });
-
-            event.stopPropagation();
-            event.data.originalEvent.stopPropagation();
-        });
-
-        this.rect.on('pointerup', (event: PIXI.InteractionEvent) => {
-            const x =
-                (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-            const y =
-                (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-            event.data.global.x = x;
-            event.data.global.y = y;
-            globalThis.inputController.up({
-                ...event,
-                meshId: 'clickable-platform-' + platform.getId(),
-                button: event.data.button
-            });
-
-            event.stopPropagation();
-            event.data.originalEvent.stopPropagation();
-        });
+        PixiClick(this.rect, 'platform', platform.getId());
 
         globalThis.stage.addChild(this.rect);
 
@@ -98,5 +67,11 @@ export class PlatformPixiRenderer extends BasePixiRenderer
         this.rect.endFill();
 
         this.text.text = this.platform.getNo();
+    }
+
+    remove() {
+        this.rect.clear();
+        this.rect.renderable = false;
+        this.text.renderable = false;
     }
 }

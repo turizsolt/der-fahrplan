@@ -17,6 +17,38 @@ const productionContainer =
     ? productionContainer2d
     : productionContainer3d;
 
+setTimeout(() => {
+  const app2 = new PIXI.Application({ width: 5120, height: 5120 });
+  const container2 = document.getElementById('pixi-map-container');
+  container2.appendChild(app2.view);
+  app2.renderer.backgroundColor = 0xcceecc;
+  app2.renderer.view.style.position = 'absolute';
+  app2.renderer.view.style.display = 'block';
+  app2.renderer.resize(container2.clientWidth - 1, container2.clientHeight - 1);
+  app2.renderer.view.style.zIndex = '0';
+  app2.view.id = 'renderCanvasMap';
+
+  globalThis.stageMap = app2.stage;
+  globalThis.stageMap.sortableChildren = true;
+  globalThis.rendererMap = app2.renderer;
+  globalThis.containerMap = container2;
+
+  const app3 = new PIXI.Application({ width: 5120, height: 5120 });
+  const container3 = document.getElementById('pixi-diagram-container');
+  container3.appendChild(app3.view);
+  app3.renderer.backgroundColor = 0xcceecc;
+  app3.renderer.view.style.position = 'absolute';
+  app3.renderer.view.style.display = 'block';
+  app3.renderer.resize(container3.clientWidth - 1, container3.clientHeight - 1);
+  app3.renderer.view.style.zIndex = '0';
+  app3.view.id = 'renderCanvasDiagram';
+
+  globalThis.stageDiagram = app3.stage;
+  globalThis.stageDiagram.sortableChildren = true;
+  globalThis.rendererDiagram = app3.renderer;
+  globalThis.containerDiagram = container3;
+}, 0);
+
 if (globalThis.startParam === '2d') {
   // init PIXI
   const app = new PIXI.Application({ width: 5120, height: 5120 });
@@ -144,9 +176,9 @@ if (globalThis.startParam === '2d') {
               const obj = JSON.parse(contents);
 
               if (!obj._version) throw new Error();
-              if (obj._version != 2) throw new Error();
+              if (obj._version < 2) throw new Error();
               if (!obj._format || obj._format !== 'fahrplan') throw new Error();
-              globalController.load(obj.data);
+              globalController.load(obj.data, obj._version);
               globalController.loadSpecific(obj);
             } catch {
               console.error('Not proper JSON, hey!');
@@ -313,9 +345,9 @@ if (globalThis.startParam === '2d') {
               const obj = JSON.parse(contents);
 
               if (!obj._version) throw new Error();
-              if (obj._version != 2) throw new Error();
+              if (obj._version < 2) throw new Error();
               if (!obj._format || obj._format !== 'fahrplan') throw new Error();
-              globalController.load(obj.data);
+              globalController.load(obj.data, obj._version);
               globalController.loadSpecific(obj);
             } catch {
               console.error('Not proper JSON, hey!');

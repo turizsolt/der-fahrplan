@@ -1,15 +1,15 @@
 import { TYPES } from "../../di/TYPES";
 import { Store } from "../../structs/Interfaces/Store";
-import { Route } from "../../structs/Scheduling/Route";
-import { RouteStop } from "../../structs/Scheduling/RouteStop";
 import { Station } from "../Station/Station";
 import { Util } from "../../structs/Util";
 import { TravelPath } from "./TravelPath";
+import { RouteVariant } from "../../structs/Scheduling/RouteVariant";
+import { RoutePart } from "../../structs/Scheduling/RoutePart";
 
 export class TravelPathes {
     private pathes: Record<string, Record<string, TravelPath[]>> = {};
     private stations: Station[] = [];
-    private routes: Route[] = [];
+    private routes: RouteVariant[] = [];
 
     constructor(private store: Store) { }
 
@@ -34,7 +34,7 @@ export class TravelPathes {
     }
 
     private initialiseRoutes(): void {
-        this.routes = this.store.getAllOf<Route>(TYPES.Route);
+        this.routes = this.store.getAllOf<RouteVariant>(TYPES.RouteVariant);
     }
 
     private initialiseStations(): void {
@@ -53,13 +53,23 @@ export class TravelPathes {
 
     private findDirect(): void {
         for (let route of this.routes) {
-            const stops: RouteStop[] = route.getStops();
+            const stops: RoutePart[] = route.getStops();
             for (let i = 0; i < stops.length; i++) {
+                if (![TYPES.RoutePartStop, TYPES.RoutePartJunction].includes(stops[i].getType())) continue;
+
+                let dur = 0;
                 for (let j = i + 1; j < stops.length; j++) {
-                    const from: Station = stops[i].getStation();
-                    const to: Station = stops[j].getStation();
-                    const dist: number = stops[j].getArrivalTime() - stops[i].getDepartureTime();
+                    if (![TYPES.RoutePartStop, TYPES.RoutePartJunction].includes(stops[j].getType())) {
+                        dur += stops[j].getDuration();
+                        continue;
+                    }
+
+                    const from: Station = stops[i].getRef() as Station;
+                    const to: Station = stops[j].getRef() as Station;
+                    const dist: number = dur; // todo stops[j].getArrivalTime() - stops[i].getDepartureTime();
                     this.pathes[from.getId()][to.getId()].push({ score: dist, changes: [{ route, station: to, time: dist }] });
+
+                    dur += stops[j].getDuration();
                 }
             }
         }

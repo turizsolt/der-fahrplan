@@ -1,13 +1,31 @@
+import { ScaleBlock } from "babylonjs/Materials/Node/Blocks/scaleBlock";
+import { Coordinate } from "../../structs/Geometry/Coordinate";
+import { Ray } from "../../structs/Geometry/Ray";
+import { Route } from "../../structs/Scheduling/Route";
+import { RoutePart } from "../../structs/Scheduling/RoutePart";
 import { RailMap } from "./RailMap";
 import { RailMapBounds } from "./RailMapBounds";
 import { RailMapEdge } from "./RailMapEdge";
 import { RailMapNode } from "./RailMapNode";
+import { RailMapRoute, RailMapRouteArray, RailMapRouteDraw, RailMapStop } from "./RailMapRoute";
+
+const DEFAULT_ROUTE_GAP = 6;
+const DEFAULT_STATION_GAP = 4;
 
 export class ActualRailMap implements RailMap {
     private nodes: RailMapNode[] = [];
     private edges: Record<string, RailMapEdge> = {};
     private bounds: RailMapBounds;
     private neighbours: Record<string, RailMapNode[]> = {};
+    private routes: RailMapRouteArray[] = [];
+    private routesDraw: RailMapRouteDraw[][] = [];
+    private nodesWithHash: Record<string, Record<string, any[]>> = {};
+    private nodesWithRoute: Record<string, Record<string, any[]>> = {};
+    private stops: RailMapStop[] = [];
+    private nodesSize: Record<string, number> = {};
+
+    private routeGap = 6;
+    private stationGap = 4;
 
     addNodes(nodes: RailMapNode[]): void {
         this.nodes.push(...nodes);
@@ -20,7 +38,7 @@ export class ActualRailMap implements RailMap {
         let { from, to } = this.orderNodes(nodeFrom, nodeTo);
         const hash = this.hashNodes(from, to);
         if (!this.edges[hash]) {
-            this.edges[hash] = { from, to, count: 0, avgDistance: 0, distances: [] };
+            this.edges[hash] = { from, to, count: 0, avgDistance: 0, distances: [], routeCount: 0, opposite: from === nodeTo };
             this.neighbours[nodeFrom.getId()].push(nodeTo);
             this.neighbours[nodeTo.getId()].push(nodeFrom);
         }
@@ -29,12 +47,167 @@ export class ActualRailMap implements RailMap {
         this.edges[hash].avgDistance = sum(this.edges[hash].distances) / this.edges[hash].count;
     }
 
+    addRoute(route: Route): void {
+        // todo this is not the right place
+        const bounds = this.getBounds();
+        const border = 20;
+
+        const scale = Math.min(
+            (globalThis.containerMap.clientWidth - 2 * border) / (bounds.maxX - bounds.minX),
+            (globalThis.containerMap.clientHeight - 2 * border) / (bounds.maxZ - bounds.minZ)
+        );
+        this.routeGap = DEFAULT_ROUTE_GAP / scale;
+        this.stationGap = DEFAULT_STATION_GAP / scale;
+
+        const mapRoute: RailMapRouteArray = [];
+        const waypoints = route.getVariants()[0].getWaypoints();
+        for (let i = 1; i < waypoints.length; i++) {
+            const { from, to } = this.orderNodes(waypoints[i - 1].getRef() as RailMapNode, waypoints[i].getRef() as RailMapNode);
+
+            const fromObj: RoutePart = from === waypoints[i - 1].getRef() ? waypoints[i - 1] : waypoints[i];
+            const toObj: RoutePart = from === waypoints[i - 1].getRef() ? waypoints[i] : waypoints[i - 1];
+
+            const hash = this.hashNodes(from, to);
+            const routeCount = this.edges[hash].routeCount++;
+
+            const fromCoord: Coordinate = from.getCoord();
+            const toCoord: Coordinate = to.getCoord();
+            const fromDir: number = fromCoord.whichDir2d(toCoord);
+            const toDir: number = toCoord.whichDir2d(fromCoord);
+
+            const routeProps: RailMapRoute = {
+                from: new Ray(fromCoord, fromDir),
+                to: new Ray(toCoord, toDir),
+                fromOriginal: new Ray(fromCoord, fromDir),
+                toOriginal: new Ray(toCoord, toDir),
+                fromId: from.getId(),
+                toId: to.getId(),
+                fromObj: fromObj,
+                toObj: toObj,
+                no: routeCount,
+                color: route.getColor(),
+                routeId: route.getId(),
+                hash,
+                count: 1,
+                opposite: this.edges[hash].opposite
+            };
+
+            mapRoute.push(routeProps);
+
+            if (!this.nodesWithHash[from.getId()]) {
+                this.nodesWithHash[from.getId()] = {};
+            }
+            if (!this.nodesWithHash[from.getId()][to.getId()]) {
+                this.nodesWithHash[from.getId()][to.getId()] = [];
+            }
+
+            if (!this.nodesWithHash[to.getId()]) {
+                this.nodesWithHash[to.getId()] = {};
+            }
+            if (!this.nodesWithHash[to.getId()][from.getId()]) {
+                this.nodesWithHash[to.getId()][from.getId()] = [];
+            }
+
+            this.nodesWithHash[from.getId()][to.getId()].push({ which: 'from', routeProps });
+            this.nodesWithHash[to.getId()][from.getId()].push({ which: 'to', routeProps });
+
+            if (!this.nodesWithRoute[from.getId()]) {
+                this.nodesWithRoute[from.getId()] = {};
+            }
+            if (!this.nodesWithRoute[from.getId()][route.getId()]) {
+                this.nodesWithRoute[from.getId()][route.getId()] = [];
+            }
+
+            if (!this.nodesWithRoute[to.getId()]) {
+                this.nodesWithRoute[to.getId()] = {};
+            }
+            if (!this.nodesWithRoute[to.getId()][route.getId()]) {
+                this.nodesWithRoute[to.getId()][route.getId()] = [];
+            }
+
+            this.nodesWithRoute[from.getId()][route.getId()].push({ which: 'from', routeProps });
+            this.nodesWithRoute[to.getId()][route.getId()].push({ which: 'to', routeProps });
+        }
+        this.routes.push(mapRoute);
+
+        // b
+
+        for (let route of this.routes) {
+            for (let edge of route) {
+                edge.count = this.edges[edge.hash].routeCount;
+                const no = (- ((edge.count - 1) / 2) + edge.no) * (edge.opposite ? -1 : 1);
+                edge.from = edge.fromOriginal.fromHere(0, edge.count * this.stationGap).fromHere(Math.PI / 2, this.routeGap * no);
+                edge.to = edge.toOriginal.fromHere(0, edge.count * this.stationGap).fromHere(-Math.PI / 2, this.routeGap * no);
+            }
+        }
+
+        // c
+        this.routesDraw = [];
+        this.stops = [];
+        this.nodesSize = {};
+        for (let key of Object.keys(this.nodesWithRoute)) {
+            for (let key2 of Object.keys(this.nodesWithRoute[key])) {
+                const arr = this.nodesWithRoute[key][key2];
+
+                let k = 0;
+                for (let a of arr) {
+                    this.stops.push({
+                        color: a.routeProps.color,
+                        point: a.routeProps[a.which],
+                        routeId: a.routeProps.routeId,
+                        stopping: (a.routeProps[a.which + 'Obj'] as RoutePart).isStopping() && k === 0
+                    });
+                    k++;
+                }
+
+                // console.log(arr.length);
+                if (arr.length === 2) {
+                    const a0: Ray = arr[0].routeProps[arr[0].which];
+                    const a1: Ray = arr[1].routeProps[arr[1].which];
+                    /*
+                    const aMid = a0.computeMidpoint(a1);
+                    if (aMid) {
+                        arr[0].routeProps[arr[0].which] = new Ray(aMid, a0.dirXZ);
+                        arr[1].routeProps[arr[1].which] = new Ray(aMid, a1.dirXZ);
+                    }
+                    */
+                    this.routesDraw.push([{
+                        from: a0,
+                        to: a1,
+                        color: arr[0].routeProps.color,
+                        routeId: key2
+                    }]);
+                }
+            }
+        }
+
+        for (let key of Object.keys(this.nodesWithHash)) {
+            let size = 0;
+            for (let key2 of Object.keys(this.nodesWithHash[key])) {
+                size = Math.max(size, this.nodesWithHash[key][key2].length);
+            }
+            this.nodesSize[key] = size;
+        }
+    }
+
     getEdges(): Record<string, RailMapEdge> {
         return this.edges;
     }
 
     getNodes(): RailMapNode[] {
         return this.nodes;
+    }
+
+    getNodesSize(): Record<string, number> {
+        return this.nodesSize;
+    }
+
+    getStops(): RailMapStop[] {
+        return this.stops;
+    }
+
+    getRoutes(): RailMapRouteDraw[][] {
+        return [...this.routes, ...this.routesDraw];
     }
 
     getNeighboursOf(node: RailMapNode): RailMapNode[] {
@@ -46,7 +219,7 @@ export class ActualRailMap implements RailMap {
     }
 
     getBounds(): RailMapBounds {
-        return this.bounds
+        return this.bounds;
     }
 
     getDistance(nodeFrom: RailMapNode, nodeTo: RailMapNode): number {
@@ -63,7 +236,7 @@ export class ActualRailMap implements RailMap {
         return this.edges[hash]?.count;
     }
 
-    getShortestPath(from: RailMapNode, to: RailMapNode): RailMapNode[] {
+    getShortestPath(from: RailMapNode, to: RailMapNode, forbiddenNodes: RailMapNode[]): RailMapNode[] {
         const queue: RailMapNode[] = [from];
         const comesFrom: Record<string, RailMapNode> = { [from.getId()]: null };
 
@@ -84,6 +257,8 @@ export class ActualRailMap implements RailMap {
             }
 
             for (let e of this.getNeighboursOf(next)) {
+                if (forbiddenNodes.includes(e)) continue;
+
                 if (comesFrom[e.getId()] === undefined) {
                     comesFrom[e.getId()] = next;
                     queue.push(e);

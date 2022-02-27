@@ -28,11 +28,16 @@ import { Sensor } from '../../../../modules/Signaling/Sensor';
 import { convertFrom, convertTo } from '../../../../modules/Train/ActualTrain';
 import { SectionEnd } from '../../../../modules/Signaling/SectionEnd';
 import { ActualTrainSight } from '../../../../modules/Train/Sight/ActualTrainSight';
-import { Util } from '../../../../structs/Util';
+import { PathBlockEnd } from '../../../../modules/Signaling/PathBlockEnd';
+import { MouseLeft, MouseRight } from '../Interfaces/InputType';
+import { BaseBrick } from '../../../../structs/Interfaces/BaseBrick';
+import { MeshInfo } from '../../MeshInfo';
+import { BaseStorable } from '../../../../structs/Interfaces/BaseStorable';
 
 // @injectable()
 export class BlockWizardInputHandler extends InputHandler {
     private commandLog: CommandLog;
+    private selectedPathBlock: PathBlock = null;
 
     // @inject(TYPES.TrackInputHandler)
     private plugin: BlockWizardInputHandlerPlugin;
@@ -48,7 +53,7 @@ export class BlockWizardInputHandler extends InputHandler {
         this.plugin.init();
         this.commandLog = store.getCommandLog();
 
-        this.reg(click(), (legacyEvent: PointerEvent) => {
+        this.reg(click(MouseLeft), (legacyEvent: PointerEvent) => {
             const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
             const dpot = legacyProps.snappedPositionOnTrack;
             const position =
@@ -65,8 +70,21 @@ export class BlockWizardInputHandler extends InputHandler {
                 dpot &&
                 dpot.track.constructor.name === ActualTrackSwitch.name
             ) {
-                this.wizardPathBlock(position);
+                this.wizardPathBlock(position, this.selectedPathBlock);
             }
+
+            if (this.selectedPathBlock) { this.selectedPathBlock.highlight(false); }
+            this.selectedPathBlock = null;
+            this.plugin.click();
+        });
+
+        this.reg(click(MouseRight), (legacyEvent: PointerEvent) => {
+            const legacyProps = this.store.getInputController().convertEventToProps(legacyEvent);
+            const pathBlock = this.isPathBlock(legacyProps) as PathBlock;
+            if (!pathBlock) return false;
+
+            pathBlock.highlight(true);
+            this.selectedPathBlock = pathBlock;
 
             this.plugin.click();
         });
@@ -122,7 +140,7 @@ export class BlockWizardInputHandler extends InputHandler {
                 : nearestBackward;
 
         const wholeDistance = forward.distance + backward.distance;
-        const signalMinimumDistance = 100;
+        const signalMinimumDistance = globalThis.signalDistance || 100;
         const signalCount = Math.max(
             1,
             Math.floor(wholeDistance / signalMinimumDistance)
@@ -168,7 +186,7 @@ export class BlockWizardInputHandler extends InputHandler {
         }
     }
 
-    wizardPathBlock(position: PositionOnTrack): void {
+    wizardPathBlock(position: PositionOnTrack, selectedPathBlock: PathBlock): void {
         const track: TrackBase = position.getTrack();
         const queue: TrackBase[] = [track];
         const visited: Record<string, DirectedTrack> = { [track.getId()]: position.getDirectedTrack() };
@@ -199,56 +217,116 @@ export class BlockWizardInputHandler extends InputHandler {
             }
         }
 
-        //
-        const pb = this.store
+        // find for old PathBlock
+        let oldPathBlock: PathBlock = selectedPathBlock;
+        for (let bje of blockJointEnds) {
+            if (bje.joint.getEnd(WhichEnd.A)?.getType() === TYPES.PathBlockEnd) {
+                oldPathBlock = (bje.joint.getEnd(WhichEnd.A) as PathBlockEnd).getPathBlock();
+                break;
+            }
+            if (bje.joint.getEnd(WhichEnd.B)?.getType() === TYPES.PathBlockEnd) {
+                oldPathBlock = (bje.joint.getEnd(WhichEnd.B) as PathBlockEnd).getPathBlock();
+                break;
+            }
+        }
+
+        const pathBlock = oldPathBlock ?? this.store
             .create<PathBlock>(TYPES.PathBlock)
             .init(blockJointEnds);
 
-        // connect all
-        pb.getPathBlockEnds().map(pbe => pbe.pathConnect());
+        if (oldPathBlock) {
+            const oldPathBlockEnds = pathBlock.getPathBlockEnds();
+            oldPathBlockEnds.map(pbe => pbe.pathDisconnect());
 
-        // create sensors
-        pb.getPathBlockEnds().map(pbe => {
-            const bj = pbe.getJointEnd().joint;
-            const pot = bj.getPosition().clone();
-            if (pbe.getJointEnd().end === WhichEnd.B) {
-                pot.reverse();
+            pathBlock.update(blockJointEnds);
+
+            const newPathBlockEnds = pathBlock.getPathBlockEnds();
+            newPathBlockEnds.map(pbe => pbe.pathConnect());
+
+            for (let newPathBlockEnd of newPathBlockEnds) {
+                if (!oldPathBlockEnds.some(pbe => pbe.getHash() === newPathBlockEnd.getHash())) {
+                    this.createSensor(pathBlock, newPathBlockEnd);
+                }
             }
 
-            const sight = new ActualTrainSight();
-            const distance: number = sight.distanceWithoutSwitchprivate(pot, 160) - 1;
+            // todo sensor
+        } else {
+            this.handleNewPathBlockEnds(pathBlock, pathBlock.getPathBlockEnds());
+        }
 
-            // console.log('dist', distance);
-
-            pot.move(distance);
-            pot.reverse();
-
-            const nearestData = Nearest.platform(pot.clone());
-            if (nearestData?.distance < distance) {
-                this.store.create<Sensor>(TYPES.Sensor).init(nearestData.position, pb, pbe);
-
-            } else {
-                this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
-            }
-            /*
-            pot.move(160);
-            pot.reverse();
-
-            const sight = new ActualTrainSight();
-            const nearestPlatformList = sight.getSight(pot, 160, null, null).markers
-                .filter(m => m.type === 'Platform');;
-            
-            if (nearestPlatformList.length > 0) {
-                pot.move(Util.last(nearestPlatformList).distance);
-                this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
-            } else {
-                this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
-            }
-            */
-        });
-
-        // create signals
         createSignals(blockJointEnds, SignalSignal.Red, this.store);
+    }
+
+    private handleNewPathBlockEnds(pathBlock: PathBlock, pathBlockEnds: PathBlockEnd[]) {
+        pathBlockEnds.map(pbe => pbe.pathConnect());
+        pathBlockEnds.map(pbe => this.createSensor(pathBlock, pbe));
+    }
+
+    private createSensor(pathBlock: PathBlock, pbe: PathBlockEnd) {
+        const bj = pbe.getJointEnd().joint;
+        const pot = bj.getPosition().clone();
+        if (pbe.getJointEnd().end === WhichEnd.B) {
+            pot.reverse();
+        }
+
+        const sight = new ActualTrainSight();
+        const distance: number = sight.distanceWithoutSwitchprivate(pot, 160) - 1;
+
+        // console.log('dist', distance);
+
+        pot.move(distance);
+        pot.reverse();
+
+        const nearestData = Nearest.platform(pot.clone());
+        if (nearestData?.distance < distance) {
+            this.store.create<Sensor>(TYPES.Sensor).init(nearestData.position, pathBlock, pbe);
+
+        } else {
+            this.store.create<Sensor>(TYPES.Sensor).init(pot, pathBlock, pbe);
+        }
+        /*
+        pot.move(160);
+        pot.reverse();
+    
+        const sight = new ActualTrainSight();
+        const nearestPlatformList = sight.getSight(pot, 160, null, null).markers
+            .filter(m => m.type === 'Platform');;
+        
+        if (nearestPlatformList.length > 0) {
+            pot.move(Util.last(nearestPlatformList).distance);
+            this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
+        } else {
+            this.store.create<Sensor>(TYPES.Sensor).init(pot, pb, pbe);
+        }
+        */
+    }
+
+    private isPathBlock(legacyProps: InputProps): BaseStorable {
+        const meshInfo = this.getMeshInfo(legacyProps?.mesh?.id);
+        if (!meshInfo || !meshInfo.storedBrick) return null;
+        if (![TYPES.PathBlock].includes(meshInfo.type)) return null;
+
+        return this.store.get(meshInfo.id);
+    }
+
+    // todo duplicate from SelectInputHandler
+    private getMeshInfo(meshId: string): MeshInfo {
+        if (!meshId) return null;
+
+        if (meshId.includes('.')) {
+            meshId = meshId.slice(0, meshId.indexOf('.'));
+        }
+
+        if (meshId.startsWith('clickable-')) {
+            const [_, type, id, command] = meshId.split('-');
+            const storedObj = this.store.get(id);
+            const storedBrick = storedObj as BaseBrick;
+            return {
+                typeString: type, id, command, storedBrick, type: storedBrick?.getType()
+            };
+        }
+
+        return null;
     }
 }
 

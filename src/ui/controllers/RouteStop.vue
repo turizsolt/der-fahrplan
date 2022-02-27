@@ -2,7 +2,9 @@
   <div class="stop">
     <div
       class="stop-circle"
-      :style="{ backgroundColor: stop.shouldStop ? stop.stationRgbColor : 'transparent' }"
+      :style="{
+        backgroundColor: stop.shouldStop ? stop.stationRgbColor : 'transparent',
+      }"
       @click.stop="$emit('shouldStop')"
     ></div>
     <div v-if="index !== route.stops.length - 1" class="stop-after color"></div>
@@ -10,17 +12,27 @@
       v-if="index === route.stops.length - 1"
       class="stop-after nocolor"
     ></div>
-    <div class="stop-name" :style="{ color: (stop.isServed || !stop.isStation || !stop.shouldStop) ? 'grey' : 'black', fontStyle: (stop.isStation) ? 'normal' : 'italic' }">
+    <div
+      class="stop-name"
+      :style="{
+        color:
+          stop.isServed || !stop.isStation || !stop.shouldStop
+            ? 'grey'
+            : 'black',
+        fontStyle: stop.isStation ? 'normal' : 'italic',
+      }"
+    >
       {{ stop.atStation ? "* " : "" }} {{ stop.stationName }}
       {{ stop.isArrivalStation ? "é." : "" }}
+      <!--<span @click="addTime()">+</span>/<span @click="removeTime()">-</span>-->
     </div>
 
-    <!-- buttons -->
+    <!-- buttons 
     <div class="stop-button-holder">
       <div
         v-if="candelete"
         class="stop-button"
-        :class="stop.isReverseStop?'stop-reverse':'stop-non-reverse'"
+        :class="stop.isReverseStop ? 'stop-reverse' : 'stop-non-reverse'"
         @click.stop="$emit('reverse')"
       >
         R
@@ -33,11 +45,24 @@
         x
       </div>
     </div>
+    -->
 
     <!-- platform -->
-    <select v-if="!isTrip" size="1" class="stop-select-platform" :value="stop.platform" @change="changePlatform">
+    <select
+      v-if="!isTrip"
+      size="1"
+      class="stop-select-platform"
+      :value="stop.platform"
+      @change="changePlatform"
+    >
       <option value="">?</option>
-      <option v-for="option in stop.platformOptions" :value="option.id">{{option.no}}</option>
+      <option
+        v-for="(option, index) in stop.platformOptions"
+        :value="option.id"
+        :key="index"
+      >
+        {{ option.no }}
+      </option>
     </select>
 
     <!-- arrival departure -->
@@ -45,7 +70,7 @@
       v-if="!isTrip && !stop.isDepartureStation"
       class="stop-input-time"
       type="text"
-      v-model="stop.arrivalTimeString"
+      v-model="arrivalTime"
       @keyup.stop="handleTime('arrivalTime', $event)"
     />
     <div v-if="!isTrip && stop.isDepartureStation" class="stop-input-time">
@@ -55,17 +80,13 @@
       v-if="!isTrip && !stop.isArrivalStation"
       class="stop-input-time"
       type="text"
-      v-model="stop.departureTimeString"
+      v-model="departureTime"
       @keyup.stop="handleTime('departureTime', $event)"
     />
     <div v-if="!isTrip && stop.isArrivalStation" class="stop-input-time">-</div>
 
     <div v-if="isTrip" class="trip-stop-time">
-      {{
-        stop.isArrivalStation
-          ? stop.arrivalTimeString
-          : stop.departureTimeString
-      }}
+      {{ stop.isArrivalStation ? arrivalTime : departureTime }}
     </div>
     <div v-if="isTrip" class="trip-stop-time" :style="{ color: realColor }">
       {{
@@ -74,8 +95,8 @@
           : stop.realDepartureTime) === -1
           ? "?"
           : stop.isArrivalStation
-          ? stop.realArrivalTimeString
-          : stop.realDepartureTimeString
+          ? realArrivalTime
+          : realDepartureTime
       }}
     </div>
   </div>
@@ -83,9 +104,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import { AbstractPlatform } from "../../modules/Station/AbstractPlatform";
-import { RouteStop } from "../../structs/Scheduling/RouteStop";
-import { getStorable } from "../../structs/Actuals/Store/StoreForVue";
+import { Util } from "../../structs/Util";
+import { handleTimeText } from "./HandleTime";
 
 @Component
 export default class RouteTitle extends Vue {
@@ -95,6 +115,22 @@ export default class RouteTitle extends Vue {
   @Prop() candelete?: boolean;
   @Prop() canmove?: boolean;
   @Prop() isTrip?: boolean;
+
+  get arrivalTime(): string {
+    return Util.timeToString(this.stop.arrivalTime);
+  }
+
+  get departureTime(): string {
+    return Util.timeToString(this.stop.departureTime);
+  }
+
+  get realArrivalTime(): string {
+    return Util.timeToString(this.stop.realArrivalTime);
+  }
+
+  get realDepartureTime(): string {
+    return Util.timeToString(this.stop.realDepartureTime);
+  }
 
   get realColor(): string {
     const defVal = this.stop.isArrivalStation
@@ -114,36 +150,32 @@ export default class RouteTitle extends Vue {
   }
 
   handleTime(column: string, event: any): void {
-    let value = event.currentTarget.value;
-    value = value
-      .split("")
-      .filter((x) => "0" <= x && x <= "9")
-      .join("");
-    if (value.length > 4) {
-      value = value.substr(0, 4);
-    }
-    let time = parseInt(value, 10);
-    if (value.length > 2) {
-      value = value.substr(0, value.length - 2) + ":" + value.substr(-2);
-      time =
-        parseInt(value.substr(0, value.length - 2), 10) * 60 +
-        parseInt(value.substr(-2), 10);
-    }
-    event.currentTarget.value = value;
+    const { time, timeStr } = handleTimeText(event);
+    event.currentTarget.value = timeStr;
 
-    const stop = getStorable(this.stop.id) as RouteStop;
+    /*const stop = getStorable(this.stop.id) as RouteStop;
     if (column === "arrivalTime") {
-      stop.setArrivalTime(value === "" ? undefined : time * 60);
+      stop.setArrivalTime(time);
     }
     if (column === "departureTime") {
-      stop.setDepartureTime(value === "" ? undefined : time * 60);
-    }
+      stop.setDepartureTime(time);
+    }*/
   }
 
-  changePlatform(event:any):void {
-    const stop = getStorable(this.stop.id) as RouteStop;
+  changePlatform(event: any): void {
+    /*const stop = getStorable(this.stop.id) as RouteStop;
     const platform = getStorable(event.currentTarget.value) as unknown as AbstractPlatform;
-    stop.setPlatform(platform);
+    stop.setPlatform(platform);*/
+  }
+
+  addTime(): void {
+    /*const stop = getStorable(this.stop.id) as RouteStop;
+    stop.setExtraTimeToStation(stop.getExtraTimeToStation()+60);*/
+  }
+
+  removeTime(): void {
+    /*const stop = getStorable(this.stop.id) as RouteStop;
+    stop.setExtraTimeToStation(stop.getExtraTimeToStation()-60);*/
   }
 }
 </script>
@@ -212,5 +244,4 @@ export default class RouteTitle extends Vue {
   font-weight: bold;
   color: orange;
 }
-
 </style>

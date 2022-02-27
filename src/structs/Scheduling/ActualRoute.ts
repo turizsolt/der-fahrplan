@@ -1,106 +1,118 @@
 import { ActualBaseStorable } from '../Actuals/ActualStorable';
 import { Route } from './Route';
-import { RouteStop } from './RouteStop';
 import { Store } from '../Interfaces/Store';
 import { TYPES } from '../../di/TYPES';
-import { Station } from '../../modules/Station/Station';
-import { Util } from '../Util';
 import { RailMapNode } from '../../modules/RailMap/RailMapNode';
+import { otherEnd, WhichEnd } from '../Interfaces/WhichEnd';
+import { RoutePart } from './RoutePart';
+import { RouteVariant } from './RouteVariant';
+import { ActualRoutePart } from './ActualRoutePart';
+import { RoutePartReference } from './RoutePartReference';
+import { ActualRoutePartEdge } from './ActualRoutePartEdge';
+import { ActualRoutePartStop } from './ActualRoutePartStop';
+import { ActualRoutePartJunction } from './ActualRoutePartJunction';
+import { RoutePartReferenceDuration } from './RoutePartReferenceDuration';
+import { RoutePartReferenceColor } from './RoutePartReferenceColor';
 
 export class ActualRoute extends ActualBaseStorable implements Route {
     private name: string;
-    private stops: RouteStop[];
-    private reverse: Route;
     private color: string;
+    private parts: Record<WhichEnd, RoutePart> = {
+        A: null,
+        B: null
+    }
+    private variants: RouteVariant[] = [];
 
     init(): Route {
-        super.initStore(TYPES.Route);
-        this.name = this.id;
-        this.stops = [];
+        this.initStore(TYPES.Route);
+
+        this.variants.push(this.store.create<RouteVariant>(TYPES.RouteVariant).init(this, WhichEnd.A));
+        this.variants.push(this.store.create<RouteVariant>(TYPES.RouteVariant).init(this, WhichEnd.B));
         return this;
     }
 
-    setReverse(route: Route): void {
-        this.reverse = route;
-        if (route.getReverse() != this) {
-            route.setReverse(this);
-        }
-    }
-
-    getReverse(): Route {
-        return this.reverse;
-    }
-
-    remove(): void {
-        this.store.unregister(this);
-    }
-
-    getColor(): string {
-        return this.color ?? '#fff';
-    }
-
-    setColor(color: string): void {
-        this.color = color;
+    xinit(): Route {
+        this.initStore(TYPES.Route);
+        return this;
     }
 
     getName(): string {
         return this.name;
     }
 
-    getDetailedName(): string {
-        if (this.stops.length === 0) {
-            return 'Unknown terminus';
-        } else if (this.stops.length === 1) {
-            return this.stops[0].getWaypointName();
-        } else {
-            const last = this.stops[this.stops.length - 1];
-            return this.stops[0].getWaypointName() + '>>' + last.getWaypointName();
-        }
-    }
-
-    setName(name: string) {
+    setName(name: string): void {
         this.name = name;
     }
 
-    getStops(): RouteStop[] {
-        return this.stops.filter(s => s.getShouldStop());
+    getColor(): string {
+        return this.color;
     }
 
-    getWaypoints(): RouteStop[] {
-        return this.stops;
+    setColor(color: string): void {
+        this.color = color;
     }
 
-    addWaypoint(stop: RouteStop): void {
-        this.stops.push(stop);
-        this.store.getTravelPathes().find(3);
-    }
-
-    removeStop(stop: RouteStop): void {
-        const foundIndex = this.stops.findIndex(s => s === stop);
-        if (foundIndex === 0 || foundIndex === this.stops.length - 1) {
-            this.stops = this.stops.filter(s => s !== stop);
+    addPart(whichEnd: WhichEnd, part: RoutePart): void {
+        if (!this.parts.A) {
+            this.parts.A = part;
+            this.parts.B = part;
+        } else {
+            const p = this.parts[whichEnd];
+            part.setNext(whichEnd, p);
+            this.parts[whichEnd] = part;
         }
-        this.store.getTravelPathes().find(3);
+
+        this.update();
     }
 
-    getFirstStation(): Station {
-        return Util.first(this.stops)?.getStation();
+    getParts(whichEnd: WhichEnd): RoutePart[] {
+        const result: RoutePart[] = [];
+        let iter: RoutePart = this.parts[whichEnd];
+        while (iter) {
+            result.push(iter);
+            iter = iter.getNext(whichEnd);
+        }
+        return result;
     }
 
-    getLastStation(): Station {
-        return Util.last(this.stops)?.getStation();
+    getEnd(whichEnd: WhichEnd): RoutePart {
+        return this.parts[whichEnd];
     }
 
-    getFirstWaypoint(): RailMapNode {
-        return Util.first(this.stops)?.getWaypoint();
+    removePart(whichEnd: WhichEnd): void {
+        if (!this.parts[whichEnd]) return;
+
+        const p0 = this.parts[whichEnd];
+        const p1 = p0.getNext(whichEnd);
+
+        if (p1) {
+            p0.setNext(whichEnd, null);
+            p1.setNext(otherEnd(whichEnd), null);
+            this.parts[whichEnd] = p1;
+        } else {
+            this.parts = { A: null, B: null };
+        }
+
+        this.update();
     }
 
-    getLastWaypoint(): RailMapNode {
-        return Util.last(this.stops)?.getWaypoint();
+    getVariants(): RouteVariant[] {
+        return this.variants;
     }
 
-    getLastStop(): RouteStop {
-        return Util.last(this.stops);
+    /********************/
+
+    getDetailedName(): string {
+        const from = this.parts.A?.getName();
+        const to = this.parts.B?.getName();
+
+        if (from && to) {
+            return from + ">>" + to;
+        } else if (from) {
+            return from;
+        } else if (to) {
+            return to;
+        } else return 'Unknown terminus';
     }
 
     hasCommonEdgeWith(route: Route): boolean {
@@ -119,10 +131,19 @@ export class ActualRoute extends ActualBaseStorable implements Route {
 
     getEdges(): { from: RailMapNode, to: RailMapNode }[] {
         const result: { from: RailMapNode, to: RailMapNode }[] = [];
-        for (let i = 1; i < this.stops.length; i++) {
-            result.push({ from: this.stops[i - 1].getWaypoint(), to: this.stops[i].getWaypoint() });
+        for (let part of this.getParts(WhichEnd.A)) {
+            if (part.getType() === TYPES.RoutePartEdge) {
+                result.push({
+                    from: part.getNext(WhichEnd.A).getRef() as RailMapNode,
+                    to: part.getNext(WhichEnd.B).getRef() as RailMapNode,
+                });
+            }
         }
         return result;
+    }
+
+    private update() {
+        this.variants.forEach(variant => variant.emit('update', {}));
     }
 
     persist(): Object {
@@ -130,11 +151,10 @@ export class ActualRoute extends ActualBaseStorable implements Route {
             id: this.id,
             type: 'Route',
             name: this.name,
-            detailedName: this.getDetailedName(),
-            stops: this.stops.map(x => x.getId()),
-            reverse: this.getReverse() && this.getReverse().getId(),
-            color: this.color
-        };
+            color: this.color,
+            parts: this.getParts(WhichEnd.A).map(part => part.persist()),
+            variants: this.variants.map(variant => variant.getId())
+        }
     }
 
     persistDeep(): Object {
@@ -142,34 +162,51 @@ export class ActualRoute extends ActualBaseStorable implements Route {
             id: this.id,
             type: 'Route',
             name: this.name,
-            destination:
-                this.stops.length > 0
-                    ? this.stops[this.stops.length - 1].getWaypointName()
-                    : 'Unknown',
             detailedName: this.getDetailedName(),
-            stops: this.stops.map((x, ind) => ({
-                ...x.persistDeep(),
-                isDepartureStation: ind === 0,
-                isArrivalStation: ind === this.stops.length - 1
-            })),
-            reverse: this.getReverse() && this.getReverse().getId(),
-            color: this.color
+            fistStationName: this.getEnd(WhichEnd.A)?.getName(),
+            lastStationName: this.getEnd(WhichEnd.B)?.getName(),
+            color: this.color,
+            variants: this.variants.map(v => v?.getId())
         };
     }
 
     load(obj: any, store: Store): void {
         this.presetId(obj.id);
-        this.init();
+        this.xinit();
+        this.setColor(obj.color);
         this.setName(obj.name);
-        for (let stopId of obj.stops) {
-            const x = store.get(stopId) as RouteStop;
-            this.addWaypoint(x);
+
+        const parts: RoutePart[] = obj.parts.map(part => {
+            switch (Symbol.for(part.type)) {
+                case TYPES.RoutePartEdge:
+                    return new ActualRoutePartEdge({ getDuration: () => part.duration || 0, getId: () => '', getName: () => '' });
+
+                case TYPES.RoutePartStop:
+                    const stop = new ActualRoutePartStop(store.get(part.id) as unknown as RoutePartReferenceColor);
+                    stop.setStopping(part.isStopping !== undefined ? part.isStopping : true);
+                    stop.setDuration(part.duration);
+                    return stop;
+
+                case TYPES.RoutePartJunction:
+                    return new ActualRoutePartJunction(store.get(part.id) as unknown as RoutePartReference);
+
+                default:
+                    return new ActualRoutePart(store.get(part.id) as unknown as RoutePartReference);
+            }
+        });
+
+        for (let part of parts) {
+            this.addPart(WhichEnd.B, part);
         }
-        if (obj.reverse && store.get(obj.reverse)) {
-            this.setReverse(store.get(obj.reverse) as Route);
-        }
-        if (obj.color) {
-            this.setColor(obj.color);
-        }
+
+        // TODO two-phase loading to apply globally
+        setTimeout(() => {
+            this.variants = obj.variants.map(variant => store.get(variant) as RouteVariant);
+        }, 0);
+    }
+
+    remove(): void {
+        this.variants.map(v => v.remove());
+        this.store.unregister(this);
     }
 }

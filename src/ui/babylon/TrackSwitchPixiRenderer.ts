@@ -5,11 +5,13 @@ import { BasePixiRenderer } from './BasePixiRenderer';
 import { Left, Right } from '../../structs/Geometry/Directions';
 import { TrackSwitchRenderer } from '../../structs/Renderers/TrackSwitchRenderer';
 import { TrackSwitch } from '../../modules/Track/TrackSwitch';
+import { PixiClick } from './PixiClick';
 
 @injectable()
 export class TrackSwitchPixiRenderer extends BasePixiRenderer
   implements TrackSwitchRenderer {
   private sw: TrackSwitch;
+  private lines: PIXI.Graphics[] = [];
 
   init(sw: TrackSwitch): void {
     this.sw = sw;
@@ -18,7 +20,7 @@ export class TrackSwitchPixiRenderer extends BasePixiRenderer
     this.draw(sw.getSegmentRight().getLineSegmentChain());
   }
 
-  update() {}
+  update() { }
 
   private draw(chain) {
     const rays1 = chain.getRays().map(r => r.fromHere(Left, 1));
@@ -33,47 +35,22 @@ export class TrackSwitchPixiRenderer extends BasePixiRenderer
 
     const line = new PIXI.Graphics();
     line.hitArea = polygon;
-    line.interactive = true;
-    line.buttonMode = true;
     line.beginFill(0xa6bdac);
     line.drawPolygon(polygon);
     line.endFill();
     line.zIndex = 0;
 
-    line.on('pointerdown', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.down({
-        ...event,
-        meshId: 'clickable-trackswitch-' + this.sw.getId(),
-        button: event.data.button
-      });
-
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
-
-    line.on('pointerup', (event: PIXI.InteractionEvent) => {
-      const x =
-        (event.data.global.x - globalThis.stage.x) / globalThis.stage.scale.x;
-      const y =
-        (event.data.global.y - globalThis.stage.y) / globalThis.stage.scale.y;
-      event.data.global.x = x;
-      event.data.global.y = y;
-      globalThis.inputController.up({
-        ...event,
-        meshId: 'clickable-trackswitch-' + this.sw.getId(),
-        button: event.data.button
-      });
-
-      event.stopPropagation();
-      event.data.originalEvent.stopPropagation();
-    });
+    PixiClick(line, 'trackswitch', this.sw.getId());
 
     globalThis.stage.addChild(line);
+
+    this.lines.push(line);
+  }
+
+  remove() {
+    this.lines.map(l => {
+      l.clear();
+      l.renderable = false;
+    });
   }
 }

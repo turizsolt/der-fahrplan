@@ -10,8 +10,6 @@ import { Platform } from '../modules/Station/Platform';
 import { ActualPlatform } from '../modules/Station/ActualPlatform';
 import { ActualWagon } from '../structs/Actuals/Wagon/ActualWagon';
 import { Wagon } from '../structs/Interfaces/Wagon';
-import { RouteStop } from '../structs/Scheduling/RouteStop';
-import { ActualRouteStop } from '../structs/Scheduling/ActualRouteStop';
 import { Route } from '../structs/Scheduling/Route';
 import { ActualRoute } from '../structs/Scheduling/ActualRoute';
 import { Station } from '../modules/Station/Station';
@@ -40,12 +38,12 @@ import { Sensor } from '../modules/Signaling/Sensor';
 import { ActualSensor } from '../modules/Signaling/ActualSensor';
 import { CapacityCap } from '../modules/Signaling/CapacityCap/CapacityCap';
 import { ActualCapacityCap } from '../modules/Signaling/CapacityCap/ActualCapacityCap';
-import { TripGroup } from '../structs/Scheduling/TripGroup';
-import { ActualTripGroup } from '../structs/Scheduling/ActualTripGroup';
 import { WaitingHall } from '../modules/Station/WaitingHall';
 import { ActualWaitingHall } from '../modules/Station/ActualWaitingHall';
 import { PlatformGroup } from '../modules/Station/PlatformGroup';
 import { ActualPlatformGroup } from '../modules/Station/ActualPlatformGroup';
+import { RouteVariant } from '../structs/Scheduling/RouteVariant';
+import { ActualRouteVariant } from '../structs/Scheduling/ActualRouteVariant';
 
 export const addCommonMaps = (ioc: DependencyContainer): void => {
     ioc.sng<Store>(T.FactoryOfStore, T.Store, ActualStore);
@@ -66,9 +64,8 @@ export const addCommonMaps = (ioc: DependencyContainer): void => {
     ioc.fm<WaitingHall>(T.FactoryOfWaitingHall, T.WaitingHall, ActualWaitingHall);
     ioc.fm<Passenger>(T.FactoryOfPassenger, T.Passenger, ActualPassenger);
     ioc.fm<Route>(T.FactoryOfRoute, T.Route, ActualRoute);
-    ioc.fm<RouteStop>(T.FactoryOfRouteStop, T.RouteStop, ActualRouteStop);
+    ioc.fm<RouteVariant>(T.FactoryOfRouteVariant, T.RouteVariant, ActualRouteVariant);
     ioc.fm<Trip>(T.FactoryOfTrip, T.Trip, ActualTrip);
-    ioc.fm<TripGroup>(T.FactoryOfTripGroup, T.TripGroup, ActualTripGroup);
     ioc.fm<Signal>(T.FactoryOfSignal, T.Signal, ActualSignal);
     ioc.fm<Sensor>(T.FactoryOfSensor, T.Sensor, ActualSensor);
     ioc.fm<Block>(T.FactoryOfBlock, T.Block, ActualBlock);

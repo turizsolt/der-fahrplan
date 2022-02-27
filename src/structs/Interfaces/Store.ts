@@ -13,7 +13,7 @@ export interface Store {
     getAllOf<T extends BaseStorable>(type: symbol): T[];
     getFiltered(filter: (b: BaseStorable) => boolean): BaseStorable[];
     persistAll(): Object;
-    loadAll(arr: any[]);
+    loadAll(arr: any[], version: number);
     create<T>(type: symbol): T;
 
     setSelected(selected: BaseStorable): void;

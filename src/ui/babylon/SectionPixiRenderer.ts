@@ -4,6 +4,7 @@ import { BasePixiRenderer } from './BasePixiRenderer';
 import { Coordinate } from '../../structs/Geometry/Coordinate';
 import { SectionRenderer } from '../../structs/Renderers/SectionRenderer';
 import { Ray } from '../../structs/Geometry/Ray';
+import { PixiClick } from './PixiClick';
 
 @injectable()
 export class SectionPixiRenderer extends BasePixiRenderer
@@ -22,6 +23,7 @@ export class SectionPixiRenderer extends BasePixiRenderer
     this.circleA.zIndex = 9;
     this.circleA.x = rayA.coord.x;
     this.circleA.y = rayA.coord.z;
+    PixiClick(this.circleA, 'section', data.id);
 
     const rayB = Ray.fromData(data.rayB);
     this.circleB = new PIXI.Graphics();
@@ -32,6 +34,7 @@ export class SectionPixiRenderer extends BasePixiRenderer
     this.circleB.zIndex = 9;
     this.circleB.x = rayB.coord.x;
     this.circleB.y = rayB.coord.z;
+    PixiClick(this.circleB, 'section', data.id);
 
     globalThis.stage.addChild(this.circleA);
     globalThis.stage.addChild(this.circleB);
@@ -54,5 +57,12 @@ export class SectionPixiRenderer extends BasePixiRenderer
     );
     this.circleB.drawCircle(0, 0, 2);
     this.circleB.endFill();
+  }
+
+  remove() {
+    this.circleA.clear();
+    this.circleA.renderable = false;
+    this.circleB.clear();
+    this.circleB.renderable = false;
   }
 }

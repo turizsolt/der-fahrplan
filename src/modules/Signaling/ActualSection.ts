@@ -59,6 +59,14 @@ export class ActualSection extends ActualBaseBrick implements Section {
     return this;
   }
 
+  remove() {
+    this.direction = null;
+    this.disconnect();
+    this.emit('update', this.persist());
+    this.emit('remove', this.id);
+    super.remove();
+  }
+
   connect(): void {
     this.ends.A.connect();
     this.ends.B.connect();

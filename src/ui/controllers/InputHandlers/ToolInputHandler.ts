@@ -13,6 +13,8 @@ import { PathInputHandler } from './Path/PathInputHandler';
 import { CapacityCapInputHandler } from './CapacityCap/CapacityCapInputHandler';
 import { AssignStationInputHandler } from './AssignStation/AssignStationInputHandler';
 import { PlatformGroupInputHandler } from './PlatformGroup/PlatformGroupInputHandler';
+import { DeleteInputHandler } from './Delete/DeleteInputHandler';
+import { PathToStationInputHandler } from './PathBlockToStation/PathBlockToStationInputHandler';
 
 export class ToolInputHandler extends InputHandler {
     private inputHandler: InputHandler;
@@ -33,6 +35,8 @@ export class ToolInputHandler extends InputHandler {
             [InputMode.ASSIGN_STATION]: new AssignStationInputHandler(store),
             [InputMode.ADD_PLATFORM_GROUP]: new PlatformGroupInputHandler(store),
             [InputMode.CREATE_PATH]: new PathInputHandler(store),
+            [InputMode.PATHBLOCK_TO_STATION]: new PathToStationInputHandler(store),
+            [InputMode.DELETE]: new DeleteInputHandler(store),
             [InputMode.CREATE_CAPACITY_CAP]: new CapacityCapInputHandler(store),
         };
 
@@ -51,7 +55,9 @@ export class ToolInputHandler extends InputHandler {
             [InputMode.ASSIGN_STATION]: 'Stat',
             [InputMode.ADD_PLATFORM_GROUP]: 'PlGr',
             [InputMode.ALLOW_PATH]: 'Allow',
+            [InputMode.PATHBLOCK_TO_STATION]: 'PB St',
             [InputMode.BLOCK_WIZARD]: 'BWiz',
+            [InputMode.DELETE]: 'Del',
             [InputMode.CREATE_CAPACITY_CAP]: 'CCap'
         };
 

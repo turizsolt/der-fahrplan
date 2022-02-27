@@ -33,6 +33,7 @@ import { ActualTrainSight } from './Sight/ActualTrainSight';
 import { Sight } from './Sight/Sight';
 import { ActualTrainStopper } from './ActualTrainStopper';
 import { AbstractPlatform } from '../Station/AbstractPlatform';
+import { PathBlockEnd } from '../Signaling/PathBlockEnd';
 
 export class ActualTrain extends ActualBaseStorable implements Train {
     private position: PositionOnTrack = null;
@@ -230,6 +231,9 @@ export class ActualTrain extends ActualBaseStorable implements Train {
                 const ccap: CapacityCap = next.value.blockJoint.getCapacityCap(convertFrom(next.value.blockJoint, next.positionOnTrack));
                 if (bjend) {
                     bjend.checkin(this);
+                    if (bjend.getType() === TYPES.PathBlockEnd && this.trips && this.trips[0]) {
+                        this.trips[0].skip((bjend as PathBlockEnd).getPathBlock());
+                    }
                 }
                 if (send) {
                     send.checkin(this);
@@ -378,7 +382,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
 
 
         if (this.autoMode && this.speed.getSpeed() === 0) {
-            this.stopper.tick(this.sight?.markers?.[0]);
+            this.stopper.tick(this.sight?.markers.filter(m => m.type === 'Platform')?.[0]);
             return;
         }
 
@@ -464,7 +468,7 @@ export class ActualTrain extends ActualBaseStorable implements Train {
                     station,
                     platform,
                     this,
-                    trip.getRoute()
+                    trip.getRouteVariant()
                 );
             });
             if (station) {
