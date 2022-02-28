@@ -37,7 +37,19 @@ export class ActualTrip extends ActualBaseStorable implements Trip {
         this.routeVariant.on('update', this.routeVariantSubscribe);
         this.updateRouteVariant();
 
+        const stationsInvolved: Station[] = this.routeVariant.getStops().map((routePart: RoutePart) => routePart.getRef() as Station);
+        stationsInvolved.map((station: Station) => station?.addTripToSchedule(this));
+        this.updateScheduleOnAllStations(stationsInvolved);
+
         return this;
+    }
+
+    private updateScheduleOnAllStations(excludeStations: Station[] = []) {
+        this.store.getAllOf(Symbol.for("Station")).map((station: Station) => {
+            if (!excludeStations.includes(station)) {
+                station.addTripToSchedule(null);
+            }
+        });
     }
 
     private updateRouteVariant(): void {

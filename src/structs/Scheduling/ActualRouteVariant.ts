@@ -48,7 +48,7 @@ export class ActualRouteVariant extends ActualBaseStorable implements RouteVaria
         return this.startEnd;
     }
 
-    private getParts(): RoutePart[] {
+    getParts(): RoutePart[] {
         return this.route.getParts(this.startEnd);
     }
 

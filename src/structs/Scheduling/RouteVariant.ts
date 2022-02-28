@@ -20,6 +20,7 @@ export interface RouteVariant extends BaseStorable, Emitable {
     getLastStop(): RoutePart;
     getStops(): RoutePart[];
     getWaypoints(): RoutePart[];
+    getParts(): RoutePart[];
 
     hasCommonEdgeWith(routeVariant: RouteVariant): boolean;
 

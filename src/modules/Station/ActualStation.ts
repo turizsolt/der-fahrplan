@@ -71,14 +71,19 @@ export class ActualStation extends ActualBaseBrick implements Station {
     updateArrivingPlatform(platform: AbstractPlatform, trip: Trip): void {
         const stop = trip.getWaypoints().find(s => s.station === this);
         if (stop && stop.platform !== platform) {
-            const pax = stop.platform
-                ? stop.platform.getBoardedPassengers()
-                : this.getWaitingHalls().map(wh => wh.getBoardedPassengers()).flat();
+
+            // const pax = stop.platform
+            //     ? stop.platform.getBoardedPassengers()
+            //     : this.getWaitingHalls().map(wh => wh.getBoardedPassengers()).flat();
+            const pax = this.getAllBoardedPassengers();
 
             trip.updatePlatformInfo(stop.routePart, platform);
             //trip.redefine(stop, { platform });
-            pax.map(p =>
-                PassengerRelocator.changedPlatform(this.store, p, platform));
+            const paxFiltered = pax.filter(p => p.getWaitingFor() === trip.getRouteVariant());
+
+            paxFiltered.map(p => {
+                PassengerRelocator.changedPlatform(this.store, p, platform);
+            });
 
             this.update();
         }
@@ -206,6 +211,14 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
     getBoardedPassengers(): Passenger[] {
         return this.boardable.getBoardedPassengers();
+    }
+
+    private getAllBoardedPassengers(): Passenger[] {
+        return [
+            ...this.waitingHalls.map(wh => wh.getBoardedPassengers()).flat(),
+            ...this.platforms.map(p => p.getBoardedPassengers()).flat(),
+            ...this.getBoardedPassengers()
+        ];
     }
 
     getPlatforms(): AbstractPlatform[] {
