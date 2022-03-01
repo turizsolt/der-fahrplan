@@ -61,9 +61,17 @@ export class ActualStation extends ActualBaseBrick implements Station {
 
     setTripAsGone(trip: Trip): void {
         const scheduledTrip = this.scheduledTrips.find(x => x.trip === trip);
+        const stop = scheduledTrip.trip.getWaypoints().find(s => s.isStation && s.station === this);
+        const platform = stop?.platform;
+
         if (scheduledTrip) {
             scheduledTrip.gone = true;
         }
+
+        platform.getBoardedPassengers().forEach(p => {
+            PassengerRelocator.insideStation(this.store, p, this);
+        });
+
         this.update();
     }
 
