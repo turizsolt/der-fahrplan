@@ -138,8 +138,9 @@ export class ActualPlatform extends ActualBaseBrick implements Platform {
         start: number,
         end: number,
         side: Side,
-        width: number = 5
+        width: number = 11.2
     ): Platform {
+        width = 11.2;
         super.initStore(TYPES.Platform);
 
         const segment = track.getCurve();
